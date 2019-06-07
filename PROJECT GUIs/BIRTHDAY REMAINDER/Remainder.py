@@ -1,45 +1,27 @@
 import os
-from datetime import datetime
+import time
 from winsound import PlaySound, SND_LOOP, SND_ASYNC
 
 try:  # Python 3
     import tkinter.ttk as ttk
     from tkinter import Tk, Label, Button, IntVar
-    from winreg import ConnectRegistry, OpenKey, SetValueEx, KEY_WRITE, KEY_SET_VALUE, REG_SZ, HKEY_CURRENT_USER    # Python 3.x
 
 except (ImportError, ModuleNotFoundError):  # Python 2
     import ttk
     from Tkinter import Tk, Label, Button, IntVar
-    from _winreg import ConnectRegistry, OpenKey, SetValueEx, KEY_WRITE, KEY_SET_VALUE, REG_SZ, HKEY_CURRENT_USER    # Python 2.x
 
 
+current_date = time.strftime('%Y-%m-%d\n')
 birthday_list, today_birthdates = {}, {}
 
 
-def startup():
-    '''Add to the startup'''
-
-    areg = ConnectRegistry(None, HKEY_CURRENT_USER)
-
-    try:
-        akey = OpenKey(areg, r'SOFTWARE\Microsoft\Windows\CurrentVersion\Run\Remainder.exe', 0, KEY_WRITE)
-        areg.Close()
-        akey.Close()
-
-    except WindowsError:
-        key = OpenKey(areg, r'SOFTWARE\Microsoft\Windows\CurrentVersion\Run', 0, KEY_SET_VALUE)
-        SetValueEx(key, 'Birthday Remainder', 0, REG_SZ, r'C:\ProgramData\Birthday Remainder\Remainder.exe')
-        areg.Close()
-        key.Close()
-
-
-def is_today():
-    '''Check if today's date is in file'''
+def is_today_in_file():
+    '''Check if today's date is in file. If NOT, then erasing everything inside it'''
 
     with open('mark_read.txt', 'r') as check_seen:
         lines = check_seen.readlines()
 
-        if len(lines) != 0 and datetime.now().strftime('%Y-%m-%d\n') in lines[0]:
+        if len(lines) != 0 and current_date in lines[0]:
             pass
 
         else:
@@ -73,8 +55,7 @@ def mark_read(name, date):
     if f'{name.ljust(50)}{date}\n' in lines:
         return False
 
-    else:
-        return True
+    return True
 
 
 def seen_birthday(name, date):
@@ -83,8 +64,8 @@ def seen_birthday(name, date):
     with open('mark_read.txt', 'r+') as seen_write:
         lines = seen_write.readlines()
 
-        if datetime.now().strftime('%Y-%m-%d\n') not in lines:
-            seen_write.write(datetime.now().strftime('%Y-%m-%d\n'))
+        if current_date not in lines:
+            seen_write.write(current_date)
             seen_write.write(f'{name.ljust(50)}{date}\n')
 
         else:
@@ -109,6 +90,8 @@ def Remainder_Window(name, date):
     global root, var
 
     root = Tk()
+    root.withdraw()
+    root.after(0, root.deiconify)
     root.resizable(0, 0)
     root.config(bg='red')
     root.overrideredirect(True)
@@ -136,28 +119,25 @@ def Remainder_Window(name, date):
 def main():
     '''Main function of the entire script'''
 
-    startup()
     check_file()
     get_birthdates()
 
     for name, date in birthday_list.items():
-        if str(datetime.now())[5:10] == birthday_list[name]:   # Checking if there is anyone's birthday
+        if current_date.strip()[5:] == birthday_list[name]:   # Checking if there is anyone's birthday
             today_birthdates.update({name: date})
 
     if len(today_birthdates) != 0:
-        is_today()
+        is_today_in_file()
 
         for name, date in today_birthdates.items():
             if mark_read(name, date):
                 PlaySound('tone.wav', SND_LOOP + SND_ASYNC)
-
                 Remainder_Window(name, date)
 
 
 if __name__ == '__main__':
     try:
-        if os.path.exists('details.txt'):
-            main()
+        main()
 
     except FileNotFoundError:
         pass
