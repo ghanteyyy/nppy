@@ -1132,6 +1132,8 @@ def main():
     global root, entry, combo_box, text_area, scrollbar
 
     root = Tk()
+    root.withdraw()
+    root.after(0, root.deiconify)
     root.iconbitmap('icon.ico')
     root.title('Number System')
     pos_x, pos_y = root.winfo_screenwidth() // 2 - 300 // 2, root.winfo_screenheight() // 2 - 300 // 2
