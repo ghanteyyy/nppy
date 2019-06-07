@@ -125,6 +125,8 @@ def show_details(title, text, image, file_name, yet):
     window.iconify()
 
     root = Toplevel()
+    root.withdraw()
+    root.after(0, root.deiconify)
     root.title(title)
     root.iconbitmap(os.path.join(images_path, 'icon.ico'))
     root.geometry(f'900x500+{pos_x}+{pos_y}')
@@ -390,6 +392,8 @@ def edit_window(event=None):
     root.destroy()   # Destroy previous opened window
 
     root = Toplevel()
+    root.withdraw()
+    root.after(0, root.deiconify)
     root.title('Edit')
     root.iconbitmap(os.path.join(images_path, 'icon.ico'))
     root.geometry(f'900x500+{pos_x}+{pos_y}')
@@ -472,6 +476,8 @@ def gui_earning(event=None):
     window.iconify()
 
     root = Toplevel()
+    root.withdraw()
+    root.after(0, root.deiconify)
     root.title('Add Earning | Expenditure')
     root.iconbitmap(os.path.join(images_path, 'icon.ico'))
     root.geometry(f'900x500+{pos_x}+{pos_y}')
@@ -550,6 +556,8 @@ def main():
     global window, pos_x, pos_y
 
     window = Tk()
+    window.withdraw()
+    window.after(0, window.deiconify)
     window.title('Saving & Spending')
     window.iconbitmap(os.path.join(images_path, 'icon.ico'))
     window.resizable(0, 0)
