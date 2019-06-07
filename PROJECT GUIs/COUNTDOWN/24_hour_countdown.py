@@ -32,13 +32,15 @@ def Counter():
 
 
 root = Tk()
+root.withdraw()
+root.after(0, root.deiconify)
 root.title('24 HOUR COUNTDOWN')
 root.geometry(f'326x82+{root.winfo_screenwidth() // 2 - 326 // 2}+{root.winfo_screenheight() // 2 - 82 // 2}')
 root.resizable(0, 0)
 root.iconbitmap('icon.ico')
 root.config(bg='dark blue')
 
-tim_e = Label(root, font=('Courier', 50, 'bold'), bg='dark blue', fg='white')
+tim_e = Label(root, font=('Courier', 50, 'bold'), bg='dark blue', fg='silver')
 tim_e.pack(fill='both')
 
 Counter()

@@ -140,6 +140,8 @@ def Counter():
 
 
 root = Tk()
+root.withdraw()
+root.after(1, root.deiconify)
 root.title('CUSTOM COUNTDOWN')
 root.geometry(f'342x81+{root.winfo_screenwidth() // 2 - 342 // 2}+{root.winfo_screenheight() // 2 - 81 // 2}')
 root.resizable(0, 0)
