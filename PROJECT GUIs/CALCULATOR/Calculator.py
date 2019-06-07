@@ -132,6 +132,8 @@ def main():
     global root, var, text_area, history_area, scrollbar
 
     root = Tk()
+    root.withdraw()
+    root.after(0, root.deiconify)
     root.title('Calculator')
     root.iconbitmap('icon.ico')
     root.resizable(0, 0)
