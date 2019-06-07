@@ -185,6 +185,8 @@ def main_window():
     global root, collapse_button, entry_box, _var_, list_box, scrollbar, delete_menu, load_prev_button, exit_frame
 
     root = Tk()
+    root.withdraw()
+    root.after(0, root.deiconify)
     root.resizable(0, 0)
     root.title('TO-DO LIST')
     root.geometry('{}x{}+{}+{}'.format(400, root.winfo_screenheight() - 74, root.winfo_screenwidth() - 401, 0))
