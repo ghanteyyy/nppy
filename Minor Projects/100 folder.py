@@ -11,14 +11,13 @@ def hunderd_folders(number_of_folders, length_of_folder_name):
         path = 'C:\\Users\\{}\\Desktop\\python_Folder'.format(getpass.getuser())
 
         if not os.path.exists(path):   # Checking if path exists
-            os.mkdir(os.path.join(path))    # If path does not exist then creates it
+            os.mkdir(path)    # If path does not exist then creates it
 
         folder_name = ''     # No name yet.
 
         for _ in range(number_of_folders):     # Loop for creating folders
             for _ in range(length_of_folder_name):    # Loop to generate random folder name
-                x = random.randint(0, 61)   # Generate random number between 0 to 61
-                folder_name += string.printable[x]   # Slicing a character from string.printable with value 'x'
+                folder_name += random.choice(string.ascii_letters + string.digits)
 
             os.mkdir(os.path.join(path, folder_name))    # Joining path and random generated name and creating folder.
             folder_name = ''   # Emptying folder_name for another new name

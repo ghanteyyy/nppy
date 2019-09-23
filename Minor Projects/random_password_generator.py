@@ -9,8 +9,7 @@ def random_password(length_of_password):
         password = ''
 
         for number in range(length_of_password):
-            random_number = random.randint(0, 61)  # Getting random number
-            password += string.printable[random_number]  # Slicing letter with random number
+            password += random.choice(string.ascii_letters + string.digits)
 
         print(password)
 
