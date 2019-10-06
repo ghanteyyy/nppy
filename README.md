@@ -14,6 +14,3 @@ nppy, contains small and useful projects made in free time.
 - Clone this repository to your machine
 - Extract the file
 - Run the script
-
-# Note
-Images used in this repository are taken from google. So if those images belongs to you then please kindly forgive us and let us use those images. **Thank You !!**
