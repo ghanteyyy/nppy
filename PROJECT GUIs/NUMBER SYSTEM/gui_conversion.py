@@ -24,17 +24,11 @@ def is_binary(binary_number):
     '''Check if the given number is binary'''
 
     try:
-        count = 0
-
         for binn in str(binary_number):
             if not binn.isdigit() or int(binn) > 1:
-                count += 1
+                return False
 
-        if count == 0:
-            return True
-
-        else:
-            return False
+        return True
 
     except ValueError:
         MessageBeep()
@@ -45,17 +39,11 @@ def is_octal(octal_number):
     '''Check if the given number is octal'''
 
     try:
-        count = 0
-
         for oct_num in str(octal_number):
             if not oct_num.isdigit() or int(oct_num) > 7:
-                count += 1
+                return False
 
-        if count == 0:
-            return True
-
-        else:
-            return False
+        return True
 
     except ValueError:
         MessageBeep()
@@ -65,35 +53,23 @@ def is_octal(octal_number):
 def is_hexadecimal(hexadecimal_number):
     '''Check if the given number is hexadecimal'''
 
-    count = 0
-
     if hexadecimal_number.isalpha() or hexadecimal_number.isalnum():
         for hexa_decimal in hexadecimal_number:
             if hexa_decimal.isalpha() and hexa_decimal.upper() not in list('ABCDEF'):
-                count += 1
+                return False
 
-    if count == 0:
-        return True
-
-    else:
-        return False
+    return True
 
 
 def is_quinary(quinary_number):
     '''Check if the given number is quinary'''
 
     try:
-        count = 0
-
         for quinary in str(quinary_number):
             if int(quinary) >= 5:
-                count += 1
+                return False
 
-        if count == 0:
-            return True
-
-        else:
-            return False
+        return True
 
     except ValueError:
         MessageBeep()
@@ -974,6 +950,7 @@ def entry_enter(event=None):
     '''when cursor is inside the entry box'''
 
     entry.focus_set()
+    entry.config(fg='black')
 
     if entry.get() == 'Enter Number':
         entry.delete(0, END)
@@ -985,8 +962,9 @@ def entry_leave(event=None):
     if len(entry.get()) == 0:
         entry.delete(0, END)
         entry.insert(0, 'Enter Number')
+        entry.config(fg='grey')
 
-    text_area.focus_set()
+        text_area.focus_set()
 
 
 def display_answer(result):
@@ -1125,66 +1103,62 @@ def calculation(event=None):
             if is_quinary(get_value) and len(str(hexadecimal_number)) != 0:
                 display_answer(hexadecimal_number)
 
+        entry.delete(0, END)
+        entry.insert(0, 'Enter Number')
+        entry.config(fg='grey')
 
-def main():
-    '''Main window of the program'''
-
-    global root, entry, combo_box, text_area, scrollbar
-
-    root = Tk()
-    root.withdraw()
-    root.after(0, root.deiconify)
-    root.iconbitmap('icon.ico')
-    root.title('Number System')
-    pos_x, pos_y = root.winfo_screenwidth() // 2 - 300 // 2, root.winfo_screenheight() // 2 - 300 // 2
-    root.geometry(f'260x369+{pos_x}+{pos_y}')
-    root.resizable(0, 0)
-
-    label_image_frame = Frame(root, bd=0, width=237, height=280)
-    file_image_file = PIL.ImageTk.PhotoImage(PIL.Image.open('temp.jpg'))
-    label_image = Label(label_image_frame, image=file_image_file, bg='blue', borderwidth=0)
-    label_image.grid(row=0, column=0)
-    label_image_frame.place(x=0, y=0)
-
-    combo_values = ['Binary to Decimal', 'Binary to Octal', 'Binary to Hexadecimal', 'Binary to Quinary',
-                    'Decimal to Binary', 'Decimal to Octal', 'Decimal to Hexadecimal', 'Decimal to Quinary',
-                    'Octal to Binary', 'Octal to Decimal', 'Octal to Hexadecimal', 'Octal to Quinary',
-                    'Hexadecimal to Binary', 'Hexadecimal to Decimal', 'Hexadecimal to Octal', 'Hexadecimal to Quinary',
-                    'Quinary to Binary', 'Quinary to Decimal', 'Quinary to Octal', 'Quinary to Hexadecimal']
-
-    entry_field = Frame(root)
-    entry = Entry(entry_field, width=33, highlightcolor='grey', highlightthickness=1)
-    entry.insert(0, 'Enter Number')
-    entry.grid(row=0, column=0)
-    entry_field.place(x=30, y=130)
-
-    combo_frame = Frame(root)
-    combo_box = Combobox(combo_frame, values=combo_values, width=30)
-    combo_box.set('Select Number System')
-    combo_box.grid(row=0, column=0)
-    combo_frame.place(x=30, y=160)
-
-    convert_frame = Frame(root)
-    convert_button = Button(convert_frame, width=28, height=2, bg='Green', activebackground='Green', text='CONVERT', command=calculation)
-    convert_button.pack()
-    convert_frame.place(x=30, y=190)
-
-    # Binding Keys
-    entry.bind('<Return>', calculation)
-    combo_box.bind('<Return>', calculation)
-    convert_button.bind('<Return>', calculation)
-    entry.bind('<Enter>', entry_enter)
-    entry.bind('<Leave>', entry_leave)
-
-    text_area_frame = Frame(root)
-    text_area = Text(text_area_frame, width=23, height=5, bg='black', font="-weight bold", bd=0, fg='White', cursor='arrow')
-    text_area.grid(column=0, row=0)
-    text_area_frame.place(x=30, y=240)
-
-    scrollbar = Scrollbar(text_area_frame, orient="vertical", command=text_area.yview)
-    show_scrollbar()
-    root.mainloop()
+        combo_box.set('')
+        combo_box.set('Select Number System')
 
 
-if __name__ == '__main__':
-    main()
+root = Tk()
+root.withdraw()
+root.after(0, root.deiconify)
+root.iconbitmap('icon.ico')
+root.title('Number System')
+pos_x, pos_y = root.winfo_screenwidth() // 2 - 300 // 2, root.winfo_screenheight() // 2 - 300 // 2
+root.geometry(f'260x369+{pos_x}+{pos_y}')
+root.resizable(0, 0)
+
+label_image_frame = Frame(root, bd=0, width=237, height=280)
+file_image_file = PIL.ImageTk.PhotoImage(PIL.Image.open('temp.jpg'))
+label_image = Label(label_image_frame, image=file_image_file, bg='blue', borderwidth=0)
+label_image.grid(row=0, column=0)
+label_image_frame.place(x=0, y=0)
+
+combo_values = ['Binary to Decimal', 'Binary to Octal', 'Binary to Hexadecimal', 'Binary to Quinary', 'Decimal to Binary', 'Decimal to Octal', 'Decimal to Hexadecimal',
+                'Decimal to Quinary', 'Octal to Binary', 'Octal to Decimal', 'Octal to Hexadecimal', 'Octal to Quinary', 'Hexadecimal to Binary', 'Hexadecimal to Decimal',
+                'Hexadecimal to Octal', 'Hexadecimal to Quinary', 'Quinary to Binary', 'Quinary to Decimal', 'Quinary to Octal', 'Quinary to Hexadecimal']
+
+entry_field = Frame(root)
+entry = Entry(entry_field, width=33, highlightcolor='grey', highlightthickness=1, fg='grey')
+entry.insert(0, 'Enter Number')
+entry.grid(row=0, column=0)
+entry_field.place(x=30, y=130)
+
+combo_frame = Frame(root)
+combo_box = Combobox(combo_frame, values=combo_values, width=30)
+combo_box.set('Select Number System')
+combo_box.grid(row=0, column=0)
+combo_frame.place(x=30, y=160)
+
+convert_frame = Frame(root)
+convert_button = Button(convert_frame, width=28, height=2, bg='Green', activebackground='Green', text='CONVERT', command=calculation)
+convert_button.pack()
+convert_frame.place(x=30, y=190)
+
+# Binding Keys
+entry.bind('<Return>', calculation)
+combo_box.bind('<Return>', calculation)
+convert_button.bind('<Return>', calculation)
+entry.bind('<Enter>', entry_enter)
+entry.bind('<Leave>', entry_leave)
+
+text_area_frame = Frame(root)
+text_area = Text(text_area_frame, width=23, height=5, bg='black', font="-weight bold", bd=0, fg='White', cursor='arrow')
+text_area.grid(column=0, row=0)
+text_area_frame.place(x=30, y=240)
+
+scrollbar = Scrollbar(text_area_frame, orient="vertical", command=text_area.yview)
+show_scrollbar()
+root.mainloop()

@@ -140,6 +140,10 @@ def save_to_file():
 
     get_value = [line.strip('\n') for line in list_box.get(0, END)]
 
+    if not os.path.exists('load_prev.txt'):
+        with open('load_prev.txt', 'w'):
+            pass
+
     with open('load_prev.txt', 'r') as rlp, open('load_prev.txt', 'a') as alp:
         lines = [line.strip('\n') for line in rlp.readlines()]
 
@@ -255,8 +259,4 @@ def main_window():
 
 
 if __name__ == '__main__':
-    if not os.path.exists('load_prev.txt'):
-        with open('load_prev.txt', 'w'):
-            pass
-
     main_window()

@@ -1,15 +1,14 @@
 import os
 import winsound
-import PIL.Image  # Install if not installed
-import PIL.ImageTk  # Install if not installed
+import PIL.Image
+import PIL.ImageTk
 import collections
 
-try:  # For python 2.x
-    from Tkinter import *
-
-except (ImportError, ModuleNotFoundError):  # For python 3.x
+try:  # Python 3
     from tkinter import *
-    from tkinter import font
+
+except (ImportError, ModuleNotFoundError):  # Python 2
+    from Tkinter import *
 
 images_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'files')  # Image path
 
@@ -449,11 +448,6 @@ def edit_window(event=None):
     back_button.grid(row=0, column=0)
     back_frame.place(x=350, y=415)
 
-    # Underline text of back button
-    fnt = font.Font(back_button, back_button.cget("font"))
-    fnt.configure(underline=True)
-    back_button.configure(font=fnt)
-
     # Bind Keys
     source_entry_box.bind('<Return>', edit_get_details)
     old_money_entry.bind('<Return>', edit_get_details)
@@ -604,5 +598,4 @@ def main():
 
 
 if __name__ == '__main__':
-    check_file('saving.txt', 'spending.txt')
     main()

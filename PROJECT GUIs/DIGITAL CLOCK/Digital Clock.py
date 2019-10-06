@@ -14,27 +14,16 @@ def get_time():
     root.after(200, get_time)
 
 
-def Clock():
-    '''Display Clock'''
+root = Tk()
+root.withdraw()
+root.after(0, root.deiconify)
+root.config(bg='red')
+root.overrideredirect(True)
+root.wm_attributes("-topmost", 1, "-transparentcolor", 'red')
+root.geometry('240x45+{}+{}'.format(root.winfo_screenwidth() - 260, root.winfo_screenheight() - 90))
 
-    global root, label
+label = Label(root, bg='red', fg="#fc0000", font=('Courier', 16, 'bold'))
+label.pack()
 
-    root = Tk()
-    root.withdraw()
-    root.after(0, root.deiconify)
-    root.config(bg='red')
-    root.overrideredirect(True)
-    root.wm_attributes("-topmost", 1, "-transparentcolor", 'red')
-    root.geometry('240x45+{}+{}'.format(root.winfo_screenwidth() - 260, root.winfo_screenheight() - 90))
-
-    frame = Frame(root)
-    label = Label(frame, bg='red', fg="#fc0000", font=('Courier', 16, 'bold'))
-    label.pack()
-    frame.pack()
-
-    get_time()
-    root.mainloop()
-
-
-if __name__ == '__main__':
-    Clock()
+get_time()
+root.mainloop()

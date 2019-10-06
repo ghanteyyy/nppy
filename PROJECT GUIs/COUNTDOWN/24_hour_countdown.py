@@ -1,4 +1,8 @@
-from tkinter import *
+try:  # Python 3
+    from tkinter import *
+
+except (ImportError, ModuleNotFoundError):  # Python 2
+    from Tkinter import *
 
 HOUR, MINUTE, SECOND, PAUSE = 24, 0, 6, False
 
@@ -23,10 +27,10 @@ def Counter():
 
         if HOUR == MINUTE == SECOND == 0:
             PAUSE = True
-            tim_e.config(text='Time up', font=('Courier', 40, 'bold'))
+            time.config(text='Time up', font=('Courier', 40, 'bold'))
 
         else:
-            tim_e.config(text='{}:{}:{}'.format(str(HOUR).zfill(2), str(MINUTE).zfill(2), str(SECOND).zfill(2)))
+            time.config(text='{}:{}:{}'.format(str(HOUR).zfill(2), str(MINUTE).zfill(2), str(SECOND).zfill(2)))
 
         root.after(1000, Counter)
 
@@ -40,8 +44,8 @@ root.resizable(0, 0)
 root.iconbitmap('icon.ico')
 root.config(bg='dark blue')
 
-tim_e = Label(root, font=('Courier', 50, 'bold'), bg='dark blue', fg='silver')
-tim_e.pack(fill='both')
+time = Label(root, font=('Courier', 50, 'bold'), bg='dark blue', fg='silver')
+time.pack(fill='both')
 
 Counter()
 
