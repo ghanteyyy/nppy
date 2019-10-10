@@ -8,7 +8,7 @@ def execute_command(command):
         if not str(command).isalpha():
             command = str(command)
 
-        subprocess.call('attrib {}'.format(command), creationflags=0x08000000)
+        subprocess.call('{}'.format(command), creationflags=0x08000000)
 
     except NameError:
         print('Invalid Command')
