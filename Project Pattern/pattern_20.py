@@ -3,23 +3,25 @@ def pattern_twenty(strings):
 
         If you input "Programming" then you will get
 
-            K A T H M A N D U
-            A T H M A N D
-            T H M A N
-            H M A
-            M
+            P r o g r a m m i n g
+            r o g r a m m i n
+            o g r a m m i
+            g r a m m
+            r a m
+            a
 
         or SIMILAR
     '''
 
     strings = str(strings)
+    print()
 
     for index, value in enumerate(strings):
         output = strings[index:len(strings) - index]
 
         if len(output) != 0:
-            print(' '.join(output))
+            print(output)
 
 
 if __name__ == '__main__':
-    pattern_twenty('KATHMANDU')
+    pattern_twenty('Programming')

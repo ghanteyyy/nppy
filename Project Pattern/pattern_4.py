@@ -19,7 +19,7 @@ def pattern_four(strings):
     if not str(strings).isalpha():
         strings = str(strings)  # If provided is integer then converting to string
 
-    for i in range(len(strings) + 1, 0, -1):
+    for i in range(len(strings), 0, -1):
         print(' '.join(strings[:i]))
 
 
