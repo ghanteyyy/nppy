@@ -11,6 +11,6 @@ nppy, contains small and useful projects made in free time.
 
 # Usage
 - Make sure you have installed Python in your machine
-- Clone**(Linux / Unix)** or download**(Window)** this repository to your machine
+- Clone **(Linux / Unix)** or download **(Window)** this repository to your machine
 - Extract the file
 - Run the script
