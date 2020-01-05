@@ -1,5 +1,5 @@
 def pattern_fifteen(steps):
-    ''' Pattern Fifteen
+    ''' Pattern fifteen
 
             1
             1 2
@@ -9,7 +9,8 @@ def pattern_fifteen(steps):
             1 2 3 4 5 6
             1 2 3 4 5 6 7
             1 2 3 4 5 6 7 8
-            1 2 3 4 5 6 7 8 9 '''
+            1 2 3 4 5 6 7 8 9
+    '''
 
     get_range = [str(i) for i in range(1, steps + 1)]   # Getting range of number in string
 

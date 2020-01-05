@@ -1,19 +1,15 @@
 def pattern_twelve(strings):
-    '''Pattern three
+    '''Pattern twelve
 
-        If you input "KATHMANDU" then you get
-
-                U
-                D U
-                N D U
-                A N D U
-                M A N D U
-                H M A N D U
-                T H M A N D U
-                A T H M A N D U
-                K A T H M A N D U
-
-        or SIMILAR
+        U
+        D U
+        N D U
+        A N D U
+        M A N D U
+        H M A N D U
+        T H M A N D U
+        A T H M A N D U
+        K A T H M A N D U
     '''
 
     if not str(strings).isalpha():

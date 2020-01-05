@@ -1,5 +1,5 @@
 def pattern_nineteen(steps):
-    ''' Pattern Nineteen
+    ''' Pattern nineteen
 
         1   2   3   4   5   6   7   8   9   10
         2   4   6   8   10  12  14  16  18  20
@@ -10,7 +10,8 @@ def pattern_nineteen(steps):
         7   14  21  28  35  42  49  56  63  70
         8   16  24  32  40  48  56  64  72  80
         9   18  27  36  45  54  63  72  81  90
-        10  20  30  40  50  60  70  80  90  100 '''
+        10  20  30  40  50  60  70  80  90  100
+    '''
 
     for i in range(1, steps + 1):
         num_list = []

@@ -1,16 +1,12 @@
 def pattern_twenty(strings):
-    '''Pattern Twentry
+    '''Pattern twenty
 
-        If you input "Programming" then you will get
-
-            P r o g r a m m i n g
-            r o g r a m m i n
-            o g r a m m i
-            g r a m m
-            r a m
-            a
-
-        or SIMILAR
+        P r o g r a m m i n g
+        r o g r a m m i n
+        o g r a m m i
+        g r a m m
+        r a m
+        a
     '''
 
     strings = str(strings)

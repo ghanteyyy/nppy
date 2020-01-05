@@ -1,19 +1,15 @@
 def pattern_thirteen(strings):
-    '''Pattern twelve
+    '''Pattern thirteen
 
-        If you enter "1" then you will get
-
-                    U
-                    D
-                    N
-                    A
-                    M
-                    H
-                    T
-                    A
-                    K
-
-        or SIMILAR
+            U
+            D
+            N
+            A
+            M
+            H
+            T
+            A
+            K
     '''
 
     if not str(strings).isalpha():

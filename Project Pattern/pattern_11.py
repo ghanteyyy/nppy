@@ -1,19 +1,15 @@
 def pattern_elevan(strings):
-    '''Pattern ten
+    '''Pattern elevan
 
-        If you input "KATHMANDU" then you get
-
-                    K A T H M A N D U
-                    A T H M A N D U
-                    T H M A N D U
-                    H M A N D U
-                    M A N D U
-                    A N D U
-                    N D U
-                    D U
-                    U
-
-        or SIMILAR
+        K A T H M A N D U
+        A T H M A N D U
+        T H M A N D U
+        H M A N D U
+        M A N D U
+        A N D U
+        N D U
+        D U
+        U
     '''
 
     if not str(strings).isalpha():

@@ -15,7 +15,8 @@ def pattern_twenty_three(string):
                      oooo
         ooooooooooooooooo
         ooooooooooooooooo
-        ooooooooooooooooo'''
+        ooooooooooooooooo
+    '''
 
     for i in range(15):
         if i == 0:

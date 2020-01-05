@@ -1,5 +1,5 @@
 def pattern_fourteen(strings):
-    '''Pattern thirteen
+    '''Pattern fourteen
 
             K
              A
@@ -10,8 +10,6 @@ def pattern_fourteen(strings):
                   N
                    D
                     U
-
-        Or SIMILAR
     '''
 
     if not str(strings).isalpha():

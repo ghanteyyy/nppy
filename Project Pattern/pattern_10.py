@@ -1,7 +1,5 @@
 def pattern_ten(strings):
-    '''Pattern three
-
-        If you input "KATHMANDU" then you get
+    '''Pattern ten
 
                             K
                           K A
@@ -12,8 +10,6 @@ def pattern_ten(strings):
                 K A T H M A N
               K A T H M A N D
             K A T H M A N D U
-
-        or SIMILAR
     '''
 
     if not str(strings).isalpha():
