@@ -19,11 +19,11 @@ class TIC_TAC_TOE:
     def display_board(self):
         '''Display board after each time player and computer enter their respective turns'''
 
-        print(f'\n{" " * 10} {self.__BOARD[0]} | {self.__BOARD[1]} | {self.__BOARD[2]}')
-        print(f'{" " * 11}- - - - -')
-        print(f'{" " * 10} {self.__BOARD[3]} | {self.__BOARD[4]} | {self.__BOARD[5]}')
-        print(f'{" " * 11}- - - - -')
-        print(f'{" " * 10} {self.__BOARD[6]} | {self.__BOARD[7]} | {self.__BOARD[8]}\n')
+        for i in range(0, 9, 3):
+            print(' | '.join(self.__BOARD[i: i + 3]).rjust(30))
+
+            if i in [0, 3]:
+                print((' - ' * 4).rjust(31))
 
     def players_turn(self):
         '''Get player's move'''
