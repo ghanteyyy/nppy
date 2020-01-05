@@ -20,8 +20,6 @@ def pattern_thirty_one(string, steps):
             *
             *
             *
-
-        or SIMILAR
     '''
 
     for i in range(1, int(steps // 2) - 2):

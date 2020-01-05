@@ -1,13 +1,13 @@
 def pattern_twenty_two(string):
     ''' Pattern twenty_two
 
-                  ***
-                 *   *
-                 *   *
-                 *****
-                 *   *
-                 *   *
-                 *   *
+              ***
+             *   *
+             *   *
+             *****
+             *   *
+             *   *
+             *   *
     '''
 
     for i in range(7):

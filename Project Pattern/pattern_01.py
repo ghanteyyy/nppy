@@ -1,13 +1,13 @@
 def pattern_one(strings, steps):
     '''Pattern one
 
-            1
-            1 1
-            1 1 1
-            1 1 1 1
-            1 1 1 1 1
-            1 1 1 1 1 1
-            1 1 1 1 1 1 1
+        1
+        1 1
+        1 1 1
+        1 1 1 1
+        1 1 1 1 1
+        1 1 1 1 1 1
+        1 1 1 1 1 1 1
     '''
 
     if not str(strings).isalpha():

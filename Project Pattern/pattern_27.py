@@ -1,12 +1,12 @@
 def pattern_twenty_seven(string):
     '''Pattern twenty_seven
-             *
-             *
-             *
-             *
-             *
-             *
-             *****
+         *
+         *
+         *
+         *
+         *
+         *
+         *****
     '''
 
     for i in range(7):

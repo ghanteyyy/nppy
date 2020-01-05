@@ -1,5 +1,6 @@
 def pattern_thirty_one(string):
     '''Pattern thirty_one
+
          ****
          *   *
          *   *
@@ -8,6 +9,7 @@ def pattern_thirty_one(string):
          *  *
          *   *
     '''
+
     j = 1
 
     for i in range(7):

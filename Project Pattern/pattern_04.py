@@ -1,14 +1,14 @@
 def pattern_four(strings):
     '''Pattern four
 
-            K A T H M A N D U
-            K A T H M A N D
-            K A T H M A N
-            K A T H M A
-            K A T H
-            K A T
-            K A
-            K
+        K A T H M A N D U
+        K A T H M A N D
+        K A T H M A N
+        K A T H M A
+        K A T H
+        K A T
+        K A
+        K
     '''
 
     if not str(strings).isalpha():
