@@ -1,15 +1,15 @@
 def pattern_ten(strings):
     '''Pattern ten
 
-                            K
-                          K A
-                        K A T
-                      K A T H
-                    K A T H M
-                  K A T H M A
-                K A T H M A N
-              K A T H M A N D
-            K A T H M A N D U
+                        K
+                      K A
+                    K A T
+                  K A T H
+                K A T H M
+              K A T H M A
+            K A T H M A N
+          K A T H M A N D
+        K A T H M A N D U
     '''
 
     if not str(strings).isalpha():

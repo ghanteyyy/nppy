@@ -1,27 +1,27 @@
 def pattern_eight(strings):
     '''Pattern eight
 
-            P
-            P r
-            P r o
-            P r o g
-            P r o g r
-            P r o g r a
-            P r o g r a m
-            P r o g r a m m
-            P r o g r a m m i
-            P r o g r a m m i n
-            P r o g r a m m i n g
-            P r o g r a m m i n
-            P r o g r a m m i
-            P r o g r a m m
-            P r o g r a m
-            P r o g r a
-            P r o g r
-            P r o g
-            P r o
-            P r
-            P
+        P
+        P r
+        P r o
+        P r o g
+        P r o g r
+        P r o g r a
+        P r o g r a m
+        P r o g r a m m
+        P r o g r a m m i
+        P r o g r a m m i n
+        P r o g r a m m i n g
+        P r o g r a m m i n
+        P r o g r a m m i
+        P r o g r a m m
+        P r o g r a m
+        P r o g r a
+        P r o g r
+        P r o g
+        P r o
+        P r
+        P
     '''
 
     if not str(strings).isalpha():

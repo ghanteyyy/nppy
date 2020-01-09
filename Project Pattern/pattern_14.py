@@ -1,15 +1,15 @@
 def pattern_fourteen(strings):
     '''Pattern fourteen
 
-            K
+        K
+         A
+          T
+           H
+            M
              A
-              T
-               H
-                M
-                 A
-                  N
-                   D
-                    U
+              N
+               D
+                U
     '''
 
     if not str(strings).isalpha():

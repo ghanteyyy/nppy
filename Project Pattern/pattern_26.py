@@ -1,5 +1,6 @@
 def pattern_twenty_six(string):
     '''Pattern twenty_six
+
           ***
          *   *
          *

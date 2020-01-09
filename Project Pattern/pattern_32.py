@@ -33,4 +33,4 @@ def pattern_thirty_one(string, steps):
 
 
 if __name__ == '__main__':
-    pattern_thirty_one('|||||', 20)
+    pattern_thirty_one('*', 20)

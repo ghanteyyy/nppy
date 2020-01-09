@@ -1,15 +1,15 @@
 def pattern_nine(strings):
     '''Pattern nine
 
-             K
-             A
-             T
-             H
-             M
-             A
-             N
-             D
-             U
+        K
+        A
+        T
+        H
+        M
+        A
+        N
+        D
+        U
     '''
 
     def method_one(strings):
