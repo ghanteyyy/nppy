@@ -145,7 +145,7 @@ root.after(0, root.deiconify)
 root.title('CUSTOM COUNTDOWN')
 root.geometry(f'342x81+{root.winfo_screenwidth() // 2 - 342 // 2}+{root.winfo_screenheight() // 2 - 81 // 2}')
 root.resizable(0, 0)
-root.iconbitmap('icon.ico')
+root.iconbitmap('included files/icon.ico')
 
 start_button = Button(root, text='START', font=("Courier", 16), bg='dark blue', fg='white', activebackground='dark blue', width=8, command=start)
 start_button.grid(row=1, column=0, sticky='e')

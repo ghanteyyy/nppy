@@ -50,8 +50,7 @@ def remove_decimal(result):
     if split[-1] == '0':
         return True
 
-    else:
-        return False
+    return False
 
 
 def history(value=None):
@@ -63,16 +62,17 @@ def history(value=None):
 
     if len(get) == 0:
         history_area.insert('end', 'There\'s no history yet.')
+        history_area.config(state=DISABLED)
 
     else:
         if get == 'There\'s no history yet.':
             history_area.delete('1.0', 'end')
             history_area.insert('end', value)
+            history_area.config(state=DISABLED)
 
         else:
             history_area.insert('end', value)
-
-    history_area.config(state=DISABLED)
+            history_area.config(state=DISABLED)
 
 
 def keyaction(event):
@@ -103,12 +103,12 @@ def equals_to(event=None):
         if remove_decimal(calc):
             hist = '{} = {}\n'.format(text_area.get().lstrip('0'), split[0])
             var.set(split[0])
+            history(hist)
 
         else:
             hist = '{} = {}\n'.format(text_area.get().lstrip('0'), calc)
             var.set(calc)
-
-        history(hist)
+            history(hist)
 
     except ZeroDivisionError:
         var.set('Cannot divide by ZERO')
@@ -123,14 +123,15 @@ def set_value(value):
     if text_area.get() == 'Invalid Input':
         var.set('')
 
-    var.set(text_area.get() + value)
+    val = text_area.get() + value
+    var.set(val)
 
 
 root = Tk()
 root.withdraw()
 root.after(0, root.deiconify)
 root.title('Calculator')
-root.iconbitmap('icon.ico')
+root.iconbitmap('included files/icon.ico')
 root.resizable(0, 0)
 
 # pos_x and pos_y are calculated such that the window is at the center of the screen

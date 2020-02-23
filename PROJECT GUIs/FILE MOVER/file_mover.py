@@ -99,7 +99,7 @@ class GUI:
         self.__master.resizable(0, 0)
         self.font = ('Courier', 15, 'bold')
         self.__master.title('File MOVER')
-        self.__master.iconbitmap('icon.ico')
+        self.__master.iconbitmap('included files/icon.ico')
 
         self.title_label = Label(self.__master, text='File MOVER', fg='white', background='black', font=('Times New Roman', 30, 'bold'))
         self.title_label.pack(fill='both')

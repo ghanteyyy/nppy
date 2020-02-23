@@ -1,8 +1,4 @@
-try:  # Python 3
-    from tkinter import *
-
-except (ImportError, ModuleNotFoundError):  # Python 2
-    from Tkinter import *
+from tkinter import *
 
 HOUR, MINUTE, SECOND, PAUSE = 24, 0, 6, False
 
@@ -27,10 +23,10 @@ def Counter():
 
         if HOUR == MINUTE == SECOND == 0:
             PAUSE = True
-            time.config(text='Time up', font=('Courier', 40, 'bold'))
+            tim_e.config(text='Time up', font=('Courier', 40, 'bold'))
 
         else:
-            time.config(text='{}:{}:{}'.format(str(HOUR).zfill(2), str(MINUTE).zfill(2), str(SECOND).zfill(2)))
+            tim_e.config(text='{}:{}:{}'.format(str(HOUR).zfill(2), str(MINUTE).zfill(2), str(SECOND).zfill(2)))
 
         root.after(1000, Counter)
 
@@ -41,11 +37,11 @@ root.after(0, root.deiconify)
 root.title('24 HOUR COUNTDOWN')
 root.geometry(f'326x82+{root.winfo_screenwidth() // 2 - 326 // 2}+{root.winfo_screenheight() // 2 - 82 // 2}')
 root.resizable(0, 0)
-root.iconbitmap('icon.ico')
+root.iconbitmap('included files/icon.ico')
 root.config(bg='dark blue')
 
-time = Label(root, font=('Courier', 50, 'bold'), bg='dark blue', fg='silver')
-time.pack(fill='both')
+tim_e = Label(root, font=('Courier', 50, 'bold'), bg='dark blue', fg='silver')
+tim_e.pack(fill='both')
 
 Counter()
 

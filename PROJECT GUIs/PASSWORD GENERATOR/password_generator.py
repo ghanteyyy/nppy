@@ -69,13 +69,13 @@ root.withdraw()
 root.after(0, root.deiconify)
 root.resizable(0, 0)
 root.title('Password GENERATOR')
-root.iconbitmap('icon.ico')
+root.iconbitmap('included files/icon.ico')
 root.geometry(f'362x529+{root.winfo_screenwidth() // 2 - 362 // 2}+{root.winfo_screenheight() // 2 - 529 // 2}')
 
 title = Label(root, text='Password GENERATOR', font=('Calibri', 20))
 title.pack(pady=5)
 
-image_obj = PIL.ImageTk.PhotoImage(PIL.Image.open('apg.png'))
+image_obj = PIL.ImageTk.PhotoImage(PIL.Image.open('included files/apg.png'))
 image = Label(root, image=image_obj)
 image.pack(pady=5)
 

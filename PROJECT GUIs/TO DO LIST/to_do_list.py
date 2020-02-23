@@ -2,23 +2,23 @@ import os
 import ctypes
 from tkinter import *
 
-# Shortcuts WinAPI functionality
-set_window_pos = ctypes.windll.user32.SetWindowPos
-set_window_long = ctypes.windll.user32.SetWindowLongW
-get_window_long = ctypes.windll.user32.GetWindowLongW
-get_parent = ctypes.windll.user32.GetParent
-
-# Some WinAPI flags
-GWL_STYLE = -16
-WS_MINIMIZEBOX = 131072
-WS_MAXIMIZEBOX = 65536
-SWP_NOZORDER = 4
-SWP_NOMOVE = 2
-SWP_NOSIZE = 1
-SWP_FRAMECHANGED = 32
-
 
 def hide_minimize_maximize(window):
+    # Shortcuts WinAPI functionality
+    set_window_pos = ctypes.windll.user32.SetWindowPos
+    set_window_long = ctypes.windll.user32.SetWindowLongW
+    get_window_long = ctypes.windll.user32.GetWindowLongW
+    get_parent = ctypes.windll.user32.GetParent
+
+    # Some WinAPI flags
+    GWL_STYLE = -16
+    WS_MINIMIZEBOX = 131072
+    WS_MAXIMIZEBOX = 65536
+    SWP_NOZORDER = 4
+    SWP_NOMOVE = 2
+    SWP_NOSIZE = 1
+    SWP_FRAMECHANGED = 32
+
     hwnd = get_parent(window.winfo_id())
     old_style = get_window_long(hwnd, GWL_STYLE)  # getting the old style
     new_style = old_style & ~ WS_MAXIMIZEBOX & ~ WS_MINIMIZEBOX  # building the new style (old style AND NOT Maximize AND NOT Minimize)
@@ -140,10 +140,6 @@ def save_to_file():
 
     get_value = [line.strip('\n') for line in list_box.get(0, END)]
 
-    if not os.path.exists('load_prev.txt'):
-        with open('load_prev.txt', 'w'):
-            pass
-
     with open('load_prev.txt', 'r') as rlp, open('load_prev.txt', 'a') as alp:
         lines = [line.strip('\n') for line in rlp.readlines()]
 
@@ -194,7 +190,7 @@ def main_window():
     root.resizable(0, 0)
     root.title('TO-DO LIST')
     root.geometry('{}x{}+{}+{}'.format(400, root.winfo_screenheight() - 74, root.winfo_screenwidth() - 401, 0))
-    root.iconbitmap('icon.ico')
+    root.iconbitmap('included files/icon.ico')
     root.wm_attributes("-topmost", 'true')
 
     _var_ = IntVar()
@@ -228,17 +224,17 @@ def main_window():
     delete_menu.add_command(label="Delete All", command=delete_all)
 
     load_prev_frame = Frame()
-    load_prev_button = Button(load_prev_frame, text='LOAD PREVIOUS DATA', width=30, height=2, fg='white', bg='#666666', activebackground='#666666', bd=0, command=load_prev_data)
+    load_prev_button = Button(load_prev_frame, text='LOAD PREVIOUS DATA', width=30, height=2, fg='white', bg='#666666', activebackground='#666666', activeforeground='white', bd=0, command=load_prev_data)
     load_prev_button.grid(row=0, column=0)
     load_prev_frame.place(x=150, y=root.winfo_screenheight() - 153)
 
     del_prev_frame = Frame()
-    del_prev_button = Button(del_prev_frame, text='DELETE PREVIOUS DATA', width=30, height=2, fg='white', bg='#666666', activebackground='#666666', bd=0, command=del_prev_data)
+    del_prev_button = Button(del_prev_frame, text='DELETE PREVIOUS DATA', width=30, height=2, fg='white', bg='#666666', activebackground='#666666', activeforeground='white', bd=0, command=del_prev_data)
     del_prev_button.grid(row=0, column=0)
     del_prev_frame.place(x=150, y=root.winfo_screenheight() - 114)
 
     clear_frame = Frame()
-    clear_button = Button(clear_frame, text='CLEAR', width=15, height=4, fg='white', bg='#666666', activebackground='#666666', bd=0, command=lambda: list_box.delete(0, END))
+    clear_button = Button(clear_frame, text='CLEAR', width=15, height=4, fg='white', bg='#666666', activebackground='#666666', activeforeground='white', bd=0, command=lambda: list_box.delete(0, END))
     clear_button.grid(row=0, column=0)
     clear_frame.place(x=33, y=root.winfo_screenheight() - 148)
 
@@ -259,4 +255,8 @@ def main_window():
 
 
 if __name__ == '__main__':
+    if not os.path.exists('load_prev.txt'):
+        with open('load_prev.txt', 'w'):
+            pass
+
     main_window()

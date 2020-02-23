@@ -1,16 +1,17 @@
 import os
 import winsound
-import PIL.Image
-import PIL.ImageTk
+import PIL.Image  # Install if not installed
+import PIL.ImageTk  # Install if not installed
 import collections
 
-try:  # Python 3
-    from tkinter import *
-
-except (ImportError, ModuleNotFoundError):  # Python 2
+try:  # For python 2.x
     from Tkinter import *
 
-images_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'files')  # Image path
+except (ImportError, ModuleNotFoundError):  # For python 3.x
+    from tkinter import *
+    from tkinter import font
+
+images_path = os.path.dirname(os.path.realpath(__file__))  # Image path
 
 
 def show_scrollbar():
@@ -127,7 +128,7 @@ def show_details(title, text, image, file_name, yet):
     root.withdraw()
     root.after(0, root.deiconify)
     root.title(title)
-    root.iconbitmap(os.path.join(images_path, 'icon.ico'))
+    root.iconbitmap(os.path.join(images_path, 'included files', 'icon.ico'))
     root.geometry(f'900x500+{pos_x}+{pos_y}')
     root.resizable(0, 0)
 
@@ -149,21 +150,21 @@ def show_details(title, text, image, file_name, yet):
 
     # Inserting image
     spent_image_frame = Frame(root, bd=0)
-    spent_image = PIL.ImageTk.PhotoImage(PIL.Image.open(os.path.join(images_path, image)))
+    spent_image = PIL.ImageTk.PhotoImage(PIL.Image.open(os.path.join(images_path, 'included files', image)))
     spent_label_image = Label(spent_image_frame, image=spent_image, borderwidth=0)
     spent_label_image.grid(row=0, column=0)
     spent_image_frame.place(x=10, y=220)
 
     # Inserting name image
     name_image_frame = Frame(root, bd=0)
-    name_image = PIL.ImageTk.PhotoImage(PIL.Image.open(os.path.join(images_path, 'name.jpg')))
+    name_image = PIL.ImageTk.PhotoImage(PIL.Image.open(os.path.join(images_path, 'included files', 'name.jpg')))
     name_label_image = Label(name_image_frame, image=name_image, borderwidth=0)
     name_label_image.grid(row=0, column=0)
     name_image_frame.place(x=460, y=10)
 
     # Inserting rupees image
     rupee_image_frame = Frame(root, bd=0)
-    rupee_image = PIL.ImageTk.PhotoImage(PIL.Image.open(os.path.join(images_path, 'rupees.jpg')))
+    rupee_image = PIL.ImageTk.PhotoImage(PIL.Image.open(os.path.join(images_path, 'included files', 'rupees.jpg')))
     rupee_label_name = Label(rupee_image_frame, image=rupee_image, borderwidth=0)
     rupee_label_name.grid(row=0, column=0)
     rupee_image_frame.place(x=715, y=10)
@@ -394,13 +395,13 @@ def edit_window(event=None):
     root.withdraw()
     root.after(0, root.deiconify)
     root.title('Edit')
-    root.iconbitmap(os.path.join(images_path, 'icon.ico'))
+    root.iconbitmap(os.path.join(images_path, 'included files', 'icon.ico'))
     root.geometry(f'900x500+{pos_x}+{pos_y}')
     root.resizable(0, 0)
 
     # Adding image
     edit_frame = Frame(root, bd=0)
-    edit_image = PIL.ImageTk.PhotoImage(PIL.Image.open(os.path.join(images_path, 'edit.png')))
+    edit_image = PIL.ImageTk.PhotoImage(PIL.Image.open(os.path.join(images_path, 'included files', 'edit.png')))
     edit_label_image = Label(edit_frame, image=edit_image, borderwidth=0)
     edit_label_image.grid(row=0, column=0)
     edit_frame.place(x=80, y=120)
@@ -448,6 +449,11 @@ def edit_window(event=None):
     back_button.grid(row=0, column=0)
     back_frame.place(x=350, y=415)
 
+    # Underline text of back button
+    fnt = font.Font(back_button, back_button.cget("font"))
+    fnt.configure(underline=True)
+    back_button.configure(font=fnt)
+
     # Bind Keys
     source_entry_box.bind('<Return>', edit_get_details)
     old_money_entry.bind('<Return>', edit_get_details)
@@ -473,7 +479,7 @@ def gui_earning(event=None):
     root.withdraw()
     root.after(0, root.deiconify)
     root.title('Add Earning | Expenditure')
-    root.iconbitmap(os.path.join(images_path, 'icon.ico'))
+    root.iconbitmap(os.path.join(images_path, 'included files', 'icon.ico'))
     root.geometry(f'900x500+{pos_x}+{pos_y}')
     root.resizable(0, 0)
 
@@ -485,7 +491,7 @@ def gui_earning(event=None):
 
     # Adding image
     spent_image_frame = Frame(root, bd=0)
-    spent_image = PIL.ImageTk.PhotoImage(PIL.Image.open(os.path.join(images_path, 'earning.jpg')))
+    spent_image = PIL.ImageTk.PhotoImage(PIL.Image.open(os.path.join(images_path, 'included files', 'earning.jpg')))
     spent_label_image = Label(spent_image_frame, image=spent_image, borderwidth=0)
     spent_label_image.grid(row=0, column=0)
     spent_image_frame.place(x=70, y=200)
@@ -553,7 +559,7 @@ def main():
     window.withdraw()
     window.after(0, window.deiconify)
     window.title('Saving & Spending')
-    window.iconbitmap(os.path.join(images_path, 'icon.ico'))
+    window.iconbitmap(os.path.join(images_path, 'included files', 'icon.ico'))
     window.resizable(0, 0)
 
     pos_x, pos_y = window.winfo_screenwidth() // 2 - 900 // 2, window.winfo_screenheight() - 650
@@ -567,7 +573,7 @@ def main():
 
     # Adding first title image
     label_image_frame = Frame(window, bd=0, width=237, height=280)
-    file_image_file = PIL.ImageTk.PhotoImage(PIL.Image.open(os.path.join(images_path, 'istock.jpg')))
+    file_image_file = PIL.ImageTk.PhotoImage(PIL.Image.open(os.path.join(images_path, 'included files', 'istock.jpg')))
     label_image = Label(label_image_frame, image=file_image_file, bg='blue', borderwidth=0)
     label_image.grid(row=0, column=0)
     label_image_frame.place(x=3, y=200)
@@ -577,14 +583,14 @@ def main():
     earned_button = Button(earned_button_frame, bd=3, bg='Red', activebackground='Red', height=3, width=60, fg='White', borderwidth=2, relief='raise', text='MY EARNING', command=lambda: (show_details('Earned details', 'MY\nEARNING', 'save.jpg', 'saving.txt', 'Not Earned Yet')))
     earned_button.grid(row=0, column=0)
     earned_button_frame.place(x=425, y=200)
-    earned_button.bind('<Return>', (lambda e: (show_details('Earned details', 'MY\nEARNING', 'save.jpg', 'saving.txt', 'Not Earned Yet'))))
+    earned_button.bind('<Return>', (lambda e: (show_details('Earned details', 'MY\nEARNING', 'included files/save.jpg', 'saving.txt', 'Not Earned Yet'))))
 
     # Adding spent button
     spent_button_frame = Frame(window)
     spent_button = Button(spent_button_frame, bd=3, height=3, width=60, fg='White', bg='#01912f', activebackground='#01912f', borderwidth=2, relief='raise', text='MY SPENDING', command=lambda: (show_details('Spent details', 'MY\nSPENDING', 'spent.jpg', 'spending.txt', 'Not Spent Yet')))
     spent_button.grid(row=0, column=0)
     spent_button_frame.place(x=425, y=260)
-    spent_button.bind('<Return>', (lambda e: (show_details('Spent details', 'MY\nsSPENDING', 'spent.jpg', 'spending.txt', 'Not Spent Yet'))))
+    spent_button.bind('<Return>', (lambda e: (show_details('Spent details', 'MY\nsSPENDING', 'included files/spent.jpg', 'spending.txt', 'Not Spent Yet'))))
 
     # Add source of saving and spent
     add_button_frame = Frame(window)
@@ -598,4 +604,5 @@ def main():
 
 
 if __name__ == '__main__':
+    check_file('saving.txt', 'spending.txt')
     main()

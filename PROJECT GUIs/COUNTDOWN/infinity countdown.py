@@ -70,7 +70,7 @@ root.after(0, root.deiconify)
 root.title('INFINITY COUNTDOWN')
 root.geometry('{}x{}+{}+{}'.format(342, 108, root.winfo_screenwidth() // 2 - 342 // 2, root.winfo_screenheight() // 2 - 108 // 2))
 root.resizable(0, 0)
-root.iconbitmap('icon.ico')
+root.iconbitmap('included files/icon.ico')
 root.config(bg='dark blue')
 
 time = Label(root, fg='silver', text='00:00:00', font=("Helvetica", 40), bg='dark blue')

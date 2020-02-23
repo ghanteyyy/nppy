@@ -121,7 +121,7 @@ def preload():
 root = Tk()
 root.resizable(0, 0)
 root.title('DAILY EXPENSES')
-root.iconbitmap('icon.ico')
+root.iconbitmap('included files/icon.ico')
 root.geometry(f'448x570+{root.winfo_screenwidth() // 2 - 448 // 2}+{root.winfo_screenheight() // 2 - 570 // 2}')
 
 items_box = Entry(root, width=70, fg='grey', highlightbackground='blue', highlightthickness=2, justify=CENTER)

@@ -45,7 +45,7 @@ def add_command():
     for value in values:
         if value in ['Remind Me about ...', 'Month', 'Day', 'Hour', 'Min', 'AM / PM']:
             is_valid = False
-            show_info('Some field(s) are left empty')
+            show_info('Some field(s) are left empty or not valid')
             break
 
     if is_valid is True:

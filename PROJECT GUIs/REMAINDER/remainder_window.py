@@ -12,7 +12,7 @@ except (ImportError, ModuleNotFoundError):  # Python 2
 def Remainder_Window(text):
     '''Remainder window to show remainders'''
 
-    PlaySound('tone.wav', SND_LOOP + SND_ASYNC)
+    PlaySound('included files/tone.wav', SND_LOOP + SND_ASYNC)
 
     root = Tk()
     root.withdraw()

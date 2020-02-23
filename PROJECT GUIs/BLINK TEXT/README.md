@@ -2,4 +2,4 @@
 
 Blink any text per second
 
-<img src="readme_images/1.jpg">
+<img src="included files/1.jpg">

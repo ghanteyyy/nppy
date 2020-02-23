@@ -17,7 +17,6 @@ month_number = {'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05',
 def show_info(message, pos_x, pos_y):
     '''Display result to user'''
 
-    MessageBeep()
     error_frame = Frame(root, bg='dark green')
     label_error_message = Label(error_frame, text=message, font=('Courier', 20), fg='white', bg='dark green')
     label_error_message.grid(row=0, column=0)
@@ -55,27 +54,28 @@ def add_info(event=None):
     get_values = [name_box.get().strip().upper(), month_box.get(), date_box.get()]
 
     if len(get_values[0]) == 0 or len(get_values[1]) == 0:  # Check if the field is empty
+        MessageBeep()
         show_info(message='Empty Field', pos_x=35, pos_y=415)
         name_box.delete(0, END)
 
     elif get_values[1] not in month_number or not get_values[-1].isdigit() or get_values[-1] == 'Select Date' or get_values[1] == 'Select Month':  # Check entered date is not digit or alphabets
+        MessageBeep()
         show_info(message='Invalid Date', pos_x=25, pos_y=415)
 
     elif int(get_values[-1]) > 32 or int(get_values[-1]) == 0:  # Check entered date is integer and between 01-32
+        MessageBeep()
         show_info(message='Invalid Date', pos_x=25, pos_y=415)
 
     elif var.get() != 1 and var.get() != 2:  # Check if no buttons are selected
+        MessageBeep()
         show_info(message='No button\nselected', pos_x=50, pos_y=400)
 
     else:
-        if not os.path.exists('details.txt'):   # Creating file to write given details if not exists already
-            with open('details.txt', 'w'):
-                pass
-
         date = '{}-{}'.format(month_number[get_values[1]].zfill(2), get_values[-1].zfill(2))
 
         if var.get() == 1:  # Check if add button is selected
             if check_duplicate(get_values[0], date):  # Check if input date already exists
+                MessageBeep()
                 show_info(message='Details Exists', pos_x=12, pos_y=415)
 
             else:  # If not already in file
@@ -86,6 +86,7 @@ def add_info(event=None):
 
         elif var.get() == 2:  # Check if delete button is selected
             if not check_duplicate(get_values[0], date):  # Check if entered value not in file
+                MessageBeep()
                 show_info(message='Invalid Details', pos_x=2, pos_y=415)
 
             else:  # Check if entered value in file
@@ -101,78 +102,85 @@ def add_info(event=None):
 
                 show_info(message='Details Deleted', pos_x=2, pos_y=415)
 
-        name_box.delete(0, END)
-
-        month_box.set('')
-        month_box.set('Select Month')
-
-        date_box.set('')
-        date_box.set('Select Date')
-
-        var.set(None)
-        root.focus_set()
-
-        sort_details()
+    sort_details()
 
 
-root = Tk()
-root.withdraw()
-root.after(0, root.deiconify)
-root.resizable(0, 0)
-root.iconbitmap('icon.ico')
-root.title('Birthday Remainder')
-root.geometry(f'426x500+{root.winfo_screenwidth() // 2 - 426 // 2}+{root.winfo_screenheight() // 2 - 500 // 2}')
+def main():
+    '''Main function of the script'''
 
-# Inserting image
-birthday_quote_frame = Frame(root)
-birthday_quote_image = PIL.ImageTk.PhotoImage(PIL.Image.open('image.jpg', 'r'))
-label_birthday_quote = Label(birthday_quote_frame, image=birthday_quote_image)
-label_birthday_quote.grid(row=0, column=0)
-birthday_quote_frame.place(x=0, y=0)
+    global root, name_box, var, date_box, label_birthday_quote, month_box
 
-# Insert Name label and entry field
-label_entry_frame = Frame(root, bg='dark green')
-name_label = Label(label_entry_frame, text='Name', fg='white', font=('Courier', 12), bg='dark green')
-name_box = Entry(label_entry_frame, width=30)
-name_label.grid(row=0, column=0)
-name_box.grid(row=0, column=1, padx=30, pady=20)
+    root = Tk()
+    root.withdraw()
+    root.after(0, root.deiconify)
+    root.resizable(0, 0)
+    root.iconbitmap('included Files/icon.ico')
+    root.title('Birthday Remainder')
+    root.geometry(f'426x500+{root.winfo_screenwidth() // 2 - 426 // 2}+{root.winfo_screenheight() // 2 - 500 // 2}')
 
-# Insert date of birth label
-birthday_label = Label(label_entry_frame, text='Date of Birth', fg='white', font=('Courier', 12), bg='dark green')
-birthday_label.grid(row=1, column=0)
-label_entry_frame.place(x=70, y=240)
+    # Inserting image
+    birthday_quote_frame = Frame(root)
+    birthday_quote_image = PIL.ImageTk.PhotoImage(PIL.Image.open('included Files/image.jpg', 'r'))
+    label_birthday_quote = Label(birthday_quote_frame, image=birthday_quote_image)
+    label_birthday_quote.grid(row=0, column=0)
+    birthday_quote_frame.place(x=0, y=0)
 
-# Options to select month and dates
-combo_box_frame = Frame(root, bg='dark green')
-month_box = Combobox(combo_box_frame, values=[month for month in month_number], width=13)
-month_box.set('Select Month')
-month_box.grid(row=0, column=0)
+    # Insert Name label and entry field
+    label_entry_frame = Frame(root, bg='dark green')
+    name_label = Label(label_entry_frame, text='Name', fg='white', font=('Courier', 12), bg='dark green')
+    name_box = Entry(label_entry_frame, width=30)
+    name_label.grid(row=0, column=0)
+    name_box.grid(row=0, column=1, padx=30, pady=20)
 
-date_box = Combobox(combo_box_frame, values=[i for i in range(1, 33)], width=10)
-date_box.set('Select Date')
-date_box.grid(row=0, column=1, padx=5)
+    # Insert date of birth label
+    birthday_label = Label(label_entry_frame, text='Date of Birth', fg='white', font=('Courier', 12), bg='dark green')
+    birthday_label.grid(row=1, column=0)
+    label_entry_frame.place(x=70, y=240)
 
-combo_box_frame.place(x=235, y=300)
+    # Options to select month and dates
+    combo_box_frame = Frame(root, bg='dark green')
+    month_box = Combobox(combo_box_frame, values=[month for month in month_number], width=13)
+    month_box.set('Select Month')
+    month_box.grid(row=0, column=0)
 
-# Insert radiobuttons add or delete
-var = IntVar()
-radio_frame = Frame(root, bg='dark green')
-add_radio_button = Radiobutton(radio_frame, text='Add', fg='#000000', activebackground='dark green', font=('Courier', 12), bg='dark green', value=1, variable=var, disabledforeground='black')
-delete_radio_button = Radiobutton(radio_frame, text='Delete', fg='#000000', activebackground='dark green', font=('Courier', 12), bg='dark green', value=2, variable=var, disabledforeground='black')
-add_radio_button.grid(row=0, column=0)
-delete_radio_button.grid(row=0, column=1)
-radio_frame.place(x=255, y=360)
+    date_box = Combobox(combo_box_frame, values=[i for i in range(1, 32)], width=10)
+    date_box.set('Select Date')
+    date_box.grid(row=0, column=1, padx=5)
 
-# Insert submit button
-button_frame = Frame(root)
-submit_button = Button(button_frame, text='SUBMIT', fg='white', bg='#039e05', activebackground='#039e05', font=('Courier', 12), width=16, height=3, relief=RAISED, command=add_info)
-submit_button.grid(row=2, column=0)
-button_frame.place(x=250, y=400)
+    combo_box_frame.place(x=235, y=300)
 
-# Bind keys
-name_box.bind('<Return>', add_info)
-date_box.bind('<Return>', add_info)
-name_box.bind('<Enter>', lambda e: name_box.focus_set())
+    # Insert radiobuttons add or delete
+    var = IntVar()
+    radio_frame = Frame(root, bg='dark green')
+    add_radio_button = Radiobutton(radio_frame, text='Add', fg='#000000', activebackground='dark green', font=('Courier', 12), bg='dark green', value=1, variable=var, disabledforeground='black')
+    delete_radio_button = Radiobutton(radio_frame, text='Delete', fg='#000000', activebackground='dark green', font=('Courier', 12), bg='dark green', value=2, variable=var, disabledforeground='black')
+    add_radio_button.grid(row=0, column=0)
+    delete_radio_button.grid(row=0, column=1)
+    radio_frame.place(x=255, y=360)
 
-root.config(bg='dark green')
-root.mainloop()
+    # Insert submit button
+    button_frame = Frame(root)
+    submit_button = Button(button_frame, text='SUBMIT', fg='white', bg='#039e05', activebackground='#039e05', font=('Courier', 12), width=16, height=3, relief=RAISED, command=add_info)
+    submit_button.grid(row=2, column=0)
+    button_frame.place(x=250, y=400)
+
+    # Bind keys
+    name_box.bind_class('<Return>', add_info)
+    date_box.bind('<Return>', add_info)
+    name_box.bind('<Enter>', lambda e: name_box.focus_set())
+    name_box.bind('<Leave>', lambda e: birthday_label.focus_set())
+
+    root.config(bg='dark green')
+    root.mainloop()
+
+
+if __name__ == '__main__':
+    try:
+        if not os.path.exists('details.txt'):
+            with open('details.txt', 'w'):
+                pass
+
+        main()
+
+    except FileNotFoundError:
+        main()
