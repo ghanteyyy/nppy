@@ -2,8 +2,6 @@ from tkinter import *
 
 
 def blink():
-    text.pack()
-
     if text['fg'] == 'white':
         text['fg'] = 'red'
 
@@ -19,6 +17,7 @@ root.iconbitmap('included files/icon.ico')
 root.title('Blinking Text')
 root.geometry('298x36+{}+{}'.format(root.winfo_screenwidth() // 2 - 298 // 2, root.winfo_screenheight() // 2 - 36 // 2))
 text = Label(root, text='BLINK', fg='white', bg='white', font=('Courier', 20, 'bold'))
+text.pack()
 
 blink()
 
