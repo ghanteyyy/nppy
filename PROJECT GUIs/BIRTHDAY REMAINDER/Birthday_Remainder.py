@@ -48,6 +48,12 @@ def sort_details():
             read_write.write(line)
 
 
+def check_for_folder():
+    if not os.path.exists('details.txt'):
+        with open('details.txt', 'w'):
+            pass
+
+
 def add_info(event=None):
     '''Get value from user and add/delete them'''
 
@@ -71,6 +77,8 @@ def add_info(event=None):
         show_info(message='No button\nselected', pos_x=50, pos_y=400)
 
     else:
+        check_for_folder()
+
         date = '{}-{}'.format(month_number[get_values[1]].zfill(2), get_values[-1].zfill(2))
 
         if var.get() == 1:  # Check if add button is selected
@@ -102,7 +110,7 @@ def add_info(event=None):
 
                 show_info(message='Details Deleted', pos_x=2, pos_y=415)
 
-    sort_details()
+        sort_details()
 
 
 def main():
@@ -175,12 +183,4 @@ def main():
 
 
 if __name__ == '__main__':
-    try:
-        if not os.path.exists('details.txt'):
-            with open('details.txt', 'w'):
-                pass
-
-        main()
-
-    except FileNotFoundError:
-        main()
+    main()
