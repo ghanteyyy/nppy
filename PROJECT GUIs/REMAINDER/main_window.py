@@ -23,7 +23,7 @@ def leave():
     if len(event_entry.get().strip()) == 0:
         event_entry.delete(0, END)
         event_entry.insert(END, 'Remind Me About ...')
-        event_entry.config(fg='grey')
+        event_entry.config(fg='#8a86ad')
         root.focus()
 
 
@@ -74,15 +74,16 @@ def add_command():
 
 
 root = Tk()
-root.title('REMIND ME !')
 root.resizable(0, 0)
-root.config(bg='grey')
+root.title('REMIND ME !')
+root.config(bg='#6200ff')
+root.iconbitmap('included files/icon.ico')
 root.geometry('446x230+{}+{}'.format(root.winfo_screenwidth() // 2 - 446 // 2, root.winfo_screenheight() // 2 - 230 // 2))
 
-title_label = Label(root, text='REMIND ME!', bg='grey', font=('ISOCP', 40, 'bold'))
+title_label = Label(root, text='REMIND ME!', fg='#cfb0be', bg='#6200ff', font=('ISOCP', 40, 'bold'))
 title_label.pack()
 
-event_entry = Entry(root, fg='grey', width=25, font=('ISOCP', 12, 'bold'))
+event_entry = Entry(root, fg='#8a86ad', width=25, font=('ISOCP', 12, 'bold'))
 event_entry.insert(END, 'Remind Me About ...')
 event_entry.pack(pady=10)
 
@@ -111,9 +112,9 @@ combo_box_am_pm.pack(side=LEFT)
 
 combo_box_frame.pack(pady=10)
 
-info = Label(root, fg='white', bg='black', font=('ISOCP', 15, 'bold'))
+info = Label(root, fg='#cfb0be', bg='#6200ff', font=('ISOCP', 15, 'bold'))
 
-add_button = Button(root, text='ADD REMAINDER', width=35, fg='black', bg='grey', font=('ISOCP', 12, 'bold'), activebackground='grey', activeforeground='black', border=0, command=add_command)
+add_button = Button(root, text='ADD REMAINDER', width=35, fg='#cfb0be', bg='#6200ff', font=('ISOCP', 15, 'bold'), activebackground='#6200ff', activeforeground='#cfb0be', border=0, command=add_command)
 add_button.pack(pady=10, side='bottom')
 
 event_entry.bind('<Enter>', lambda e: (enter()))
