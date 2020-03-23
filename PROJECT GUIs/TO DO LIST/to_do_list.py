@@ -47,17 +47,17 @@ class To_Do_List:
         self.delete_menu.add_command(label="Delete from list and file", command=lambda: self.popup_delete(mode='from both file and list'))  # Adding option to popup menu
 
         self.load_prev_frame = Frame(self.master)   # Frame to place load_prev_button
-        self.load_prev_button = Button(self.load_prev_frame, text='LOAD PREVIOUS DATA', width=30, height=2, fg='white', bg='#002157', activebackground='#002157', activeforeground='white', bd=1, relief=GROOVE, command=self.add_to_list)   # LOAD PREVIOUS DATA button with respective to its attributes
+        self.load_prev_button = Button(self.load_prev_frame, text='LOAD PREVIOUS DATA', width=30, height=2, fg='white', bg='#002157', activebackground='#002157', activeforeground='white', bd=1, relief=GROOVE, cursor='hand2', command=self.add_to_list)   # LOAD PREVIOUS DATA button with respective to its attributes
         self.load_prev_button.grid(row=0, column=0)   # Placing load_prev_button to the load_prev_button frame
         self.load_prev_frame.place(x=150, y=self.master.winfo_screenheight() - 153)   # Placing load_prev_frame to the window
 
         self.del_prev_frame = Frame(self.master)   # Frame to place del_prev_button
-        self.del_prev_button = Button(self.del_prev_frame, text='DELETE ALL PREVIOUS DATA', width=30, height=2, fg='white', bg='#002157', activebackground='#002157', activeforeground='white', bd=1, relief=GROOVE, command=lambda: self.check_for_file(clear_all=True))  # DELETE PREVIOUS DATA button with respective to its attributes
+        self.del_prev_button = Button(self.del_prev_frame, text='DELETE ALL PREVIOUS DATA', width=30, height=2, fg='white', bg='#002157', activebackground='#002157', activeforeground='white', bd=1, relief=GROOVE, cursor='hand2', command=lambda: self.check_for_file(clear_all=True))  # DELETE PREVIOUS DATA button with respective to its attributes
         self.del_prev_button.grid(row=0, column=0)   # Placing del_prev_button to the del_prev_frame
         self.del_prev_frame.place(x=150, y=self.master.winfo_screenheight() - 114)   # Placing del_prev_frame to the window
 
         self.clear_frame = Frame(self.master)   # Frame to palce clear_button
-        self.clear_button = Button(self.clear_frame, text='CLEAR', width=13, height=4, fg='white', bg='#002157', activebackground='#002157', activeforeground='white', bd=1, relief=GROOVE, command=self.clear)   # Clear button with respective to its attributes
+        self.clear_button = Button(self.clear_frame, text='CLEAR', width=13, height=4, fg='white', bg='#002157', activebackground='#002157', activeforeground='white', bd=1, relief=GROOVE, cursor='hand2', command=self.clear)   # Clear button with respective to its attributes
         self.clear_button.grid(row=0, column=0, ipadx=4, ipady=4)   # Placing clear_button to the clear_frame
         self.clear_frame.place(x=40, y=self.master.winfo_screenheight() - 152)   # Placing clear_frame to the window
 
@@ -69,9 +69,6 @@ class To_Do_List:
         self.entry_box.bind('<Leave>', self.leave)    # Binding entry widget when the cursor leaves the entry widget
         self.entry_box.bind('<Return>', self.add_command)  # Binding enter key with enter function
         self.list_box.bind("<Button-3>", self.popup_menu)  # Showing popup menu option when right button is clicked
-        self.clear_button.bind('<Enter>', lambda e: self.clear_button.config(cursor='hand2'))    # Binding clear button when the cursor enters the clear button
-        self.del_prev_button.bind('<Enter>', lambda e: self.del_prev_button.config(cursor='hand2'))    # Binding del_prev_button button when the cursor enters the del_prev_button button
-        self.load_prev_button.bind('<Enter>', lambda e: self.load_prev_button.config(cursor='hand2'))    # Binding load_prev_button button when the cursor enters the load_prev_button button
 
         self.add_to_list()  # Adding the content from "to_do_list.txt" if the file is not empty
         self.show_scrollbar()  # Showing scrollbar at the right side of list_box
@@ -251,3 +248,6 @@ if __name__ == '__main__':
     root = Tk()
     To_Do_List(root)
     root.mainloop()
+
+
+# add --hidden-import = '_cffi_backend' while compiling to .exe
