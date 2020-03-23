@@ -17,113 +17,116 @@ month_number = {'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05',
 def show_info(message, pos_x, pos_y):
     '''Display result to user'''
 
-    error_frame = Frame(root, bg='dark green')
-    label_error_message = Label(error_frame, text=message, font=('Courier', 20), fg='white', bg='dark green')
-    label_error_message.grid(row=0, column=0)
-    error_frame.place(x=pos_x, y=pos_y)
+    error_frame = Frame(root, bg='dark green')  # Creating "frame" object
+    label_error_message = Label(error_frame, text=message, font=('Courier', 20), fg='white', bg='dark green')  # Creating "label" object
+    label_error_message.grid(row=0, column=0)  # Packing "label" object
+    error_frame.place(x=pos_x, y=pos_y)  # Placing "frame" to the given coordinates
 
-    root.update()
-    root.after(1000, label_error_message.grid_forget)
+    root.update()  # Updating whole window
+    root.after(1000, label_error_message.grid_forget)   # Removing "label" object after 1 second. 1000ms = 1 sec
 
 
 def check_duplicate(name, date):
-    '''Check if name and date provided is already in file or not'''
+    '''Check if name and date provided exists in file'''
 
-    with open('details.txt', 'r') as details:
-        if f'{name.ljust(50)}{date}\n' in details.readlines():
-            return True
+    with open('details.txt', 'r') as details:  # Opening file in reading mode
+        if f'{name.ljust(50)}{date}\n' in details.readlines():   # Checking if the given name and date exists in file
+            return True  # Returing True if given name and date exists in file
 
-        return False
+        return False  # If not returning False
 
 
 def sort_details():
-    '''Sort details alphabetically'''
+    '''Sort contents of file alphabetically'''
 
-    with open('details.txt', 'r+') as read_write:
-        lines = read_write.readlines()
-        lines.sort()
-        read_write.seek(0)
+    with open('details.txt', 'r+') as read_write:   # Opening files in both reading and writing mode
+        lines = read_write.readlines()   # Reading contents of file
+        lines.sort()   # Sorting the contents alphabetically
+        read_write.seek(0)  # Placing the cursor back to the starting of the file
 
+        # Writing sorted contents to the file line by line
         for line in lines:
             read_write.write(line)
 
 
-def check_for_folder():
-    if not os.path.exists('details.txt'):
-        with open('details.txt', 'w'):
+def check_for_file():
+    '''Create "details.txt" if not exists'''
+
+    if not os.path.exists('details.txt'):  # If "details.txt" not exists
+        with open('details.txt', 'w'):   # Creating "details.txt"
             pass
 
 
 def add_info(event=None):
     '''Get value from user and add/delete them'''
 
-    get_values = [name_box.get().strip().upper(), month_box.get(), date_box.get()]
+    name, month, date = name_box.get().strip().upper(), month_box.get(), date_box.get()   # Getting content from GUI
 
-    if len(get_values[0]) == 0 or len(get_values[1]) == 0:  # Check if the field is empty
-        MessageBeep()
-        show_info(message='Empty Field', pos_x=35, pos_y=415)
+    if len(name) == 0 or len(month) == 0:  # Check if the field is empty
+        MessageBeep()  # Playing error sound
+        show_info(message='Empty Field', pos_x=35, pos_y=415)  # Displaying error message to the user
         name_box.delete(0, END)
 
-    elif get_values[1] not in month_number or not get_values[-1].isdigit() or get_values[-1] == 'Select Date' or get_values[1] == 'Select Month':  # Check entered date is not digit or alphabets
-        MessageBeep()
-        show_info(message='Invalid Date', pos_x=25, pos_y=415)
+    elif month not in month_number or not date.isdigit() or date == 'Select Date' or month == 'Select Month':  # Check entered date is not digit or alphabets
+        MessageBeep()  # Playing error sound
+        show_info(message='Invalid Date', pos_x=25, pos_y=415)  # Displaying error message to the user
 
-    elif int(get_values[-1]) > 32 or int(get_values[-1]) == 0:  # Check entered date is integer and between 01-32
-        MessageBeep()
-        show_info(message='Invalid Date', pos_x=25, pos_y=415)
+    elif int(date) > 32 or int(date) == 0:  # Check entered date is integer and between 01-32
+        MessageBeep()  # Playing error sound
+        show_info(message='Invalid Date', pos_x=25, pos_y=415)  # Displaying error message to the user
 
     elif var.get() != 1 and var.get() != 2:  # Check if no buttons are selected
-        MessageBeep()
-        show_info(message='No button\nselected', pos_x=50, pos_y=400)
+        MessageBeep()  # Playing error sound
+        show_info(message='No button\nselected', pos_x=50, pos_y=400)  # Displaying error message to the user
 
-    else:
-        check_for_folder()
+    else:   # If no errors then preceding to save the details in text file
+        check_for_file()   # Checking if file exists where we can store data
 
-        date = '{}-{}'.format(month_number[get_values[1]].zfill(2), get_values[-1].zfill(2))
+        date = '{}-{}'.format(month_number[month].zfill(2), date.zfill(2))   # Formatting date
 
         if var.get() == 1:  # Check if add button is selected
-            if check_duplicate(get_values[0], date):  # Check if input date already exists
-                MessageBeep()
+            if check_duplicate(name, date):  # Check if input date already exists
+                MessageBeep()  # Playing error sound
                 show_info(message='Details Exists', pos_x=12, pos_y=415)
 
             else:  # If not already in file
-                with open('details.txt', 'a') as append:
-                    append.write('{}{}\n'.format(get_values[0].ljust(50), date))
+                with open('details.txt', 'a') as append:   # Opening file for editing
+                    append.write('{}{}\n'.format(name.ljust(50), date))   # Writing to the file
 
-                show_info(message='Details Added', pos_x=17, pos_y=415)
+                show_info(message='Details Added', pos_x=17, pos_y=415)   # Showing details added info
 
         elif var.get() == 2:  # Check if delete button is selected
-            if not check_duplicate(get_values[0], date):  # Check if entered value not in file
-                MessageBeep()
-                show_info(message='Invalid Details', pos_x=2, pos_y=415)
+            if not check_duplicate(name, date):  # Check if entered value not in file
+                MessageBeep()  # Playing error sound
+                show_info(message='Invalid Details', pos_x=2, pos_y=415)   # Showing invalid info
 
             else:  # Check if entered value in file
-                with open('details.txt', 'r+') as read_write_details:
+                with open('details.txt', 'r+') as read_write_details:   # opening file for both reading and writing
                     lines = read_write_details.readlines()  # Reading file
-                    lines.remove('{}{}\n'.format(get_values[0].ljust(50), date))
-                    read_write_details.seek(0)
+                    lines.remove('{}{}\n'.format(name.ljust(50), date))   # Removing the targeted value from "lines" list
+                    read_write_details.seek(0)   # Placing cursor to the starting of the file
 
                     for line in lines:  # Writing everything except details entered by user
-                        read_write_details.write(line)
+                        read_write_details.write(line)   # Writing to the file
 
                     read_write_details.truncate()
 
-                show_info(message='Details Deleted', pos_x=2, pos_y=415)
+                show_info(message='Details Deleted', pos_x=2, pos_y=415)   # Showing deletion info
 
-        sort_details()
+        sort_details()   # Sorting file
 
 
 def main():
-    '''Main function of the script'''
+    '''Starting script'''
 
     global root, name_box, var, date_box, label_birthday_quote, month_box
 
     root = Tk()
-    root.withdraw()
-    root.after(0, root.deiconify)
-    root.resizable(0, 0)
-    root.iconbitmap('included Files/icon.ico')
-    root.title('Birthday Remainder')
+    root.withdraw()  # Minimizing the window
+    root.after(0, root.deiconify)   # Restoring window after 0 seconds
+    root.resizable(0, 0)  # Making window unresizable
+    root.iconbitmap('included Files/icon.ico')   # Inserting icon to the window
+    root.title('Birthday Remainder')  # Setting window's title name
     root.geometry(f'426x500+{root.winfo_screenwidth() // 2 - 426 // 2}+{root.winfo_screenheight() // 2 - 500 // 2}')
 
     # Inserting image
