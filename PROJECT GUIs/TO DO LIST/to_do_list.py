@@ -1,5 +1,6 @@
 import os
 import ctypes
+import winsound
 from tkinter import *
 
 
@@ -217,6 +218,9 @@ class To_Do_List:
 
             self.entry_box.delete(0, END)   # Removing the user entered value from the entry_box in order to set the default values
             self.leave()   # Adding the default values to the entry_box
+
+        else:
+            winsound.MessageBeep()
 
     def clear(self):
         '''Command for clear button'''
