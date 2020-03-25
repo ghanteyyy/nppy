@@ -59,7 +59,7 @@ class move_or_copy:
         return False
 
     def action(self, file=None):
-        '''Copy or Move the files and folders'''
+        '''Copy or Move the files / folders'''
 
         to_path = os.path.join(self.to_path, os.path.basename(file))
 
