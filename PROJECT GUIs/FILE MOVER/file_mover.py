@@ -1,6 +1,7 @@
 import os
 import shutil
 import winsound
+import threading
 from tkinter import *
 import tkinter.ttk as ttk
 from tkinter import messagebox
@@ -8,25 +9,30 @@ from tkinter import messagebox
 
 class move_or_copy:
     def __init__(self, from_path, to_path, file_type, var):
-        self.from_path, self.var = from_path, var
+        self.var = var
+        self.file_type = file_type
+        self.from_path = from_path
         self.to_path = os.path.join(to_path, os.path.split(self.from_path)[1])
         self.files = [os.path.join(self.from_path, f) for f in os.listdir(self.from_path)]
-        self.extension = {'Text File': 'txt',
-                          'Audio': ['wav', 'aiff', 'mp3'],
-                          'Image': ['tif', 'jpg', 'png', 'gif', 'jpeg'],
-                          'MS-Office': ['doc', 'docx', 'docm', 'dotx', 'dotm', 'xlsx', 'xlsm', 'xltx', 'xltm', 'xlsb', 'xlam', 'pptx', 'pptm', 'potx', 'potm', 'ppam', 'ppsx', 'ppsm', 'sldx', 'sldm', 'thmx'],
-                          'Video': ['mp4', 'm4a', 'm4v', 'f4v', 'f4a', 'm4b', 'm4r', 'f4b', 'mov', '3gp', '3gp2', '3g2', '3gpp', '3gpp2', 'ogg', 'oga', 'ogv', 'ogx', 'wmv', 'wma', 'asf', 'webm', 'flv', 'avi']}
+        self.extensions_list = {'Text File': ['txt'],
+                                'Audio': ['wav', 'aiff', 'mp3'],
+                                'Programs': ['exe'],
+                                'Image': ['tif', 'jpg', 'png', 'gif', 'jpeg'],
+                                'MS-Office': ['doc', 'docx', 'docm', 'dotx', 'dotm', 'xlsx', 'xlsm', 'xltx', 'xltm', 'xlsb', 'xlam', 'pptx', 'pptm', 'potx', 'potm', 'ppam', 'ppsx', 'ppsm', 'sldx', 'sldm', 'thmx'],
+                                'Video': ['mp4', 'm4a', 'm4v', 'f4v', 'f4a', 'm4b', 'm4r', 'f4b', 'mov', '3gp', '3gp2', '3g2', '3gpp', '3gpp2', 'ogg', 'oga', 'ogv', 'ogx', 'wmv', 'wma', 'asf', 'webm', 'flv', 'avi']}
 
-        if file_type == 'ALL':
-            self.file_type = [ext for k, v in self.extension for ext in v]
+        if self.file_type == 'ALL':
+            self.extensions = [ext for k, v in self.extensions_list.items() for ext in v]
 
-        elif file_type == 'Folders':
-            self.file_type = 'Folders'
+        elif self.file_type == 'Folders':
+            self.extensions = 'Folders'
 
         else:
-            self.file_type = self.extension[file_type]
+            self.extensions = self.extensions_list[self.file_type]
 
     def already_exists(self):
+        '''Checking duplicates files of from_path and to_path'''
+
         global common_files
 
         if not os.path.exists(self.to_path):
@@ -42,15 +48,19 @@ class move_or_copy:
         return False
 
     def filter_function(self, file):
-        if os.path.isfile(file) and os.path.basename(file).split('.')[1].lower() in self.file_type:
+        '''Filtering files as per the extension given by the user'''
+
+        if os.path.isfile(file) and os.path.basename(file).split('.')[1].lower() in self.extensions:
             return True
 
-        elif os.path.isdir(file) and self.file_type == 'Folders':
+        elif os.path.isdir(file) and self.extensions == 'Folders':
             return True
 
         return False
 
-    def copy(self, file=None):
+    def action(self, file=None):
+        '''Copy or Move the files and folders'''
+
         to_path = os.path.join(self.to_path, os.path.basename(file))
 
         if os.path.isdir(file):
@@ -67,94 +77,103 @@ class move_or_copy:
             else:
                 shutil.copy(file, to_path)
 
-        return True
-
     def main(self):
-        self.files = list(filter(self.filter_function, self.files))
+        '''Main function for copying and moving file / folders'''
+
+        self.files = set(filter(self.filter_function, self.files))
+
+        if self.file_type == 'ALL':
+            self.folders = {os.path.join(self.from_path, dirs) for dirs in os.listdir(self.from_path)}
+            self.files.update(self.folders)
 
         try:
             if self.already_exists():
                 if not messagebox.askyesno('File Already Exists', 'Some files are already exists. Do you want to overwrite the files?'):
-                    self.files = list(set(self.files) - common_files)
+                    self.files = self.files - common_files
 
             for file in self.files:
-                self.copy(file)
+                self.action(file)
 
-            messagebox.showinfo('Job Done', 'Job DONE')
+            messagebox.showinfo('Operation Successful', 'Your operation is successfully completed')
+            os.startfile(self.to_path)
 
         except FileExistsError:
-            messagebox.showinfo('Directory Already Exists', 'Please! Give new directory name')
+            messagebox.showerror('Directory Already Exists', 'Please! Give new directory name')
 
         except FileNotFoundError:
-            messagebox.showinfo('Invalid Path', f'{self.to_path} is not a valid path')
+            os.makedirs(self.to_path)
+            self.main()
 
 
 class GUI:
     def __init__(self, master):
-        self.__master = master
-        self.__master.withdraw()
-        self.__master.after(0, self.__master.deiconify)
-        self.screen_width, self.screen_height = self.__master.winfo_screenwidth(), self.__master.winfo_screenheight()
-        self.__master.geometry(f'400x270+{self.screen_width // 2 - 200}+{self.screen_height // 2 - 135}')
-        self.__master.resizable(0, 0)
+        self.master = master
+        self.master.withdraw()
+        self.master.after(0, self.master.deiconify)
+        self.screen_width, self.screen_height = self.master.winfo_screenwidth(), self.master.winfo_screenheight()
+        self.master.geometry(f'543x267+{self.screen_width // 2 - 543 // 2}+{self.screen_height // 2 - 267 // 2}')
+        self.master.resizable(0, 0)
         self.font = ('Courier', 15, 'bold')
-        self.__master.title('File MOVER')
-        self.__master.iconbitmap('included files/icon.ico')
+        self.master.title('File MOVER')
+        self.master.iconbitmap('included files/icon.ico')
 
-        self.title_label = Label(self.__master, text='File MOVER', fg='white', background='black', font=('Times New Roman', 30, 'bold'))
-        self.title_label.pack(fill='both')
+        self.title_label = Label(self.master, text='File MOVER', fg='white', background='green', font=('Times New Roman', 30, 'bold'))
+        self.title_label.pack(fill='both', pady=11)
 
-        self.copy_from_entry = Entry(self.__master, fg='grey', font=self.font, width=22, highlightbackground='blue', highlightthickness=3)
+        self.copy_from_entry = Entry(self.master, fg='grey', font=self.font, width=40, justify='center', relief=GROOVE)
         self.copy_from_entry.insert(END, 'From Path')
-        self.copy_from_entry.place(x=60, y=80)
+        self.copy_from_entry.place(x=30, y=80)
 
-        self.copy_to_entry = Entry(self.__master, fg='grey', font=self.font, width=22, highlightbackground='blue', highlightthickness=3)
+        self.copy_to_entry = Entry(self.master, fg='grey', font=self.font, width=40, justify='center', relief=GROOVE)
         self.copy_to_entry.insert(END, 'To Path')
-        self.copy_to_entry.place(x=60, y=130)
+        self.copy_to_entry.place(x=30, y=130)
 
-        self.combo_box = ttk.Combobox(self.__master, value=['Folders', 'Image', 'Video', 'Audio', 'MS-Office', 'Text File', 'ALL'], width=23, height=4)
+        self.combo_box = ttk.Combobox(self.master, value=['ALL', 'Image', 'Video', 'Audio', 'Folders', 'Programs', 'MS-Office', 'Text File'], width=23, height=4)
         self.combo_box.set('Select file types')
-        self.combo_box.place(x=60, y=180)
+        self.combo_box.place(x=100, y=175)
 
         self.var = IntVar()
-        self.copy_or_move_frame = Frame(self.__master)
-        self.copy_radio_button = Radiobutton(self.copy_or_move_frame, text='COPY', value=1, variable=self.var, bg='dark green', activebackground='dark green', fg='black', font=self.font)
-        self.move_radio_button = Radiobutton(self.copy_or_move_frame, text='MOVE', value=2, variable=self.var, bg='dark green', activebackground='dark green', fg='black', font=self.font)
+        self.copy_or_move_frame = Frame(self.master)
+        self.copy_radio_button = Radiobutton(self.copy_or_move_frame, text='COPY', value=1, variable=self.var, bg='green', activebackground='green', fg='black', font=self.font)
+        self.move_radio_button = Radiobutton(self.copy_or_move_frame, text='MOVE', value=2, variable=self.var, bg='green', activebackground='green', fg='black', font=self.font)
         self.copy_radio_button.grid(row=0, column=0)
         self.move_radio_button.grid(row=0, column=1)
-        self.copy_or_move_frame.place(x=60, y=210)
+        self.copy_or_move_frame.place(x=300, y=170)
 
-        self.do_it_button_frame = Frame(self.__master)
-        self.do_it_button = Button(self.do_it_button_frame, text='DO IT !', command=self.button_command, fg='white', bg='black', activebackground='black', activeforeground='white')
-        self.do_it_button.grid(row=0, column=0, ipadx=30, ipady=20)
-        self.do_it_button_frame.place(x=230, y=180)
+        self.do_it_button_frame = Frame(self.master)
+        self.do_it_button = Button(self.do_it_button_frame, text='Move / Copy', command=self.button_command, fg='white', bg='green', activebackground='green', activeforeground='white', relief=GROOVE, cursor='hand2')
+        self.do_it_button.grid(row=0, column=0, ipadx=35, ipady=10)
+        self.do_it_button_frame.place(x=200, y=210)
 
-        self.copy_from_entry.bind('<Enter>', lambda e: self.enter(self.copy_from_entry, 'From Path'))
+        self.copy_from_entry.bind('<Button-1>', lambda e: self.button_1_command(self.copy_from_entry, 'From Path'))
         self.copy_from_entry.bind('<Leave>', lambda e: self.leave(self.copy_from_entry, 'From Path'))
 
-        self.copy_to_entry.bind('<Enter>', lambda e: self.enter(self.copy_to_entry, 'To Path'))
+        self.copy_to_entry.bind('<Button-1>', lambda e: self.button_1_command(self.copy_to_entry, 'To Path'))
         self.copy_to_entry.bind('<Leave>', lambda e: self.leave(self.copy_to_entry, 'To Path'))
 
-        self.__master.config(bg='green')
+        self.master.config(bg='green')
 
-    def enter(self, *args):
-        args[0].focus()
-        args[0].config(highlightcolor='blue')
+    def button_1_command(self, widget, value):
+        '''Activates when user clicks to the entry boxes'''
 
-        if args[0].get() == args[1]:
-            args[0].delete(0, END)
-            args[0].insert(END, '')
-            args[0].config(fg='black')
+        widget.focus()
 
-    def leave(self, *args):
-        args[0].config(highlightcolor='blue')
+        if widget.get() == value:
+            widget.delete(0, END)
+            widget.config(fg='black')
 
-        if not args[0].get():
-            self.__master.focus()
-            args[0].insert(END, args[-1])
-            args[0].config(fg='grey')
+    def leave(self, widget, value):
+        '''Activates when user leaves the entry boxes'''
+
+        if not widget.get().strip():
+            self.master.focus()
+            widget.delete(0, END)
+            widget.insert(END, value)
+            widget.config(fg='grey')
 
     def button_command(self):
+        '''Activates when "Move / Copy" button is pressed'''
+
         from_path = self.copy_from_entry.get()
         to_path = self.copy_to_entry.get()
         combo_get = self.combo_box.get()
@@ -166,9 +185,8 @@ class GUI:
 
         else:
             moc = move_or_copy(from_path, to_path, combo_get, var)
-            moc.main()
-
-        os.startfile(to_path)
+            thread = threading.Thread(target=moc.main)
+            thread.start()
 
 
 if __name__ == '__main__':
