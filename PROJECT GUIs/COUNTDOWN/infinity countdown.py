@@ -1,88 +1,84 @@
 from tkinter import *
 
-HOUR, MINUTE, SECOND = 0, 0, 0
 
+class Infinity_Countdown:
+    def __init__(self, master):
+        self.master = master
+        self.master.withdraw()
+        self.master.after(0, self.master.deiconify)
+        self.master.title('INFINITY COUNTDOWN')
+        self.master.geometry('{}x{}+{}+{}'.format(342, 108, self.master.winfo_screenwidth() // 2 - 342 // 2, self.master.winfo_screenheight() // 2 - 108 // 2))
+        self.master.resizable(0, 0)
+        self.master.iconbitmap('included files/icon.ico')
+        self.master.config(bg='dark blue')
 
-def start():
-    '''Command for START button'''
+        self.time = Label(self.master, fg='silver', text='00:00:00', font=("Helvetica", 40), bg='dark blue')
+        self.time.pack(side='bottom')
 
-    global PAUSE
+        self.start_button = Button(self.master, text='START', font=("Arial", 16), bg='dark blue', fg='white', activebackground='dark blue', width=8, command=self.Start)
+        self.start_button.pack(side='left')
 
-    PAUSE = False
-    start_button['state'] = 'disabled'
-    pause_button['state'] = 'normal'
-    reset_button['state'] = 'normal'
-    Counter()
+        self.pause_button = Button(self.master, text='PAUSE', font=("Arial", 16), bg='dark blue', fg='white', activebackground='dark blue', width=8, state='disabled', command=self.Pause)
+        self.pause_button.pack(side='left')
 
+        self.reset_button = Button(self.master, text='RESET', font=("Arial", 16), bg='dark blue', fg='white', activebackground='dark blue', width=10, state='disabled', command=self.Reset)
+        self.reset_button.pack(side='left', fill='both')
 
-def pause():
-    '''Command for PAUSE button'''
+        self.hour = 0
+        self.minute = 0
+        self.second = 0
+        self.pause = False
 
-    global PAUSE
+    def Start(self):
+        '''Command for START button'''
 
-    PAUSE = True
-    pause_button['state'] = 'disabled'
+        self.pause = False
+        self.start_button['state'] = 'disabled'
+        self.pause_button['state'] = 'normal'
+        self.reset_button['state'] = 'normal'
+        self.master.after(1000, self.Counter)
 
+    def Pause(self):
+        '''Command for PAUSE button'''
 
-def reset():
-    '''Command for RESET button'''
+        self.pause = True
+        self.pause_button['state'] = 'disabled'
 
-    global HOUR, MINUTE, SECOND, PAUSE
+    def Reset(self):
+        '''Command for RESET button'''
 
-    PAUSE = True
-    pause_button['state'] = 'disabled'
-    reset_button['state'] = 'disabled'
-    time['text'] = '00:00:00'
+        self.pause = True
+        self.pause_button['state'] = 'disabled'
+        self.reset_button['state'] = 'disabled'
+        self.time['text'] = '00:00:00'
 
-    HOUR, MINUTE, SECOND = 0, 0, 0
+        self.hour, self.minute, self.second = 0, 0, 0
 
+    def Counter(self):
+        '''Updating hour, minute and seconds'''
 
-def Counter():
-    '''Updating hour, minute and seconds'''
+        if self.pause is False:
+            self.start_button['state'] = 'disabled'
 
-    global HOUR, MINUTE, SECOND
+            if self.second == 59:
+                if self.minute == self.second == 59:
+                    self.hour += 1
+                    self.minute = 0
 
-    if PAUSE is False:
-        start_button['state'] = 'disabled'
+                else:
+                    self.minute += 1
 
-        if SECOND == 59:
-            if MINUTE == SECOND == 59:
-                HOUR += 1
-                MINUTE = 0
+                self.second = -1
 
-            else:
-                MINUTE += 1
+            self.second += 1
 
-            SECOND = -1
+            self.time.config(text='{}:{}:{}'.format(str(self.hour).zfill(2), str(self.minute).zfill(2), str(self.second).zfill(2)))
+            self.master.after(1000, self.Counter)
 
-        SECOND += 1
-
-        time.config(text='{}:{}:{}'.format(str(HOUR).zfill(2), str(MINUTE).zfill(2), str(SECOND).zfill(2)))
-        root.after(1000, Counter)
-
-    else:
-        start_button['state'] = 'normal'
+        else:
+            self.start_button['state'] = 'normal'
 
 
 root = Tk()
-root.withdraw()
-root.after(0, root.deiconify)
-root.title('INFINITY COUNTDOWN')
-root.geometry('{}x{}+{}+{}'.format(342, 108, root.winfo_screenwidth() // 2 - 342 // 2, root.winfo_screenheight() // 2 - 108 // 2))
-root.resizable(0, 0)
-root.iconbitmap('included files/icon.ico')
-root.config(bg='dark blue')
-
-time = Label(root, fg='silver', text='00:00:00', font=("Helvetica", 40), bg='dark blue')
-time.pack(side='bottom')
-
-start_button = Button(root, text='START', font=("Arial", 16), bg='dark blue', fg='white', activebackground='dark blue', width=8, command=start)
-start_button.pack(side='left')
-
-pause_button = Button(root, text='PAUSE', font=("Arial", 16), bg='dark blue', fg='white', activebackground='dark blue', width=8, state='disabled', command=pause)
-pause_button.pack(side='left')
-
-reset_button = Button(root, text='RESET', font=("Arial", 16), bg='dark blue', fg='white', activebackground='dark blue', width=10, state='disabled', command=reset)
-reset_button.pack(side='left', fill='both')
-
+Infinity_Countdown(root)
 root.mainloop()

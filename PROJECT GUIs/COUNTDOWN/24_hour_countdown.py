@@ -1,48 +1,54 @@
 from tkinter import *
 
-HOUR, MINUTE, SECOND, PAUSE = 24, 0, 6, False
 
+class twenty_four_hour_countdown:
+    def __init__(self, master):
+        self.master = master
+        self.master.withdraw()
+        self.master.after(0, self.master.deiconify)
+        self.master.title('24 Hour COUNTDOWN')
+        self.master.geometry(f'326x82+{self.master.winfo_screenwidth() // 2 - 326 // 2}+{self.master.winfo_screenheight() // 2 - 82 // 2}')
+        self.master.resizable(0, 0)
+        self.master.iconbitmap('included files/icon.ico')
+        self.master.config(bg='dark blue')
 
-def Counter():
-    '''Updating hour, minute and seconds'''
+        self.time_label = Label(self.master, text='24:00:00', font=('Courier', 50, 'bold'), bg='dark blue', fg='silver')
+        self.time_label.pack(fill='both')
 
-    global HOUR, MINUTE, SECOND, PAUSE
+        self.master.after(1000, self.Counter)
 
-    if PAUSE is False:
-        if SECOND == 0:
-            if MINUTE == SECOND == 0:
-                HOUR -= 1
-                MINUTE = 59
+        self.sec = 0
+        self.min = 0
+        self.hrs = 24
+        self.pause = False
+
+    def Counter(self):
+        '''Updating hour, minute and seconds'''
+
+        if self.pause is False:
+            if self.sec == 0:
+                if self.min == self.sec == 0:
+                    self.hrs -= 1
+                    self.min = 59
+
+                else:
+                    self.min -= 1
+
+                self.sec = 60
+
+            self.sec -= 1
+
+            if self.hrs == self.min == self.sec == 0:
+                self.pause = True
+                self.time_label.config(text='Time up', font=('Courier', 40, 'bold'))
 
             else:
-                MINUTE -= 1
+                self.time_label.config(text='{}:{}:{}'.format(str(self.hrs).zfill(2), str(self.min).zfill(2), str(self.sec).zfill(2)))
 
-            SECOND = 60
-
-        SECOND -= 1
-
-        if HOUR == MINUTE == SECOND == 0:
-            PAUSE = True
-            tim_e.config(text='Time up', font=('Courier', 40, 'bold'))
-
-        else:
-            tim_e.config(text='{}:{}:{}'.format(str(HOUR).zfill(2), str(MINUTE).zfill(2), str(SECOND).zfill(2)))
-
-        root.after(1000, Counter)
+            self.master.after(1000, self.Counter)
 
 
-root = Tk()
-root.withdraw()
-root.after(0, root.deiconify)
-root.title('24 HOUR COUNTDOWN')
-root.geometry(f'326x82+{root.winfo_screenwidth() // 2 - 326 // 2}+{root.winfo_screenheight() // 2 - 82 // 2}')
-root.resizable(0, 0)
-root.iconbitmap('included files/icon.ico')
-root.config(bg='dark blue')
-
-tim_e = Label(root, font=('Courier', 50, 'bold'), bg='dark blue', fg='silver')
-tim_e.pack(fill='both')
-
-Counter()
-
-root.mainloop()
+if __name__ == '__main__':
+    root = Tk()
+    twenty_four_hour_countdown(root)
+    root.mainloop()
