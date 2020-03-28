@@ -1,6 +1,6 @@
 import os
 import time
-from winsound import PlaySound, SND_LOOP, SND_ASYNC
+import winsound
 
 try:  # Python 3
     import tkinter.ttk as ttk
@@ -11,133 +11,109 @@ except (ImportError, ModuleNotFoundError):  # Python 2
     from Tkinter import Tk, Label, Button, IntVar
 
 
-current_date = time.strftime('%Y-%m-%d\n')
-birthday_list, today_birthdates = {}, {}
+class Remainder_Window:
+    def __init__(self):
+        self.seen = {}
+        self.birthdates = {}
+        self.current_date = time.strftime('%m-%d')
+        self.month_number = {'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'}
 
+    def get_birthdates(self, file, dic):
+        '''Get birth dates from the file'''
 
-def is_today_in_file():
-    '''Check if today's date is in file. If NOT, then erasing everything inside it'''
+        with open(file, 'r') as f:
+            lines = f.readlines()
 
-    with open('mark_read.txt', 'r') as check_seen:
-        lines = check_seen.readlines()
+            for line in lines:
+                split = line.strip('\n').split()
 
-        if len(lines) != 0 and current_date in lines[0]:
-            pass
+                if len(split) > 2:
+                    name = f"{' '.join(split[:-1])}"
 
-        else:
-            with open('mark_read.txt', 'w'):
-                pass
+                else:
+                    name = split[0]
 
+                date = split[-1]
 
-def check_file():
-    '''Create file if not exists'''
+                if date == self.current_date:
+                    dic.update({name: date})
 
-    if not os.path.exists('mark_read.txt'):
-        with open('mark_read.txt', 'w'):
-            pass
+    def Window(self, name, date):
+        '''GUI window for showing of those whose birthday is today'''
 
+        self.master = Tk()
+        self.master.withdraw()
+        self.master.after(0, self.master.deiconify)
+        self.master.resizable(0, 0)
+        self.master.config(bg='red')
+        self.master.overrideredirect(True)
+        self.master.title('BIRTHDAY REMAINDER')
+        self.master.wm_attributes('-topmost', 1)
+        self.master.geometry(f'405x170+{self.master.winfo_screenwidth() - 406}+0')
 
-def quit_button(name, date):
-    '''When close button is clicked'''
+        self.var = IntVar()
+        self.style = ttk.Style()
+        self.style.configure('Red.TCheckbutton', foreground='white', background='red')
 
-    if var.get() == 1:
-        seen_birthday(name, date)
+        title = Label(self.master, text='REMAINDER', font=("Courier", 30), bg='red', fg='White')
+        wishes = Label(self.master, text=f'Today is {name}\'s Birthday\n({date})', font=("Courier", 15), bg='red', fg='White', wraplength=450)
+        check_button = ttk.Checkbutton(self.master, style='Red.TCheckbutton', text='Don\'t show again', variable=self.var)
+        close_button = Button(self.master, text='CLOSE', font=("Courier", 12), bg='red', activeforeground='white', activebackground='red', fg='White', width=10, relief='ridge', command=lambda: self.quit_button(name, date))
 
-    root.destroy()
+        title.pack()
+        wishes.pack()
+        check_button.pack(side='bottom')
+        close_button.pack(side='bottom')
 
+        self.master.mainloop()
 
-def mark_read(name, date):
-    '''Check if birthday is already seen by user (when check button is checked)'''
+    def mark_as_seen(self, name, date):
+        '''Store name and date if user selects "Don't show again"'''
 
-    with open('mark_read.txt', 'r') as notseen:
-        lines = notseen.readlines()
+        with open('mark_as_seen.txt', 'a') as file:
+            file.write(f'{name} {date}\n')
 
-    if f'{name.ljust(50)}{date}\n' in lines:
+    def quit_button(self, name, date):
+        '''When user click the quit button'''
+
+        if self.var.get() == 1:
+            self.mark_as_seen(name, date)
+
+        self.master.destroy()
+
+    def already_seen(self, name, date):
+        '''Check user has already seen the remainder'''
+
+        if os.path.exists('mark_as_seen.txt'):
+            self.get_birthdates('mark_as_seen.txt', self.seen)
+
+        if name in self.seen and self.seen[name] == date:
+            return True
+
         return False
 
-    return True
+    def destroy_seen(self):
+        '''Removing "mark_as_seen.txt" at the next day of the birthday so that it can display at the next birthday'''
 
+        if os.path.exists('mark_as_seen.txt'):
+            modified_time = time.ctime(os.path.getmtime('mark_as_seen.txt')).split()
+            real_time = f'{self.month_number[modified_time[1]]}-{modified_time[2]}'
 
-def seen_birthday(name, date):
-    '''Save seen birthday to a file'''
+            if self.current_date != real_time:
+                os.remove('mark_as_seen.txt')
 
-    with open('mark_read.txt', 'r+') as seen_write:
-        lines = seen_write.readlines()
+    def main(self):
+        '''Main function of the entire script'''
 
-        if current_date not in lines:
-            seen_write.write(current_date)
-            seen_write.write(f'{name.ljust(50)}{date}\n')
+        self.destroy_seen()
+        self.get_birthdates('Birthday Remainder.txt', self.birthdates)
 
-        else:
-            seen_write.write(f'{name.ljust(50)}{date}\n')
-
-        seen_write.truncate()
-
-
-def get_birthdates():
-    '''Get birth dates from the file'''
-
-    with open('details.txt', 'r') as birthdates:
-        lines = birthdates.readlines()
-
-        for line in lines:
-            birthday_list[line.split(' ')[0]] = line.split()[-1].strip('\n')  # Appending name and date to the birthday_list dictionary
-
-
-def Remainder_Window(name, date):
-    '''Display birthday'''
-
-    global root, var
-
-    root = Tk()
-    root.withdraw()
-    root.after(0, root.deiconify)
-    root.resizable(0, 0)
-    root.config(bg='red')
-    root.overrideredirect(True)
-    root.title('BIRTHDAY REMAINDER')
-    root.wm_attributes('-topmost', 1)
-    root.geometry(f'405x160+{root.winfo_screenwidth() - 406}+0')
-
-    var = IntVar()
-    style = ttk.Style()
-    style.configure('Red.TCheckbutton', foreground='white', background='red')
-
-    title = Label(root, text='REMAINDER', font=("Courier", 30), bg='red', fg='White')
-    wishes = Label(root, text=f'Today is {name}\'s Birthday\n({date})', font=("Courier", 15), bg='red', fg='White')
-    check_button = ttk.Checkbutton(root, style='Red.TCheckbutton', text='Don\'t show again', variable=var)
-    close_button = Button(root, text='CLOSE', font=("Courier", 12), bg='red', activeforeground='white', activebackground='red', fg='White', width=10, relief='ridge', command=lambda: quit_button(name, date))
-
-    title.pack()
-    wishes.pack()
-    check_button.pack(side='bottom')
-    close_button.pack(side='bottom')
-
-    root.mainloop()
-
-
-def main():
-    '''Main function of the entire script'''
-
-    check_file()
-    get_birthdates()
-
-    for name, date in birthday_list.items():
-        if current_date.strip()[5:] == birthday_list[name]:   # Checking if there is anyone's birthday
-            today_birthdates.update({name: date})
-
-    if len(today_birthdates) != 0:
-        is_today_in_file()
-
-        for name, date in today_birthdates.items():
-            if mark_read(name, date):
-                PlaySound('tone.wav', SND_LOOP + SND_ASYNC)
-                Remainder_Window(name, date)
+        for name, date in self.birthdates.items():
+            if not self.already_seen(name, date):
+                winsound.PlaySound('included files/tone.wav', winsound.SND_LOOP + winsound.SND_ASYNC)
+                self.Window(name, date)
 
 
 if __name__ == '__main__':
-    try:
-        main()
-
-    except FileNotFoundError:
-        pass
+    if os.path.exists('Birthday Remainder.txt'):
+        Remainder_Window().main()
