@@ -1,4 +1,11 @@
-from tkinter import *
+import os
+import sys
+
+try:
+    from tkinter import *
+
+except (ImportError, ModuleNotFoundError):
+    from Tkinter import *
 
 
 class Infinity_Countdown:
@@ -9,7 +16,7 @@ class Infinity_Countdown:
         self.master.title('INFINITY COUNTDOWN')
         self.master.geometry('{}x{}+{}+{}'.format(342, 108, self.master.winfo_screenwidth() // 2 - 342 // 2, self.master.winfo_screenheight() // 2 - 108 // 2))
         self.master.resizable(0, 0)
-        self.master.iconbitmap('included files/icon.ico')
+        self.master.iconbitmap(self.resource_path('included files/icon.ico'))
         self.master.config(bg='dark blue')
 
         self.time = Label(self.master, fg='silver', text='00:00:00', font=("Helvetica", 40), bg='dark blue')
@@ -77,6 +84,23 @@ class Infinity_Countdown:
 
         else:
             self.start_button['state'] = 'normal'
+
+    def resource_path(self, relative_path):
+        """ Get absolute path to resource from temporary directory
+
+        In development:
+            Gets path of photos that are used in this script like in icons and title_image from current directory
+
+        After compiling to .exe with pyinstaller and using --add-data flag:
+            Gets path of photos that are used in this script like in icons and title image from temporary directory"""
+
+        try:
+            base_path = sys._MEIPASS  # PyInstaller creates a temp folder and stores path in _MEIPASS
+
+        except AttributeError:
+            base_path = os.path.abspath(".")
+
+        return os.path.join(base_path, relative_path)
 
 
 root = Tk()

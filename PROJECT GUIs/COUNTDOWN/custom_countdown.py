@@ -1,4 +1,11 @@
-from tkinter import *
+import os
+import sys
+
+try:
+    from tkinter import *
+
+except (ImportError, ModuleNotFoundError):
+    from Tkinter import *
 
 
 class custom_countdown:
@@ -9,7 +16,7 @@ class custom_countdown:
         self.master.title('CUSTOM COUNTDOWN')
         self.master.geometry(f'342x81+{self.master.winfo_screenwidth() // 2 - 342 // 2}+{self.master.winfo_screenheight() // 2 - 81 // 2}')
         self.master.resizable(0, 0)
-        self.master.iconbitmap('included files/icon.ico')
+        self.master.iconbitmap(self.resource_path('included files/icon.ico'))
 
         self.start_button = Button(self.master, text='START', font=("Courier", 16), bg='dark blue', fg='white', activebackground='dark blue', width=8, command=self.start)
         self.start_button.grid(row=1, column=0, sticky='e')
@@ -178,6 +185,23 @@ class custom_countdown:
 
         self.master.focus()
         self.master.after(1000, self.Counter)
+
+    def resource_path(self, relative_path):
+        """ Get absolute path to resource from temporary directory
+
+        In development:
+            Gets path of photos that are used in this script like in icons and title_image from current directory
+
+        After compiling to .exe with pyinstaller and using --add-data flag:
+            Gets path of photos that are used in this script like in icons and title image from temporary directory"""
+
+        try:
+            base_path = sys._MEIPASS  # PyInstaller creates a temp folder and stores path in _MEIPASS
+
+        except AttributeError:
+            base_path = os.path.abspath(".")
+
+        return os.path.join(base_path, relative_path)
 
 
 if __name__ == '__main__':
