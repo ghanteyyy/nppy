@@ -1,7 +1,13 @@
 import os
+import sys
 import ctypes
 import winsound
-from tkinter import *
+
+try:
+    from tkinter import *
+
+except (ImportError, ModuleNotFoundError):
+    from Tkinter import *
 
 
 class To_Do_List:
@@ -13,7 +19,7 @@ class To_Do_List:
         self.file_name = 'to_do_list.txt'
         self.master.after(0, self.master.deiconify)
         self.master.wm_attributes("-topmost", 'true')
-        self.master.iconbitmap('included files/icon.ico')
+        self.master.iconbitmap(self.resource_path('included files/icon.ico'))
         self.master.geometry('{}x{}+{}+{}'.format(400, self.master.winfo_screenheight() - 74, self.master.winfo_screenwidth() - 401, 0))
 
         self.is_collapsed = False
@@ -107,7 +113,7 @@ class To_Do_List:
             self.is_collapsed = True
             self.master.geometry('{}x{}+{}+{}'.format(0, self.master.winfo_screenheight() - 74, self.master.winfo_screenwidth() - 33, 0))
             self.collapse_button.config(text='<<')
-            self.exit_frame.place(x=3, y=self.master.winfo_screenheight() - 102)
+            self.exit_frame.place(x=4, y=self.master.winfo_screenheight() - 102)
 
         else:
             self.is_collapsed = False
@@ -242,6 +248,23 @@ class To_Do_List:
 
             if from_list:
                 self.add_to_list(from_list)
+
+    def resource_path(self, relative_path):
+        """ Get absolute path to resource from temporary directory
+
+        In development:
+            Gets path of photos that are used in this script like in icons and title_image from current directory
+
+        After compiling to .exe with pyinstaller and using --add-data flag:
+            Gets path of photos that are used in this script like in icons and title image from temporary directory"""
+
+        try:
+            base_path = sys._MEIPASS  # PyInstaller creates a temp folder and stores path in _MEIPASS
+
+        except AttributeError:
+            base_path = os.path.abspath(".")
+
+        return os.path.join(base_path, relative_path)
 
 
 if __name__ == '__main__':

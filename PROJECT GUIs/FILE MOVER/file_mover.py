@@ -1,10 +1,18 @@
 import os
+import sys
 import shutil
 import winsound
 import threading
-from tkinter import *
-import tkinter.ttk as ttk
-from tkinter import messagebox
+
+try:
+    from tkinter import *
+    import tkinter.ttk as ttk
+    from tkinter import messagebox
+
+except (ImportError, ModuleNotFoundError):
+    from Tkinter import *
+    import ttk as ttk
+    import tkMessagebox as messagebox
 
 
 class move_or_copy:
@@ -59,7 +67,7 @@ class move_or_copy:
         return False
 
     def action(self, file=None):
-        '''Copy or Move the files / folders'''
+        '''Copy or Move the files and folders'''
 
         to_path = os.path.join(self.to_path, os.path.basename(file))
 
@@ -115,7 +123,7 @@ class GUI:
         self.master.resizable(0, 0)
         self.font = ('Courier', 15, 'bold')
         self.master.title('File MOVER')
-        self.master.iconbitmap('included files/icon.ico')
+        self.master.iconbitmap(self.resource_path('included files/icon.ico'))
 
         self.title_label = Label(self.master, text='File MOVER', fg='white', background='green', font=('Times New Roman', 30, 'bold'))
         self.title_label.pack(fill='both', pady=11)
@@ -187,6 +195,23 @@ class GUI:
             moc = move_or_copy(from_path, to_path, combo_get, var)
             thread = threading.Thread(target=moc.main)
             thread.start()
+
+    def resource_path(self, relative_path):
+        """ Get absolute path to resource from temporary directory
+
+        In development:
+            Gets path of photos that are used in this script like in icons and title_image from current directory
+
+        After compiling to .exe with pyinstaller and using --add-data flag:
+            Gets path of photos that are used in this script like in icons and title image from temporary directory"""
+
+        try:
+            base_path = sys._MEIPASS  # PyInstaller creates a temp folder and stores path in _MEIPASS
+
+        except AttributeError:
+            base_path = os.path.abspath(".")
+
+        return os.path.join(base_path, relative_path)
 
 
 if __name__ == '__main__':
