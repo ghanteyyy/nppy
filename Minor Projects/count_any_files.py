@@ -1,45 +1,41 @@
 import os
 
-try:
-    import win32con
-    import win32file
 
-except (NameError, ImportError, ModuleNotFoundError):
-    print('pywin32 is not installed\nOR\nString was expected')
+class Count_Files:
+    '''Count number of files of given extension in a given path'''
 
+    def __init__(self, path, extension):
+        self.count = 0
+        self.path = path
+        self.extension = extension
+        self.exclude = ['$RECYCLE.BIN', '$Recycle.Bin', '$SysReset', 'Config.Msi', 'Documents and Settings', 'ESD', 'hiberfil.sys', 'Intel', 'MSOCache',
+                        'OneDriveTemp', 'pagefile.sys', 'PerfLogs', 'Program Files', 'Program Files (x86)', 'ProgramData', 'Python27', 'Recovery',
+                        'swapfile.sys', 'System Volume Information', 'Windows', 'Public', '.idlerc', 'AppData', 'MicrosoftEdgeBackups', 'All Users']  # These directories is to be excluded.
 
-def count_any_files(drive, extension):
-    '''Count number of files of given extension available in your drive'''
+    def is_path_valid(self):
+        '''Check if the path given by the user is valid'''
 
-    counter = 0
-    exclude = ['$RECYCLE.BIN', '$Recycle.Bin', '$SysReset', 'Config.Msi', 'Documents and Settings', 'ESD', 'hiberfil.sys', 'Intel', 'MSOCache', 'OneDriveTemp',
-               'pagefile.sys', 'PerfLogs', 'Program Files', 'Program Files (x86)', 'ProgramData', 'Python27', 'Recovery', 'swapfile.sys', 'System Volume Information',
-               'Windows', 'Public', '.idlerc', 'AppData', 'MicrosoftEdgeBackups', 'All Users']   # These directories is to be excluded. Add if you want other too
+        if not os.path.exists(self.path):
+            raise FileNotFoundError(f'{self.path} does not exists')
 
-    drive_types = (win32con.DRIVE_REMOVABLE,)  # Removable disk type
+        return True
 
-    try:
-        if win32file.GetDriveType(drive) in drive_types:  # Check if the the listed drive is removeable
-            print('{} is removeable drive. Do not remove it until this process completes'.format(drive))
+    def main(self):
+        '''Count files'''
 
-        for dirs, dirn, files in os.walk(drive):  # Walking through all directories and files of a given drive
-            for di in dirn:
-                if di in exclude:
-                    dirn.remove(di)  # Removing directory if they are in exclude list
+        if self.is_path_valid():
+            for dirs, dirn, files in os.walk(self.path):  # Going through all directories and files of the path
+                for di in dirn:
+                    if di in self.exclude:
+                        dirn.remove(di)  # Removing directories if they are in self.exclude
 
-            for f in files:
-                if f.endswith(extension):  # Checking if the obtained file's name end with given extension
-                    counter += 1
+                for f in files:
+                    if f.endswith(self.extension):  # Checking if the obtained file has given extension
+                        self.count += 1
 
-        print('{}{}\n{}{}'.format('Drive'.ljust(15), 'Number of {} files'.format(extension).rjust(15), drive.rjust(4), str(counter).rjust(23)))
-
-    except WindowsError as err:
-        if err.strerror == 'The device is not ready':
-            print('{} is not ready to use'.format(drive))
-
-        if err.strerror == 'This drive is locked by BitLocker Drive Encryption. You must unlock this drive from Control Panel':
-            print('{} is locked by BitLocker Drive Encryption. You must unlock this drive from Control Panel'.format(drive))
+            return f'\nPath: {self.path}\nNumber of .{self.extension} files: {self.count}'
 
 
 if __name__ == '__main__':
-    count_any_files('D:\\', '.jpg')
+    count = Count_Files(r'D:\My Project', 'jpg')
+    print(count.main())
