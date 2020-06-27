@@ -1,39 +1,68 @@
-def add_number(numbers):
-    '''Add given number in series
+class add_series_of_numbers:
+    '''Add given integer entered in series
 
-    If user inputs 123456789 then the scripts adds all the numbers.
-          = 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9
-          = 45    '''
+        If user inputs 123456789 then the scripts adds all the integerbers.
+              = 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9
+              = 45    '''
 
-    def method_one(numbers):
-        Sum = 0
-        lists = []   # Empty list
-        number = str(numbers)
+    def __init__(self, integer=123):
+        self.integer = str(integer)
 
-        for num in number:    # Looping for each value stored in number variable to temporaily variable num
-            integer_value = int(num)      # Converting string value (num is in string type) to integer value
-            lists.append(integer_value)   # And appending that integer value 'n' to the empty list "lists"
+    def method_one(self):
+        '''Using for loop while appending each integer in a list and adding each integer of a list to get sum'''
 
-        for adding in lists:  # Looping to each value in lists
-            Sum += adding     # Adding that each value
+        sums = 0
+        lists = []
 
-        print('The sum of {} is {}'.format(number, Sum))
+        for integer in self.integer:
+            lists.append(int(integer))
 
-    def method_two(numbers):
-        sums = sum([int(num) for num in str(numbers)])
+        for adding in lists:
+            sums += adding
 
-        print('Sum of {} is {}'.format(numbers, sums))
+        return f'Sum of {self.integer} = {sums}'
 
-    print('Method One')
-    method_one(123)
+    def method_two(self):
+        '''Using for loop and getting the sum directly without appending to any list'''
 
-    print('\nMethod Two')
-    method_two(123)
+        sums = 0
+
+        for integer in self.integer:
+            sums += int(integer)
+
+        return f'Sum of {self.integer} = {sums}'
+
+    def method_three(self):
+        '''Using list comphrension'''
+
+        sums = sum([int(integer) for integer in self.integer])
+
+        return f'Sum of {self.integer} = {sums}'
+
+    def method_four(self):
+        '''Using for loop and built-in function : sum : to add those integers'''
+
+        lists = []
+
+        for integer in self.integer:
+            lists.append(int(integer))
+
+        sums = sum(lists)
+
+        return f'Sum of {self.integer} = {sums}'
 
 
 if __name__ == '__main__':
-    try:
-        add_number(123)
+    add = add_series_of_numbers()
 
-    except (ValueError, NameError):
-        print('Integer value was expected')
+    print('\nMethod One')
+    print(add.method_one(), end='\n\n')
+
+    print('Method Two')
+    print(add.method_two(), end='\n\n')
+
+    print('Method Three')
+    print(add.method_three(), end='\n\n')
+
+    print('Method Four')
+    print(add.method_four())
