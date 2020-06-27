@@ -1,41 +1,45 @@
 import collections
 
 
-def count_letter(strings):
-    '''Count number of character of a give word or sentence'''
+class Count_Letter:
+    def __init__(self, strings):
+        self.strings = strings
 
-    if not str(strings).isalpha():
-        strings = str(strings)
+    def method_one(self):
+        '''Using for loop'''
 
-    def method_one(strings):
         dic = {}
 
-        for string in strings:       # Looping through each value in strings
-            if string in dic:        # Checking if that value is in dictionary dic
-                dic[string] += 1     # If character exists in dic then adding 1 to the value with respective character
+        for string in self.strings:
+            if string in dic:
+                dic[string] += 1     # If a character exists in dic then increasing its count by 1.
 
             else:
-                dic[string] = 1      # If character not exists in dic then giving 1 as value of that respective character
+                dic[string] = 1      # Else assigning its count to 1.
 
-        for k, v in dic.items():     # Looping to each value of key and value in dictionary "dic"
-            print('{} : {}'.format(k, v))     # Printing key and value
+        keys = [key for key in dic.keys()]   # Ssorting keys of dic alphabetically so that we can print keys and values in order.
+        keys.sort()
 
-    def method_two(strings):
-        count = collections.Counter(strings)
+        for key in keys:
+            print('{} : {}'.format(key, dic[key]))
 
-        for k, v in count.items():
-            print('{} : {}'.format(k, v))
+    def method_two(self):
+        '''Using built-in module : collections :'''
 
-    print('Method One')
-    method_one(strings)
+        dic = collections.Counter(self.strings)
 
-    print('\nMethod Two')
-    method_two(strings)
+        keys = [key for key in dic.keys()]  # Ssorting keys of dic alphabetically so that we can print keys and values in order.
+        keys.sort()
+
+        for key in keys:
+            print('{} : {}'.format(key, dic[key]))
 
 
 if __name__ == '__main__':
-    try:
-        count_letter('pneumonoultramicroscopicsilicovolcanoconiosis')
+    count = Count_Letter('pneumonoultramicroscopicsilicovolcanoconiosis')
 
-    except (ValueError, NameError):
-        print('String value was expected')
+    print('Method One')
+    count.method_one()
+
+    print('\nMethod Two')
+    count.method_two()
