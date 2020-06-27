@@ -1,29 +1,37 @@
-try:
-    import cv2
-
-except (NameError, ImportError, ModuleNotFoundError):
-    print('cv2 package installed not found')
+import cv2
 
 
-def live_stream():
-    '''Stream your live video'''
+class Live_Stream:
+    '''Getting live video from your webcam'''
 
-    cam = cv2.VideoCapture(cv2.CAP_DSHOW)
+    def __init__(self, window_name='Live Stream'):
+        self.window_name = window_name
 
-    while True:
-        ret, frame = cam.read()  # Getting frame
-        frame = cv2.flip(frame, 180)   # Rotating frame to 180 degree
+    def live_stream(self):
+        '''Streaming Video'''
 
-        cv2.namedWindow('LIVE STREAM', cv2.WINDOW_NORMAL)
-        cv2.resizeWindow('LIVE STREAM', (800, 600))
-        cv2.imshow('LIVE STREAM', frame)
+        cam = cv2.VideoCapture(cv2.CAP_DSHOW)
 
-        if cv2.waitKey(1) == 27:   # Press esc to quit everything
-            break
+        try:
+            while True:
+                ret, frame = cam.read()  # Getting frame
 
-    cam.release()   # Destroying camera
-    cv2.destroyAllWindows()   # Destroying all your active windows
+                frame = cv2.flip(frame, 180)   # Rotating frame to 180 degree
+
+                cv2.namedWindow(self.window_name, cv2.WINDOW_NORMAL)
+                cv2.resizeWindow(self.window_name, (800, 600))
+                cv2.imshow(self.window_name, frame)
+
+                if cv2.waitKey(1) == 27:   # Press esc to quit everything
+                    break
+
+            cam.release()   # Destroying camera
+            cv2.destroyAllWindows()   # Destroying all your active windows
+
+        except cv2.error:
+            print('Camera is not connected')
 
 
 if __name__ == '__main__':
-    live_stream()
+    live_stream = Live_Stream()
+    live_stream.live_stream()

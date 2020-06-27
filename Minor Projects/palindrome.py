@@ -1,19 +1,31 @@
-def palindrome(strings):
+class Palindrome:
     '''Checks if your given string is palindrome or not
 
         Palindrome is a string / number which is same as reversing the orginal string / number
     '''
 
-    try:
-        if strings.lower() == strings[::-1].lower():   # Checking if original value is same as reversing it
-            print('{} is palindrome'.format(strings))
+    def __init__(self, string):
+        self.string = string.lower()
+
+    def reverse_string(self):
+        '''Reversing the given string
+
+           See reverse.py to know other ways to reverse the given string'''
+
+        return self.string[::-1]
+
+    def is_palindrome(self):
+        '''Checking if the given string is palindrome'''
+
+        reversed_string = self.reverse_string()
+
+        if self.string == reversed_string:
+            print(f'{self.string} is palindrome')
 
         else:
-            print('{} is not palindrome'.format(strings))
-
-    except (ValueError, NameError):
-        print('String value was expected')
+            print(f'{self.string} is not palindrome')
 
 
 if __name__ == '__main__':
-    palindrome('mom')
+    palin = Palindrome('mom')
+    palin.is_palindrome()

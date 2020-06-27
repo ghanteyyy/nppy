@@ -1,36 +1,44 @@
-def join_word(string, joining_keyword):
-    """Join your word with your joining keyword
+class join_word:
+    '''Join your word with your joining keyword
         Example:
                 word = PYTHON
-                joining_keyword = -
+                delimiter = -
 
                 then you get
                     P-Y-T-H-O-N
-    """
+    '''
 
-    def method_one(string, joining_keyword):
+    def __init__(self, string, delimiter):
+        self.string = string
+        self.delimiter = delimiter
+
+    def method_one(self):
+        '''Using for loop'''
+
         join_word = ""
 
-        for x in range(0, len(string)):
-            join_word += string[x] + joining_keyword
+        for x in range(len(self.string)):
+            if x != len(self.string) - 1:
+                join_word += self.string[x] + self.delimiter
 
-        print(join_word[:-1])
+            else:
+                join_word += self.string[x]
 
-    def method_two(string, joining_keyword):
-        join = (joining_keyword).join(string)
+        print(join_word)
+
+    def method_two(self):
+        '''Using built-in function : join :'''
+
+        join = (self.delimiter).join(self.string)
 
         print(join)
 
-    print("Method One")
-    method_one(string, joining_keyword)
-
-    print("\nMethod Two")
-    method_two(string, joining_keyword)
-
 
 if __name__ == "__main__":
-    try:
-        join_word("python", "-")
+    join = join_word('PYTHON', '-')
 
-    except (ValueError, NameError):
-        print("String value was expected")
+    print("Method One")
+    join.method_one()
+
+    print("\nMethod Two")
+    join.method_two()

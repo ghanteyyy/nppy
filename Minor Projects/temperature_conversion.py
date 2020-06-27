@@ -1,21 +1,48 @@
-def Celsius_to_Fahrenheit(Tc):
-    # Celsius to Fahrenheit = (9 / 5) * Temperature in celsius + 32
+class Temperature_convertedersion:
+    '''Convert given temperature to celsius, fahrenheit or kelvin'''
 
-    Tf = (9 / 5) * Tc + 32
-    print('The Fahrenheit scale of {} is {}'.format(Tc, Tf))
+    def __init__(self, temp):
+        self.temp = temp
 
+    def celsius_to_fahrenheit(self):
+        converted = (9 / 5) * self.temp + 32
 
-def Fahrenheit_to_Celsius(Tf):
-    # Fahrenheit to Celsius = (5 / 9) * Temperature in Fahrenheit - 32
+        return f'{self.temp}C = {converted}F'
 
-    Tc = (5 / 9) * Tf - 32
-    print('The Celsius scale of {} is {}'.format(Tf, Tc))
+    def celsius_to_kelvin(self):
+        converted = self.temp + 273
+
+        return f'{self.temp}C = {converted}K'
+
+    def fahrenheit_to_celsius(self):
+        converted = (5 / 9) * self.temp - 32
+
+        return f'{self.temp}F = {converted}C'
+
+    def fahrenheit_to_kelvin(self):
+        converted = (5 * self.temp - 2617) / 9
+
+        return f'{self.temp}F = {converted}K'
+
+    def kelvin_to_celsius(self):
+        converted = self.temp - 273
+
+        return f'{self.temp}K = {converted}C'
+
+    def kelvin_to_fahrenheit(self):
+        converted = (9 * self.temp + 2167) / 5
+
+        return f'{self.temp}K = {converted}F'
 
 
 if __name__ == '__main__':
-    try:
-        Celsius_to_Fahrenheit(float(input('Give Temperature in Celsius scale:')))
-        Fahrenheit_to_Celsius(float(input('\n\nGive Temperature in Fahrenheit scale:')))
+    temp_converted = Temperature_convertedersion(100)
 
-    except (ValueError, NameError):
-        print('Integer was expected')
+    print(temp_converted.celsius_to_fahrenheit())
+    print(temp_converted.celsius_to_kelvin(), end='\n\n')
+
+    print(temp_converted.fahrenheit_to_celsius())
+    print(temp_converted.fahrenheit_to_kelvin(), end='\n\n')
+
+    print(temp_converted.kelvin_to_celsius())
+    print(temp_converted.kelvin_to_fahrenheit())

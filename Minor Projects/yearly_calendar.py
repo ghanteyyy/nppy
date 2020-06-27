@@ -1,15 +1,19 @@
 import calendar
 
 
-def year_calendar(year):
+class Yearly_Calendar:
     '''Get calendar of a given year'''
 
-    try:
-        print(calendar.calendar(year))
+    def __init__(self, year):
+        self.year = year
 
-    except (ValueError, NameError):
-        print('Integer was expected')
+    def get_calendar(self):
+        '''Getting calendar'''
+
+        print('\n')
+        print(calendar.calendar(self.year))
 
 
 if __name__ == '__main__':
-    year_calendar(2019)
+    year_calendar = Yearly_Calendar(2020)
+    year_calendar.get_calendar()

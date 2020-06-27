@@ -1,12 +1,8 @@
-try:
-    import requests         # This module allows to send all kinds of HTTP requests
-
-except (ImportError, ModuleNotFoundError):
-    print('requests package installed not found')
+import requests
 
 
 def is_internet():
-    '''Check your internet conection'''
+    '''Check if you are connected to internet'''
 
     try:
         requests.get("http://www.google.com")

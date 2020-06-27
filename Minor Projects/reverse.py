@@ -1,42 +1,82 @@
-def reverse(strings):
-    '''Reversing the string'''
+class Reverse:
+    def __init__(self, strings):
+        self.strings = strings
+        self.length = len(self.strings) - 1
 
-    try:
-        if not str(strings).isalpha():  # If given value is interger
-            strings = str(strings)
+    def method_one(self):
+        '''Using for loop'''
 
-        def method_one(strings):
-            reversing = ''
+        reverse = ''
 
-            for i in range(len(strings) - 1, -1, -1):
-                reversing += strings[i]
+        for i in range(self.length, -1, -1):
+            reverse += self.strings[i]
 
-            print(reversing)
+        return reverse
 
-        def method_two(strings):
-            reverse_list = reversed(strings)
-            join_reverse = ''.join(reverse_list)
-            print(join_reverse)
+    def method_two(self):
+        '''Using while loop'''
 
-            ''' Here, first reverse the given string with "reversed" function which returns list
-               and joins the reversed list using "join" function.'''
+        reverse = ''
+        length = self.length
 
-        def method_three(strings):
-            reversing = strings[::-1]
-            print(reversing)
+        while length >= 0:
+            reverse += self.strings[length]
+            length -= 1
 
-        print('Method One')
-        method_one(strings)
+        return reverse
 
-        print('\nMethod Two')
-        method_two(strings)
+    def method_three(self):
+        '''Using slicing method'''
 
-        print('\nMethod Three')
-        method_three(strings)
+        return self.strings[::-1]
 
-    except (ValueError, NameError):
-        print('String Value was expected')
+    def method_four(self):
+        '''Using built-in function reversed'''
+
+        reverse = reversed(self.strings)
+
+        return ''.join(reverse)
+
+    def method_five(self):
+        '''Using in-place algorithm
+
+           Defination:
+                In-place means that the algorithm does not use extra space for
+                manipulating the input but may require a small though nonconstant
+                extra space for its operation.'''
+
+        strings = list(self.strings)
+
+        for i in range((self.length + 1) // 2):
+            strings[i], strings[self.length - i] = strings[self.length - i], strings[i]
+
+        return ''.join(strings)
+
+    def method_six(self):
+        '''List Comphrension of method one'''
+
+        reverse = [self.strings[i] for i in range(self.length, -1, -1)]
+
+        return ''.join(reverse)
 
 
 if __name__ == '__main__':
-    reverse('Python')
+    reverse = Reverse('PYTHON')
+
+    print('\nMethod One')
+    print(reverse.method_one())
+
+    print('\nMethod Two')
+    print(reverse.method_two())
+
+    print('\nMethod Three')
+    print(reverse.method_three())
+
+    print('\nMethod Four')
+    print(reverse.method_four())
+
+    print('\nMethod Five')
+    print(reverse.method_five())
+
+    print('\nMethod Six')
+    print(reverse.method_six())

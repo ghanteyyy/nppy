@@ -1,21 +1,34 @@
-def remove_vowels(strings):
+class Remove_Vowels:
     '''Remove vowels from the word given by the user'''
 
-    try:
-        if not str(strings).isalpha():  # If the given value is integer
-            strings = str(strings)
+    def __init__(self, strings):
+        self.strings = strings.lower()
+        self.vowels = ['a', 'e', 'i', 'o', 'u']
 
-        new_word = ''
+    def method_one(self):
+        '''Using for loop'''
 
-        for letter in strings:
-            if letter not in 'aeiou':
-                new_word += letter  # Joining only consonant letters
+        words_removed_vowels = ''
 
-        print(new_word)
+        for string in self.strings:
+            if string not in self.vowels:
+                words_removed_vowels += string
 
-    except (ValueError, NameError):
-        print('String value was expected')
+        return words_removed_vowels
+
+    def method_two(self):
+        '''Using list comphrension'''
+
+        words_removed_vowels = [string for string in self.strings if string not in self.vowels]
+
+        return ''.join(words_removed_vowels)
 
 
 if __name__ == '__main__':
-    remove_vowels('santosh')
+    remove_vowels = Remove_Vowels('The quick brown fox jumps over the lazy dog')
+
+    print('Method One')
+    print(remove_vowels.method_one())
+
+    print('\nMethod Two')
+    print(remove_vowels.method_two())

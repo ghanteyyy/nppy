@@ -1,16 +1,47 @@
-try:
-    import ipgetter
-
-except (NameError, ImportError, ModuleNotFoundError):
-    print('ipgetter installed not found')
+import requests
+from bs4 import BeautifulSoup
 
 
-def get_public_ip():
-    # Get your public ip address
+class Get_Public_IP:
+    '''Gets the external public IP form "myip.com"
 
-    myip = ipgetter.myip()    # Getting your ip
-    print(myip)
+       Still lacks flexibility. Needs to work more'''
+
+    def __init__(self):
+        self.servers = ['https://www.myip.com']
+
+    def is_internet(self):
+        '''Checks if you have internet connection'''
+
+        try:
+            requests.get(self.servers[0])
+            return True
+
+        except requests.ConnectionError:
+            return False
+
+    def get_html(self):
+        '''Gets the whole html source code of the website'''
+
+        return requests.get(self.servers[0]).content
+
+    def get_ip(self):
+        '''Getting IP'''
+
+        if self.is_internet():
+            html = self.get_html()
+
+            if html:
+                soup = BeautifulSoup(html, 'html.parser')
+                spans = soup.find('span')
+
+                if spans.get('id') == 'ip':
+                    return spans.text
+
+        else:
+            return 'You are not connected to Internet'
 
 
 if __name__ == '__main__':
-    get_public_ip()
+    public_ip = Get_Public_IP()
+    print(public_ip.get_ip())

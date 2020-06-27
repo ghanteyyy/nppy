@@ -1,13 +1,17 @@
-def multiples(number):
-    '''Get multiplication of a given number'''
+class Multiplication_Table:
+    '''Prints the multiplication table of a given number till given upto'''
 
-    try:
-        for x in range(1, 11):
-            print('{} * {}  = {}'.format(number, x, number * x))
+    def __init__(self, number=9, upto=20):
+        self.upto = upto
+        self.number = number
 
-    except (ValueError, NameError):
-        print('Integer value was expected')
+    def get_multiples(self):
+        '''Printing the multiplication table '''
+
+        for num in range(1, self.upto + 1):
+            print(f'{self.number} x {num} = {self.number * num}')
 
 
 if __name__ == '__main__':
-    multiples(10)
+    multiples = Multiplication_Table()
+    multiples.get_multiples()

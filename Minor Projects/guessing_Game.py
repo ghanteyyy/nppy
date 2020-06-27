@@ -1,58 +1,81 @@
 import random
 
 
-def game():
-    ''' Let's play guessing game
+class Guessing_Game:
+    def __init__(self, low=0, high=100):
+        self.low = low
+        self.high = high
 
-        Guess a number between 1-100
-        Your guess must not exceed 100 and must not be less than 1 '''
+    def is_guess_within_range(self, guess):
+        '''Check if the guess is within the range of self.low and self.high'''
 
-    try:
+        if self.low <= guess <= self.high:
+            return True
 
-        name = input('Enter name:\t').title()
-        print('Welcome {}\n'.format(name))
+        return False
 
-        found = False
-        number_of_tries = 0        # Track number of tries
-        random_number = random.randint(1, 100)   # You need to guess this random number
+    def get_user_guess(self):
+        '''Ask user to enter their guess until the valid guess is entered.'''
 
-        while not found:
-            user_guess = int(input('\nGuess a number:'))   # Asking user to enter their guess
+        try:
+            guess = int(input(f'\nGuess a number between {self.low}-{self.high}: '))
 
-            if user_guess == random_number:   # Checking if user guess and random number equal
-                print("You have guessed in {} tries".format(number_of_tries))
-                found = True
+            if not self.is_guess_within_range(guess):
+                print(f'Your guess is not between {self.low}-{self.high}')
 
-                choice = input('\nDo you want to continue (y/n)?:').lower()
+            else:
+                return guess
 
-                if choice == 'y':
-                    game()    # Calling function to restart the game
+        except ValueError:
+            print('Your guess is not valid. Guess was expected in integer')
 
-                else:
-                    print('\nGoodbye! Have a nice day ...')
-                    break
+    def play_again(self):
+        '''Ask user if they want to play the game again.'''
 
-            elif user_guess > random_number:   # Checking if user guess is greater than random number
-                print('Guess Lower')
+        check = input('\nDo you want to play again (y/n)?').lower()
 
-            elif user_guess < random_number:   # Checking if user guess is higher than random number
-                print('Guess Higher')
+        if check == 'y':
+            return True
 
-            elif user_guess > 100:             # Checking if user guess is more than 100
-                print('Guess Lower than 100')
+        return False
 
-            elif user_guess < 1:               # Checking if user guess is less than 1
-                print('Guess Higher than 0')
+    def random_number(self):
+        '''Returns random number which has to be guessed by the user'''
 
-            number_of_tries += 1
+        return random.randint(self.low, self.high)
 
-    except ValueError:
-        print('Integer value was expected\n')
-        game()
+    def main(self):
+        '''Playing the game'''
 
-    except KeyboardInterrupt:
-        pass
+        count = 0
+        is_guessed = False
+        is_valid_guess = False
+        to_guess = self.random_number()
+
+        while not is_guessed:   # Until user guesses the random_number
+            while not is_valid_guess:  # Until users enters valid guess
+                user_guess = self.get_user_guess()
+
+                if user_guess:
+                    is_valid_guess = True
+
+            if user_guess == to_guess:
+                is_guessed = True
+                print(f'You have guessed in {count} guesses')
+
+                if self.play_again():
+                    self.main()
+
+            elif user_guess > to_guess:
+                print('Your guess is high')
+
+            elif user_guess < to_guess:
+                print('Your guess is low')
+
+            count += 1
+            is_valid_guess = False
 
 
 if __name__ == '__main__':
-    game()
+    guess = Guessing_Game()
+    guess.main()

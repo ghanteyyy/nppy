@@ -1,66 +1,48 @@
 import os
 import string
 import random
-import getpass
 
 
-def hunderd_folders(number_of_folders, length_of_folder_name):
-    '''Create 'n' number of folders inside python_FOLDER in your desktop'''
+class Folders_Creator:
+    '''Create n number of folders'''
 
-    try:
-        path = 'C:\\Users\\{}\\Desktop\\python_Folder'.format(getpass.getuser())
+    def __init__(self, path, number_of_folders=100, name_length=8):
+        self.path = path
+        self.name_length = name_length    # To generate random name as per name_length
+        self.number_of_folders = number_of_folders    # To generate folders as per the number_of_folders
 
-        if not os.path.exists(path):   # Checking if path exists
-            os.mkdir(path)    # If path does not exist then creates it
+    def is_path_valid(self):
+        '''Check if the path given by the user actually exists'''
 
-        folder_name = ''     # No name yet.
+        split_path = os.path.split(self.path)[0]
 
-        for _ in range(number_of_folders):     # Loop for creating folders
-            for _ in range(length_of_folder_name):    # Loop to generate random folder name
-                folder_name += random.choice(string.ascii_letters + string.digits)
+        if os.path.exists(split_path):
+            os.mkdir(self.path)
+            return True
 
-            os.mkdir(os.path.join(path, folder_name))    # Joining path and random generated name and creating folder.
-            folder_name = ''   # Emptying folder_name for another new name
+        else:
+            raise FileNotFoundError(f'{self.path} does not exists')
 
-        os.startfile(path)
+    def random_name(self):
+        '''Generating random name for each folder'''
 
-    except (ValueError, NameError):
-        print('Number of folders and length of folder name is expected in integer')
+        return ''.join([random.choice(string.printable[:62]) for _ in range(self.name_length)])
 
-    except KeyboardInterrupt:
-        pass
+    def main(self):
+        '''Creating folders as per the number_of_folders provided by the user'''
 
-    '''PYTHONIC way:
+        if self.is_path_valid():
+            for _ in range(self.number_of_folders):
+                random_name = self.random_name()
 
-            [CODE]
-                path = 'C:\\Users\\{}\\Desktop\\Python Generated Folder'.format(getpass.getuser())
+                path = os.path.join(self.path, random_name)
+                os.mkdir(path)
 
-                if not os.path.exists(path):
-                    os.mkdir(os.path.join(path))
-
-                for _ in range(number_of_folders):
-                    os.mkdir(path + '\\' + '.join(x for _ in range(length_of_folder_name) for x in _string.printable[(random.randint(0, 61))]))
-
-                os.startfile('path')
-
-            [EXPLANATION of CODE]
-                Here, ''.join(x for _ in range(length_of_folder_name) for x in _string.printable[(random.randint(0, 61))])
-
-                        first gets the random letters from string.printable by slicing with random number generated between (0, 61) by random.randint(0, 61)
-
-                        and then the join function joins the every letter
-
-                        '_' is throwaway variable
-
-                        Example: Lets assume:
-                                    length_of_folder_name = 10
-                                    number_of_folder = 100
-
-                                    The first loop "for _ in range(number_of_folders)" is used to make folder
-
-                                    Then the for loop iterate for 10 times and generates random letter like (a,w,2,q,k,i,4,j,x,v) and the built in function
-                                    joins them together and forms "aw2qki4jxv" for every loop in first loop'''
+            os.startfile(self.path)
 
 
 if __name__ == '__main__':
-    hunderd_folders(100, 20)
+    path = os.path.join(os.path.realpath('.'), '100folders')
+
+    folders = Folders_Creator(path)
+    folders.main()

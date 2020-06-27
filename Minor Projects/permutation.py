@@ -1,33 +1,35 @@
 import math
 
 
-def permutation(number, difference):
-    '''
-       Formula to calulate permutation.
-               P(n,r) = n! / (n-r)!   ; n > r
+class Permutation:
+    '''Formula to calulate permutation.
+           P(n,r) = n! / (n-r)!   ; n > r
 
-                    where, n = total number of arrangements
-                           r = difference of arrangements
-                           ! = factorial of the number  eg: 4! = 4 * 3 * 2 * 1 = 24
-    '''
+                where, n = total number of arrangements
+                       r = difference of arrangements
+                       ! = factorial of the number  eg: 4! = 4 * 3 * 2 * 1 = 24'''
 
-    try:
-        if difference > number:
-            print('Difference is greater than Number')
+    def __init__(self, number, difference):
+        self.number = number
+        self.difference = difference
 
-        else:
-            num = math.factorial(number)
-            diff = math.factorial(number - difference)
+    def factorial(self, num):
+        '''See more about factorial in factorial.py'''
 
-            permutation = int(num / diff)
-            print(permutation)
+        return math.factorial(num)
 
-    except (ValueError, NameError):
-        print('Integer value was expected')
+    def get_permutaion(self):
+        '''Calculating permutation of the given number and difference'''
 
-    except KeyboardInterrupt:
-        pass
+        if self.difference > self.number:
+            return 'Number must be greater than difference'
+
+        n = self.factorial(self.number)
+        r = self.factorial(self.number - self.difference)
+
+        return n // r     # Here r is equivalent to n - r
 
 
 if __name__ == '__main__':
-    permutation(18, 6)
+    permutation = Permutation(18, 6)
+    print(permutation.get_permutaion())

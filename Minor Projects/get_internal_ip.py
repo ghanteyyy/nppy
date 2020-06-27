@@ -1,19 +1,34 @@
-# import os
-# import platform
+import os
 import socket
+import platform
 
 
-def get_internal_ip():
-    host_name = socket.gethostname()
+class Internal_IP:
+    '''Getting internal IP'''
 
-    '''You can get host_name is next three ways:
-            host_name = os.environ['COMPUTERNAME']
-            host_name = os.environ['DOMAINNAME']
-            host_name = platform.node() '''
+    def get_ip(self, host):
+        '''Getting IP'''
 
-    get_ip = socket.gethostbyname(host_name)
-    print(get_ip)
+        return socket.gethostbyname(host)
+
+    def method_one(self):
+        '''Getting host name using os module.'''
+
+        host = os.environ['COMPUTERNAME']
+        return self.get_ip(host)
+
+    def method_two(self):
+        '''Getting host name using platform module.'''
+
+        host = platform.node()
+        return self.get_ip(host)
 
 
 if __name__ == '__main__':
-    get_internal_ip()
+    internal_ip = Internal_IP()
+
+    print('\nMethod One')
+    print(internal_ip.method_one())
+
+    print('\nMethod Two')
+    print(internal_ip.method_two())

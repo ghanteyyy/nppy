@@ -1,54 +1,67 @@
 import random
 
 
-def play_game():
-    '''
-    Game Rule:
-
+class Scissors_Paper_Rock:
+    '''Game Rules:
         If a rock and scissors are formed, the rock wins, because a rock can smash scissors.
         If scissors and paper are formed, the scissors win, because scissors can cut paper.
         If paper and a rock are formed, the paper wins, because a sheet of paper can cover a rock. '''
 
-    print('scissors (s) or paper (p) or rock (r) \n')
-    choices = ['s', 'p', 'r']
+    def __init__(self):
+        self.choices = ['s', 'p', 'r']
+        self.user_winning = [('r', 's'), ('s', 'p'), ('p', 'r')]   # Combination for user to win
 
-    try:
-        while True:
-            random_choice = random.choice(choices)
-            user_input = str(input('Whats your choice?:'))
+    def get_user_input(self):
+        '''Ask user to input their choice'''
 
-            if user_input == '' or user_input == ' ':
-                print('Blank input... scissors (s) or paper (p) or rock (r) was expected ...\n')
+        user_input = input('\nscissors (s) or paper (p) or rock (r): ').lower()
 
-            elif user_input == 's' and random_choice == 'p':
-                print('You Own!\n')
+        if user_input in self.choices:
+            return user_input
 
-            elif user_input == 'p' and random_choice == 'r':
-                print('You Own!\n')
+        else:
+            print('Invalid input')
 
-            elif user_input == 'r' and random_choice == 's':
-                print('You Own!\n')
+    def get_bot_input(self):
+        '''Bot Input: Random choice between "spr" '''
 
-            elif user_input == 'p' and random_choice == 's':
-                print('You Lost! \n')
+        return random.choice(self.choices)
 
-            elif user_input == 'r' and random_choice == 'p':
-                print('You Lost! \n')
+    def check_winner(self, user, bot):
+        '''check if user won or bot or the game is draw'''
 
-            elif user_input == 's' and random_choice == 'r':
-                print('You Lost! \n')
+        if user == bot:
+            return 'Draw'
 
-            elif user_input == random_choice:
-                print('Draw \n')
+        for winner in self.user_winning:
+            if winner == (user, bot):
+                return 'You Won'
 
-            elif user_input != 's' or user_input != 'p' or user_input != 'r':
-                print('scissors (s) or paper (p) or rock (r) was expected ...')
+        return 'You Lost'
 
-            print('Press "Ctrl + c" to exit .... \n')
+    def play(self):
+        '''Playing the game'''
 
-    except KeyboardInterrupt:
-        pass
+        print('\nQuit Command: Ctrl + C')
+
+        try:
+            while True:
+                user_input = self.get_user_input()
+
+                while not user_input:   # If user_input is none
+                    user_input = self.get_user_input()
+
+                bot_input = self.get_bot_input()
+
+                print(f'You: {user_input}\nBot: {bot_input}')
+
+                winner = self.check_winner(user_input, bot_input)
+                print(winner)
+
+        except KeyboardInterrupt:
+            pass
 
 
 if __name__ == '__main__':
-    play_game()
+    srp = Scissors_Paper_Rock()
+    srp.play()

@@ -1,17 +1,19 @@
-try:
-    from SimpleCV import Camera       # This module allows you to access with camera
-
-except (ImportError, ModuleNotFoundError):
-    print('Download SimpleCV from >>>   https://sourceforge.net/projects/simplecv/files/latest/download?source=files')
+from SimpleCV import Camera
 
 
-def capture_image(name):
-    '''Capture image from your camera'''
+class Simple_CV:
+    def __init__(self, name):
+        self.name = 'Image.jpg'
+        self.download_link = 'https://sourceforge.net/projects/simplecv/files/latest/download?source=files'
 
-    cam = Camera()
-    pic = cam.getImage()
-    pic.save(name)
+    def capture(self):
+        '''Capture image from your camera'''
+
+        cam = Camera
+        cap = cam.getImage()
+        cap.save(self.name)
 
 
 if __name__ == '__main__':
-    capture_image('Image.jpg')   # Don't forget to include extension either '.jpg' or 'png'
+    simple_cv = Simple_CV('Image.jpg')
+    simple_cv.capture()

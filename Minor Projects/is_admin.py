@@ -19,7 +19,7 @@ if is_admin():
 
 else:
     # Re-run the program with admin rights
-    ctypes.windll.shell32.ShellExecuteW(None, u"runas", unicode(sys.executable), unicode(__file__), None, 1)
+    ctypes.windll.shell32.ShellExecuteW(None, u"runas", sys.executable, __file__, None, 1)
 
 
 if __name__ == '__main__':

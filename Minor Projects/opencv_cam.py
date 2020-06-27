@@ -1,28 +1,32 @@
-try:
-    import cv2
-
-except (ImportError, ModuleNotFoundError):
-    print('[opencv-python] cv2 package found not installed')
+import cv2
 
 
-def capture_image(name):
+class Open_CV:
     '''Capture image from your camera'''
 
-    try:
-        cam = cv2.VideoCapture(0)  # Setting default camera
+    def __init__(self, image_name):
+        self.image_name = image_name
+        self.download_link = 'pip install opencv-python'
 
-        for _ in range(30):   # This loop prevents black image
-            cam.read()
+    def capture(self):
+        '''Capturing Image'''
 
-        ret, frame = cam.read()  # Reading each frame
-        cv2.imwrite(str(name), frame)  # Saving captured frame
+        try:
+            cam = cv2.VideoCapture(0)  # Setting default camera
 
-        cam.release()
-        cv2.destroyAllWindows()
+            for _ in range(30):   # This loop prevents black image
+                cam.read()
 
-    except NameError:
-        print('String value was expected')
+            ret, frame = cam.read()  # Reading each frame
+            cv2.imwrite(self.image_name, frame)  # Saving captured frame
+
+            cam.release()
+            cv2.destroyAllWindows()
+
+        except cv2.error:
+            print('Camera is not connected')
 
 
 if __name__ == '__main__':
-    capture_image('Image.jpg')    # Don't forget to include '.jpg' or '.png' extension
+    open_cv = Open_CV('Image.jpg')    # Don't forget to include '.jpg' or '.png' extension
+    open_cv.capture()

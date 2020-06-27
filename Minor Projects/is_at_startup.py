@@ -1,31 +1,50 @@
 import os
 
-try:   # Python 2
-    from _winreg import ConnectRegistry, HKEY_CURRENT_USER, OpenKey, KEY_WRITE, SetValueEx, REG_SZ, KEY_SET_VALUE
+try:   # Python 3
+    import winreg
 
-except (ImportError, ModuleNotFoundError):   # Python 3
-    from winreg import ConnectRegistry, HKEY_CURRENT_USER, OpenKey, KEY_WRITE, SetValueEx, REG_SZ, KEY_SET_VALUE
+except ModuleNotFoundError:   # Python 2
+    import _winreg as winreg
 
 
-def is_at_startup(program_path):
-    '''Add any program to your startup list'''
+class is_at_startup:
+    '''Adding the given program path to startup'''
 
-    areg = ConnectRegistry(None, HKEY_CURRENT_USER)
+    def __init__(self, program_path):
+        self.program_path = program_path
+        self.program_basename = os.path.basename(self.program_path)
 
-    try:
-        akey = OpenKey(areg, 'SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\{}'.format(os.path.basename(program_path)), 0, KEY_WRITE)
-        areg.Close()
-        akey.Close()
+    def is_path_valid(self):
+        '''Check if the given program path is actually exists'''
 
-    except WindowsError:
-        key = OpenKey(areg, r'SOFTWARE\Microsoft\Windows\CurrentVersion\Run', 0, KEY_SET_VALUE)
-        SetValueEx(key, '{}'.format(os.path.basename(program_path)), 0, REG_SZ, '{}'.format(program_path))
+        if os.path.exists(self.program_path):
+            return True
 
-        areg.Close()
-        key.Close()
+        return False
 
-        print('{} added to startup'.format(os.path.basename(program_path)))
+    def main(self):
+        '''Adding to startup'''
+
+        if not self.is_path_valid():
+            areg = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
+
+            try:
+                akey = winreg.OpenKey(areg, f'SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\{self.program_basename}', 0, winreg.KEY_WRITE)
+                areg.Close()
+                akey.Close()
+
+                print(f'{self.program_path} already at startup')
+
+            except WindowsError:
+                key = winreg.OpenKey(areg, r'SOFTWARE\Microsoft\Windows\CurrentVersion\Run', 0, winreg.KEY_SET_VALUE)
+                winreg.SetValueEx(key, f'{self.program_basename}', 0, winreg.REG_SZ, f'{self.program_basename}')
+
+                areg.Close()
+                key.Close()
+
+                print(f'{self.program_path} added to startup')
 
 
 if __name__ == '__main__':
-    is_at_startup('your program path')
+    startup = is_at_startup('your program path')
+    startup.main()
