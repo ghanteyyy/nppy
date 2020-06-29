@@ -9,35 +9,39 @@ except (ImportError, ModuleNotFoundError):
 
 
 class Blink:
-    def __init__(self, master):
-        self.master = master
+    '''Show and hide the given text such that is appears as blinking'''
+
+    def __init__(self):
+        self.master = Tk()
         self.master.withdraw()
-        self.master.after(0, self.master.deiconify)
         self.master.resizable(0, 0)
-        self.master.iconbitmap(self.resource_path('included files/icon.ico'))
+        self.master.after(0, self.master.deiconify)
+        self.master.iconbitmap(self.resource_path('included_files/icon.ico'))
         self.master.title('Blinking Text')
-        self.master.geometry('365x115+{}+{}'.format(self.master.winfo_screenwidth() // 2 - 365 // 2, self.master.winfo_screenheight() // 2 - 115 // 2))
+
+        self.width, self.height = 302, 99
+        self.master.geometry(f'{self.width}x{self.height}+{self.master.winfo_screenwidth() // 2 - self.width // 2}+{self.master.winfo_screenheight() // 2 - self.height // 2}')
 
         self.frame = Frame(self.master, bg='#422a91')
         self.frame.pack()
 
         self.entry = Entry(self.frame, width=15, font=('Courier', 15, 'bold'), fg='grey', justify='center')
         self.entry.insert(END, 'TEXT')
-        self.entry.pack(pady=10, side=LEFT)
+        self.entry.pack(pady=10, ipady=2, side=LEFT)
 
         self.add = Button(self.frame, text='ADD', fg='white', bg='#422a91', activebackground='#422a91', activeforeground='white', relief=GROOVE, cursor='hand2', command=self.add_button_command)
         self.add.pack(side=LEFT, padx=10, ipadx=15, ipady=3)
 
         self.text = Label(self.master, text='Blink', fg='white', bg='#422a91', font=('Courier', 20))  # Creating label object
-        self.text.pack(pady=10)
+        self.text.pack(pady=2)
 
         self.blink()
 
         self.entry.bind('<Return>', lambda e: self.add_button_command())
         self.entry.bind('<Button-1>', lambda e: self.button_1_command())
-        self.entry.bind('<Leave>', lambda e: self.leave())
 
         self.master.config(bg='#422a91')
+        self.master.mainloop()
 
     def button_1_command(self):
         '''Binding function for left click'''
@@ -99,6 +103,4 @@ class Blink:
 
 
 if __name__ == '__main__':
-    root = Tk()
-    Blink(root)
-    root.mainloop()
+    Blink()
