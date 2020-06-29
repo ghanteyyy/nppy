@@ -11,12 +11,16 @@ except (ImportError, ModuleNotFoundError):  # Python 2
     from Tkinter import *
     from ttk import Combobox
 
-month_number = {'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'}
-
 
 class Birthday_Remainder:
-    def __init__(self, master):
-        self.master = master
+    def __init__(self):
+        self.file = 'birthday_remainder.txt'
+        self.month_number = {'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'}
+
+    def Window(self):
+        '''GUI window'''
+
+        self.master = Tk()
         self.master.withdraw()
         self.master.after(0, self.master.deiconify)
         self.master.resizable(0, 0)
@@ -45,7 +49,7 @@ class Birthday_Remainder:
 
         # Options to select month and dates
         self.combo_box_frame = Frame(self.master, bg='dark green')
-        self.month_box = Combobox(self.combo_box_frame, values=[month for month in month_number], width=13)
+        self.month_box = Combobox(self.combo_box_frame, values=[month for month in self.month_number], width=13)
         self.month_box.set('Select Month')
         self.month_box.grid(row=0, column=0)
 
@@ -71,26 +75,24 @@ class Birthday_Remainder:
         self.button_frame.place(x=250, y=400)
 
         # Bind keys
-        self.name_box.bind_class('<Return>', self.add_info)
+        self.name_box.bind('<Return>', self.add_info)
         self.date_box.bind('<Return>', self.add_info)
         self.name_box.bind('<Enter>', lambda e: self.name_box.focus_set())
-        self.name_box.bind('<Leave>', lambda e: self.birthday_label.focus_set())
 
         self.master.config(bg='dark green')
+        self.master.mainloop()
 
-        self.file = 'Birthday Remainder.txt'
-
-    def check_for_file(self):
-        if not os.path.exists(self.file):
-            with open(self.file, 'w'):
-                pass
-
-    def check_duplicate(self, name, date):
+    def exists_details(self, name, date):
         '''Check if name and date provided is already in file or not'''
 
         with open(self.file, 'r') as details:
-            if f'{name.ljust(50)}{date}\n' in details.readlines():
-                return True
+            lines = details.readlines()
+
+            for line in lines:
+                split = line.strip('\n').split(':')
+
+                if split[0].strip() == name and split[1].strip():
+                    return True
 
             return False
 
@@ -125,10 +127,10 @@ class Birthday_Remainder:
 
         if len(name) == 0 or len(month) == 0:
             winsound.MessageBeep()
-            self.show_info(message='Empty Field', pos_x=35, pos_y=415)
+            self.show_info(message='Empty Field(s)', pos_x=15, pos_y=415)
             self.name_box.delete(0, END)
 
-        elif month not in month_number or not day.isdigit() or day == 'Select Date' or month == 'Select Month':
+        elif month not in self.month_number or not day.isdigit() or day == 'Select Date' or month == 'Select Month':
             winsound.MessageBeep()
             self.show_info(message='Invalid Date', pos_x=25, pos_y=415)
 
@@ -141,30 +143,39 @@ class Birthday_Remainder:
             self.show_info(message='No button\nselected', pos_x=50, pos_y=400)
 
         else:
-            self.check_for_file()
+            if not os.path.exists(self.file):   # Creating file if not exists
+                with open(self.file, 'w'):
+                    pass
 
-            date = '{}-{}'.format(month_number[month].zfill(2), day.zfill(2))
+            date = f'{self.month_number[month].zfill(2)}-{day.zfill(2)}'
 
             if self.var.get() == 1:
-                if self.check_duplicate(name, date):
+                if self.exists_details(name, date):
                     winsound.MessageBeep()
                     self.show_info(message='Details Exists', pos_x=12, pos_y=415)
 
                 else:
                     with open(self.file, 'a') as append:
-                        append.write('{}{}\n'.format(name.ljust(50), date))
+                        append.write(f'{name.ljust(30)}:{date.rjust(10)}\n')
 
                     self.show_info(message='Details Added', pos_x=17, pos_y=415)
 
+                    # Setting all entry box and combo-box to defaults
+                    self.name_box.delete(0, END)
+                    self.month_box.delete(0, END)
+                    self.month_box.set('Select Month')
+                    self.date_box.delete(0, END)
+                    self.date_box.set('Select Date')
+
             elif self.var.get() == 2:
-                if not check_duplicate(name, date):
+                if not self.exists_details(name, date):
                     winsound.MessageBeep()
                     self.show_info(message='Invalid Details', pos_x=2, pos_y=415)
 
                 else:
                     with open(self.file, 'r+') as read_write_details:
                         lines = read_write_details.readlines()
-                        lines.remove('{}{}\n'.format(name.ljust(50), date))
+                        lines.remove(f'{name.ljust(30)}:{date.rjust(10)}\n')
                         read_write_details.seek(0)
 
                         for line in lines:
@@ -178,6 +189,5 @@ class Birthday_Remainder:
 
 
 if __name__ == '__main__':
-    root = Tk()
-    Birthday_Remainder(root)
-    root.mainloop()
+    remainder = Birthday_Remainder()
+    remainder.Window()

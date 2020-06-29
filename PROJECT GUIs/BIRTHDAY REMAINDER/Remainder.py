@@ -13,33 +13,13 @@ except (ImportError, ModuleNotFoundError):  # Python 2
 
 class Remainder_Window:
     def __init__(self):
-        self.seen = {}
         self.birthdates = {}
-        self.current_date = time.strftime('%m-%d')
+        self.todays_date = time.strftime('%m-%d')
+        self.files = ['birthday_remainder.txt', 'seen_birthday.txt']
         self.month_number = {'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'}
 
-    def get_birthdates(self, file, dic):
-        '''Get birth dates from the file'''
-
-        with open(file, 'r') as f:
-            lines = f.readlines()
-
-            for line in lines:
-                split = line.strip('\n').split()
-
-                if len(split) > 2:
-                    name = f"{' '.join(split[:-1])}"
-
-                else:
-                    name = split[0]
-
-                date = split[-1]
-
-                if date == self.current_date:
-                    dic.update({name: date})
-
     def Window(self, name, date):
-        '''GUI window for showing of those whose birthday is today'''
+        '''GUI window for showing those whose have birthday today'''
 
         self.master = Tk()
         self.master.withdraw()
@@ -58,7 +38,7 @@ class Remainder_Window:
         title = Label(self.master, text='REMAINDER', font=("Courier", 30), bg='red', fg='White')
         wishes = Label(self.master, text=f'Today is {name}\'s Birthday\n({date})', font=("Courier", 15), bg='red', fg='White', wraplength=450)
         check_button = ttk.Checkbutton(self.master, style='Red.TCheckbutton', text='Don\'t show again', variable=self.var)
-        close_button = Button(self.master, text='CLOSE', font=("Courier", 12), bg='red', activeforeground='white', activebackground='red', fg='White', width=10, relief='ridge', command=lambda: self.quit_button(name, date))
+        close_button = Button(self.master, text='CLOSE', font=("Courier", 12), bg='red', activeforeground='white', activebackground='red', fg='White', width=10, relief='ridge', command=lambda: self.quit_button(name))
 
         title.pack()
         wishes.pack()
@@ -67,53 +47,83 @@ class Remainder_Window:
 
         self.master.mainloop()
 
-    def mark_as_seen(self, name, date):
-        '''Store name and date if user selects "Don't show again"'''
+    def read_file(self, filename):
+        '''Storing name and birthdates from the given name of file in a dictionary'''
 
-        with open('mark_as_seen.txt', 'a') as file:
-            file.write(f'{name} {date}\n')
+        dic = {}
 
-    def quit_button(self, name, date):
-        '''When user click the quit button'''
+        with open(filename, 'r') as f:
+            lines = [line.strip('\n') for line in f.readlines()]
+
+            for line in lines:
+                split = line.split(':')
+                dic.update({split[0].strip(): split[1].strip()})
+
+        return dic
+
+    def get_today_birthdays(self):
+        '''Getting name and date of those whose birthday is today'''
+
+        try:
+            all_birthdates = self.read_file(self.files[0])
+
+            if os.path.exists(self.files[1]):
+                today_birthdates = self.read_file(self.files[1])
+
+                for name, date in all_birthdates.items():
+                    if name not in today_birthdates and date == self.todays_date:  # If birthdates from 'birthday_remainder.txt' is same as todays_date and name is not in 'seen_birthday.txt'
+                        self.birthdates.update({name: date})
+
+            else:
+                for name, date in all_birthdates.items():
+                    if date == self.todays_date:
+                        self.birthdates.update({name: date})
+
+        except FileNotFoundError:
+            return
+
+    def quit_button(self, name):
+        '''Command when close button is closed.
+
+           When close button is clicked with selecting the check_button that means
+           don't show remainder of that name again. So this function saves those
+           names to seen_birthday.txt and excludes the stored birthdates next time
+           when this script runs'''
 
         if self.var.get() == 1:
-            self.mark_as_seen(name, date)
+            if not os.path.exists(self.files[1]):
+                with open(self.files[1], 'w'):
+                    pass
+
+            with open(self.files[1], 'a') as tf:
+                tf.write(f'{name.ljust(30)}:{self.birthdates[name].rjust(10)}\n')
 
         self.master.destroy()
 
-    def already_seen(self, name, date):
-        '''Check user has already seen the remainder'''
+    def remove_file(self):
+        '''Removing seen_birthday.txt if date in that file does not match from
+           today's date'''
 
-        if os.path.exists('mark_as_seen.txt'):
-            self.get_birthdates('mark_as_seen.txt', self.seen)
+        if os.path.exists(self.files[1]):
+            contents = self.read_file(self.files[1])
 
-        if name in self.seen and self.seen[name] == date:
-            return True
-
-        return False
-
-    def destroy_seen(self):
-        '''Removing "mark_as_seen.txt" at the next day of the birthday so that it can display at the next birthday'''
-
-        if os.path.exists('mark_as_seen.txt'):
-            modified_time = time.ctime(os.path.getmtime('mark_as_seen.txt')).split()
-            real_time = f'{self.month_number[modified_time[1]]}-{modified_time[2]}'
-
-            if self.current_date != real_time:
-                os.remove('mark_as_seen.txt')
+            for key, value in contents.items():
+                if value != self.todays_date:
+                    os.remove(self.files[1])
+                    return
 
     def main(self):
-        '''Main function of the entire script'''
+        '''Getting, showing and removing birthdays'''
 
-        self.destroy_seen()
-        self.get_birthdates('Birthday Remainder.txt', self.birthdates)
+        self.remove_file()
+        self.get_today_birthdays()
 
-        for name, date in self.birthdates.items():
-            if not self.already_seen(name, date):
+        if self.birthdates:
+            for name, date in self.birthdates.items():
                 winsound.PlaySound('included files/tone.wav', winsound.SND_LOOP + winsound.SND_ASYNC)
                 self.Window(name, date)
 
 
 if __name__ == '__main__':
-    if os.path.exists('Birthday Remainder.txt'):
-        Remainder_Window().main()
+    remainder = Remainder_Window()
+    remainder.main()
