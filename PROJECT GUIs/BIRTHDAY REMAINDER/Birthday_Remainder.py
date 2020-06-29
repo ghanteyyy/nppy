@@ -1,4 +1,5 @@
 import os
+import sys
 import PIL.Image
 import PIL.ImageTk
 import winsound
@@ -24,13 +25,13 @@ class Birthday_Remainder:
         self.master.withdraw()
         self.master.after(0, self.master.deiconify)
         self.master.resizable(0, 0)
-        self.master.iconbitmap('included Files/icon.ico')
+        self.master.iconbitmap(self.resource_path('included_files/icon.ico'))
         self.master.title('Birthday Remainder')
         self.master.geometry(f'426x500+{self.master.winfo_screenwidth() // 2 - 426 // 2}+{self.master.winfo_screenheight() // 2 - 500 // 2}')
 
         # Inserting image
         self.birthday_quote_frame = Frame(self.master)
-        self.birthday_quote_image = PIL.ImageTk.PhotoImage(PIL.Image.open('included Files/image.jpg', 'r'))
+        self.birthday_quote_image = PIL.ImageTk.PhotoImage(PIL.Image.open(self.resource_path('included_files/image.jpg'), 'r'))
         self.label_birthday_quote = Label(self.birthday_quote_frame, image=self.birthday_quote_image)
         self.label_birthday_quote.grid(row=0, column=0)
         self.birthday_quote_frame.place(x=0, y=0)
@@ -186,6 +187,23 @@ class Birthday_Remainder:
                     self.show_info(message='Details Deleted', pos_x=2, pos_y=415)
 
             self.sort_details()
+
+    def resource_path(self, relative_path):
+        """ Get absolute path to resource from temporary directory
+
+        In development:
+            Gets path of photos that are used in this script like in icons and title_image from current directory
+
+        After compiling to .exe with pyinstaller and using --add-data flag:
+            Gets path of photos that are used in this script like in icons and title image from temporary directory"""
+
+        try:
+            base_path = sys._MEIPASS  # PyInstaller creates a temp folder and stores path in _MEIPASS
+
+        except AttributeError:
+            base_path = os.path.abspath(".")
+
+        return os.path.join(base_path, relative_path)
 
 
 if __name__ == '__main__':

@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import winsound
 
@@ -120,8 +121,25 @@ class Remainder_Window:
 
         if self.birthdates:
             for name, date in self.birthdates.items():
-                winsound.PlaySound('included files/tone.wav', winsound.SND_LOOP + winsound.SND_ASYNC)
+                winsound.PlaySound(self.resource_path('included_files/tone.wav'), winsound.SND_LOOP + winsound.SND_ASYNC)
                 self.Window(name, date)
+
+    def resource_path(self, relative_path):
+        """ Get absolute path to resource from temporary directory
+
+        In development:
+            Gets path of photos that are used in this script like in icons and title_image from current directory
+
+        After compiling to .exe with pyinstaller and using --add-data flag:
+            Gets path of photos that are used in this script like in icons and title image from temporary directory"""
+
+        try:
+            base_path = sys._MEIPASS  # PyInstaller creates a temp folder and stores path in _MEIPASS
+
+        except AttributeError:
+            base_path = os.path.abspath(".")
+
+        return os.path.join(base_path, relative_path)
 
 
 if __name__ == '__main__':
