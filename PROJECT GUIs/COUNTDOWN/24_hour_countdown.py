@@ -16,7 +16,7 @@ class twenty_four_hour_countdown:
         self.master.title('24 Hour COUNTDOWN')
         self.master.geometry(f'326x82+{self.master.winfo_screenwidth() // 2 - 326 // 2}+{self.master.winfo_screenheight() // 2 - 82 // 2}')
         self.master.resizable(0, 0)
-        self.master.iconbitmap(self.resource_path('included files/icon.ico'))
+        self.master.iconbitmap(self.resource_path('included_files/icon.ico'))
         self.master.config(bg='dark blue')
 
         self.time_label = Label(self.master, text='24:00:00', font=('Courier', 50, 'bold'), bg='dark blue', fg='silver')
@@ -33,25 +33,23 @@ class twenty_four_hour_countdown:
         '''Updating hour, minute and seconds'''
 
         if self.pause is False:
-            if self.sec == 0:
-                if self.min == self.sec == 0:
-                    self.hrs -= 1
-                    self.min = 59
+            if self.sec == self.min == self.hrs == 0:
+                self.pause = True
+                self.time_label.config(text='Time Up!', font=('Courier', 40, 'bold'))
+                return
 
-                else:
-                    self.min -= 1
+            elif self.sec == self.min == 0:
+                self.hrs -= 1
+                self.min = 59
+                self.sec = 60
 
+            elif self.sec == 0:
+                self.min -= 1
                 self.sec = 60
 
             self.sec -= 1
 
-            if self.hrs == self.min == self.sec == 0:
-                self.pause = True
-                self.time_label.config(text='Time up', font=('Courier', 40, 'bold'))
-
-            else:
-                self.time_label.config(text='{}:{}:{}'.format(str(self.hrs).zfill(2), str(self.min).zfill(2), str(self.sec).zfill(2)))
-
+            self.time_label.config(text=f'{str(self.hrs).zfill(2)}:{str(self.min).zfill(2)}:{str(self.sec).zfill(2)}')
             self.master.after(1000, self.Counter)
 
     def resource_path(self, relative_path):

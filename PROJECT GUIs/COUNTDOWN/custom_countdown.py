@@ -16,7 +16,7 @@ class custom_countdown:
         self.master.title('CUSTOM COUNTDOWN')
         self.master.geometry(f'342x81+{self.master.winfo_screenwidth() // 2 - 342 // 2}+{self.master.winfo_screenheight() // 2 - 81 // 2}')
         self.master.resizable(0, 0)
-        self.master.iconbitmap(self.resource_path('included files/icon.ico'))
+        self.master.iconbitmap(self.resource_path('included_files/icon.ico'))
 
         self.start_button = Button(self.master, text='START', font=("Courier", 16), bg='dark blue', fg='white', activebackground='dark blue', width=8, command=self.start)
         self.start_button.grid(row=1, column=0, sticky='e')
@@ -79,110 +79,88 @@ class custom_countdown:
             widget.insert(END, text)
             widget.focus()
 
-        self.master.focus()
+    def activate_deactivate_buttons(self, widgets=None, entries=None):
+        '''Enable or disable buttons or entry_boxes'''
 
-    def activate_edit(self):
-        '''Activate editing mode in hour, minute and second entry box'''
+        if widgets:   # Enabling or disabling buttons
+            for widget, state in widgets.items():
+                widget.config(state=state)
 
-        self.hour_entry.config(state='normal', cursor='xterm')
-        self.minute_entry.config(state='normal', cursor='xterm')
-        self.second_entry.config(state='normal', cursor='xterm')
+        if entries:   # Enabling or disabling entry_boxes
+            for widget in entries[0]:
+                widget.config(state=entries[1][0], cursor=entries[1][1])
 
     def pause(self, event=None):
         '''Command for self.pause button'''
 
         self.pause = True
-        self.pause_button['state'] = 'disabled'
-        self.activate_edit()
+        self.activate_deactivate_buttons(widgets={self.pause_button: 'disabled'}, entries=[(self.hour_entry, self.minute_entry, self.second_entry), ('normal', 'xterm')])
 
     def reset(self, event=None):
         '''Command for RESET button'''
 
         self.pause = True
-        self.pause_button['state'] = 'disabled'
-        self.reset_button['state'] = 'disabled'
+        self.activate_deactivate_buttons(widgets={self.start_button: 'normal', self.pause_button: 'disabled', self.reset_button: 'disabled'}, entries=[(self.hour_entry, self.minute_entry, self.second_entry), ('normal', 'xterm')])
+        self.set_var('HH', 'MM', 'SS')
+        self.hour, self.minute, self.second = 0, 0, 0
 
-        self.hr_var.set('HH')
-        self.min_var.set('MM')
-        self.sec_var.set('SS')
+    def set_var(self, hrs, mins, secs):
+        '''Appending hour, minute and second values'''
 
-        self.activate_edit()
+        self.hr_var.set(str(hrs).zfill(2))
+        self.min_var.set(str(mins).zfill(2))
+        self.sec_var.set(str(secs).zfill(2))
 
     def Counter(self):
         '''Updating hour, minute and seconds'''
 
         if self.pause is False:
-            self.start_button['state'] = 'disabled'
+            self.activate_deactivate_buttons(widgets={self.start_button: 'disabled'})
 
             if self.hour == self.minute == self.second == 0:
-                self.hour, self.minute, self.second = 'HH', 'MM', 'SS'
-                self.pause_button['state'] = 'disabled'
-                self.reset_button['state'] = 'disabled'
-                self.activate_edit()
-                self.pause = True
+                self.reset()
+                self.activate_deactivate_buttons(entries=[(self.hour_entry, self.minute_entry, self.second_entry), ('normal', 'xterm')])
+                return
+
+            elif self.second == self.minute == 0:
+                self.hour -= 1
+                self.second = 60
+                self.minute = 59
 
             elif self.second == 0:
-                if self.minute == self.second == 0:
-                    self.hour -= 1
+                self.minute -= 1
+                self.second = 60
 
-                if self.minute == 0:
-                    self.minute = 59
+            self.second -= 1
 
-                else:
-                    self.minute -= 1
-
-                self.second = 59
-
-            else:
-                self.second -= 1
-
-            self.hr_var.set(str(self.hour).zfill(2))
-            self.min_var.set(str(self.minute).zfill(2))
-            self.sec_var.set(str(self.second).zfill(2))
-
+            self.set_var(self.hour, self.minute, self.second)
             self.master.after(1000, self.Counter)
 
         else:
-            self.start_button['state'] = 'normal'
+            self.activate_deactivate_buttons(widgets={self.start_button: 'normal'})
 
     def start(self, event=None):
         '''Command for START button'''
 
         self.pause = False
 
-        get_hour, get_minute, get_second = self.hour_entry.get(), self.minute_entry.get(), self.second_entry.get()
+        get_hour, get_minute, get_second = self.hour_entry.get().strip(), self.minute_entry.get().strip(), self.second_entry.get().strip()
 
-        if len(get_hour) == 0 or not get_hour.isdigit():
+        if not get_hour or not get_hour.isdigit():
             self.hour = 24
 
-        if len(get_minute) == 0 or not get_minute.isdigit():
-            self.minute = 0
+        elif not get_minute or not get_minute.isdigit():
+            self.minute = 59
 
-        if len(get_second) == 0 or not get_second.isdigit():
-            self.second = 2
+        elif not get_second or not get_second.isdigit():
+            self.second = 60
 
-        if get_minute.isdigit() and get_minute.isdigit():
-            if int(get_minute) > 60:
-                self.minute = 59
+        else:
+            self.hour, self.minute, self.second = int(get_hour), int(get_minute), int(get_second)
 
-            if int(get_second) > 60:
-                self.second = 60
+        self.set_var(self.hour, self.minute, self.second)
 
-            else:
-                self.minute = int(get_minute)
-                self.second = int(get_second)
-
-        if get_hour.isdigit():
-            self.hour = int(get_hour)
-
-        self.start_button['state'] = 'disabled'
-        self.pause_button['state'] = 'normal'
-        self.reset_button['state'] = 'normal'
-
-        self.hour_entry.config(state='disabled', cursor='arrow')
-        self.minute_entry.config(state='disabled', cursor='arrow')
-        self.second_entry.config(state='disabled', cursor='arrow')
-
+        self.activate_deactivate_buttons(widgets={self.start_button: 'disabled', self.pause_button: 'normal', self.reset_button: 'normal'}, entries=[(self.hour_entry, self.minute_entry, self.second_entry), ('disabled', 'arrow')])
         self.master.focus()
         self.master.after(1000, self.Counter)
 
