@@ -1,5 +1,5 @@
 # Digital Clock
 
-Display current date and current time formatted as HH:MM:SS
+Display current date and current
 
-<img src="included files/1.jpg">
+<img src="included_files/1.jpg">
