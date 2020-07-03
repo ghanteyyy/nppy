@@ -2,4 +2,4 @@
 
 Convert numbers to different forms of number system (binary, decimal, octal and hexadecimal)
 
-<img src="included files/1.jpg">
+<img src="included_files/1.jpg">
