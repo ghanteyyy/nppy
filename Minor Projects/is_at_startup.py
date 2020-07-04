@@ -25,7 +25,7 @@ class is_at_startup:
     def main(self):
         '''Adding to startup'''
 
-        if not self.is_path_valid():
+        if self.is_path_valid():
             areg = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
 
             try:
