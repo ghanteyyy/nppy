@@ -1,92 +1,161 @@
 import os
+import sys
 import time
-from winsound import PlaySound, SND_LOOP, SND_ASYNC
+import winsound
 
 try:  # Python 3
-    from tkinter import Tk, Label, Button, IntVar
+    import winreg
+    from tkinter import *
 
 except (ImportError, ModuleNotFoundError):  # Python 2
-    from Tkinter import Tk, Label, Button, IntVar
+    from Tkinter import *
+    import _winreg as winreg
 
 
-def Remainder_Window(text):
-    '''Remainder window to show remainders'''
+class Remainder_Window:
+    def __init__(self):
+        self.file_name = 'Remainder.txt'
 
-    PlaySound('included files/tone.wav', SND_LOOP + SND_ASYNC)
+    def window(self, text):
+        '''GUI window'''
 
-    root = Tk()
-    root.withdraw()
-    root.after(0, root.deiconify)
-    root.resizable(0, 0)
-    root.config(bg='red')
-    root.overrideredirect(True)
-    root.title('BIRTHDAY REMAINDER')
-    root.wm_attributes('-topmost', 1)
-    root.geometry(f'405x160+{root.winfo_screenwidth() - 406}+0')
+        self.root = Tk()
+        self.root.withdraw()
+        self.root.after(0, self.root.deiconify)
+        self.root.resizable(0, 0)
+        self.root.config(bg='red')
+        self.root.overrideredirect(True)
+        self.root.title('BIRTHDAY REMAINDER')
+        self.root.wm_attributes('-topmost', 1)
+        self.root.geometry(f'405x160+{self.root.winfo_screenwidth() - 406}+0')
 
-    title = Label(root, text='REMAINDER', font=("Courier", 30), bg='red', fg='White')
-    wishes = Label(root, text=text, font=("Courier", 15), bg='red', fg='White')
-    close_button = Button(root, text='CLOSE', font=("Courier", 12), bg='red', activeforeground='white', activebackground='red', fg='White', width=10, relief='ridge', command=root.destroy)
+        self.title = Label(self.root, text='REMAINDER', font=("Courier", 30), bg='red', fg='White')
+        self.wishes = Label(self.root, text=text, font=("Courier", 15), bg='red', fg='White')
+        self.close_button = Button(self.root, text='CLOSE', font=("Courier", 12), bg='red', activeforeground='white', activebackground='red', fg='White', width=10, relief='ridge', command=self.root.destroy)
 
-    title.pack()
-    wishes.pack()
-    close_button.pack(side='bottom', pady=5)
+        self.title.pack()
+        self.wishes.pack()
+        self.close_button.pack(side='bottom', pady=5)
 
-    root.mainloop()
+        self.root.mainloop()
 
+    def read_file(self):
+        '''Getting contents of "Remainder.txt" '''
 
-def get_remainders():
-    '''Getting all todays remainders'''
+        with open(self.file_name, 'r') as f:
+            return [line.strip('\n') for line in f.readlines()]
 
-    remainder = {}
+    def get_remainder(self):
+        '''Getting remainders for today'''
 
-    if os.path.exists('remind_me.txt'):
-        with open('remind_me.txt', 'r') as r_r:
-            lines = r_r.readlines()
+        remainders = []
+        remainder_time = time.strftime('%b %d')
 
-            for line in lines:
-                split = line.strip('\n').split(' || ')
-
-                if split[-1][:6] == time.strftime('%b %d'):    # If current month and date of txt file matches to the current month and date
-                    remainder.update({split[0]: split[-1]})    # then updating to remainder dictionary
-
-            return remainder
-
-
-def remove_remainders(text, timee):
-    '''Removing showed remainders from txt file'''
-
-    with open('remind_me.txt', 'r') as r_r, open('remind_me.txt', 'w') as r_w:
-        lines = r_r.readlines()
+        lines = self.read_file()
 
         for line in lines:
-            check = '{} || {}\n'.format(text, timee)
+            if remainder_time in line:
+                split = line.strip().split('|')
+                remainder, rem_time = split[0].strip(), split[1].strip()
 
-            if check != line:
-                r_w.write(line)
+                remainders.append((remainder, rem_time))
+
+        remainders.sort()
+        return remainders
+
+    def remove_remainder(self, remainder):
+        '''Removing displayed remainders'''
+
+        lines = self.read_file()
+        check = ' | '.join(remainder)
+
+        with open(self.file_name, 'w') as f:
+            for line in lines:
+                if check != line:
+                    f.write(f'{line}\n')
+
+    def main(self):
+        '''Getting, showing and removing remainders'''
+
+        try:
+            while True:
+                today_remainders = self.get_remainder()
+                curr_time = time.strftime('%b %d %I %M %p')
+
+                for remainder in today_remainders:
+                    rem, rem_time = remainder[0], remainder[1]
+                    split_rem_time = rem_time.split()
+
+                    if curr_time == rem_time or (split_rem_time[2] == time.strftime('%I') and split_rem_time[3] < time.strftime('%M')) or (split_rem_time[2] < time.strftime('%I')):
+                        winsound.PlaySound(self.resource_path('included_files/tone.wav'), winsound.SND_LOOP + winsound.SND_ASYNC)    # Playing Sound before showing remainder window and till user clicks close button
+                        self.window(rem)
+                        winsound.PlaySound(None, winsound.SND_PURGE)  # Stopping sound after user click close button
+
+                        self.remove_remainder(remainder)
+
+                        today_remainders.remove(remainder)
+
+        except FileNotFoundError:
+            return
+
+    def resource_path(self, relative_path):
+        """ Get absolute path to resource from temporary directory
+
+        In development:
+            Gets path of photos that are used in this script like in icons and title_image from current directory
+
+        After compiling to .exe with pyinstaller and using --add-data flag:
+            Gets path of photos that are used in this script like in icons and title image from temporary directory"""
+
+        try:
+            base_path = sys._MEIPASS  # PyInstaller creates a temp folder and stores path in _MEIPASS
+
+        except AttributeError:
+            base_path = os.path.abspath(".")
+
+        return os.path.join(base_path, relative_path)
 
 
-track = 0
+class is_at_startup:
+    '''Adding the given program path to startup'''
 
-if get_remainders():
-    while True:
-        todays_remainders = get_remainders()
-        curr_time = time.strftime('%b %d %H %M %p')
-        split_curr_time = [int(ct) if ct.isdigit() else ct for ct in curr_time.split()[2:4]]
+    def __init__(self, program_path):
+        self.program_path = program_path
+        self.program_basename = os.path.basename(self.program_path)
 
-        for text, timee in todays_remainders.items():
-            if timee == curr_time:
-                track += 1
-                Remainder_Window(text)
-                remove_remainders(text, timee)
+    def is_path_valid(self):
+        '''Check if the given program path is actually exists'''
 
-        for text, timee in todays_remainders.items():
-            split_timee = [int(tim) if tim.isdigit() else tim for tim in timee.split()[2:4]]
+        if os.path.exists(self.program_path):
+            return True
 
-            if split_curr_time[0] > split_timee[0] or (split_curr_time[0] == split_timee[0] and split_curr_time[1] > split_timee[1]):
-                track += 1
-                Remainder_Window(text)
-                remove_remainders(text, timee)
+        return False
 
-        if len(todays_remainders) == track:
-                break
+    def main(self):
+        '''Adding to startup'''
+
+        if self.is_path_valid():
+            areg = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
+
+            try:
+                akey = winreg.OpenKey(areg, f'SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\{self.program_basename}', 0, winreg.KEY_WRITE)
+                areg.Close()
+                akey.Close()
+
+                print(f'{self.program_path} already at startup')
+
+            except WindowsError:
+                key = winreg.OpenKey(areg, r'SOFTWARE\Microsoft\Windows\CurrentVersion\Run', 0, winreg.KEY_SET_VALUE)
+                winreg.SetValueEx(key, f'{self.program_basename}', 0, winreg.REG_SZ, f'{self.program_basename}')
+
+                areg.Close()
+                key.Close()
+
+
+if __name__ == '__main__':
+    path = os.path.realpath(__file__)
+    startup = is_at_startup(path)
+    startup.main()
+
+    remind = Remainder_Window()
+    remind.main()
