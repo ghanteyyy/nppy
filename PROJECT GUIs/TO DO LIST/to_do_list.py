@@ -1,13 +1,14 @@
 import os
 import sys
 import ctypes
-import winsound
 
 try:
     from tkinter import *
+    from tkinter import messagebox
 
 except (ImportError, ModuleNotFoundError):
     from Tkinter import *
+    import TkMessageBox as messagebox
 
 
 class To_Do_List:
@@ -19,8 +20,11 @@ class To_Do_List:
         self.file_name = 'to_do_list.txt'
         self.master.after(0, self.master.deiconify)
         self.master.wm_attributes("-topmost", 'true')
-        self.master.iconbitmap(self.resource_path('included files/icon.ico'))
-        self.master.geometry('{}x{}+{}+{}'.format(400, self.master.winfo_screenheight() - 74, self.master.winfo_screenwidth() - 401, 0))
+        self.master.iconbitmap(self.resource_path('included_files/icon.ico'))
+
+        self.screenwidth, self.screenheight = self.master.winfo_screenwidth() - 401, self.master.winfo_screenheight()
+        self.width, self.height = 400, self.screenheight - 74
+        self.master.geometry(f'{self.width}x{self.height}+{self.screenwidth}+0')
 
         self.is_collapsed = False
         self.collapse_frame = Frame(self.master)
@@ -33,10 +37,11 @@ class To_Do_List:
         self.label.grid(row=0, column=0)
         self.label_frame.place(x=210, y=25, anchor="center")
 
+        self.entry_var = StringVar()
         self.entry_frame = Frame(self.master, bg='#002157')
-        self.entry_box = Entry(self.entry_frame, font=("Arial", 15), fg='grey')
-        self.entry_box.insert(END, 'I have to do ...')
-        self.add_button = Button(self.entry_frame, text='ADD', width=10, height=2, bg='Green', fg='white', activebackground='Green', activeforeground='white', command=self.add_command)
+        self.entry_box = Entry(self.entry_frame, font=("Arial", 15), fg='grey', textvariable=self.entry_var)
+        self.entry_var.set('I have to do ...')
+        self.add_button = Button(self.entry_frame, text='ADD', width=10, height=2, bg='Green', fg='white', activebackground='Green', activeforeground='white', cursor='hand2', command=self.add_command)
         self.entry_box.grid(row=0, column=0)
         self.add_button.grid(row=0, column=1, padx=20)
         self.entry_frame.place(x=40, y=50)
@@ -71,16 +76,29 @@ class To_Do_List:
         self.exit_button = Button(self.exit_frame, text='X', font=('Arial Black', 9, 'bold'), fg='white', bg='red', activebackground='red', activeforeground='white', bd=0, command=self.master.destroy)
         self.exit_button.grid(row=0, column=0, ipadx=2, ipady=1)
 
-        self.entry_box.bind('<Button-1>', self.button_1_command)
-        self.entry_box.bind('<Leave>', self.leave)
-        self.entry_box.bind('<Return>', self.add_command)
-        self.list_box.bind("<Button-3>", self.popup_menu)
+        self.master.bind('<Button-1>', self.key_bindings)
 
         self.add_to_list()
         self.show_scrollbar()
         self.hide_minimize_maximize(self.master)
 
         self.master.config(bg='#002157')
+
+    def key_bindings(self, event):
+        '''Different actions when user click to different widgets '''
+
+        get = self.entry_var.get().strip()
+
+        if event.widget == self.entry_box and get == 'I have to do ...':
+            self.entry_var.set('')
+            self.entry_box.config(fg='black')
+
+        elif event.widget in [self.master, self.label, self.list_box, self.entry_frame]:
+            if not get:
+                self.entry_var.set('I have to do ...')
+                self.entry_box.config(fg='grey')
+
+            self.master.focus()
 
     def hide_minimize_maximize(self, window):
         '''Hide minimize and maximize button'''
@@ -120,24 +138,6 @@ class To_Do_List:
             self.master.geometry('{}x{}+{}+{}'.format(400, self.master.winfo_screenheight() - 74, self.master.winfo_screenwidth() - 401, 0))
             self.collapse_button.config(text='>>')
             self.exit_frame.place_forget()
-
-    def button_1_command(self, event=None):
-        '''When user clicks entry box'''
-
-        if self.entry_box.get() == 'I have to do ...':
-            self.entry_box.delete(0, END)
-            self.entry_box.focus()
-            self.entry_box.config(fg='black')
-
-    def leave(self, event=None):
-        '''When cursor leaves the entry box'''
-
-        if len(self.entry_box.get().strip()) == 0:
-            self.entry_box.delete(0, END)
-            self.entry_box.insert(END, 'I have to do ...')
-            self.entry_box.config(fg='grey')
-
-        self.master.focus()
 
     def show_scrollbar(self):
         '''show scrollbar when text is more than the text area'''
@@ -220,10 +220,9 @@ class To_Do_List:
             self.add_to_list()
 
             self.entry_box.delete(0, END)
-            self.leave()
 
         else:
-            winsound.MessageBeep()
+            messagebox.showerror('Invalid Entry', 'Enter something in the entry box')
 
     def clear(self):
         '''Command for clear button'''
