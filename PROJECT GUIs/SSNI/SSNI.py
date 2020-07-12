@@ -14,7 +14,7 @@ except (ImportError, ModuleNotFoundError):
 
 class SSNI:
     def __init__(self):
-        self.file_name = r'D:\My Project\Python\PROJECT GUIs\SSNI\video_file.txt'
+        self.file_name = 'video_file.txt'
 
         self.master = Tk()
         self.master.withdraw()
@@ -23,315 +23,130 @@ class SSNI:
         self.master.title('SSNI')
         self.master.iconbitmap(self.resource_path('included_files\\icon.ico'))
 
-        self.width, self.height = 246, 175
-        self.w_width, self.w_height = 246, 312
+        self.width, self.height = 475, 280
         self.screen_width, self.screen_height = self.master.winfo_screenwidth(), self.master.winfo_screenheight()
         self.master.geometry(f'{self.width}x{self.height}+{self.screen_width // 2 - self.width // 2}+{self.screen_height // 2 - self.height // 2}')
 
         self.title_label = Label(self.master, text='SSNI', fg='white', bg='black', font=('Courier', 20))
-        self.title_label.pack(fill='both')
+        self.title_label.pack(fill='x')
 
-        self.add_remove_search = Button(self.master, text='ADD | REMOVE | SEARCH', bg='red', fg='white', activebackground='red', activeforeground='white', cursor='hand2', command=self.add_remove_search_view_command)
-        self.add_remove_search.pack(fill='both', ipady=10)
+        self.first_left_frame = Frame(self.master)
 
-        self.rename_button = Button(self.master, text='RENAME', bg='red', fg='white', activebackground='red', activeforeground='white', cursor='hand2', command=self.rename_button_command)
-        self.rename_button.pack(fill='both', ipady=10)
+        self.video_entry = Entry(self.first_left_frame, fg='grey', font=('Courier', 12), width=19, justify='center', highlightthickness=2, highlightbackground='grey')
+        self.video_entry.insert(END, 'Video Name')
+        self.video_entry.pack(pady=10, padx=10, ipady=3)
 
-        self.view_button = Button(self.master, text='VIEW', bg='red', fg='white', activebackground='red', activeforeground='white', cursor='hand2', command=self.view_command)
-        self.view_button.pack(fill='both', ipady=10)
+        self.add_button = Button(self.first_left_frame, text='ADD', bg='green', fg='white', activebackground='green', activeforeground='white', cursor='hand2', command=lambda: self.add_remove_search_command(button_name='ADD'))
+        self.add_button.pack(pady=5, ipady=3, ipadx=80)
 
-        self.add_remove_search.bind('<Return>', lambda e: self.add_remove_search_view_command())
-        self.rename_button.bind('<Return>', lambda e: self.rename_button_command())
-        self.view_button.bind('<Return>', lambda e: self.view_command())
+        self.remove_button = Button(self.first_left_frame, text='REMOVE', bg='green', fg='white', activebackground='green', activeforeground='white', cursor='hand2', command=lambda: self.add_remove_search_command(button_name='REMOVE'))
+        self.remove_button.pack(pady=5, ipady=3, ipadx=70)
 
-        self.master.mainloop()
+        self.search_button = Button(self.first_left_frame, text='SEARCH', bg='green', fg='white', activebackground='green', activeforeground='white', cursor='hand2', command=lambda: self.add_remove_search_command(button_name='SEARCH'))
+        self.search_button.pack(pady=5, ipady=3, ipadx=70)
 
-    def widgets_bindings(self, event, vars, var_texts, widgets):
-        '''When user clicks or select using tab from keyboard'''
+        self.rename_window_button = Button(self.first_left_frame, text='RENAME', bg='green', fg='white', activebackground='green', activeforeground='white', cursor='hand2', command=self.rename_window)
+        self.rename_window_button.pack(pady=5, ipady=3, ipadx=69)
 
-        if event.widget == widgets[0]:
-            if vars[0].get().strip() == var_texts[0]:
-                vars[0].set('')
-                widgets[0].config(fg='black')
+        self.first_left_frame.pack(padx=5, side=LEFT, ipady=2)
 
-        if len(vars) == 2 and not vars[1].get().strip():
-            vars[1].set(var_texts[1])
-            widgets[1].config(fg='grey')
+        self.text_area_frame = Frame(self.master)
 
-    def master_bindings(self, event, vars, var_texts, frame, widgets):
-        '''When user clicks to any frames or to the root window'''
-
-        if event.widget in [frame, self.master, self.title_label]:
-            for index, var in enumerate(vars):
-                if not var.get().strip():
-                    var.set(var_texts[index])
-                    widgets[index].config(fg='grey')
-
-            self.master.focus()
-
-    def remove_widgets(self, widgets):
-        '''Remove widgets for adding another see in: re_add_widgets function'''
-
-        for widget in widgets:
-            widget.place_forget()
-            widget.pack_forget()
-
-    def re_add_widgets(self, widgets):
-        '''Add removed back to the window'''
-
-        for widget in widgets:
-            widget.pack(fill='both', ipady=10)
-
-    def back_command(self, add_widgets=None, remove_widgets=None):
-        '''When user clicks back command'''
-
-        self.remove_widgets(remove_widgets)
-
-        if add_widgets:
-            self.re_add_widgets(add_widgets)
-
-        else:
-            self.re_add_widgets((self.add_remove_search, self.rename_button, self.view_button))
-            self.master.geometry(f'{self.width}x{self.height}+{self.screen_width // 2 - self.width // 2}+{self.screen_height // 2 - self.height // 2}')
-
-    def add_remove_search_view_command(self):
-        '''When user clicks ADD | REMOVE | SEARCH | VIEW button'''
-
-        self.master.geometry(f'{self.w_width}x{self.w_height}+{self.screen_width // 2 - self.w_width // 2}+{self.screen_height // 2 - self.w_height // 2}')
-        self.remove_widgets((self.add_remove_search, self.rename_button, self.view_button))
-
-        frame = Frame(self.master, highlightthickness=2, highlightbackground='silver')
-
-        video_entry_var = StringVar()
-        video_entry = Entry(frame, fg='grey', font=('Courier', 12), width=19, justify='center', highlightthickness=2, highlightbackground='grey', textvariable=video_entry_var)
-        video_entry_var.set('Video Name')
-        video_entry.pack(pady=10, padx=10, ipady=3)
-
-        add_button = Button(frame, text='ADD', bg='green', fg='white', activebackground='green', activeforeground='white', cursor='hand2', command=lambda: self.action_button_command('ADD', entry_var=video_entry_var, widgets=video_entry))
-        add_button.pack(pady=5, ipady=3, ipadx=80)
-
-        remove_button = Button(frame, text='REMOVE', bg='green', fg='white', activebackground='green', activeforeground='white', cursor='hand2', command=lambda: self.action_button_command('REMOVE', entry_var=video_entry_var, widgets=video_entry))
-        remove_button.pack(pady=5, ipady=3, ipadx=70)
-
-        search_button = Button(frame, text='SEARCH', bg='green', fg='white', activebackground='green', activeforeground='white', cursor='hand2', command=lambda: self.action_button_command('SEARCH', entry_var=video_entry_var, widgets=video_entry))
-        search_button.pack(pady=5, ipady=3, ipadx=70)
-
-        frame.pack(pady=10)
-
-        back_button = Button(self.master, text='BACK', bd=0, fg='blue', font=('Courier', 15, 'bold'), cursor='hand2', command=lambda: self.back_command(remove_widgets=(video_entry, frame, back_button)))
-
-        view_button = Button(frame, text='VIEW', bg='green', fg='white', activebackground='green', activeforeground='white', cursor='hand2', command=lambda: self.view_command(remove_widgets=(frame, back_button)))
-        view_button.pack(pady=5, ipady=3, ipadx=80)
-
-        back_button.pack()
-
-        back_button.bind('<Enter>', lambda e: back_button.config(fg='red'))
-        back_button.bind('<Leave>', lambda e: back_button.config(fg='blue'))
-        view_button.bind('<Return>', lambda e: self.view_command(remove_widgets=(frame, back_button)))
-        back_button.bind('<Return>', lambda e: self.back_command(remove_widgets=(video_entry, frame, back_button)))
-        add_button.bind('<Return>', lambda e: self.action_button_command('ADD', entry_var=video_entry_var, widgets=video_entry))
-        search_button.bind('<Return>', lambda e: self.action_button_command('SEARCH', entry_var=video_entry_var, widgets=video_entry))
-        remove_button.bind('<Return>', lambda e: self.action_button_command('REMOVE', entry_var=video_entry_var, widgets=video_entry))
-        video_entry.bind('<FocusIn>', lambda event, vars=[video_entry_var], var_texts=['Video Name'], widgets=[video_entry]: self.widgets_bindings(event, vars, var_texts, widgets))
-        video_entry.bind('<Button-1>', lambda event, vars=[video_entry_var], var_texts=['Video Name'], widgets=[video_entry]: self.widgets_bindings(event, vars, var_texts, widgets))
-        self.master.bind('<Button-1>', lambda event, vars=[video_entry_var], var_texts=['Video Name'], frame=frame, widgets=[video_entry]: self.master_bindings(event, vars, var_texts, frame, widgets))
-        video_entry.bind('<FocusOut>', lambda event, vars=[video_entry_var, video_entry_var], var_texts=['Video Name', 'Video Name'], widgets=[video_entry, video_entry]: self.widgets_bindings(event, vars, var_texts, widgets))
-
-    def rename_button_command(self):
-        '''When user clicks rename button'''
-
-        self.master.geometry(f'{self.w_width}x{self.w_height}+{self.screen_width // 2 - self.w_width // 2}+{self.screen_height // 2 - self.w_height // 2}')
-        self.remove_widgets((self.add_remove_search, self.rename_button, self.view_button))
-
-        frame = Frame(self.master, highlightthickness=2, highlightbackground='silver')
-
-        old_name_var = StringVar()
-        old_name_entry = Entry(frame, fg='grey', font=('Courier', 12), width=20, justify='center', highlightthickness=2, highlightbackground='grey', textvariable=old_name_var)
-        old_name_var.set('Old Name')
-        old_name_entry.pack(pady=10, padx=10, ipady=3)
-
-        new_name_var = StringVar()
-        new_name_entry = Entry(frame, fg='grey', font=('Courier', 12), width=20, justify='center', highlightthickness=2, highlightbackground='grey', textvariable=new_name_var)
-        new_name_var.set('New Name')
-        new_name_entry.pack(pady=10, padx=10, ipady=3)
-
-        action_button = Button(frame, text='RENAME', bg='green', fg='white', activebackground='green', activeforeground='white', cursor='hand2', command=lambda: self.action_button_command('REPLACE', widgets=[old_name_entry, new_name_entry], old_var=old_name_entry, new_var=new_name_var))
-        action_button.pack(pady=15, ipady=3, ipadx=80)
-
-        frame.pack(pady=25)
-
-        back_button = Button(self.master, text='BACK', bd=0, fg='blue', font=('Courier', 15, 'bold'), cursor='hand2', command=lambda: self.back_command(remove_widgets=(frame, back_button)))
-        back_button.pack()
-
-        back_button.bind('<Enter>', lambda e: back_button.config(fg='red'))
-        back_button.bind('<Leave>', lambda e: back_button.config(fg='blue'))
-        back_button.bind('<Return>', lambda e: self.back_command(remove_widgets=(frame, back_button)))
-        old_name_entry.bind('<Return>', lambda e: self.action_button_command('REPLACE', widgets=[old_name_entry, new_name_entry], old_var=old_name_var, new_var=new_name_var))
-        new_name_entry.bind('<Return>', lambda e: self.action_button_command('REPLACE', widgets=[old_name_entry, new_name_entry], old_var=old_name_var, new_var=new_name_var))
-        action_button.bind('<Return>', lambda e: self.action_button_command('REPLACE', widgets=[old_name_entry, new_name_entry], old_var=old_name_entry, new_var=new_name_var))
-        old_name_entry.bind('<Button-1>', lambda event, vars=[old_name_var, new_name_var], var_texts=['Old Name', 'New Name'], widgets=[old_name_entry, new_name_entry]: self.widgets_bindings(event, vars, var_texts, widgets))
-        new_name_entry.bind('<Button-1>', lambda event, vars=[new_name_var, old_name_var], var_texts=['New Name', 'Old Name'], widgets=[new_name_entry, old_name_entry]: self.widgets_bindings(event, vars, var_texts, widgets))
-        old_name_entry.bind('<FocusIn>', lambda event, vars=[old_name_var, new_name_var], var_texts=['Old Name', 'New Name'], widgets=[old_name_entry, new_name_entry]: self.widgets_bindings(event, vars, var_texts, widgets))
-        new_name_entry.bind('<FocusIn>', lambda event, vars=[new_name_var, old_name_var], var_texts=['New Name', 'Old Name'], widgets=[new_name_entry, old_name_entry]: self.widgets_bindings(event, vars, var_texts, widgets))
-        new_name_entry.bind('<FocusOut>', lambda event, vars=[old_name_var, new_name_var], var_texts=['Old Name', 'New Name'], widgets=[old_name_entry, new_name_entry]: self.widgets_bindings(event, vars, var_texts, widgets))
-        self.master.bind('<Button-1>', lambda event, vars=[old_name_var, new_name_var], var_texts=['Old Name', 'New Name'], frame=frame, widgets=[old_name_entry, new_name_entry]: self.master_bindings(event, vars, var_texts, frame, widgets))
-
-    def view_command(self, remove_widgets=None):
-        '''When user clicks view button'''
-
-        self.master.geometry(f'{self.w_width}x{self.w_height}+{self.screen_width // 2 - self.w_width // 2}+{self.screen_height // 2 - self.w_height // 2}')
-
-        if not remove_widgets:
-            self.remove_widgets((self.add_remove_search, self.rename_button, self.view_button))
-
-        else:
-            self.remove_widgets(remove_widgets)
-
-        self.sort_contents()
-
-        with open(self.file_name, 'r') as f:
-            contents = [content.strip('\n') for content in f.readlines()]
-
-        self.text_area_frame = Frame(self.master, highlightthickness=2, highlightbackground='silver')
-        self.text_area = Text(self.text_area_frame, width=27, height=14, state=DISABLED, cursor='arrow')
+        self.text_area = Text(self.text_area_frame, width=27, height=13, state=DISABLED, cursor='arrow')
         self.scrollbar = Scrollbar(self.text_area_frame, orient="vertical", command=self.text_area.yview)
 
-        self.text_area.pack(side=LEFT)
+        self.text_area.pack(side=LEFT, ipady=1)
         self.text_area_frame.pack(pady=5, padx=4, anchor='w')
         self.show_scrollbar()
 
         self.text_area.config(state=NORMAL)
         self.text_area.delete('1.0', END)
+        self.text_area_frame.pack(padx=5, pady=5, side=LEFT)
 
-        for index, content in enumerate(contents):
-            if index == 0:
-                self.text_area.insert(END, content)
+        self.master.after(0, self.insert_text_area)
 
-            else:
-                self.text_area.insert(END, '\n' + content)
+        self.rename_window_button.bind('<Return>', lambda e: self.rename_window())
+        self.add_button.bind('<Return>', lambda e: self.add_remove_search_command(button_name='ADD'))
+        self.remove_button.bind('<Return>', lambda e: self.add_remove_search_command(button_name='REMOVE'))
+        self.search_button.bind('<Return>', lambda e: self.add_remove_search_command(button_name='SEARCH'))
+        self.video_entry.bind('<Button-1>', lambda event, widgets=[self.video_entry], texts=['Video Name']: self.widgets_bindings(event, widgets, texts))
+        self.video_entry.bind('<FocusIn>', lambda event, widgets=[self.video_entry], texts=['Video Name']: self.widgets_bindings(event, widgets, texts))
+        self.video_entry.bind('<FocusOut>', lambda event, widgets=[self.video_entry, self.video_entry], texts=['Video Name', 'Video Name']: self.widgets_bindings(event, widgets, texts))
 
-        self.text_area.config(state=DISABLED)
+        self.master.bind('<Button-1>', lambda event, widgets=[self.first_left_frame], entries=[self.video_entry], texts=['Video Name']: self.master_bindings(event, widgets, entries, texts))
+        self.master.mainloop()
 
-        back_button = Button(self.master, text='BACK', bd=0, fg='blue', font=('Courier', 15, 'bold'), cursor='hand2')
+    def widgets_bindings(self, event, widgets, texts):
+        '''When user clicks or select using tab from keyboard'''
 
-        if remove_widgets:
-            back_button.config(command=lambda: self.back_command(add_widgets=remove_widgets, remove_widgets=(self.text_area_frame, back_button)))
-            back_button.bind('<Return>', lambda e: self.back_command(add_widgets=remove_widgets, remove_widgets=(self.text_area_frame, back_button)))
+        if event.widget == widgets[0] and widgets[0].get().strip() == texts[0]:
+            widgets[0].delete(0, END)
+            widgets[0].config(fg='black')
 
-        else:
-            back_button.config(command=lambda: self.back_command(remove_widgets=(self.text_area_frame, back_button)))
-            back_button.bind('<Return>', lambda e: self.back_command(remove_widgets=(self.text_area_frame, back_button)))
+        if len(widgets) == 2 and not widgets[1].get().strip():
+            widgets[1].delete(0, END)
+            widgets[1].insert(END, texts[1])
+            widgets[1].config(fg='grey')
 
-        back_button.pack()
+    def master_bindings(self, event, widgets, enteries, texts):
+        '''When user clicks to any frames or to the root window'''
 
-        back_button.bind('<Enter>', lambda e: back_button.config(fg='red'))
-        back_button.bind('<Leave>', lambda e: back_button.config(fg='blue'))
+        widgets.extend([self.title_label, self.text_area, self.scrollbar, self.master])
 
-    def action_button_command(self, button_name, entry_var=None, widgets=None, old_var=None, new_var=None):
-        '''When user clicks add, remove, search or rename button'''
-
-        if entry_var:
-            get_from_entry = entry_var.get().strip()
-
-            if get_from_entry == 'Video Name':
-                messagebox.showerror('Invalid Name', 'Enter a valid video')
-                return
-
-        if not os.path.exists(self.file_name):
-            with open(self.file_name, 'w'):
-                pass
-
-            contents = []
-
-        else:
-            with open(self.file_name, 'r') as f:
-                contents = [line.strip('\n') for line in f.readlines()]
-
-        if button_name == 'ADD':
-            if get_from_entry in contents:
-                messagebox.showinfo('Already Exists', f'"{get_from_entry}" is already in file')
-
-            else:
-                with open(self.file_name, 'a') as f:
-                    f.write(f'{get_from_entry}\n')
-
-                messagebox.showinfo('Value Added', f'"{get_from_entry}" added in file')
-
-        elif button_name == 'REMOVE':
-            try:
-                if get_from_entry in contents:
-                    with open(self.file_name, 'w') as f:
-                        for content in contents:
-                            if get_from_entry != content:
-                                f.write(f'{content}\n')
-
-                    messagebox.showinfo('Value Removed', f'"{get_from_entry}" reomved from file')
-
-                else:
-                    option = messagebox.askyesno('Add Value?', f'"{get_from_entry}" not in file. Do you want to add it?')
-
-                    if option:
-                        self.action_button_command('ADD', entry_var, widgets)
-
-            except TypeError:
-                messagebox.showinfo('Value Removed', f'{get_from_entry} reomved from file')
-
-        elif button_name == 'SEARCH':
-            if get_from_entry in contents:
-                messagebox.showinfo('Exists', f'"{get_from_entry}" is in file')
-
-            else:
-                option = messagebox.askyesno('Add Value?', f'"{get_from_entry}" not in file. Do you want to add it?')
-
-                if option:
-                    self.action_button_command('ADD', entry_var, widgets)
-
-        elif button_name == 'REPLACE':
-            old_name = old_var.get().strip().title()
-            new_name = new_var.get().strip().title()
-
-            if not old_name or not new_name or old_name == 'Old Name' or new_name == 'New Name':
-                messagebox.showerror('Invalid Video Name', 'The input video name is invlaid')
-
-            elif old_name not in contents:
-                messagebox.showerror('Not exists', 'Old Name Not found')
-
-            elif new_name in contents:
-                messagebox.showerror('Already Exists', 'New Name already exists in file. Try another!')
-
-            else:
-                old_name_index = contents.index(old_name)
-                contents[old_name_index] = new_name
-
-                with open(self.file_name, 'w') as f:
-                    for content in contents:
-                        f.write(f'{content}\n')
-
-                old_var.set('Old Name')
-                new_var.set('New Name')
-
-                for widget in widgets:
-                    widget.config(fg='grey')
-
-        else:
-            messagebox.showerror('Invalid Name', 'Please Enter a valid video name')
-
-        if button_name in ['ADD', 'REMOVE', 'SEARCH']:
-            entry_var.set('Video Name')
-            widgets.config(fg='grey')
+        if event.widget in widgets:
+            for index, entry in enumerate(enteries):
+                if not entry.get().strip():
+                    entry.delete(0, END)
+                    entry.insert(END, texts[index])
+                    entry.config(fg='grey')
 
             self.master.focus()
 
-    def sort_contents(self):
-        '''Sorting the contents of the file alphabetically'''
+    def rename_window(self):
+        '''When user clicks rename button'''
 
-        with open(self.file_name, 'r') as f:
-            contents = f.readlines()
-            contents.sort()
+        self.first_left_frame.pack_forget()
+        self.text_area_frame.pack_forget()
 
-        with open(self.file_name, 'w') as f:
-            for content in contents:
-                f.write(content)
+        frame = Frame(self.master)
+
+        self.old_name_entry = Entry(frame, fg='grey', font=('Courier', 12), width=19, justify='center', highlightthickness=2, highlightbackground='grey')
+        self.old_name_entry.insert(END, 'Old Name')
+        self.old_name_entry.pack(pady=10, padx=10, ipady=3)
+
+        self.new_name_entry = Entry(frame, fg='grey', font=('Courier', 12), width=19, justify='center', highlightthickness=2, highlightbackground='grey')
+        self.new_name_entry.insert(END, 'New Name')
+        self.new_name_entry.pack(pady=10, padx=10, ipady=3)
+
+        self.rename_button = Button(frame, text='RENAME', bg='green', fg='white', activebackground='green', activeforeground='white', cursor='hand2', command=self.rename_command)
+        self.rename_button.pack(pady=15, ipady=3, ipadx=70)
+
+        back_button = Button(frame, text='BACK', bd=0, fg='blue', font=('Courier', 15, 'bold'), cursor='hand2', command=lambda: self.back_command(frame), activeforeground='blue')
+        back_button.pack()
+
+        frame.pack(padx=5, side=LEFT, ipady=2)
+        self.text_area_frame.pack(pady=15, padx=5, anchor='w')
+
+        self.old_name_entry.bind('<Button-1>', lambda event, widgets=[self.old_name_entry, self.new_name_entry], texts=['Old Name', 'New Name']: self.widgets_bindings(event, widgets, texts))
+        self.new_name_entry.bind('<Button-1>', lambda event, widgets=[self.new_name_entry, self.old_name_entry], texts=['New Name', 'Old Name']: self.widgets_bindings(event, widgets, texts))
+        self.old_name_entry.bind('<FocusIn>', lambda event, widgets=[self.old_name_entry, self.new_name_entry], texts=['Old Name', 'New Name']: self.widgets_bindings(event, widgets, texts))
+        self.new_name_entry.bind('<FocusIn>', lambda event, widgets=[self.new_name_entry, self.old_name_entry], texts=['New Name', 'Old Name']: self.widgets_bindings(event, widgets, texts))
+        self.new_name_entry.bind('<FocusOut>', lambda event, widgets=[self.old_name_entry, self.new_name_entry], texts=['Old Name', 'New Name']: self.widgets_bindings(event, widgets, texts))
+
+        back_button.bind('<Return>', lambda e: self.back_command(frame))
+        self.master.bind('<Button-1>', lambda event, widgets=[frame], entries=[self.old_name_entry, self.new_name_entry], texts=['Old Name', 'New Name']: self.master_bindings(event, widgets, entries, texts))
+
+    def back_command(self, frame):
+        '''Command for the back button'''
+
+        self.text_area_frame.pack_forget()
+        frame.pack_forget()
+
+        self.first_left_frame.pack(padx=5, side=LEFT, ipady=2)
+        self.text_area_frame.pack(pady=15, padx=5, anchor='w')
+
+        self.video_entry.bind('<Button-1>', lambda event, widgets=[self.video_entry], texts=['Video Name']: self.widgets_bindings(event, widgets, texts))
+        self.master.bind('<Button-1>', lambda event, widgets=[self.first_left_frame], entries=[self.video_entry], texts=['Video Name']: self.master_bindings(event, widgets, entries, texts))
 
     def show_scrollbar(self):
         '''Show scrollbar when the character in the text is more than the height of the text widget'''
@@ -351,6 +166,140 @@ class SSNI:
             self.scrollbar.pack_forget()
             self.text_area.config(yscrollcommand=None)
             self.master.after(100, self.show_scrollbar)
+
+    def read_file(self):
+        '''Reading all contents of the file'''
+
+        if os.path.exists(self.file_name):
+            with open(self.file_name, 'r') as f:
+                return [line.strip('\n') for line in f.readlines()]
+
+        else:
+            with open(self.file_name, 'w'):
+                pass
+
+    def sort_file(self):
+        '''Sorting contents of file according to length in ascending order'''
+
+        contents = self.read_file()
+        contents.sort(key=len)
+
+        with open(self.file_name, 'w') as f:
+            for content in contents:
+                f.write(f'{content}\n')
+
+    def insert_text_area(self):
+        '''Insert text in Text widget'''
+
+        contents = self.read_file()
+        self.sort_file()
+        self.text_area.config(state=NORMAL)
+
+        if contents:
+            self.text_area.delete('1.0', END)
+            self.text_area.config(fg='black')
+
+            for index, content in enumerate(contents):
+                if index == 0:
+                    self.text_area.insert(END, content)
+
+                else:
+                    self.text_area.insert(END, '\n' + content)
+
+        else:
+            self.text_area.delete('1.0', END)
+            self.text_area.config(fg='grey')
+            self.text_area.insert('1.0', 'No data yet.')
+
+        self.text_area.config(state=DISABLED)
+
+    def add_remove_search_command(self, button_name):
+        '''Command for the ADD, REMOVE and SEARCH buttons'''
+
+        contents = self.read_file()
+        from_entry = self.video_entry.get().strip().title()
+
+        if not from_entry or from_entry == 'Video Name':
+            messagebox.showerror('Invalid Name', 'No Name given')
+
+        elif button_name == 'ADD':
+            if from_entry in contents:
+                messagebox.showinfo('Already Exists', f'"{from_entry}" is already in file')
+
+            else:
+                with open(self.file_name, 'a') as f:
+                    f.write(f'{from_entry}\n')
+
+                messagebox.showinfo('Value Added', f'"{from_entry}" added in file')
+
+        elif button_name == 'REMOVE':
+            if from_entry in contents:
+                with open(self.file_name, 'w') as f:
+                    for content in contents:
+                        if from_entry != content:
+                            f.write(f'{content}\n')
+
+                messagebox.showinfo('Value Removed', f'"{from_entry}" reomved from file')
+
+            else:
+                option = messagebox.askyesno('Add Value?', f'"{from_entry}" not in file. Do you want to add it?')
+
+                if option:
+                    self.action_button_command('ADD')
+
+        elif button_name == 'SEARCH':
+            if from_entry in contents:
+                messagebox.showinfo('Exists', f'"{from_entry}" is in file')
+
+            else:
+                option = messagebox.askyesno('Add Value?', f'"{from_entry}" not in file. Do you want to add it?')
+
+                if option:
+                    self.action_button_command('ADD')
+
+        self.sort_file()
+        self.insert_text_area()
+
+        self.video_entry.delete(0, END)
+        self.video_entry.insert(END, 'Video Name')
+        self.video_entry.config(fg='grey')
+
+        self.master.focus()
+
+    def rename_command(self):
+        '''Commands for the RENAME button'''
+
+        contents = self.read_file()
+        old_name = self.old_name_entry.get().strip().title()
+        new_name = self.new_name_entry.get().strip().title()
+
+        if not old_name or not new_name or old_name == 'Old Name' or new_name == 'New Name':
+            messagebox.showerror('Invalid Video Name', 'The input video name is invlaid')
+
+        elif old_name not in contents:
+            messagebox.showerror('Not exists', 'Old Name Not found')
+
+        elif new_name in contents:
+            messagebox.showerror('Already Exists', 'New Name already exists in file. Try another!')
+
+        else:
+            old_name_index = contents.index(old_name)
+            contents[old_name_index] = new_name
+
+            with open(self.file_name, 'w') as f:
+                for content in contents:
+                    f.write(f'{content}\n')
+
+            self.insert_text_area()
+            widgets = {self.old_name_entry: 'Old Name', self.new_name_entry: 'New Name'}
+
+            for widget, text in widgets.items():
+                widget.delete(0, END)
+                widget.insert(END, text)
+                widget.config(fg='grey')
+
+            self.master.focus()
+            messagebox.showinfo('Renamed', f'{old_name} renamed to {new_name}')
 
     def resource_path(self, relative_path):
         """ Get absolute path to resource from temporary directory
