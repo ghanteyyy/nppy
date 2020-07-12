@@ -1,18 +1,15 @@
-'SSNI/'
-'icons/'
-'wincap/'
-'Agreement.txt'
-'Project EULER'
-'mega_upload.py'
-'Data Structure/'
-'Project GET_PIC/'
-'Project SPYDEER/'
-'requirements.txt'
-'Project LeetCode/'
-'cursor_option.txt'
-'hidden_imports.txt'
-'Project Photo Preview/'
-'PROJECT GUIS/SYPRES QUIZ/'
-'PROJECT GUIS/Windows Activator/'
-'commands_for_pypi_deployment.txt'
-'PROJECT GUIS/[INC] Project NOTEPAD/'
+SSNI/
+*.txt
+icons/
+wincap/
+Project*EULER/
+mega_upload.py
+Data*Structure/
+Project*GET_PIC/
+Project*SPYDEER/
+Project*LeetCode/
+Project*Photo*Preview/
+PROJECT*GUIS/SYPRES*QUIZ/
+PROJECT*GUIS/Windows*Activator/
+PROJECT*GUIs/Project*NOTEPAD/
+OTHERS/
