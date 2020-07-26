@@ -2,16 +2,11 @@ import os
 import sys
 import winsound
 
-try:
-    PY3 = True
+try:  # Python 3
     from tkinter import *
-    from tkinter import PhotoImage
     from tkinter.ttk import Combobox, Scrollbar
 
-except (ImportError, ModuleNotFoundError):
-    PY3 = False
-    import PIL.Image
-    import PIL.ImageTk
+except (ImportError, ModuleNotFoundError):  # Python 2
     from Tkinter import *
     from ttk import Combobox, Scrollbar
 
@@ -375,11 +370,7 @@ class GUI:
         self.master.geometry(f'260x369+{self.pos_x}+{self.pos_y}')
         self.master.resizable(0, 0)
 
-        if PY3:
-            self.file_image_file = PhotoImage(file='included_files/cover.png')
-
-        else:
-            self.file_image_file = PIL.ImageTk.PhotoImage(PIL.Image.open(self.resource_path('included_files/cover.png')))
+        self.file_image_file = PhotoImage(file='included_files/cover.png')
 
         self.label_image = Label(self.master, image=self.file_image_file, bg='blue', borderwidth=0)
         self.label_image.place(x=0, y=0)

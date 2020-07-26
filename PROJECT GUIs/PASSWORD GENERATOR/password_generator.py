@@ -4,24 +4,19 @@ import string
 import random
 import pyperclip
 
-try:
-    PY3 = True
+try:  # Python 3
     from tkinter import *
     from tkinter import messagebox
 
-except (ImportError, ModuleNotFoundError):
-    PY3 = False
+except (ImportError, ModuleNotFoundError):  # Python 2
     from Tkinter import *
     import tkMessageBox as messagebox
-    import PIL.Image
-    import PIL.ImageTk
 
 
 class Password_Generator:
     def __init__(self):
         self.master = Tk()
         self.master.withdraw()
-        self.master.after(0, self.master.deiconify)
         self.master.resizable(0, 0)
         self.master.title('Password GENERATOR')
         self.master.iconbitmap(self.resource_path('included_files/icon.ico'))
@@ -31,11 +26,7 @@ class Password_Generator:
         self.title = Label(self.master, text='Password GENERATOR', font=('Calibri', 20))
         self.title.pack(pady=5)
 
-        if PY3:
-            self.image_obj = PhotoImage(file=self.resource_path('included_files/title_image.png'))
-
-        else:
-            self.image_obj = PIL.ImageTk.PhotoImage(PIL.Image.open(self.resource_path('included_files/title_image.png')))
+        self.image_obj = PhotoImage(file=self.resource_path('included_files/title_image.png'))
 
         self.image_label = Label(self.master, image=self.image_obj)
         self.image_label.pack(pady=5)
@@ -71,6 +62,8 @@ class Password_Generator:
         self.master.bind('<Control-C>', self.copy_to_clipboard)
         self.master.bind('<Return>', lambda e: self.generate_button())
         self.master.bind('<Button>', self.bind_keys)
+
+        self.master.after(0, self.master.deiconify)
         self.master.mainloop()
 
     def bind_keys(self, event):

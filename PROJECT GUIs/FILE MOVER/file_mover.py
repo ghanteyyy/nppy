@@ -3,12 +3,12 @@ import sys
 import shutil
 import threading
 
-try:
+try:  # Python 3
     from tkinter import *
     import tkinter.ttk as ttk
     import tkinter.messagebox as messagebox
 
-except ModuleNotFoundError:
+except ModuleNotFoundError:  # Python 2
     import ttk
     from Tkinter import *
     import tkMessageBox as messagebox

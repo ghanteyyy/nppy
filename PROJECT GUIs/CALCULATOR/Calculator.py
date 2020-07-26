@@ -2,22 +2,15 @@ from __future__ import division  # If python is 2.x
 
 import os
 import sys
+import ctypes
 
 try:  # Python 3
-    import ctypes
     from tkinter import *
-    from tkinter import PhotoImage
     from tkinter import messagebox
 
-    PY3 = True
-
 except (ImportError, ModuleNotFoundError):  # Python 2
-    import PIL.Image
-    import PIL.ImageTk
     from Tkinter import *
     import tkMessagebox as messagebox
-
-    PY3 = False
 
 
 class Calculator:
@@ -118,13 +111,8 @@ class Calculator:
         self.history_area['yscrollcommand'] = self.scrollbar.set
 
         # Creating image object
-        if PY3:
-            self.pull_back_image = PhotoImage(file=self.resource_path('included_files\\pull_back.png'))
-            self.push_front_image = PhotoImage(file=self.resource_path('included_files\\push_front.png'))
-
-        else:
-            self.pull_back_image = PIL.ImageTk.PhotoImage(PIL.Image.open(self.resource_path('included_files\\pull_back.png')))
-            self.push_front_image = PIL.ImageTk.PhotoImage(PIL.Image.open(self.resource_path('included_files\\push_front.png')))
+        self.pull_back_image = PhotoImage(file=self.resource_path('included_files\\pull_back.png'))
+        self.push_front_image = PhotoImage(file=self.resource_path('included_files\\push_front.png'))
 
         # Buttons that push the window to the top of other window or pull the window from the top of other window
         self.push_front_frame = Frame(self.master)

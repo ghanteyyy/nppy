@@ -2,7 +2,12 @@ import os
 import sys
 import time
 import winsound
-from tkinter import *
+
+try:  # Python 3
+    from tkinter import *
+
+except (ImportError, ModuleNotFoundError):  # Python 2
+    from Tkinter import *
 
 
 class Daily_Expenses:

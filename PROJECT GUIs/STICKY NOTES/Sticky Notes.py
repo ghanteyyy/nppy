@@ -3,13 +3,12 @@ import sys
 import random
 import string
 
-try:
+try:  # Python 3
     from tkinter import *
     from tkinter import messagebox
-    from tkinter import PhotoImage
     from tkinter.ttk import Scrollbar
 
-except (ModuleNotFoundError, ImportError):
+except (ModuleNotFoundError, ImportError):  # Python 2
     from Tkinter import *
     from ttk import Scrollbar
     import tkMessageBox as messagebox
@@ -86,6 +85,8 @@ class Sticky_Notes:
         return False
 
     def change_tags(self, tag):
+        '''Change text to bold, italic, underline or overstrike'''
+
         new_tag = ''.join([random.choice(string.ascii_letters) for _ in range(10)])   # Generating new tags
 
         try:

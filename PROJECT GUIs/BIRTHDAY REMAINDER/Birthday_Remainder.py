@@ -1,7 +1,5 @@
 import os
 import sys
-import PIL.Image
-import PIL.ImageTk
 import winsound
 
 try:  # Python 3
@@ -31,7 +29,7 @@ class Birthday_Remainder:
 
         # Inserting image
         self.birthday_quote_frame = Frame(self.master)
-        self.birthday_quote_image = PIL.ImageTk.PhotoImage(PIL.Image.open(self.resource_path('included_files/image.jpg'), 'r'))
+        self.birthday_quote_image = PhotoImage(file=self.resource_path('included_files/image.png'))
         self.label_birthday_quote = Label(self.birthday_quote_frame, image=self.birthday_quote_image)
         self.label_birthday_quote.grid(row=0, column=0)
         self.birthday_quote_frame.place(x=0, y=0)

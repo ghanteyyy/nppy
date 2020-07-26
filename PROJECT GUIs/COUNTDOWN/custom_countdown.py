@@ -1,10 +1,10 @@
 import os
 import sys
 
-try:
+try:  # Python 3
     from tkinter import *
 
-except (ImportError, ModuleNotFoundError):
+except (ImportError, ModuleNotFoundError):  # Python 2
     from Tkinter import *
 
 
