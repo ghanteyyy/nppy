@@ -64,7 +64,7 @@ class GUI:
         self.master.mainloop()
 
     def key_bindings(self, event):
-        '''Different action when user clicks to different widgets'''
+        '''Action when user clicks inside entry widget or oustide of the entry widget'''
 
         if event.widget == self.entry_box:
             self.entry_box_var.set('')
@@ -78,12 +78,12 @@ class GUI:
             self.master.focus()
 
     def get_combo_box_values(self, low, high):
-        '''Get values of date, hour and min for combobox'''
+        '''Get numbers of month, date, hour and min for month, date, hour and minute combobox'''
 
         return [str(i).zfill(2) for i in range(low, high + 1)]
 
     def add_command(self):
-        '''When user click "Add Remainder" button'''
+        '''Command when user clicks "Add Remainder" button'''
 
         try:
             message = self.entry_box_var.get().strip()
@@ -135,16 +135,16 @@ class GUI:
             messagebox.showerror('Invalid Input', 'Date / Hour / Minute is excepted in numbers')
 
     def resource_path(self, relative_path):
-        """ Get absolute path to resource from temporary directory
+        '''Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of photos that are used in this script like in icons and title_image from current directory
+            Gets path of files that are used in this script like icons, images or file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of photos that are used in this script like in icons and title image from temporary directory"""
+            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
 
         try:
-            base_path = sys._MEIPASS  # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS.
 
         except AttributeError:
             base_path = os.path.abspath(".")

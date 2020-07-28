@@ -64,7 +64,7 @@ class Remainder_Window:
         return remainders
 
     def remove_remainder(self, remainder):
-        '''Removing displayed remainders'''
+        '''Removing displayed remainders from files'''
 
         lines = self.read_file()
         check = ' | '.join(remainder)
@@ -87,9 +87,9 @@ class Remainder_Window:
                     split_rem_time = rem_time.split()
 
                     if curr_time == rem_time or (split_rem_time[2] == time.strftime('%I') and split_rem_time[3] < time.strftime('%M')) or (split_rem_time[2] < time.strftime('%I')):
-                        winsound.PlaySound(self.resource_path('included_files/tone.wav'), winsound.SND_LOOP + winsound.SND_ASYNC)    # Playing Sound before showing remainder window and till user clicks close button
+                        winsound.PlaySound(self.resource_path('included_files/tone.wav'), winsound.SND_LOOP + winsound.SND_ASYNC)  # Playing Sound before showing remainder window and till user clicks close button.
                         self.window(rem)
-                        winsound.PlaySound(None, winsound.SND_PURGE)  # Stopping sound after user click close button
+                        winsound.PlaySound(None, winsound.SND_PURGE)  # Stopping sound when user clicks close button.
 
                         self.remove_remainder(remainder)
 
@@ -99,16 +99,16 @@ class Remainder_Window:
             return
 
     def resource_path(self, relative_path):
-        """ Get absolute path to resource from temporary directory
+        '''Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of photos that are used in this script like in icons and title_image from current directory
+            Gets path of files that are used in this script like icons, images or file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of photos that are used in this script like in icons and title image from temporary directory"""
+            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
 
         try:
-            base_path = sys._MEIPASS  # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS.
 
         except AttributeError:
             base_path = os.path.abspath(".")
@@ -117,14 +117,14 @@ class Remainder_Window:
 
 
 class is_at_startup:
-    '''Adding the given program path to startup'''
+    '''Add the program path to startup'''
 
     def __init__(self, program_path):
         self.program_path = program_path
         self.program_basename = os.path.basename(self.program_path)
 
     def is_path_valid(self):
-        '''Check if the given program path is actually exists'''
+        '''Check if the given program path aactually exists'''
 
         if os.path.exists(self.program_path):
             return True

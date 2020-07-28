@@ -77,7 +77,7 @@ class SSNI:
         self.master.mainloop()
 
     def widgets_bindings(self, event, widgets, texts):
-        '''When user clicks or select using tab from keyboard'''
+        '''When user clicks or uses tab from keyboard to select entry widgets'''
 
         if event.widget == widgets[0] and widgets[0].get().strip() == texts[0]:
             widgets[0].delete(0, END)
@@ -89,7 +89,7 @@ class SSNI:
             widgets[1].config(fg='grey')
 
     def master_bindings(self, event, widgets, enteries, texts):
-        '''When user clicks to any frames or to the root window'''
+        '''When user clicks anywhere except entry widgets'''
 
         widgets.extend([self.title_label, self.text_area, self.scrollbar, self.master])
 
@@ -103,7 +103,7 @@ class SSNI:
             self.master.focus()
 
     def rename_window(self):
-        '''When user clicks rename button'''
+        '''Rename window when user clicks rename button'''
 
         self.first_left_frame.pack_forget()
         self.text_area_frame.pack_forget()
@@ -137,7 +137,7 @@ class SSNI:
         self.master.bind('<Button-1>', lambda event, widgets=[frame], entries=[self.old_name_entry, self.new_name_entry], texts=['Old Name', 'New Name']: self.master_bindings(event, widgets, entries, texts))
 
     def back_command(self, frame):
-        '''Command for the back button'''
+        '''Command when user clicks back button'''
 
         self.text_area_frame.pack_forget()
         frame.pack_forget()
@@ -168,7 +168,7 @@ class SSNI:
             self.master.after(100, self.show_scrollbar)
 
     def read_file(self):
-        '''Reading all contents of the file'''
+        '''Getting everything from file'''
 
         if os.path.exists(self.file_name):
             with open(self.file_name, 'r') as f:
@@ -189,7 +189,7 @@ class SSNI:
                 f.write(f'{content}\n')
 
     def insert_text_area(self):
-        '''Insert text in Text widget'''
+        '''Insert contents of file in Text widget'''
 
         contents = self.read_file()
         self.sort_file()
@@ -214,7 +214,7 @@ class SSNI:
         self.text_area.config(state=DISABLED)
 
     def add_remove_search_command(self, button_name):
-        '''Command for the ADD, REMOVE and SEARCH buttons'''
+        '''Commands when user clicks either ADD, REMOVE or SEARCH buttons'''
 
         contents = self.read_file()
         from_entry = self.video_entry.get().strip().title()
@@ -267,7 +267,7 @@ class SSNI:
         self.master.focus()
 
     def rename_command(self):
-        '''Commands for the RENAME button'''
+        '''Commands when user clicks RENAME button'''
 
         contents = self.read_file()
         old_name = self.old_name_entry.get().strip().title()
@@ -302,16 +302,16 @@ class SSNI:
             messagebox.showinfo('Renamed', f'{old_name} renamed to {new_name}')
 
     def resource_path(self, relative_path):
-        """ Get absolute path to resource from temporary directory
+        '''Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of photos that are used in this script like in icons and title_image from current directory
+            Gets path of files that are used in this script like icons, images or file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of photos that are used in this script like in icons and title image from temporary directory"""
+            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
 
         try:
-            base_path = sys._MEIPASS  # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS.
 
         except AttributeError:
             base_path = os.path.abspath(".")
