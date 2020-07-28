@@ -22,68 +22,73 @@ class Password_Generator:
         self.master.iconbitmap(self.resource_path('included_files/icon.ico'))
         self.master.geometry(f'362x529+{self.master.winfo_screenwidth() // 2 - 362 // 2}+{self.master.winfo_screenheight() // 2 - 529 // 2}')
 
-        self.font = ('Calibri', 12)
         self.title = Label(self.master, text='Password GENERATOR', font=('Calibri', 20))
         self.title.pack(pady=5)
 
-        self.image_obj = PhotoImage(file=self.resource_path('included_files/title_image.png'))
+        self.image = PhotoImage(file=self.resource_path('included_files/title_image.png'))
 
-        self.image_label = Label(self.master, image=self.image_obj)
+        self.image_label = Label(self.master, image=self.image)
         self.image_label.pack(pady=5)
 
-        # Input box to enter the length of password
         self.number_box_var = StringVar()
         self.number_box = Entry(self.master, width=25, fg='grey', font=('Calibri', 12), justify='center', textvariable=self.number_box_var)
         self.number_box_var.set('Number of Character')
         self.number_box.pack(pady=5, ipady=2)
 
         self.check_box_frame = Frame(self.master)
-        self.check_box_items = ['UPPERCASE', 'LOWERCASE', 'NUMBERS', 'SPECIAL CHARACTERS', 'ALL']   # Options for generating password
+        self.check_box_items = ['UPPERCASE', 'LOWERCASE', 'NUMBERS', 'SPECIAL CHARACTERS', 'ALL']  # Options for generating password
 
-        # Variables to hold the selected option
         self.upper_var, self.lower_var, self.num_var, self.special_var, self.all_var = IntVar(), IntVar(), IntVar(), IntVar(), IntVar()
         self.vars = [self.upper_var, self.lower_var, self.num_var, self.special_var, self.all_var]
 
-        for index, value in enumerate(self.check_box_items):  # Creating Checkbuttons according to name stored in "check_box_items" and variables to hold selected options stored in "var"
-            self.check_box = Checkbutton(self.check_box_frame, text=value, anchor='w', bd=0, variable=self.vars[index], font=self.font)
+        for index, value in enumerate(self.check_box_items):  # Creating Checkbuttons as per name in "self.check_box_items" and variables as per in self.vars
+            self.check_box = Checkbutton(self.check_box_frame, text=value, anchor='w', bd=0, variable=self.vars[index], font=('Calibri', 12))
             self.check_box.grid(row=index, column=0, sticky='w')
 
         self.check_box_frame.pack(pady=5)
 
-        # Buttons to generate random password
-        self.generate_password_button = Button(self.master, text='Generate Password', bg='Green', fg='white', activeforeground='white', activebackground='Green', font=self.font, relief=FLAT, command=self.generate_button)
+        self.generate_password_button = Button(self.master, text='Generate Password', bg='Green', fg='white', activeforeground='white', activebackground='Green', font=('Calibri', 12), relief=FLAT, cursor='hand2', command=self.generate_button)
         self.generate_password_button.pack(pady=5)
 
-        # Show random generated password
         self.password_label = Label(self.master, font=('Calibri', 20))
-        self.copy_button = Button(self.master, text='Copy', width=6, bg='Green', fg='white', activeforeground='white', activebackground='Green', font=self.font, relief=FLAT, command=self.copy_to_clipboard)
+        self.copy_button = Button(self.master, text='Copy', width=6, bg='Green', fg='white', activeforeground='white', activebackground='Green', font=('Calibri', 12), relief=FLAT, cursor='hand2', command=self.copy_to_clipboard)
 
+        self.master.bind('<Button-1>', self.bind_keys)
+        self.number_box.bind('<FocusIn>', self.bind_keys)
+        self.number_box.bind('<Return>', self.generate_button)
         self.master.bind('<Control-c>', self.copy_to_clipboard)
         self.master.bind('<Control-C>', self.copy_to_clipboard)
-        self.master.bind('<Return>', lambda e: self.generate_button())
-        self.master.bind('<Button>', self.bind_keys)
+        self.generate_password_button.bind('<Return>', self.generate_button)
+        self.number_box.bind('<FocusOut>', lambda event, focus_out=True: self.bind_keys(event, focus_out))
 
         self.master.after(0, self.master.deiconify)
         self.master.mainloop()
 
-    def bind_keys(self, event):
+    def bind_keys(self, event, focus_out=False):
+        '''Commands when user clicks in and out of the text widget'''
+
         get = self.number_box_var.get().strip()
 
-        if event.widget == self.number_box and get == 'Number of Character':
-            self.number_box_var.set('')
-            self.number_box.config(fg='black')
+        if event.widget == self.number_box and not focus_out:
+            if get == 'Number of Character':
+                self.number_box_var.set('')
+                self.number_box.config(fg='black')
 
-        elif event.widget in [self.master, self.image_label, self.title, self.check_box_frame, self.password_label] and not get:
-            self.number_box_var.set('Number of Character')
-            self.number_box.config(fg='grey')
+        elif focus_out or event.widget != self.number_box:
+            if not get:
+                self.number_box_var.set('Number of Character')
+                self.number_box.config(fg='grey')
 
+        if event.widget != self.number_box:
             self.master.focus()
 
     def generate_password(self, string_combination, lengths):
+        '''Generating random generated password'''
+
         return ''.join([random.choice(string_combination) for lenght in range(lengths)])
 
     def copy_to_clipboard(self, event=None):
-        '''Copy Generated Random Password to the clipboard'''
+        '''Copy Generated Password to the clipboard'''
 
         text = self.password_label['text']
 
@@ -92,18 +97,17 @@ class Password_Generator:
             self.copy_button['text'] = 'Copied!'
             self.master.after(1000, lambda: self.copy_button.config(text='Copy'))
 
-    def generate_button(self):
+    def generate_button(self, event=None):
+        '''Command when user clicks generate button'''
+
         try:
-            string_combination = ''
             get_var = [var.get() for var in self.vars]
             lengths = int(self.number_box_var.get().strip())
             string_combo = [string.ascii_uppercase, string.ascii_lowercase, string.digits, string.punctuation, string.printable[:94]]
 
-            for index, value in enumerate(get_var):
-                if value == 1:
-                    string_combination += string_combo[index]
-
+            string_combination = ''.join({string_combo[index] for index, value in enumerate(get_var) if value == 1})
             password = self.generate_password(string_combination, lengths)
+
             self.password_label.config(text=password)
             self.password_label.pack()
 
@@ -117,16 +121,16 @@ class Password_Generator:
             messagebox.showerror('No Option', 'No option selected')
 
     def resource_path(self, relative_path):
-        """ Get absolute path to resource from temporary directory
+        '''Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of photos that are used in this script like in icons and title_image from current directory
+            Gets path of files that are used in this script like icons, images or file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of photos that are used in this script like in icons and title image from temporary directory"""
+            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
 
         try:
-            base_path = sys._MEIPASS  # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS.
 
         except AttributeError:
             base_path = os.path.abspath(".")
