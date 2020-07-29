@@ -30,7 +30,7 @@ class FILE_MOVER:
         self.master.title('File MOVER')
         self.master.iconbitmap(self.resource_path('included_files/icon.ico'))
 
-        self.title_label = Label(self.master, text='File MOVER', fg='white', background='green', font=('Times New Roman', 32, 'bold'))
+        self.title_label = Label(self.master, text='File MOVER', fg='silver', background='green', font=('Times New Roman', 32, 'bold'))
         self.title_label.pack(pady=5)
 
         self.from_entry_var, self.to_entry_var = StringVar(), StringVar()
@@ -46,14 +46,17 @@ class FILE_MOVER:
         self.combo_box.set('Select File Types')
         self.combo_box.pack(ipady=1)
 
+        self.style = ttk.Style()
+        self.style.configure('S.TRadiobutton', foreground='silver', background='green')
+
         self.var = IntVar()
         self.radio_submit_buttons_frame = Frame(self.master, bg='green')
         self.radio_button_frame = Frame(self.radio_submit_buttons_frame, bg='green')
-        self.copy_radio_button = Radiobutton(self.radio_button_frame, text='COPY', bg='green', activebackground='green', fg='black', variable=self.var, value=1)
-        self.move_radio_button = Radiobutton(self.radio_button_frame, text='MOVE', bg='green', activebackground='green', fg='black', variable=self.var, value=2)
+        self.copy_radio_button = ttk.Radiobutton(self.radio_button_frame, text='COPY', variable=self.var, value=1, style='S.TRadiobutton')
+        self.move_radio_button = ttk.Radiobutton(self.radio_button_frame, text='MOVE', variable=self.var, value=2, style='S.TRadiobutton')
 
         self.submit_button_frame = Frame(self.radio_submit_buttons_frame)
-        self.submit_button = Button(self.submit_button_frame, text='SUBMIT', fg='white', bg='green', activebackground='green', activeforeground='white', command=self.submit_command)
+        self.submit_button = Button(self.submit_button_frame, text='SUBMIT', fg='white', bg='green', activebackground='green', activeforeground='white', cursor='hand2', relief=RIDGE, command=self.submit_command)
 
         self.copy_radio_button.grid(row=0, column=0)
         self.move_radio_button.grid(row=1, column=0)
@@ -62,51 +65,56 @@ class FILE_MOVER:
         self.submit_button_frame.pack(side=LEFT, padx=40)
         self.radio_submit_buttons_frame.pack(pady=10)
 
-        self.master.bind('<Button-1>', self.out_widget)
-        self.to_entry.bind('<FocusOut>', lambda e: self.in_entry(chk_widget=self.to_entry, chk_var=self.to_entry_var, chk_cond='To Path'))
-        self.to_entry.bind('<FocusIn>', lambda e: self.in_entry(self.to_entry, self.to_entry_var, 'To Path', self.from_entry, self.from_entry_var, 'From Path'))
-        self.from_entry.bind('<FocusIn>', lambda e: self.in_entry(self.from_entry, self.from_entry_var, 'From Path', self.to_entry, self.to_entry_var, 'To Path'))
-        self.from_entry.bind('<Button-1>', lambda e: self.in_entry(self.from_entry, self.from_entry_var, 'From Path', self.to_entry, self.to_entry_var, 'To Path'))
-        self.to_entry.bind('<Button-1>', lambda e: self.in_entry(self.to_entry, self.to_entry_var, 'To Path', self.from_entry, self.from_entry_var, 'From Path'))
+        self.master.bind('<Button-1>', self.bind_keys)
+        self.to_entry.bind('<FocusIn>', self.bind_keys)
+        self.to_entry.bind('<Button-1>', self.bind_keys)
+        self.from_entry.bind('<FocusIn>', self.bind_keys)
+        self.from_entry.bind('<Button-1>', self.bind_keys)
+        self.to_entry.bind('<FocusOut>', lambda event, focus_out=True: self.bind_keys(event, focus_out))
 
         self.master.config(bg='green')
         self.master.mainloop()
 
-    def in_entry(self, widget=None, var=None, cond=None, chk_widget=None, chk_var=None, chk_cond=None):
-        '''Insert value in a active entry box and check if the next entry box is left empty. If yes
-           then insert the default values of that box'''
+    def bind_keys(self, event, focus_out=False):
+        '''Commands when user clicks in and out of the entries widgets'''
 
-        if var:
-            if var.get().strip() == cond:
-                var.set('')
-                widget.config(fg='black')
+        get_from_entry = self.from_entry_var.get().strip()
+        get_to_entry = self.to_entry_var.get().strip()
 
-        if chk_var:
-            if not chk_var.get():
-                chk_var.set(chk_cond)
-                chk_widget.config(fg='grey')
+        if event.widget == self.from_entry or focus_out:
+            if get_from_entry == 'From Path' and not focus_out:
+                self.from_entry_var.set('')
 
-    def out_widget(self, event):
-        '''Insert default value to the entry boxes if not value is provided when user
-           clicks outside of any widgets. Also it removes focus outside of all widgets.'''
+            if not get_to_entry:
+                self.to_entry_var.set('To Path')
 
-        if event.widget in [self.master, self.title_label, self.radio_submit_buttons_frame]:
-            self.in_entry(chk_widget=self.to_entry, chk_var=self.to_entry_var, chk_cond='To Path')
-            self.in_entry(chk_widget=self.from_entry, chk_var=self.from_entry_var, chk_cond='From Path')
+        elif event.widget == self.to_entry:
+            if get_to_entry == 'To Path':
+                self.to_entry_var.set('')
+
+            if not get_from_entry:
+                self.from_entry_var.set('From Path')
+
+        if event.widget not in [self.from_entry, self.to_entry]:
+            if not get_from_entry:
+                self.from_entry_var.set('From Path')
+
+            if not get_to_entry:
+                self.to_entry_var.set('To Path')
+
             self.master.focus()
 
     def resource_path(self, relative_path):
-        """ Get absolute path to resource from temporary directory
+        '''Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of photos that are used in this script like in icons and title_image from current directory
+            Gets path of files that are used in this script like icons, images or file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of photos that are used in this script like in icons and title image from temporary directory"""
+            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
 
         try:
-            base_path = sys._MEIPASS  # PyInstaller creates a temp folder and stores path in _MEIPASS
-
+            base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS.
         except AttributeError:
             base_path = os.path.abspath(".")
 
