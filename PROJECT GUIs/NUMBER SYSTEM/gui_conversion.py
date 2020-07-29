@@ -360,8 +360,8 @@ class Number_System:
 
 
 class GUI:
-    def __init__(self, master):
-        self.master = master
+    def __init__(self):
+        self.master = Tk()
         self.master.withdraw()
         self.master.after(0, self.master.deiconify)
         self.master.iconbitmap(self.resource_path('included_files/icon.ico'))
@@ -401,36 +401,46 @@ class GUI:
         self.scrollbar = Scrollbar(self.text_area_frame, orient="vertical", command=self.text_area.yview)
         self.show_scrollbar()
 
-        # Binding Keys
         self.master.bind('<Button-1>', self.bind_keys)
         self.master.bind('<Return>', self.calculation)
+        self.entry_box.bind('<FocusIn>', self.bind_keys)
         self.entry_box.bind('<Button-1>', self.bind_keys)
+        self.entry_box.bind('<FocusOut>', lambda event, focus_out=True: self.bind_keys(event, focus_out))
+        self.combo_box.bind('<FocusOut>', lambda event, focus_out=True: self.bind_keys(event, focus_out))
 
-    def bind_keys(self, event):
-        get = self.entry_var.get().strip()
+        self.master.mainloop()
 
-        if event.widget == self.entry_box and get == 'Enter Number':
+    def bind_keys(self, event, focus_out=False):
+        '''Commands when user clicks in and out of the entry widget'''
+
+        entry_get = self.entry_var.get().strip()
+        combo_get = self.combo_box.get().strip()
+
+        if event.widget == self.entry_box and entry_get == 'Enter Number' and not focus_out:
             self.entry_var.set('')
             self.entry_box.config(fg='black')
 
-            if not self.combo_box.get().strip():
+            if not combo_get:
                 self.combo_box.set('Select Number System')
 
-        elif event.widget == self.combo_box and not get:
+        elif event.widget == self.combo_box and not entry_get and not focus_out:
             self.entry_var.set('Enter Number')
             self.entry_box.config(fg='grey')
 
-        elif event.widget in [self.label_image, self.text_area, self.text_area_frame]:
-            if not get:
+        else:
+            if not entry_get:
                 self.entry_var.set('Enter Number')
                 self.entry_box.config(fg='grey')
 
-            elif self.combo_box.get().strip() in ['', 'Select Number System']:
+            if combo_get in ['', 'Select Number System']:
                 self.combo_box.set('Select Number System')
 
+        if event.widget not in [self.entry_box, self.combo_box, self.convert_button]:
             self.master.focus()
 
     def remove_error(self):
+        '''Remove error message after three seconds'''
+
         self.text_area.delete('1.0', 'end')
         self.text_area.config(state=DISABLED)
 
@@ -494,16 +504,16 @@ class GUI:
             self.text_area.config(state=DISABLED)
 
     def resource_path(self, relative_path):
-        """ Get absolute path to resource from temporary directory
+        '''Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of photos that are used in this script like in icons and title_image from current directory
+            Gets path of files that are used in this script like icons, images or file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of photos that are used in this script like in icons and title image from temporary directory"""
+            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
 
         try:
-            base_path = sys._MEIPASS  # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS.
 
         except AttributeError:
             base_path = os.path.abspath(".")
@@ -511,7 +521,7 @@ class GUI:
         return os.path.join(base_path, relative_path)
 
     def calculation(self, event=None):
-        '''Calculate number with respective selected conversion'''
+        '''Converting number with respective selected conversion'''
 
         get_value = self.entry_var.get().strip()
 
@@ -592,6 +602,4 @@ class GUI:
 
 
 if __name__ == '__main__':
-    root = Tk()
-    gui = GUI(root)
-    root.mainloop()
+    gui = GUI()

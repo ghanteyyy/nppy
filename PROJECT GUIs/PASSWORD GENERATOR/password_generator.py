@@ -65,7 +65,7 @@ class Password_Generator:
         self.master.mainloop()
 
     def bind_keys(self, event, focus_out=False):
-        '''Commands when user clicks in and out of the text widget'''
+        '''Commands when user clicks in and out of the entry widget'''
 
         get = self.number_box_var.get().strip()
 
