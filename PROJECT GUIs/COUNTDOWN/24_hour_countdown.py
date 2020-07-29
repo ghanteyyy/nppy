@@ -8,9 +8,9 @@ except (ImportError, ModuleNotFoundError):  # Python 2
     from Tkinter import *
 
 
-class twenty_four_hour_countdown:
-    def __init__(self, master):
-        self.master = master
+class Twenty_four_hour_countdown:
+    def __init__(self):
+        self.master = Tk()
         self.master.withdraw()
         self.master.after(0, self.master.deiconify)
         self.master.title('24 Hour COUNTDOWN')
@@ -22,12 +22,13 @@ class twenty_four_hour_countdown:
         self.time_label = Label(self.master, text='24:00:00', font=('Courier', 50, 'bold'), bg='dark blue', fg='silver')
         self.time_label.pack(fill='both')
 
-        self.master.after(1000, self.Counter)
-
         self.sec = 0
         self.min = 0
         self.hrs = 24
         self.pause = False
+
+        self.master.after(1000, self.Counter)
+        self.master.mainloop()
 
     def Counter(self):
         '''Updating hour, minute and seconds'''
@@ -53,16 +54,16 @@ class twenty_four_hour_countdown:
             self.master.after(1000, self.Counter)
 
     def resource_path(self, relative_path):
-        """ Get absolute path to resource from temporary directory
+        '''Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of photos that are used in this script like in icons and title_image from current directory
+            Gets path of files that are used in this script like icons, images or file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of photos that are used in this script like in icons and title image from temporary directory"""
+            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
 
         try:
-            base_path = sys._MEIPASS  # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS.
 
         except AttributeError:
             base_path = os.path.abspath(".")
@@ -71,6 +72,4 @@ class twenty_four_hour_countdown:
 
 
 if __name__ == '__main__':
-    root = Tk()
-    twenty_four_hour_countdown(root)
-    root.mainloop()
+    Twenty_four_hour_countdown()

@@ -8,9 +8,9 @@ except (ImportError, ModuleNotFoundError):  # Python 2
     from Tkinter import *
 
 
-class custom_countdown:
-    def __init__(self, master):
-        self.master = master
+class Custom_Countdown:
+    def __init__(self):
+        self.master = Tk()
         self.master.withdraw()
         self.master.after(0, self.master.deiconify)
         self.master.title('CUSTOM COUNTDOWN')
@@ -18,13 +18,13 @@ class custom_countdown:
         self.master.resizable(0, 0)
         self.master.iconbitmap(self.resource_path('included_files/icon.ico'))
 
-        self.start_button = Button(self.master, text='START', font=("Courier", 16), bg='dark blue', fg='white', activebackground='dark blue', width=8, command=self.start)
+        self.start_button = Button(self.master, text='START', font=("Courier", 16), bg='dark blue', fg='white', activebackground='dark blue', width=8, cursor='hand2', command=self.start)
         self.start_button.grid(row=1, column=0, sticky='e')
 
-        self.pause_button = Button(self.master, text='PAUSE', font=("Courier", 16), bg='dark blue', fg='white', activebackground='dark blue', width=8, state='disabled', command=self.pause)
+        self.pause_button = Button(self.master, text='PAUSE', font=("Courier", 16), bg='dark blue', fg='white', activebackground='dark blue', width=8, cursor='hand2', state='disabled', command=self.pause)
         self.pause_button.grid(row=1, column=1)
 
-        self.reset_button = Button(self.master, text='RESET', font=("Courier", 16), bg='dark blue', fg='white', activebackground='dark blue', width=8, state='disabled', command=self.reset)
+        self.reset_button = Button(self.master, text='RESET', font=("Courier", 16), bg='dark blue', fg='white', activebackground='dark blue', width=8, cursor='hand2', state='disabled', command=self.reset)
         self.reset_button.grid(row=1, column=2)
 
         self.hr_var, self.min_var, self.sec_var = StringVar(), StringVar(), StringVar()
@@ -64,6 +64,8 @@ class custom_countdown:
         self.minute = 0
         self.second = 0
         self.pause = False
+
+        self.master.mainloop()
 
     def enter_command(self, widget, text):
         '''When cursor enters the widget'''
@@ -165,16 +167,16 @@ class custom_countdown:
         self.master.after(1000, self.Counter)
 
     def resource_path(self, relative_path):
-        """ Get absolute path to resource from temporary directory
+        '''Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of photos that are used in this script like in icons and title_image from current directory
+            Gets path of files that are used in this script like icons, images or file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of photos that are used in this script like in icons and title image from temporary directory"""
+            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
 
         try:
-            base_path = sys._MEIPASS  # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS.
 
         except AttributeError:
             base_path = os.path.abspath(".")
@@ -183,6 +185,4 @@ class custom_countdown:
 
 
 if __name__ == '__main__':
-    root = Tk()
-    custom_countdown(root)
-    root.mainloop()
+    Custom_Countdown()

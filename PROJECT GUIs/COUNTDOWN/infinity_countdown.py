@@ -9,8 +9,8 @@ except (ImportError, ModuleNotFoundError):  # Python 2
 
 
 class Infinity_Countdown:
-    def __init__(self, master):
-        self.master = master
+    def __init__(self):
+        self.master = Tk()
         self.master.withdraw()
         self.master.after(0, self.master.deiconify)
         self.master.title('INFINITY COUNTDOWN')
@@ -22,13 +22,13 @@ class Infinity_Countdown:
         self.time = Label(self.master, fg='silver', text='00:00:00', font=("Helvetica", 40), bg='dark blue')
         self.time.pack(side='bottom')
 
-        self.start_button = Button(self.master, text='START', font=("Arial", 16), bg='dark blue', fg='white', activebackground='dark blue', width=8, command=self.Start)
+        self.start_button = Button(self.master, text='START', font=("Arial", 16), bg='dark blue', fg='white', activebackground='dark blue', width=8, command=self.start)
         self.start_button.pack(side='left')
 
-        self.pause_button = Button(self.master, text='PAUSE', font=("Arial", 16), bg='dark blue', fg='white', activebackground='dark blue', width=8, state='disabled', command=self.Pause)
+        self.pause_button = Button(self.master, text='PAUSE', font=("Arial", 16), bg='dark blue', fg='white', activebackground='dark blue', width=8, state='disabled', command=self.pause)
         self.pause_button.pack(side='left')
 
-        self.reset_button = Button(self.master, text='RESET', font=("Arial", 16), bg='dark blue', fg='white', activebackground='dark blue', width=10, state='disabled', command=self.Reset)
+        self.reset_button = Button(self.master, text='RESET', font=("Arial", 16), bg='dark blue', fg='white', activebackground='dark blue', width=10, state='disabled', command=self.reset)
         self.reset_button.pack(side='left', fill='both')
 
         self.hour = 0
@@ -36,7 +36,9 @@ class Infinity_Countdown:
         self.second = 0
         self.pause = False
 
-    def Start(self):
+        self.master.mainloop()
+
+    def start(self):
         '''Command for START button'''
 
         self.pause = False
@@ -45,13 +47,13 @@ class Infinity_Countdown:
         self.reset_button['state'] = 'normal'
         self.master.after(1000, self.Counter)
 
-    def Pause(self):
+    def pause(self):
         '''Command for PAUSE button'''
 
         self.pause = True
         self.pause_button['state'] = 'disabled'
 
-    def Reset(self):
+    def reset(self):
         '''Command for RESET button'''
 
         self.pause = True
@@ -85,16 +87,16 @@ class Infinity_Countdown:
             self.start_button['state'] = 'normal'
 
     def resource_path(self, relative_path):
-        """ Get absolute path to resource from temporary directory
+        '''Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of photos that are used in this script like in icons and title_image from current directory
+            Gets path of files that are used in this script like icons, images or file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of photos that are used in this script like in icons and title image from temporary directory"""
+            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
 
         try:
-            base_path = sys._MEIPASS  # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS.
 
         except AttributeError:
             base_path = os.path.abspath(".")
@@ -102,6 +104,5 @@ class Infinity_Countdown:
         return os.path.join(base_path, relative_path)
 
 
-root = Tk()
-Infinity_Countdown(root)
-root.mainloop()
+if __name__ == '__main__':
+    Infinity_Countdown()

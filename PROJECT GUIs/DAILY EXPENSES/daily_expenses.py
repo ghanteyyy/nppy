@@ -1,13 +1,14 @@
 import os
 import sys
 import time
-import winsound
 
 try:  # Python 3
     from tkinter import *
+    from tkinter import messagebox
 
 except (ImportError, ModuleNotFoundError):  # Python 2
     from Tkinter import *
+    import tkMessageBox as messagebox
 
 
 class Daily_Expenses:
@@ -26,71 +27,60 @@ class Daily_Expenses:
         self.master.geometry(f'{self.width}x{self.height}+{self.screen_width- self.width // 2}+{self.screen_height - self.height // 2}')
 
         self.items_box_var = StringVar()
-        self.items_box = Entry(self.master, width=70, fg='grey', highlightbackground='blue', highlightthickness=2, justify=CENTER, textvariable=self.items_box_var)
+        self.items_box = Entry(self.master, width=70, fg='grey', highlightbackground='blue', highlightcolor='blue', highlightthickness=2, justify=CENTER, textvariable=self.items_box_var)
         self.items_box_var.set('ITEMS')
         self.items_box.grid(row=0, column=0, ipady=7, padx=10, pady=10)
 
         self.price_box_var = StringVar()
-        self.price_box = Entry(self.master, width=70, fg='grey', highlightbackground='blue', highlightthickness=2, justify=CENTER, textvariable=self.price_box_var)
+        self.price_box = Entry(self.master, width=70, fg='grey', highlightbackground='blue', highlightcolor='blue', highlightthickness=2, justify=CENTER, textvariable=self.price_box_var)
         self.price_box_var.set('PRICE')
         self.price_box.grid(row=1, column=0, ipady=7, padx=10, pady=5)
 
-        self.display_box = Text(self.master, width=52, fg='black', highlightbackground='blue', highlightthickness=2, state=DISABLED, cursor='arrow')
+        self.display_box = Text(self.master, width=52, fg='black', highlightbackground='blue', highlightcolor='blue', highlightthickness=2, state=DISABLED, cursor='arrow')
         self.display_box.grid(row=2, column=0, pady=10)
 
-        self.submit_box = Button(self.master, text='SUBMIT', width=59, bg='green', fg='white', activebackground='green', activeforeground='white', command=self.submit_command)
+        self.submit_box = Button(self.master, text='SUBMIT', width=59, bg='green', fg='white', activebackground='green', activeforeground='white', cursor='hand2', command=self.submit_command)
         self.submit_box.grid(row=3, column=0, ipady=10, padx=10)
 
-        self.preload()
+        self.master.bind('<Button-1>', self.bind_keys)
+        self.price_box.bind('<FocusIn>', self.bind_keys)
+        self.items_box.bind('<FocusIn>', self.bind_keys)
+        self.price_box.bind('<Return>', self.submit_command)
+        self.items_box.bind('<Return>', self.submit_command)
+        self.submit_box.bind('<Return>', self.submit_command)
+        self.price_box.bind('<FocusOut>', lambda event, focus_out=True: self.bind_keys(event, focus_out))
 
-        self.items_box.bind('<Button-1>', lambda e: self.bind_entry(self.items_box_var, 'ITEMS', self.items_box))
-        self.items_box.bind('<FocusIn>', lambda e: self.bind_entry(self.items_box_var, 'ITEMS', self.items_box))
-        self.items_box.bind('<FocusOut>', lambda e: self.bind_entry(self.items_box_var, 'ITEMS', self.items_box, 'FocusOut'))
-
-        self.price_box.bind('<Button-1>', lambda e: self.bind_entry(self.price_box_var, 'PRICE', self.price_box))
-        self.price_box.bind('<FocusIn>', lambda e: self.bind_entry(self.price_box_var, 'PRICE', self.price_box))
-        self.price_box.bind('<FocusOut>', lambda e: self.bind_entry(self.price_box_var, 'PRICE', self.price_box, 'FocusOut'))
-
-        self.submit_box.bind('<Return>', lambda e: self.submit_box())
-        self.master.bind('<Button-1>', self.enter_leave)
-        self.master.bind_class('Entry', '<Return>', lambda e: self.submit_command())
-
+        self.master.after(100, self.preload)
         self.master.mainloop()
 
-    def bind_entry(self, var, cond, widget, bind_type=None):
-        '''Bindings entry boxes when user left clicks or use tab to move in/out boxes'''
+    def bind_keys(self, event, focus_out=False):
+        '''Commands when user clicks in and out of the entries widgets'''
 
-        get = var.get().strip()
+        get_from_item_box = self.items_box_var.get().strip()
+        get_from_price_box = self.price_box_var.get().strip()
 
-        if get == cond and not bind_type:
-            var.set('')
-            widget.config(fg='black')
+        if event.widget == self.items_box or focus_out:
+            if get_from_item_box == 'ITEMS' and not focus_out:
+                self.items_box_var.set('')
 
-        if bind_type == 'FocusOut' and not get:
-            var.set(cond)
-            widget.config(fg='grey')
+            if not get_from_price_box:
+                self.price_box_var.set('PRICE')
 
-    def enter_leave(self, event):
-        '''Changes text and text color in entry boxes when user clicks outside of entry boxes'''
+        elif event.widget == self.price_box:
+            if get_from_price_box == 'PRICE':
+                self.price_box_var.set('')
+
+            if not get_from_item_box:
+                self.items_box_var.set('ITEMS')
 
         if event.widget in [self.master, self.display_box]:
-            if not self.items_box_var.get().strip():
+            if not get_from_item_box:
                 self.items_box_var.set('ITEMS')
-                self.items_box.config(fg='grey')
 
-            if not self.price_box_var.get().strip():
+            if not get_from_price_box:
                 self.price_box_var.set('PRICE')
-                self.price_box.config(fg='grey')
 
             self.master.focus()
-
-        elif event.widget == self.items_box and not self.price_box_var.get().strip():
-            self.price_box_var.set('PRICE')
-            self.price_box.config(fg='grey')
-
-        elif event.widget == self.price_box and not self.items_box_var.get().strip():
-            self.items_box_var.set('ITEMS')
-            self.items_box.config(fg='grey')
 
     def preload(self):
         '''Display content of a file at the startup of program'''
@@ -123,15 +113,15 @@ class Daily_Expenses:
         self.display_box.insert('end', text, 'center')
         self.display_box.config(state=DISABLED)
 
-    def submit_command(self):
-        '''Action for submit button'''
+    def submit_command(self, event=None):
+        '''Commands when user cilcks submit button'''
 
-        TIME = time.strftime('%d %b %a')
+        current_time = time.strftime('%d %b %a')
         get_item = self.items_box.get().strip().title()
         get_price = self.price_box.get().strip()
 
         if get_item == 'ITEMS' or get_price == 'PRICE':
-            winsound.MessageBeep()
+            messagebox.showerror('Invalid Fields', 'Some fields left empty')
 
         else:
             if not os.path.exists(self.file):
@@ -144,13 +134,13 @@ class Daily_Expenses:
 
             if in_line:
                 price = int(in_line[0].split('|')[-1].strip(' Rs. ')) + int(get_price)
-                write = '{} | {} | Rs. {}\n'.format(TIME, get_item, price)
+                write = '{} | {} | Rs. {}\n'.format(current_time, get_item, price)
 
                 index = lines.index(in_line[0])
                 lines[index] = write      # Replace old value with new value
 
             else:
-                write = f'{TIME} | {get_item} | Rs. {get_price}\n'
+                write = f'{current_time} | {get_item} | Rs. {get_price}\n'
                 lines.append(write)
 
             lines.sort(key=len)
@@ -168,16 +158,16 @@ class Daily_Expenses:
             self.master.focus()
 
     def resource_path(self, relative_path):
-        """ Get absolute path to resource from temporary directory
+        '''Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of photos that are used in this script like in icons and title_image from current directory
+            Gets path of files that are used in this script like icons, images or file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of photos that are used in this script like in icons and title image from temporary directory"""
+            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
 
         try:
-            base_path = sys._MEIPASS  # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS.
 
         except AttributeError:
             base_path = os.path.abspath(".")
