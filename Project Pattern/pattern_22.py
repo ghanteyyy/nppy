@@ -1,4 +1,4 @@
-def pattern_twenty_two(string):
+class Pattern_Twenty_Two:
     ''' Pattern twenty_two
 
               ***
@@ -10,16 +10,20 @@ def pattern_twenty_two(string):
              *   *
     '''
 
-    for i in range(7):
-        if i == 0:
-            print('{0}'.format(string * 3))
+    def __init__(self, strings='*'):
+        if not isinstance(strings, str):
+            strings = str(strings)
 
-        elif i == 3:
-            print('{}'.format(string * 5))
+        for i in range(7):
+            if i == 0:
+                print(f' {strings * 3}')
 
-        else:
-            print('{0}   {0}'.format(string))
+            elif i == 3:
+                print(f'{strings * 5}')
+
+            else:
+                print(f'{strings}   {strings}')
 
 
 if __name__ == '__main__':
-    pattern_twenty_two('*')
+    Pattern_Twenty_Two()

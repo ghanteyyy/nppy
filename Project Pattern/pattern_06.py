@@ -1,4 +1,4 @@
-def pattern_six(strings, steps):
+class Pattern_Six:
     '''Pattern six
 
                    *
@@ -13,18 +13,36 @@ def pattern_six(strings, steps):
           * * * * * * * * * *
     '''
 
-    if not str(strings).isalpha():
-        strings = str(strings)
+    def __init__(self, strings='*', steps=10):
+        self.steps = steps
 
-    for i in range(1, steps + 1):
-        multiplying_strings = strings * i  # Multiplying the given string with 'i' to get the same character
-        joining_strings = ' '.join(multiplying_strings).center(steps * 4)  # Joining the multiplied character 'a' with spaces and placing them to the center
-        print(joining_strings.rstrip())   # Stripping spaces of right side
+        if isinstance(strings, str):
+            self.strings = strings
+
+        else:  # If provided 'strings' is integer then converting it to string
+            self.strings = str(strings)
+
+    def method_one(self):
+        print('Method One')
+
+        for i in range(1, self.steps + 1):
+            joining_strings = ' '.join(self.strings * i).center(self.steps * 4)  # Joining the multiplied character 'a' with spaces and placing them to the center
+            print(joining_strings.rstrip())   # Stripping spaces of right side
+
+    def method_two(self):
+        print('\nMethod Two')
+
+        i = 1
+
+        while i != self.steps + 1:
+            joining_strings = ' '.join(self.strings * i).center(self.steps * 4)  # Joining the multiplied character 'a' with spaces and placing them to the center
+            print(joining_strings.rstrip())   # Stripping spaces of right side
+
+            i += 1
 
 
 if __name__ == '__main__':
-    try:
-        pattern_six('*', 10)
+    pattern_six = Pattern_Six()
 
-    except NameError:
-        print('String and Integer was expected')
+    pattern_six.method_one()
+    pattern_six.method_two()

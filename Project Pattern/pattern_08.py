@@ -1,4 +1,4 @@
-def pattern_eight(strings):
+class Pattern_Eight:
     '''Pattern eight
 
         P
@@ -24,22 +24,44 @@ def pattern_eight(strings):
         P
     '''
 
-    if not str(strings).isalpha():
-        strings = str(strings)
+    def __init__(self, strings='Programming'):
+        if isinstance(strings, str):
+            self.strings = strings
 
-    length = len(strings)
+        else:  # If provided 'strings' is integer then converting it to string
+            self.strings = str(strings)
 
-    for i in range(1, length + 1):
-        print(' '.join(strings[:i]))
+        self.length = len(self.strings)
 
-        if i == length:
-            for j in range(length - 1, 0, -1):
-                print(' '.join(strings[:j]))
+    def method_one(self):
+        print('\nMethod One')
+
+        for i in range(1, self.length + 1):
+            print(' '.join(self.strings[:i]))
+
+            if i == self.length:
+                for j in range(self.length - 1, 0, -1):
+                    print(' '.join(self.strings[:j]))
+
+    def method_two(self):
+        print('\nMethod Two')
+
+        i, j = 1, self.length - 1
+
+        while i != self.length + 1:
+            print(' '.join(self.strings[:i]))
+
+            if i == self.length:
+                while j != 0:
+                    print(' '.join(self.strings[:j]))
+
+                    j -= 1
+
+            i += 1
 
 
 if __name__ == '__main__':
-    try:
-        pattern_eight('Programming')
+    pattern_eight = Pattern_Eight()
 
-    except NameError:
-        print('String or Integer was expected')
+    pattern_eight.method_one()
+    pattern_eight.method_two()

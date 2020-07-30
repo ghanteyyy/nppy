@@ -1,4 +1,4 @@
-def pattern_twelve(strings):
+class Pattern_Twelve:
     '''Pattern twelve
 
         U
@@ -12,22 +12,41 @@ def pattern_twelve(strings):
         K A T H M A N D U
     '''
 
-    if not str(strings).isalpha():
-        strings = str(strings)  # If provided is integer then converting to string
+    def __init__(self, strings='KATHMANDU'):
+        if isinstance(strings, str):
+            self.strings = strings
 
-    for x in range(1, len(strings) + 1):
-        print(' '.join(strings[-x:]))
+        else:  # If provided 'strings' is integer then converting it to string
+            self.strings = str(strings)
 
-    '''Another Way to do the same thing
-            string = 'KATHMANDU'
+        self.length = len(self.strings)
 
-            for i in range(len(string) - 1, -1, -1):
-                print(' '.join(string[i:])) '''
+    def method_one(self):
+        print('Method One')
+
+        for x in range(1, self.length + 1):
+            print(' '.join(self.strings[-x:]))
+
+    def method_two(self):
+        print('\nMethod Two')
+
+        for x in range(self.length - 1, -1, -1):
+            print(' '.join(self.strings[x:]))
+
+    def method_three(self):
+        print('\nMethod Three', end='')
+
+        x = self.length
+
+        while x != -1:
+            print(' '.join(self.strings[x:]))
+
+            x -= 1
 
 
 if __name__ == '__main__':
-    try:
-        pattern_twelve('KATHMANDU')
+    pattern_twelve = Pattern_Twelve()
 
-    except NameError:
-        print('String or Integer was expected')
+    pattern_twelve.method_one()
+    pattern_twelve.method_two()
+    pattern_twelve.method_three()

@@ -1,4 +1,4 @@
-def pattern_five(strings):
+class Pattern_Five:
     '''Pattern five
 
                 K
@@ -12,18 +12,40 @@ def pattern_five(strings):
         K A T H M A N D U
     '''
 
-    if not str(strings).isalpha():
-        strings = str(strings)  # If provided is integer then converting to string
+    def __init__(self, strings='KATHMANDU'):
+        if isinstance(strings, str):
+            self.strings = strings
 
-    for i in range(1, len(strings) + 1):
-        slicing_string = ' '.join(strings[:i])
-        getting_space = ' ' * (len(strings) - i)
-        print('{}{}'.format(getting_space, slicing_string))
+        else:  # If provided 'strings' is integer then converting it to string
+            self.strings = str(strings)
+
+        self.length = len(strings)
+
+    def method_one(self):
+        print('\nMethod One')
+
+        for i in range(1, self.length + 1):
+            sliced_string = ' '.join(self.strings[:i])
+            left_space = ' ' * (self.length - i)
+
+            print('{}{}'.format(left_space, sliced_string))
+
+    def method_two(self):
+        print('\nMethod Two')
+
+        i = 1
+
+        while i != self.length + 1:
+            sliced_string = ' '.join(self.strings[:i])
+            left_space = ' ' * (self.length - i)
+
+            print('{}{}'.format(left_space, sliced_string))
+
+            i += 1
 
 
 if __name__ == '__main__':
-    try:
-        pattern_five('KATHMANDU')
+    pattern_five = Pattern_Five()
 
-    except NameError:
-        print('String or Integer was expected')
+    pattern_five.method_one()
+    pattern_five.method_two()

@@ -1,4 +1,4 @@
-def pattern_thirty_five(strings, steps):
+class Pattern_Thirty_Five:
     '''Pattern thirty_five
 
       * * * * * *
@@ -15,16 +15,24 @@ def pattern_thirty_five(strings, steps):
       * * * * * *
     '''
 
-    for i in range(steps, 0, -1):
-        multiplying_strings = strings * i  # Multiplying the given string with 'i' to get the same character
-        joining_strings = ' '.join(multiplying_strings).center(steps * 4)  # Joining the multiplied character 'a' with spaces and placing them to the center
-        print(joining_strings.rstrip())   # Stripping spaces of right side
+    def __init__(self, strings='*', steps=6):
+        self.steps = steps
 
-    for i in range(1, steps + 1):
-        multiplying_strings = strings * i  # Multiplying the given string with 'i' to get the same character
-        joining_strings = ' '.join(multiplying_strings).center(steps * 4)  # Joining the multiplied character 'a' with spaces and placing them to the center
-        print(joining_strings.rstrip())   # Stripping spaces of right side
+        if isinstance(strings, str):
+            self.strings = strings
+
+        else:
+            self.strings = str(strings)
+
+        self._loop(self.steps, 0, -1)
+        self._loop(1, self.steps + 1, 1)
+
+    def _loop(self, start, end, jump):
+        for i in range(start, end, jump):
+            multiplying_strings = self.strings * i  # Multiplying the given string with 'i' to get the same character
+            joining_strings = ' '.join(multiplying_strings).center(self.steps * 4)  # Joining the multiplied character 'a' with spaces and placing them to the center
+            print(joining_strings.rstrip())   # Stripping spaces of right side
 
 
 if __name__ == '__main__':
-    pattern_thirty_five('*', 6)
+    Pattern_Thirty_Five()

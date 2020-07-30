@@ -1,4 +1,4 @@
-def pattern_four(strings):
+class Pattern_Four:
     '''Pattern four
 
         K A T H M A N D U
@@ -11,16 +11,34 @@ def pattern_four(strings):
         K
     '''
 
-    if not str(strings).isalpha():
-        strings = str(strings)  # If provided is integer then converting to string
+    def __init__(self, strings='KATHMANDU'):
+        if isinstance(strings, str):
+            self.strings = strings
 
-    for i in range(len(strings), 0, -1):
-        print(' '.join(strings[:i]))
+        else:  # If provided 'strings' is integer then converting it to string
+            self.strings = str(strings)
+
+        self.length = len(self.strings)
+
+    def method_one(self):
+        print('\nMethod One')
+
+        for i in range(self.length, 0, -1):
+            print(' '.join(self.strings[:i]))
+
+    def method_two(self):
+        print('\nMethod Two')
+
+        i = self.length
+
+        while i:
+            print(' '.join(self.strings[:i]))
+
+            i -= 1
 
 
 if __name__ == '__main__':
-    try:
-        pattern_four('KATHMANDU')
+    pattern_four = Pattern_Four()
 
-    except NameError:
-        print('String or Integer was expected')
+    pattern_four.method_one()
+    pattern_four.method_two()

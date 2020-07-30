@@ -1,4 +1,4 @@
-def pattern_twenty_five(string):
+class Pattern_Twenty_Five:
     '''Pattern twenty_five
 
          ****
@@ -10,13 +10,17 @@ def pattern_twenty_five(string):
          ****
     '''
 
-    for i in range(7):
-        if i in [0, 6]:
-            print('{}'.format(string * 4))
+    def __init__(self, strings='*'):
+        if not isinstance(strings, str):
+            strings = str(strings)
 
-        else:
-            print('{0}   {0}'.format(string))
+        for i in range(7):
+            if i in [0, 6]:
+                print(f'{strings * 4}')
+
+            else:
+                print(f'{strings}   {strings}')
 
 
 if __name__ == '__main__':
-    pattern_twenty_five('*')
+    Pattern_Twenty_Five()

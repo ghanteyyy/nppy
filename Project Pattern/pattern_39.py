@@ -1,4 +1,4 @@
-def pattern_thirty_nine():
+class Pattern_Thirty_Nine:
     '''Pattern thirty_nine
 
                 1
@@ -8,17 +8,18 @@ def pattern_thirty_nine():
         5 6 7 8 9 8 7 6 5
     '''
 
-    num = '123456789'
+    def __init__(self):
+        num = '123456789'
 
-    for i in range(5):
-        if i == 0:
-            print('1'.center(30))
+        for i in range(5):
+            if i == 0:
+                print('1'.center(30))
 
-        else:
-            temp = num[i: i * 2 + 1]
-            output = temp + temp[:i][::-1]
-            print(' '.join(output).center(30))
+            else:
+                temp = num[i: i * 2 + 1]
+                output = temp + temp[:i][::-1]
+                print(' '.join(output).center(30))
 
 
 if __name__ == '__main__':
-    pattern_thirty_nine()
+    Pattern_Thirty_Nine()

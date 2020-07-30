@@ -1,4 +1,4 @@
-def pattern_twenty_seven(string):
+class Pattern_Twenty_Seven:
     '''Pattern twenty_seven
 
          *
@@ -10,13 +10,16 @@ def pattern_twenty_seven(string):
          *****
     '''
 
-    for i in range(7):
-        if i == 6:
-            print(string * 5)
+    def __init__(self, strings='*', steps=10):
+        strings = str(strings)
 
-        else:
-            print(string)
+        for i in range(1, steps + 1):
+            if i == steps:
+                print(strings * steps)
+
+            else:
+                print(strings)
 
 
 if __name__ == '__main__':
-    pattern_twenty_seven('*')
+    Pattern_Twenty_Seven()

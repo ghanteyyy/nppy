@@ -1,4 +1,4 @@
-def pattern_ten(strings):
+class Pattern_Ten:
     '''Pattern ten
 
                         K
@@ -12,17 +12,36 @@ def pattern_ten(strings):
         K A T H M A N D U
     '''
 
-    if not str(strings).isalpha():
-        strings = str(strings)  # If provided is integer then converting to string
+    def __init__(self, strings='KATHMANDU'):
+        if isinstance(strings, str):
+            self.strings = strings
 
-    for x in range(1, len(strings) + 1):
-        string = ' '.join(strings[:x])
-        print(string.rjust((len(strings) * 2) - 1))
+        else:  # If provided 'strings' is integer then converting it to string
+            self.strings = str(strings)
+
+        self.length = len(self.strings)
+
+    def method_one(self):
+        print('Method One')
+
+        for x in range(1, self.length + 1):
+            string = ' '.join(self.strings[:x])
+            print(string.rjust((self.length * 2) - 1))
+
+    def method_two(self):
+        print('\nMethod Two')
+
+        x = 1
+
+        while x != self.length + 1:
+            string = ' '.join(self.strings[:x])
+            print(string.rjust((self.length * 2) - 1))
+
+            x += 1
 
 
 if __name__ == '__main__':
-    try:
-        pattern_ten('KATHMANDU')
+    pattern_ten = Pattern_Ten()
 
-    except NameError:
-        print('String or Integer was expected')
+    pattern_ten.method_one()
+    pattern_ten.method_two()

@@ -1,4 +1,4 @@
-def pattern_sixteen(steps):
+class Pattern_Sixteen:
     ''' Pattern sixteen
 
         9
@@ -12,16 +12,12 @@ def pattern_sixteen(steps):
         9 8 7 6 5 4 3 2 1
     '''
 
-    get_range = [str(i) for i in range(1, steps + 1)][::-1]  # Getting range of number in string and reverse it
+    def __init__(self, steps=9):
+        _range = [str(i) for i in range(1, steps + 1)][::-1]
 
-    for gr in range(1, len(get_range) + 1):
-        join = ' '.join(get_range[:gr])  # Slicing values
-        print(join)
+        for gr in range(1, len(_range) + 1):
+            print(' '.join(_range[:gr]))
 
 
 if __name__ == '__main__':
-    try:
-        pattern_sixteen(9)
-
-    except NameError:
-        print('Integer was expected')
+    Pattern_Sixteen()

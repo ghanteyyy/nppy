@@ -1,4 +1,4 @@
-def pattern_thirty_six():
+class Pattern_Thirty_Six:
     '''Pattern thirty_six
 
         1
@@ -7,21 +7,23 @@ def pattern_thirty_six():
         1     4
         1 2 3 4 5
     '''
-    num = '12345'
 
-    for i in range(1, 6):
-        x = num[:i]
+    def __init__(self):
+        num = '12345'
 
-        if i in range(2, 5):
-            space = 2 * (i - 1) - i  # using 2*n - 1 for getting required space where n = 1, 2, 3, .... and here n = i - 1
-            print(x[0] + ' ' * space + x[-1])
+        for i in range(1, 6):
+            x = num[:i]
 
-        elif i == 5:
-            print(' '.join(num))
+            if i in range(2, 5):
+                space = 2 * (i - 1) - 1  # using 2*n - 1 for getting required space where n = 1, 2, 3, .... and here n = i - 1
+                print(x[0] + ' ' * space + x[-1])
 
-        else:
-            print(x)
+            elif i == 5:
+                print(' '.join(num))
+
+            else:
+                print(x)
 
 
 if __name__ == '__main__':
-    pattern_thirty_six()
+    Pattern_Thirty_Six()

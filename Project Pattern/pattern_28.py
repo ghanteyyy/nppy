@@ -1,4 +1,4 @@
-def pattern_twenty_eight(string):
+class Pattern_Twenty_Eight:
     '''Pattern twenty_eight
 
           *       *
@@ -10,16 +10,20 @@ def pattern_twenty_eight(string):
           *       *
     '''
 
-    for i in range(7):
-        if i in [0, 1, 4, 5, 6]:
-            print('{0}       {0}'.format(string))
+    def __init__(self, strings='*'):
+        if not isinstance(strings, str):
+            strings = str(strings)
 
-        elif i == 2:
-            print('{0} {0}   {0} {0}'.format(string))
+        for i in range(7):
+            if i in [0, 1, 4, 5, 6]:
+                print(f'{strings}       {strings}')
 
-        else:
-            print('{0}   {0}   {0}'.format(string))
+            elif i == 2:
+                print(f'{strings} {strings}   {strings} {strings}')
+
+            else:
+                print(f'{strings}   {strings}   {strings}')
 
 
 if __name__ == '__main__':
-    pattern_twenty_eight('*')
+    Pattern_Twenty_Eight()

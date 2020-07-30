@@ -1,4 +1,4 @@
-def pattern_twenty_two():
+class Pattern_Twenty_One:
     '''Pattern twenty_one
 
         1
@@ -12,9 +12,10 @@ def pattern_twenty_two():
         9 9 9 9 9 9 9 9 9
     '''
 
-    for i in range(1, 10):
-        print(' '.join(str(i) * i))
+    def __init__(self):
+        for i in range(1, 10):
+            print(' '.join(str(i) * i))
 
 
 if __name__ == '__main__':
-    pattern_twenty_two()
+    Pattern_Twenty_One()

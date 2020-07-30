@@ -1,4 +1,4 @@
-def pattern_elevan(strings):
+class Pattern_Elevan:
     '''Pattern elevan
 
         K A T H M A N D U
@@ -12,17 +12,36 @@ def pattern_elevan(strings):
         U
     '''
 
-    if not str(strings).isalpha():
-        strings = str(strings)  # If provided is integer then converting to string
+    def __init__(self, strings='KATHMANDU'):
+        if isinstance(strings, str):
+            self.strings = strings
 
-    for x in range(len(strings)):
-        get_string = ' '.join(strings[x:])
-        print(get_string)
+        else:  # If provided 'strings' is integer then converting it to string
+            self.strings = str(strings)
+
+        self.length = len(self.strings)
+
+    def method_one(self):
+        print('Method One')
+
+        for x in range(self.length):
+            get_string = ' '.join(self.strings[x:])
+            print(get_string)
+
+    def method_two(self):
+        print('\nMethod Two')
+
+        x = 0
+
+        while x != self.length:
+            get_string = ' '.join(self.strings[x:])
+            print(get_string)
+
+            x += 1
 
 
 if __name__ == '__main__':
-    try:
-        pattern_elevan('KATHMANDU')
+    pattern_elevan = Pattern_Elevan()
 
-    except NameError:
-        print('String or Integer was expected')
+    pattern_elevan.method_one()
+    pattern_elevan.method_two()

@@ -1,5 +1,5 @@
-def pattern_fourteen(strings):
-    '''Pattern fourteen
+class Pattern_Forteen:
+    '''Pattern forteen
 
         K
          A
@@ -12,27 +12,52 @@ def pattern_fourteen(strings):
                 U
     '''
 
-    if not str(strings).isalpha():
-        strings = str(strings)  # If provided is integer then converting to string
+    def __init__(self, strings='KATHMANDU'):
+        if isinstance(strings, str):
+            self.strings = strings
 
-    def method_one(strings):
-        for x in range(len(strings)):
-            print('{}{}'.format(' ' * x, strings[x]))
+        else:  # If provided 'strings' is integer then converting it to string
+            self.strings = str(strings)
 
-    def method_two(strings):
-        for x in range(len(strings)):
-            print(strings[x].rjust(x + 1))
+        self.length = len(self.strings)
 
-    print('Method One\n')
-    method_one(strings)
+    def method_one(self):
+        print('\nMethod One')
 
-    print('\n\nMethod Two\n')
-    method_two(strings)
+        for x in range(self.length):
+            print(f'{" " * x}{self.strings[x]}')
+
+    def method_two(self):
+        print('\nMethod Two')
+
+        for x in range(self.length):
+            print(self.strings[x].rjust(x + 1))
+
+    def method_three(self):
+        print('\nMethod Three')
+
+        x = 0
+
+        while x != self.length:
+            print(f'{" " * x}{self.strings[x]}')
+
+            x += 1
+
+    def method_four(self):
+        print('\nMethod Four')
+
+        x = 0
+
+        while x != self.length:
+            print(self.strings[x].rjust(x + 1))
+
+            x += 1
 
 
 if __name__ == '__main__':
-    try:
-        pattern_fourteen('KATHMANDU')
+    pattern_forteen = Pattern_Forteen()
 
-    except NameError:
-        print('String or Integer was expected')
+    pattern_forteen.method_one()
+    pattern_forteen.method_two()
+    pattern_forteen.method_three()
+    pattern_forteen.method_four()

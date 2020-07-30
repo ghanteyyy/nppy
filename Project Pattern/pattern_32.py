@@ -1,4 +1,4 @@
-def pattern_thirty_one(string, steps):
+class Pattern_Thirty_Two:
     '''Pattern thirty_two
 
             *
@@ -22,15 +22,16 @@ def pattern_thirty_one(string, steps):
             *
     '''
 
-    for i in range(1, int(steps // 2) - 2):
-        print(f'{string} ' * i)
+    def __init__(self, strings='*', steps=20):
+        for i in range(1, int(steps // 2) - 2):
+            print(f'{strings} ' * i)
 
-    for j in range(1, int(steps // 2)):
-        print(f'{string} ' * j)
+        for j in range(1, int(steps // 2)):
+            print(f'{strings} ' * j)
 
-    for k in range(1, 4):
-        print(f'{string} ')
+        for k in range(1, 4):
+            print(f'{strings} ')
 
 
 if __name__ == '__main__':
-    pattern_thirty_one('*', 20)
+    Pattern_Thirty_Two()

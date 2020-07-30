@@ -1,4 +1,4 @@
-def pattern_thirty(string):
+class Pattern_Thirty:
     '''Pattern thirty
 
          ****
@@ -10,16 +10,17 @@ def pattern_thirty(string):
          *
     '''
 
-    for i in range(7):
-        if i in [0, 3]:
-            print('{}'.format(string * 4))
+    def __init__(self, strings='*'):
+        for i in range(7):
+            if i in [0, 3]:
+                print(f'{strings * 4}')
 
-        elif i in [1, 2]:
-            print('{0}   {0}'.format(string))
+            elif i in [1, 2]:
+                print(f'{strings}   {strings}')
 
-        else:
-            print(string)
+            else:
+                print(strings)
 
 
 if __name__ == '__main__':
-    pattern_thirty('*')
+    Pattern_Thirty()

@@ -84,23 +84,29 @@ class FILE_MOVER:
         if event.widget == self.from_entry or focus_out:
             if get_from_entry == 'From Path' and not focus_out:
                 self.from_entry_var.set('')
+                self.from_entry.config(fg='black')
 
             if not get_to_entry:
                 self.to_entry_var.set('To Path')
+                self.to_entry.config(fg='grey')
 
         elif event.widget == self.to_entry:
             if get_to_entry == 'To Path':
                 self.to_entry_var.set('')
+                self.to_entry.config(fg='black')
 
             if not get_from_entry:
                 self.from_entry_var.set('From Path')
+                self.from_entry.config(fg='grey')
 
         if event.widget not in [self.from_entry, self.to_entry]:
             if not get_from_entry:
                 self.from_entry_var.set('From Path')
+                self.from_entry.config(fg='grey')
 
             if not get_to_entry:
                 self.to_entry_var.set('To Path')
+                self.to_entry.config(fg='grey')
 
             self.master.focus()
 

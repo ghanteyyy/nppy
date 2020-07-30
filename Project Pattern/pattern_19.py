@@ -1,4 +1,4 @@
-def pattern_nineteen(steps):
+class Pattern_Nineteen:
     ''' Pattern nineteen
 
         1   2   3   4   5   6   7   8   9   10
@@ -13,18 +13,15 @@ def pattern_nineteen(steps):
         10  20  30  40  50  60  70  80  90  100
     '''
 
-    for i in range(1, steps + 1):
-        num_list = []
+    def __init__(self, steps=10):
+        for i in range(1, steps + 1):
+            num_list = []
 
-        for j in range(1, steps + 1):
-            num_list.append(str(i * j).ljust(4))  # Change 3 to different value if i * j is more than 3 digits
+            for j in range(1, steps + 1):
+                num_list.append(str(i * j).ljust(4))  # Change 3 to different value if i * j is more than 3 digits
 
-        print(' '.join(num_list))
+            print(' '.join(num_list))
 
 
 if __name__ == '__main__':
-    try:
-        pattern_nineteen(10)
-
-    except NameError:
-        print('Integer was expected')
+    Pattern_Nineteen()

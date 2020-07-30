@@ -1,4 +1,4 @@
-def pattern_eighten(steps):
+class Pattern_Eightteen:
     ''' Pattern eighteen
 
         9 8 7 6 5 4 3 2 1
@@ -12,16 +12,12 @@ def pattern_eighten(steps):
         9
     '''
 
-    get_range = [str(i) for i in range(1, steps + 1)][::-1]
+    def __init__(self, steps=9):
+        _range = [str(i) for i in range(1, steps + 1)][::-1]
 
-    for i in range(len(get_range), 0, -1):
-        join = ' '.join(get_range[:i])
-        print(join)
+        for i in range(len(_range), 0, -1):
+            print(' '.join(_range[:i]))
 
 
 if __name__ == '__main__':
-    try:
-        pattern_eighten(9)
-
-    except NameError:
-        print('Integer was expected')
+    Pattern_Eightteen()

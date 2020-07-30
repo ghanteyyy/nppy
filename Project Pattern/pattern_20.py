@@ -1,4 +1,4 @@
-def pattern_twenty(strings):
+class Pattern_Twenty:
     '''Pattern twenty
 
         P r o g r a m m i n g
@@ -9,15 +9,16 @@ def pattern_twenty(strings):
         a
     '''
 
-    strings = str(strings)
-    print()
+    def __init__(self, strings='Programming'):
+        if not isinstance(strings, str):
+            strings = str(strings)
 
-    for index, value in enumerate(strings):
-        output = strings[index:len(strings) - index]
+        for index, value in enumerate(strings):
+            output = strings[index:len(strings) - index]
 
-        if len(output) != 0:
-            print(output)
+            if output:
+                print(output)
 
 
 if __name__ == '__main__':
-    pattern_twenty('Programming')
+    Pattern_Twenty()

@@ -1,4 +1,4 @@
-def pattern_twenty_nine(string):
+class Pattern_Twenty_Nine:
     '''Pattern twenty_nine
 
             ***
@@ -10,13 +10,17 @@ def pattern_twenty_nine(string):
             ***
     '''
 
-    for i in range(7):
-        if i in [0, 6]:
-            print(' {}'.format(string * 3))
+    def __init__(self, strings='*'):
+        if not isinstance(strings, str):
+            strings = str(strings)
 
-        else:
-            print('{0}   {0}'.format(string))
+        for i in range(7):
+            if i in [0, 6]:
+                print(f' {strings * 3}')
+
+            else:
+                print(f'{strings}   {strings}')
 
 
 if __name__ == '__main__':
-    pattern_twenty_nine('*')
+    Pattern_Twenty_Nine()

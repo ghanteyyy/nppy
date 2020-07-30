@@ -1,4 +1,4 @@
-def pattern_two(strings, steps):
+class Pattern_Two:
     '''Pattern two
 
         1 1 1 1 1 1 1
@@ -11,28 +11,33 @@ def pattern_two(strings, steps):
 
     '''
 
-    if not str(strings).isalpha():
-        strings = str(strings)  # If provided is integer then converting to string
+    def __init__(self, strings='1', steps=10):
+        self.steps = steps
 
-    def method_one(strings, steps):
+        if isinstance(strings, str):
+            self.strings = strings
+
+        else:  # If provided 'strings' is integer then converting it to string
+            self.strings = str(strings)
+
+    def method_one(self):
+        print('\nMethod One')
+
+        for step in range(self.steps, 0, -1):
+            print(' '.join(self.strings * step))
+
+    def method_two(self):
+        print('\nMethod Two')
+
+        steps = self.steps
+
         while steps > 0:
-            print(((strings + ' ') * steps).strip(' '))
+            print(' '.join(self.strings * steps))
             steps -= 1
-
-    def method_two(strings, steps):
-        for step in range(steps, 0, -1):
-            print(((strings + ' ') * step).strip(' '))
-
-    print('Method One')
-    method_one(strings, steps)
-
-    print('\n\nMethod Two')
-    method_two(strings, steps)
 
 
 if __name__ == '__main__':
-    try:
-        pattern_two('1', 10)
+    pattern_two = Pattern_Two()
 
-    except NameError:
-        print('String and Integer was expected')
+    pattern_two.method_one()
+    pattern_two.method_two()

@@ -1,4 +1,4 @@
-def pattern_thirteen(strings):
+class Pattern_Thirteen:
     '''Pattern thirteen
 
         U
@@ -12,31 +12,57 @@ def pattern_thirteen(strings):
         K
     '''
 
-    if not str(strings).isalpha():
-        strings = str(strings)  # If provided is integer then converting to string
+    def __init__(self, strings='KATHMANDU'):
+        if isinstance(strings, str):
+            self.strings = strings
 
-    def method_one(strings):
-        reversed_string = str(strings)[::-1]  # If provided is integer then converting to string
+        else:  # If provided 'strings' is integer then converting it to string
+            self.strings = str(strings)
+
+        self.length = len(self.strings)
+
+    def method_one(self):
+        print('Method One')
+
+        reversed_string = self.strings[::-1]  # If provided is integer then converting to string
 
         for x in range(len(reversed_string)):
-            get_string = reversed_string[x]
-            print(get_string)
+            print(reversed_string[x])
 
-    def method_two(strings):
-        reverse = strings[::-1]
-        join = '\n'.join(reverse)
-        print(join)
+    def method_two(self):
+        print('\nMethod Two')
 
-    print('Method One')
-    method_one(strings)
+        reverse = self.strings[::-1]
+        print('\n'.join(reverse))
 
-    print('\nMethod Two')
-    method_two(strings)
+    def method_three(self):
+        print('\nMethod Three')
+
+        x = self.length - 1
+
+        while x != -1:
+            print(self.strings[x])
+
+            x -= 1
+
+    def method_four(self):
+        print('\nMethod Four')
+
+        for x in range(self.length - 1, -1, -1):
+            print(self.strings[x])
+
+    def method_five(self):
+        print('\nMethod Five')
+
+        for x in range(1, self.length + 1):
+            print(self.strings[-x])
 
 
 if __name__ == '__main__':
-    try:
-        pattern_thirteen('KATHMANDU')
+    pattern_thirteen = Pattern_Thirteen()
 
-    except NameError:
-        print('String or Integer was expected')
+    pattern_thirteen.method_one()
+    pattern_thirteen.method_two()
+    pattern_thirteen.method_three()
+    pattern_thirteen.method_four()
+    pattern_thirteen.method_five()

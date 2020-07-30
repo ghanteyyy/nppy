@@ -1,4 +1,4 @@
-def pattern_nine(strings):
+class Pattern_Nine:
     '''Pattern nine
 
         K
@@ -12,27 +12,41 @@ def pattern_nine(strings):
         U
     '''
 
-    def method_one(strings):
-        if not str(strings).isalpha():
-            strings = str(strings)
+    def __init__(self, strings='KATHMANDU'):
+        if isinstance(strings, str):
+            self.strings = strings
 
-        for string in strings:
+        else:  # If provided 'strings' is integer then converting it to string
+            self.strings = str(strings)
+
+        self.length = len(self.strings)
+
+    def method_one(self):
+        print('\nMethod One')
+
+        for string in self.strings:
             print(string)
 
-    def method_two(strings):
-        join_word = '\n'.join(strings)
+    def method_two(self):
+        print('\nMethod Two')
+
+        join_word = '\n'.join(self.strings)
         print(join_word)
 
-    print('Method One')
-    method_one(strings)
+    def method_three(self):
+        print('\nMethod Three')
 
-    print('\nMethod Two')
-    method_two(strings)
+        x = 0
+
+        while x != self.length:
+            print(self.strings[x])
+
+            x += 1
 
 
 if __name__ == '__main__':
-    try:
-        pattern_nine('KATHMANDU')
+    pattern_nine = Pattern_Nine()
 
-    except NameError:
-        print('String or Integer was expected')
+    pattern_nine.method_one()
+    pattern_nine.method_two()
+    pattern_nine.method_three()
