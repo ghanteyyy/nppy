@@ -77,6 +77,8 @@ class To_Do_List:
         self.exit_button.grid(row=0, column=0, ipadx=2, ipady=1)
 
         self.master.bind('<Button-1>', self.key_bindings)
+        self.entry_box.bind('<FocusIn>', self.key_bindings)
+        self.add_button.bind('<FocusIn>', self.key_bindings)
 
         self.add_to_list()
         self.show_scrollbar()
@@ -93,11 +95,12 @@ class To_Do_List:
             self.entry_var.set('')
             self.entry_box.config(fg='black')
 
-        elif event.widget in [self.master, self.label, self.list_box, self.entry_frame]:
+        elif event.widget != self.entry_box:
             if not get:
                 self.entry_var.set('I have to do ...')
                 self.entry_box.config(fg='grey')
 
+        if event.widget not in [self.entry_box, self.add_button]:
             self.master.focus()
 
     def hide_minimize_maximize(self, window):

@@ -66,12 +66,15 @@ class GUI:
     def key_bindings(self, event):
         '''Action when user clicks inside entry widget or oustide of the entry widget'''
 
+        get_from_entry = self.entry_box.get().strip()
+
         if event.widget == self.entry_box:
-            self.entry_box_var.set('')
-            self.entry_box.config(fg='black')
+            if get_from_entry == 'Remind Me About ...':
+                self.entry_box_var.set('')
+                self.entry_box.config(fg='black')
 
         elif event.widget in [self.master, self.title_label]:
-            if not self.entry_box_var.get().strip():
+            if not get_from_entry:
                 self.entry_box_var.set('Remind Me About ...')
                 self.entry_box.config(fg='grey')
 

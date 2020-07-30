@@ -62,23 +62,29 @@ class Daily_Expenses:
         if event.widget == self.items_box or focus_out:
             if get_from_item_box == 'ITEMS' and not focus_out:
                 self.items_box_var.set('')
+                self.items_box.config(fg='black')
 
             if not get_from_price_box:
                 self.price_box_var.set('PRICE')
+                self.price_box.config(fg='grey')
 
         elif event.widget == self.price_box:
             if get_from_price_box == 'PRICE':
                 self.price_box_var.set('')
+                self.price_box.config(fg='black')
 
             if not get_from_item_box:
                 self.items_box_var.set('ITEMS')
+                self.items_box.config(fg='grey')
 
         if event.widget in [self.master, self.display_box]:
             if not get_from_item_box:
                 self.items_box_var.set('ITEMS')
+                self.items_box.config(fg='grey')
 
             if not get_from_price_box:
                 self.price_box_var.set('PRICE')
+                self.price_box.config(fg='grey')
 
             self.master.focus()
 

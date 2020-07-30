@@ -33,7 +33,7 @@ class Password_Generator:
         self.number_box_var = StringVar()
         self.number_box = Entry(self.master, width=25, fg='grey', font=('Calibri', 12), justify='center', textvariable=self.number_box_var)
         self.number_box_var.set('Number of Character')
-        self.number_box.pack(pady=5, ipady=2)
+        self.number_box.pack(pady=5)
 
         self.check_box_frame = Frame(self.master)
         self.check_box_items = ['UPPERCASE', 'LOWERCASE', 'NUMBERS', 'SPECIAL CHARACTERS', 'ALL']  # Options for generating password
