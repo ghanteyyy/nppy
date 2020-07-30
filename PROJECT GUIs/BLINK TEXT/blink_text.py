@@ -9,7 +9,7 @@ except (ImportError, ModuleNotFoundError):
 
 
 class Blink:
-    '''Show and hide the given text such that is appears as blinking'''
+    '''Show and hide the given text such that it appears as blinking'''
 
     def __init__(self):
         self.master = Tk()
@@ -25,38 +25,43 @@ class Blink:
         self.frame = Frame(self.master, bg='#422a91')
         self.frame.pack()
 
-        self.entry = Entry(self.frame, width=15, font=('Courier', 15, 'bold'), fg='grey', justify='center')
-        self.entry.insert(END, 'TEXT')
+        self.entry_var = StringVar()
+        self.entry = Entry(self.frame, width=15, font=('Courier', 15, 'bold'), fg='grey', justify='center', textvariable=self.entry_var)
+        self.entry_var.set('TEXT')
         self.entry.pack(pady=10, ipady=2, side=LEFT)
 
-        self.add = Button(self.frame, text='ADD', fg='white', bg='#422a91', activebackground='#422a91', activeforeground='white', relief=GROOVE, cursor='hand2', command=self.add_button_command)
-        self.add.pack(side=LEFT, padx=10, ipadx=15, ipady=3)
+        self.add_button = Button(self.frame, text='ADD', fg='white', bg='#422a91', activebackground='#422a91', activeforeground='white', relief=GROOVE, cursor='hand2', command=self.add_button_command)
+        self.add_button.pack(side=LEFT, padx=10, ipadx=15, ipady=3)
 
-        self.text = Label(self.master, text='Blink', fg='white', bg='#422a91', font=('Courier', 20))  # Creating label object
+        self.text = Label(self.master, text='Blink', fg='white', bg='#422a91', font=('Courier', 20))
         self.text.pack(pady=2)
 
-        self.blink()
+        self.entry.bind('<FocusIn>', self.bind_keys)
+        self.master.bind('<Button-1>', self.bind_keys)
+        self.add_button.bind('<FocusIn>', self.bind_keys)
+        self.entry.bind('<Return>', self.add_button_command)
+        self.add_button.bind('<Return>', self.add_button_command)
 
-        self.entry.bind('<Return>', lambda e: self.add_button_command())
-        self.entry.bind('<Button-1>', lambda e: self.button_1_command())
-
+        self.master.after(0, self.blink)
         self.master.config(bg='#422a91')
         self.master.mainloop()
 
-    def button_1_command(self):
-        '''Binding function for left click'''
+    def bind_keys(self, event):
+        '''Commands when user clicks in and out of the entry widget'''
 
-        if self.entry.get() == 'TEXT':
-            self.entry.delete(0, END)
-            self.entry.config(fg='black')
+        entry_get = self.entry.get().strip()
 
-    def leave(self):
-        '''Binding function when the cursor leaves the entry box'''
+        if event.widget == self.entry:
+            if entry_get == 'TEXT':
+                self.entry_var.set('')
+                self.entry.config(fg='black')
 
-        if not self.entry.get().strip():
-            self.entry.delete(0, END)
-            self.entry.insert(END, 'TEXT')
-            self.entry.config(fg='grey')
+        else:
+            if not entry_get:
+                self.entry_var.set('TEXT')
+                self.entry.config(fg='grey')
+
+        if event.widget in [self.master, self.text]:
             self.master.focus()
 
     def blink(self):
@@ -70,8 +75,8 @@ class Blink:
 
         self.master.after(100, self.blink)
 
-    def add_button_command(self):
-        '''Function for "ADD" button'''
+    def add_button_command(self, event=None):
+        '''Command for "ADD" button'''
 
         get_from_entry = self.entry.get().strip()
 
@@ -81,20 +86,22 @@ class Blink:
         else:
             self.text.config(text='Blink')
 
+        self.master.focus()
         self.entry.delete(0, END)
-        self.leave()
+        self.entry_var.set('TEXT')
+        self.entry.config(fg='grey')
 
     def resource_path(self, relative_path):
-        """ Get absolute path to resource from temporary directory
+        '''Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of photos that are used in this script like in icons and title_image from current directory
+            Gets path of files that are used in this script like icons, images or file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of photos that are used in this script like in icons and title image from temporary directory"""
+            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
 
         try:
-            base_path = sys._MEIPASS  # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS.
 
         except AttributeError:
             base_path = os.path.abspath(".")

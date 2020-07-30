@@ -187,16 +187,16 @@ class Birthday_Remainder:
             self.sort_details()
 
     def resource_path(self, relative_path):
-        """ Get absolute path to resource from temporary directory
+        '''Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of photos that are used in this script like in icons and title_image from current directory
+            Gets path of files that are used in this script like icons, images or file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of photos that are used in this script like in icons and title image from temporary directory"""
+            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
 
         try:
-            base_path = sys._MEIPASS  # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS.
 
         except AttributeError:
             base_path = os.path.abspath(".")
