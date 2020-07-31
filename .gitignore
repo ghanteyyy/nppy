@@ -2,6 +2,8 @@ SSNI/
 *.txt
 icons/
 wincap/
+OTHERS/
+Contributions/
 Project*EULER/
 mega_upload.py
 Data*Structure/
@@ -12,4 +14,3 @@ Project*Photo*Preview/
 PROJECT*GUIS/SYPRES*QUIZ/
 PROJECT*GUIS/Windows*Activator/
 PROJECT*GUIs/Project*NOTEPAD/
-OTHERS/
