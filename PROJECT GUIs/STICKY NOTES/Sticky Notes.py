@@ -23,6 +23,7 @@ class Sticky_Notes:
 
         self.master = Tk()
         self.master.withdraw()
+        self.master.resizable(0, 0)
         self.master.wm_attributes('-topmost', True)
         self.master.iconbitmap(self.resource_path('included_files/icon.ico'))
 
@@ -151,7 +152,8 @@ class Sticky_Notes:
                 f.write(contents)
 
             self.save_formatting()
-            self.master.destroy()
+
+        self.master.destroy()
 
     def tag_exists(self, start_index):
         '''Checking if the selected text has already another tag'''
