@@ -18,17 +18,8 @@ class SSNI:
 
         self.master = Tk()
         self.master.withdraw()
-        self.master.after(0, self.master.deiconify)
-        self.master.resizable(0, 0)
         self.master.title('SSNI')
         self.master.iconbitmap(self.resource_path('included_files\\icon.ico'))
-
-        self.width, self.height = 475, 280
-        self.screen_width, self.screen_height = self.master.winfo_screenwidth(), self.master.winfo_screenheight()
-        self.master.geometry(f'{self.width}x{self.height}+{self.screen_width // 2 - self.width // 2}+{self.screen_height // 2 - self.height // 2}')
-
-        self.title_label = Label(self.master, text='SSNI', fg='white', bg='black', font=('Courier', 20))
-        self.title_label.pack(fill='x')
 
         self.first_left_frame = Frame(self.master)
 
@@ -69,37 +60,65 @@ class SSNI:
         self.add_button.bind('<Return>', lambda e: self.add_remove_search_command(button_name='ADD'))
         self.remove_button.bind('<Return>', lambda e: self.add_remove_search_command(button_name='REMOVE'))
         self.search_button.bind('<Return>', lambda e: self.add_remove_search_command(button_name='SEARCH'))
-        self.video_entry.bind('<Button-1>', lambda event, widgets=[self.video_entry], texts=['Video Name']: self.widgets_bindings(event, widgets, texts))
-        self.video_entry.bind('<FocusIn>', lambda event, widgets=[self.video_entry], texts=['Video Name']: self.widgets_bindings(event, widgets, texts))
-        self.video_entry.bind('<FocusOut>', lambda event, widgets=[self.video_entry, self.video_entry], texts=['Video Name', 'Video Name']: self.widgets_bindings(event, widgets, texts))
 
-        self.master.bind('<Button-1>', lambda event, widgets=[self.first_left_frame], entries=[self.video_entry], texts=['Video Name']: self.master_bindings(event, widgets, entries, texts))
+        # Rename_window widgets
+        self.rename_window_frame = Frame(self.master)
+
+        self.old_name_entry = Entry(self.rename_window_frame, fg='grey', font=('Courier', 12), width=19, justify='center', highlightthickness=2, highlightbackground='grey')
+        self.old_name_entry.insert(END, 'Old Name')
+
+        self.new_name_entry = Entry(self.rename_window_frame, fg='grey', font=('Courier', 12), width=19, justify='center', highlightthickness=2, highlightbackground='grey')
+        self.new_name_entry.insert(END, 'New Name')
+
+        self.rename_button = Button(self.rename_window_frame, text='RENAME', bg='green', fg='white', activebackground='green', activeforeground='white', cursor='hand2', command=self.rename_command)
+        self.back_button = Button(self.rename_window_frame, text='BACK', bd=0, fg='blue', font=('Courier', 15, 'bold'), cursor='hand2', command=self.back_command, activeforeground='blue')
+
+        self.master.bind('<Button-1>', self.key_bindings)
+        self.back_button.bind('<Return>', self.back_command)
+        self.video_entry.bind('<FocusIn>', self.key_bindings)
+        self.old_name_entry.bind('<FocusIn>', self.key_bindings)
+        self.new_name_entry.bind('<FocusIn>', self.key_bindings)
+        self.rename_button.bind('<Return>', self.rename_command)
+
+        self.master.after(0, self.center_window)
+        self.master.bind_class('Button', '<FocusIn>', lambda event, focus_out=True: self.key_bindings(event, focus_out))
         self.master.mainloop()
 
-    def widgets_bindings(self, event, widgets, texts):
-        '''When user clicks or uses tab from keyboard to select entry widgets'''
+    def center_window(self):
+        '''Set initial position of the window to the center of the screen'''
 
-        if event.widget == widgets[0] and widgets[0].get().strip() == texts[0]:
-            widgets[0].delete(0, END)
-            widgets[0].config(fg='black')
+        self.master.update()
+        self.master.resizable(0, 0)
 
-        if len(widgets) == 2 and not widgets[1].get().strip():
-            widgets[1].delete(0, END)
-            widgets[1].insert(END, texts[1])
-            widgets[1].config(fg='grey')
+        screen_width, screen_height = self.master.winfo_screenwidth() // 2, self.master.winfo_screenheight() // 2
+        width, height = self.master.winfo_width(), self.master.winfo_height()
+        self.master.geometry(f'{width}x{height}+{screen_width - width // 2}+{screen_height - height // 2}')
 
-    def master_bindings(self, event, widgets, enteries, texts):
-        '''When user clicks anywhere except entry widgets'''
+        self.master.deiconify()
 
-        widgets.extend([self.title_label, self.text_area, self.scrollbar, self.master])
+    def key_bindings(self, event, focus_out=False):
+        '''When user clicks in and out of the entry boxes'''
 
-        if event.widget in widgets:
-            for index, entry in enumerate(enteries):
-                if not entry.get().strip():
-                    entry.delete(0, END)
-                    entry.insert(END, texts[index])
-                    entry.config(fg='grey')
+        widget = event.widget
+        widgets = {self.video_entry: 'Video Name', self.old_name_entry: 'Old Name', self.new_name_entry: 'New Name'}
 
+        if widget in widgets and widget.get().strip() == widgets[widget]:
+            widget.delete(0, END)
+            widget.config(fg='black')
+
+            if widget == self.new_name_entry and not self.old_name_entry.get().strip():
+                self.old_name_entry.delete(0, END)
+                self.old_name_entry.config(fg='grey')
+                self.old_name_entry.insert(END, widgets[self.old_name_entry])
+
+        elif widget not in widgets or focus_out:
+            for _widget in widgets:
+                if not _widget.get().strip():
+                    _widget.delete(0, END)
+                    _widget.config(fg='grey')
+                    _widget.insert(END, widgets[_widget])
+
+        if widget in [self.master, self.rename_window_frame, self.first_left_frame]:
             self.master.focus()
 
     def rename_window(self):
@@ -108,45 +127,25 @@ class SSNI:
         self.first_left_frame.pack_forget()
         self.text_area_frame.pack_forget()
 
-        frame = Frame(self.master)
-
-        self.old_name_entry = Entry(frame, fg='grey', font=('Courier', 12), width=19, justify='center', highlightthickness=2, highlightbackground='grey')
-        self.old_name_entry.insert(END, 'Old Name')
         self.old_name_entry.pack(pady=10, padx=10, ipady=3)
-
-        self.new_name_entry = Entry(frame, fg='grey', font=('Courier', 12), width=19, justify='center', highlightthickness=2, highlightbackground='grey')
-        self.new_name_entry.insert(END, 'New Name')
         self.new_name_entry.pack(pady=10, padx=10, ipady=3)
-
-        self.rename_button = Button(frame, text='RENAME', bg='green', fg='white', activebackground='green', activeforeground='white', cursor='hand2', command=self.rename_command)
         self.rename_button.pack(pady=15, ipady=3, ipadx=70)
 
-        back_button = Button(frame, text='BACK', bd=0, fg='blue', font=('Courier', 15, 'bold'), cursor='hand2', command=lambda: self.back_command(frame), activeforeground='blue')
-        back_button.pack()
+        self.back_button.pack()
 
-        frame.pack(padx=5, side=LEFT, ipady=2)
+        self.rename_window_frame.pack(padx=5, side=LEFT, ipady=2)
         self.text_area_frame.pack(pady=15, padx=5, anchor='w')
 
-        self.old_name_entry.bind('<Button-1>', lambda event, widgets=[self.old_name_entry, self.new_name_entry], texts=['Old Name', 'New Name']: self.widgets_bindings(event, widgets, texts))
-        self.new_name_entry.bind('<Button-1>', lambda event, widgets=[self.new_name_entry, self.old_name_entry], texts=['New Name', 'Old Name']: self.widgets_bindings(event, widgets, texts))
-        self.old_name_entry.bind('<FocusIn>', lambda event, widgets=[self.old_name_entry, self.new_name_entry], texts=['Old Name', 'New Name']: self.widgets_bindings(event, widgets, texts))
-        self.new_name_entry.bind('<FocusIn>', lambda event, widgets=[self.new_name_entry, self.old_name_entry], texts=['New Name', 'Old Name']: self.widgets_bindings(event, widgets, texts))
-        self.new_name_entry.bind('<FocusOut>', lambda event, widgets=[self.old_name_entry, self.new_name_entry], texts=['Old Name', 'New Name']: self.widgets_bindings(event, widgets, texts))
-
-        back_button.bind('<Return>', lambda e: self.back_command(frame))
-        self.master.bind('<Button-1>', lambda event, widgets=[frame], entries=[self.old_name_entry, self.new_name_entry], texts=['Old Name', 'New Name']: self.master_bindings(event, widgets, entries, texts))
-
-    def back_command(self, frame):
+    def back_command(self, event=None):
         '''Command when user clicks back button'''
 
         self.text_area_frame.pack_forget()
-        frame.pack_forget()
+        self.rename_window_frame.pack_forget()
 
         self.first_left_frame.pack(padx=5, side=LEFT, ipady=2)
         self.text_area_frame.pack(pady=15, padx=5, anchor='w')
 
-        self.video_entry.bind('<Button-1>', lambda event, widgets=[self.video_entry], texts=['Video Name']: self.widgets_bindings(event, widgets, texts))
-        self.master.bind('<Button-1>', lambda event, widgets=[self.first_left_frame], entries=[self.video_entry], texts=['Video Name']: self.master_bindings(event, widgets, entries, texts))
+        self.back_button.pack_forget()
 
     def show_scrollbar(self):
         '''Show scrollbar when the character in the text is more than the height of the text widget'''
@@ -266,7 +265,7 @@ class SSNI:
 
         self.master.focus()
 
-    def rename_command(self):
+    def rename_command(self, event=None):
         '''Commands when user clicks RENAME button'''
 
         contents = self.read_file()
