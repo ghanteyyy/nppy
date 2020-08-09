@@ -14,18 +14,10 @@ class is_at_startup:
         self.program_path = program_path
         self.program_basename = os.path.basename(self.program_path)
 
-    def is_path_valid(self):
-        '''Check if the given program path is actually exists'''
-
-        if os.path.exists(self.program_path):
-            return True
-
-        return False
-
     def main(self):
         '''Adding to startup'''
 
-        if self.is_path_valid():
+        if os.path.exists(self.program_path):
             areg = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
 
             try:
