@@ -7,7 +7,4 @@
 <img src="included files/1.png">
 <img src="included files/2.png">
 <img src="included files/3.png">
-<<<<<<< HEAD
 <img src="included files/5.png">
-=======
->>>>>>> f1b6747ab154f5c556d9a432b0e3d0e719c08857
