@@ -2,14 +2,8 @@ import os
 import sys
 import time
 import winsound
-
-try:  # Python 3
-    import tkinter.ttk as ttk
-    from tkinter import Tk, Label, Button, IntVar
-
-except (ImportError, ModuleNotFoundError):  # Python 2
-    import ttk
-    from Tkinter import Tk, Label, Button, IntVar
+import tkinter.ttk as ttk
+from tkinter import Tk, Label, Button, IntVar
 
 
 class Remainder_Window:

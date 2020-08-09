@@ -3,16 +3,9 @@ import sys
 import json
 import random
 import string
-
-try:  # Python 3
-    from tkinter import *
-    from tkinter import messagebox
-    from tkinter.ttk import Scrollbar
-
-except (ModuleNotFoundError, ImportError):  # Python 2
-    from Tkinter import *
-    from ttk import Scrollbar
-    import tkMessageBox as messagebox
+from tkinter import *
+from tkinter import messagebox
+from tkinter.ttk import Scrollbar
 
 
 class Sticky_Notes:

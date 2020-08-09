@@ -1,16 +1,8 @@
-from __future__ import division  # If python is 2.x
-
 import os
 import sys
 import ctypes
-
-try:  # Python 3
-    from tkinter import *
-    from tkinter import messagebox
-
-except (ImportError, ModuleNotFoundError):  # Python 2
-    from Tkinter import *
-    import tkMessagebox as messagebox
+from tkinter import *
+from tkinter import messagebox
 
 
 class Calculator:

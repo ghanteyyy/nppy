@@ -1,14 +1,8 @@
 import os
 import sys
 import winsound
-
-try:  # Python 3
-    from tkinter import *
-    from tkinter.ttk import Combobox, Scrollbar
-
-except (ImportError, ModuleNotFoundError):  # Python 2
-    from Tkinter import *
-    from ttk import Combobox, Scrollbar
+from tkinter import *
+from tkinter.ttk import Combobox, Scrollbar
 
 
 class Number_System:

@@ -1,11 +1,6 @@
 import os
 import sys
-
-try:  # Python 3
-    from tkinter import *
-
-except (ImportError, ModuleNotFoundError):  # Python 2
-    from Tkinter import *
+from tkinter import *
 
 
 class Infinity_Countdown:

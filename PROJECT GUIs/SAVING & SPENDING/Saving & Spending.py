@@ -1,12 +1,6 @@
-try:  # Python 3.x
-    from tkinter import *
-    from tkinter import ttk
-    from tkinter import messagebox
-
-except (ImportError, ModuleNotFoundError):  # Python 2.x
-    import ttk
-    from Tkinter import *
-    import tkMessageBox as messagebox
+from tkinter import *
+from tkinter import ttk
+from tkinter import messagebox
 
 
 class Saving_Spending:

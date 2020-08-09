@@ -1,14 +1,8 @@
 import os
 import sys
 import winsound
-
-try:  # Python 3
-    from tkinter import *
-    from tkinter.ttk import Combobox
-
-except (ImportError, ModuleNotFoundError):  # Python 2
-    from Tkinter import *
-    from ttk import Combobox
+from tkinter import *
+from tkinter.ttk import Combobox
 
 
 class Birthday_Remainder:

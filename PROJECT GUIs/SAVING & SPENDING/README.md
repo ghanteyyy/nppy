@@ -4,6 +4,7 @@
 - Displays earnings and spendings.
 - Deletes certain value or all if you don't need them.
 
-<img src="included files/1.jpg">
-<img src="included files/2.jpg">
-<img src="included files/3.jpg">
+<img src="included files/1.png">
+<img src="included files/2.png">
+<img src="included files/3.png">
+<img src="included files/5.png">

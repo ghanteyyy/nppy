@@ -1,15 +1,8 @@
 import os
 import sys
-
-try:
-    from tkinter import *
-    from tkinter import messagebox
-    from tkinter.ttk import Scrollbar
-
-except (ImportError, ModuleNotFoundError):
-    from Tkinter import *
-    import tkMessageBox as messagebox
-    from ttk import Scrollbar
+from tkinter import *
+from tkinter import messagebox
+from tkinter.ttk import Scrollbar
 
 
 class SSNI:

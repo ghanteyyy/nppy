@@ -1,11 +1,6 @@
 import os
 import sys
-
-try:
-    from tkinter import *
-
-except (ImportError, ModuleNotFoundError):
-    from Tkinter import *
+from tkinter import *
 
 
 class Blink:
