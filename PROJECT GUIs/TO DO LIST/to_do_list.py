@@ -1,14 +1,8 @@
 import os
 import sys
 import ctypes
-
-try:
-    from tkinter import *
-    from tkinter import messagebox
-
-except (ImportError, ModuleNotFoundError):
-    from Tkinter import *
-    import TkMessageBox as messagebox
+from tkinter import *
+from tkinter import messagebox
 
 
 class To_Do_List:

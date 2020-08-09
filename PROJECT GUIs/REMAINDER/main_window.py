@@ -1,15 +1,8 @@
 import os
 import sys
-
-try:  # Python 3
-    from tkinter import *
-    from tkinter import messagebox
-    from tkinter.ttk import Combobox
-
-except (ImportError, ModuleNotFoundError):  # Python 2
-    from Tkinter import *
-    from ttk import Combobox
-    import tkMessageBox as messagebox
+from tkinter import *
+from tkinter import messagebox
+from tkinter.ttk import Combobox
 
 
 class GUI:

@@ -2,16 +2,9 @@ import os
 import sys
 import shutil
 import threading
-
-try:  # Python 3
-    from tkinter import *
-    import tkinter.ttk as ttk
-    import tkinter.messagebox as messagebox
-
-except ModuleNotFoundError:  # Python 2
-    import ttk
-    from Tkinter import *
-    import tkMessageBox as messagebox
+from tkinter import *
+import tkinter.ttk as ttk
+import tkinter.messagebox as messagebox
 
 
 class FILE_MOVER:

@@ -1,10 +1,5 @@
 import time
-
-try:  # Python 3
-    from tkinter import *
-
-except ModuleNotFoundError:  # Python 2
-    from Tkinter import *
+from tkinter import *
 
 
 class Digital_Clock:

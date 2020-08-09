@@ -1,10 +1,5 @@
 import os
-
-try:   # Python 3
-    import winreg
-
-except ModuleNotFoundError:   # Python 2
-    import _winreg as winreg
+import winreg
 
 
 class is_at_startup:
