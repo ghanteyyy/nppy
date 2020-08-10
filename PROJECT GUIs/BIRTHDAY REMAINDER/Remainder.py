@@ -2,8 +2,8 @@ import os
 import sys
 import time
 import winsound
+from tkinter import *
 import tkinter.ttk as ttk
-from tkinter import Tk, Label, Button, IntVar
 
 
 class Remainder_Window:
@@ -30,15 +30,15 @@ class Remainder_Window:
         self.style = ttk.Style()
         self.style.configure('Red.TCheckbutton', foreground='white', background='red')
 
-        title = Label(self.master, text='REMAINDER', font=("Courier", 30), bg='red', fg='White')
-        wishes = Label(self.master, text=f'Today is {name}\'s Birthday\n({date})', font=("Courier", 15), bg='red', fg='White', wraplength=450)
-        check_button = ttk.Checkbutton(self.master, style='Red.TCheckbutton', text='Don\'t show again', variable=self.var)
-        close_button = Button(self.master, text='CLOSE', font=("Courier", 12), bg='red', activeforeground='white', activebackground='red', fg='White', width=10, relief='ridge', command=lambda: self.quit_button(name))
+        self.title = Label(self.master, text='REMAINDER', font=("Courier", 30), bg='red', fg='White')
+        self.wishes = Label(self.master, text=f'Today is {name}\'s Birthday\n({date})', font=("Courier", 15), bg='red', fg='White', wraplength=450)
+        self.check_button = ttk.Checkbutton(self.master, style='Red.TCheckbutton', text='Don\'t show again', variable=self.var)
+        self.close_button = Button(self.master, text='CLOSE', font=("Courier", 12), bg='red', activeforeground='white', activebackground='red', fg='White', width=10, relief='ridge', command=lambda: self.quit_button(name))
 
-        title.pack()
-        wishes.pack()
-        check_button.pack(side='bottom')
-        close_button.pack(side='bottom')
+        self.title.pack()
+        self.wishes.pack()
+        self.check_button.pack(side='bottom')
+        self.close_button.pack(side='bottom')
 
         self.master.mainloop()
 
@@ -116,7 +116,7 @@ class Remainder_Window:
         if self.birthdates:
             for name, date in self.birthdates.items():
                 winsound.PlaySound(self.resource_path('included_files/tone.wav'), winsound.SND_LOOP + winsound.SND_ASYNC)
-                self.Window(name, date)
+                self.Window(name.lower(), date)
 
     def resource_path(self, relative_path):
         '''Get absolute path to resource from temporary directory
