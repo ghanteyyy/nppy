@@ -1,120 +1,138 @@
-class TIC_TAC_TOE:
+import random
+
+
+class setup:
+    '''This class is responsible for:
+            1. Showing board each time when user as well as bot enters their turn
+            2. Asking user if he / she wants to go first'''
+
     def __init__(self):
-        self.__BOARD = [str(i + 1) for i in range(9)]
-        self.__WINNER = [(0, 1, 2), (3, 4, 5), (6, 7, 8), (0, 3, 6), (1, 4, 7), (2, 5, 8), (0, 4, 8), (2, 4, 6)]
+        self.board = [str(i) for i in range(1, 10)]
 
-    def get_first_move(self):
-        '''Check if user wants to make their turn first'''
+    def display_board(self, board):
+        '''Show board with human and bot enters their turn'''
 
-        go_first = True if input('\nDo you want to make your move first (y / N)?: ').lower() == 'y' else False
+        for i in range(3):
+            display = ' | '.join(board[i * 3:i * 3 + 3])
 
-        if go_first:
-            player_move, bot_move = 'X', 'O'
-
-        else:
-            player_move, bot_move = 'O', 'X'
-
-        return go_first, player_move, bot_move
-
-    def display_board(self):
-        '''Display board after each time player and computer enter their respective turns'''
-
-        for i in range(0, 9, 3):
-            print(' | '.join(self.__BOARD[i: i + 3]).rjust(30))
-
-            if i in [0, 3]:
-                print((' - ' * 4).rjust(31))
-
-    def players_turn(self):
-        '''Get player's move'''
-
-        try:
-            move = int(input(f'Your Turn [{human_turn}]: '))
-
-            if self.__BOARD[move - 1] in [human_turn, bot_turn]:
-                print('\nMove already Placed !\n')
-                self.players_turn()
+            if i in range(2):
+                sep = f"\n{'- ' * 5}\n"
 
             else:
-                self.__BOARD[move - 1] = human_turn
+                sep = '\n'
 
-        except ValueError:
-            print('Invalid Input ...\n')
-            self.players_turn()
+            print(display, end=sep)
 
-    def computers_turn(self):
-        '''Get computer moves'''
+    def get_turn(self):
+        '''Asking user if he/she wants to go first.
 
-        test_board = self.__BOARD[:]   # Making a copy of original board for getting best possible moves to be make by bot:
-        get_possible_moves = [int(self.__BOARD.index(value)) for value in self.__BOARD if value.isdigit()]  # Getting all possible turns that are left.
+           If user wants to go first then:
+                Human: X
+                Bot: O
 
-        for move in get_possible_moves:  # Checking if computer can win
-            test_board[move] = bot_turn
+            else:
+                Human: O
+                Bot: X'''
 
-            if self.is_winner(test_board) == bot_turn:    # If computer can win then getting the same move
-                return move
+        option = True if input('Do you want to go first (y/n)? ').lower() == 'y' else False
 
-            test_board[move] = str(move)   # Undoing the move if computer cannot win
+        if option:
+            return ('X', 'O')
 
-        for move in get_possible_moves:  # Checking if human can win in next move
-            test_board[move] = human_turn
+        return ('O', 'X')
 
-            if self.is_winner(test_board) == human_turn:   # Getting the move that can block next human's move and not letting them to win
-                return move
 
-            test_board[move] = str(move)
+class playing(setup):
+    '''This class is reponsible for:
+            1. Getting empty places
+            2. Asking user where he/she want to place their turn
+                > Checks if user inputs their turn in empty places. If not then shows warning.
 
-        return get_possible_moves[0]
+            3. Placing bot turn as per the user's turn
+                > Get empty places
+                > Checks if bot itself can win. If yes bot places its turn to that place and wins the game.
+                > If bot cannot win the game then it checks whether user can win the game. If yes, then bot blocks the user next move so user cannot win the game
 
-    def is_winner(self, BOARD):
-        '''Determining the winner of the game'''
+            4. Check where user or bot won or the game became TIE'''
 
-        for winner in self.__WINNER:
-            if BOARD[winner[0]] == BOARD[winner[1]] == BOARD[winner[2]]:
-                return BOARD[winner[0]]
+    def __init__(self):
+        super().__init__()
+        self.human, self.bot = setup().get_turn()
+        self.winner_combo = [(0, 1, 2), (3, 4, 5), (6, 7, 8), (0, 4, 8), (2, 4, 6), (0, 3, 6), (1, 4, 7), (2, 5, 8)]
 
-        if len([int(self.__BOARD.index(value)) for value in self.__BOARD if value.isdigit()]) == 0:
-            return 'TIE'
+    def get_possible_moves(self):
+        return [self.board.index(place) for place in self.board if place in [str(i) for i in range(1, 10)]]
 
-        return None
+    def human_move(self):
+        try:
+            place = int(input('\nWhere do you want to place?')) - 1
 
-    def play_again(self):
-        '''Replaying the game'''
+            if place in self.get_possible_moves() and place > -1:
+                self.board[place] = self.human
 
-        choice = input('\nDo you want to play again (y / N)? :').lower()
+            else:
+                print('Invalid Move')
+                print(self.display_board(self.board))
+                self.human_move()
 
-        if choice == 'y':
-            TIC_TAC_TOE().main()
+        except:
+            print('Invalid Move')
+            print(self.display_board(self.board))
+            self.human_move()
+
+    def is_winner(self, board):
+        if not self.get_possible_moves():
+            return 'Tie'
+
+        for winner in self.winner_combo:
+            if board[winner[0]] == board[winner[1]] == board[winner[2]] == board[winner[0]]:
+                return board[winner[0]]
+
+    def bot_move(self):
+        possible_moves = self.get_possible_moves()
+
+        if possible_moves:
+            for move in possible_moves:  # Checking if bot can win
+                self.board[move] = self.bot
+
+                if self.is_winner(self.board):
+                    self.board[move] = self.bot
+                    return
+
+                self.board[move] = str(move + 1)
+
+            for move in possible_moves:  # Checking if player can win
+                self.board[move] = self.human
+
+                if self.is_winner(self.board):
+                    self.board[move] = self.bot
+                    return
+
+                self.board[move] = str(move + 1)
+
+            self.board[random.choice(possible_moves)] = self.bot
 
     def main(self):
-        global human_turn, bot_turn
+        print(f'\nYou: {self.human}\nBot: {self.bot}\n')
 
-        go_first, human_turn, bot_turn = self.get_first_move()
+        if self.bot == 'X':
+            self.bot_move()
 
-        if go_first is False:   # If player does not want to go first then compyter is going first
-            self.__BOARD[self.computers_turn()] = bot_turn
+        self.display_board(self.board)
 
-        self.display_board()
+        while not self.is_winner(self.board):
+            self.human_move()
+            self.bot_move()
+            self.display_board(self.board)
 
-        while not self.is_winner(self.__BOARD):  # Playing game till nobody wins or becomes TIE
-            self.players_turn()
+        if self.is_winner(self.board) == self.human:
+            print('\nHuman Won')
 
-            if not self.is_winner(self.__BOARD):
-                if len([value for value in self.__BOARD if value.isdigit()]) != 0:
-                    self.__BOARD[self.computers_turn()] = bot_turn
-                    self.display_board()
+        elif self.is_winner(self.board) == self.bot:
+            print('\nBot Won')
 
-        if self.is_winner(self.__BOARD) == human_turn:  # Player won the game
-            print('\nYou Won')
-
-        elif self.is_winner(self.__BOARD) == bot_turn:  # Computer won the game
-            print('\nYou lose. BOT WON')
-
-        elif self.is_winner(self.__BOARD) == 'TIE':  # Nobody won i.e TIE
-            print('\nIts TIE')
-
-        self.play_again()  # Wanting player to replay the game
+        else:
+            print('\nHuman and Bot got tied')
 
 
-if __name__ == '__main__':
-    TIC_TAC_TOE().main()
+playing().main()
