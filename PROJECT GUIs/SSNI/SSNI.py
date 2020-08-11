@@ -41,13 +41,10 @@ class SSNI:
 
         self.text_area.pack(side=LEFT, ipady=1)
         self.text_area_frame.pack(pady=5, padx=4, anchor='w')
-        self.show_scrollbar()
 
         self.text_area.config(state=NORMAL)
         self.text_area.delete('1.0', END)
         self.text_area_frame.pack(padx=5, pady=5, side=LEFT)
-
-        self.master.after(0, self.insert_text_area)
 
         self.rename_window_button.bind('<Return>', lambda e: self.rename_window())
         self.add_button.bind('<Return>', lambda e: self.add_remove_search_command(button_name='ADD'))
@@ -74,6 +71,9 @@ class SSNI:
         self.rename_button.bind('<Return>', self.rename_command)
 
         self.master.after(0, self.center_window)
+        self.master.after(0, self.insert_text_area)
+        self.master.after(0, self.show_scrollbar)
+
         self.master.bind_class('Button', '<FocusIn>', lambda event, focus_out=True: self.key_bindings(event, focus_out))
         self.master.mainloop()
 
@@ -127,7 +127,7 @@ class SSNI:
         self.back_button.pack()
 
         self.rename_window_frame.pack(padx=5, side=LEFT, ipady=2)
-        self.text_area_frame.pack(pady=15, padx=5, anchor='w')
+        self.text_area_frame.pack(pady=5, padx=5, anchor='w')
 
     def back_command(self, event=None):
         '''Command when user clicks back button'''
@@ -136,7 +136,7 @@ class SSNI:
         self.rename_window_frame.pack_forget()
 
         self.first_left_frame.pack(padx=5, side=LEFT, ipady=2)
-        self.text_area_frame.pack(pady=15, padx=5, anchor='w')
+        self.text_area_frame.pack(pady=5, padx=5, anchor='w')
 
         self.back_button.pack_forget()
 
@@ -166,25 +166,28 @@ class SSNI:
             with open(self.file_name, 'r') as f:
                 return [line.strip('\n') for line in f.readlines()]
 
-        else:
-            with open(self.file_name, 'w'):
-                pass
+        return []
 
-    def sort_file(self):
-        '''Sorting contents of file according to length in ascending order'''
+    def write_to_file(self, contents):
+        '''Writting new or renamed data to the file'''
 
-        contents = self.read_file()
         contents.sort(key=len)
 
         with open(self.file_name, 'w') as f:
             for content in contents:
                 f.write(f'{content}\n')
 
-    def insert_text_area(self):
+        return contents
+
+    def insert_text_area(self, contents=None):
         '''Insert contents of file in Text widget'''
 
-        contents = self.read_file()
-        self.sort_file()
+        if contents is not None:
+            contents = self.write_to_file(contents)
+
+        else:
+            contents = self.read_file()
+
         self.text_area.config(state=NORMAL)
 
         if contents:
@@ -219,25 +222,19 @@ class SSNI:
                 messagebox.showinfo('Already Exists', f'"{from_entry}" is already in file')
 
             else:
-                with open(self.file_name, 'a') as f:
-                    f.write(f'{from_entry}\n')
-
+                contents.append(from_entry)
                 messagebox.showinfo('Value Added', f'"{from_entry}" added in file')
 
         elif button_name == 'REMOVE':
             if from_entry in contents:
-                with open(self.file_name, 'w') as f:
-                    for content in contents:
-                        if from_entry != content:
-                            f.write(f'{content}\n')
-
+                contents.remove(from_entry)
                 messagebox.showinfo('Value Removed', f'"{from_entry}" reomved from file')
 
             else:
                 option = messagebox.askyesno('Add Value?', f'"{from_entry}" not in file. Do you want to add it?')
 
                 if option:
-                    self.action_button_command('ADD')
+                    contents.append(from_entry)
 
         elif button_name == 'SEARCH':
             if from_entry in contents:
@@ -247,25 +244,23 @@ class SSNI:
                 option = messagebox.askyesno('Add Value?', f'"{from_entry}" not in file. Do you want to add it?')
 
                 if option:
-                    self.action_button_command('ADD')
-
-        self.sort_file()
-        self.insert_text_area()
+                    contents.append(from_entry)
 
         self.video_entry.delete(0, END)
         self.video_entry.insert(END, 'Video Name')
         self.video_entry.config(fg='grey')
 
+        self.insert_text_area(contents)
         self.master.focus()
 
     def rename_command(self, event=None):
         '''Commands when user clicks RENAME button'''
 
         contents = self.read_file()
-        old_name = self.old_name_entry.get().strip().title()
+        old_name = self.old_name_entry.get().strip()
         new_name = self.new_name_entry.get().strip().title()
 
-        if not old_name or not new_name or old_name == 'Old Name' or new_name == 'New Name':
+        if old_name in ['', 'Old Name'] or new_name in ['', 'New Name']:
             messagebox.showerror('Invalid Video Name', 'The input video name is invlaid')
 
         elif old_name not in contents:
@@ -278,14 +273,9 @@ class SSNI:
             old_name_index = contents.index(old_name)
             contents[old_name_index] = new_name
 
-            with open(self.file_name, 'w') as f:
-                for content in contents:
-                    f.write(f'{content}\n')
+            self.insert_text_area(contents)
 
-            self.insert_text_area()
-            widgets = {self.old_name_entry: 'Old Name', self.new_name_entry: 'New Name'}
-
-            for widget, text in widgets.items():
+            for widget, text in {self.old_name_entry: 'Old Name', self.new_name_entry: 'New Name'}.items():
                 widget.delete(0, END)
                 widget.insert(END, text)
                 widget.config(fg='grey')
