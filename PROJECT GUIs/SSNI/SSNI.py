@@ -74,6 +74,7 @@ class SSNI:
         self.master.after(0, self.insert_text_area)
         self.master.after(0, self.show_scrollbar)
 
+        self.master.bind('<F5>', lambda e: self.insert_text_area())
         self.master.bind_class('Button', '<FocusIn>', lambda event, focus_out=True: self.key_bindings(event, focus_out))
         self.master.mainloop()
 
