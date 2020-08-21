@@ -85,17 +85,18 @@ class Calculator:
         # Storing calculated history
         self.history_frame = Frame(self.master)
         self.history_area = Text(self.history_frame, width=52, height=13, borderwidth=0, cursor='arrow', bg='#cccccc')
+        self.history_area.insert(END, 'There\'s no history yet.')
         self.history_area.grid(row=0, column=0)
 
         # Button that has label "Show History"
         self.show_history_frame = Frame(self.master)
-        self.show_history_button = Button(self.show_history_frame, text='Show History', relief=GROOVE, bg='#cccccc', activebackground='#cccccc', command=self.show_history)
+        self.show_history_button = Button(self.show_history_frame, text='Show History', relief=GROOVE, bg='#cccccc', activebackground='#cccccc', cursor='hand2', command=self.show_history)
         self.show_history_button.grid(row=0, column=0, ipadx=215, ipady=5)
         self.show_history_frame.place(x=0, y=303)
 
         # Button that has label "Hide History"
         self.hide_history_frame = Frame(self.master)
-        self.hide_history_button = Button(self.hide_history_frame, text='Hide History', relief=GROOVE, bg='#cccccc', activebackground='#cccccc', command=self.hide_history)
+        self.hide_history_button = Button(self.hide_history_frame, text='Hide History', relief=GROOVE, bg='#cccccc', activebackground='#cccccc', cursor='hand2', command=self.hide_history)
         self.hide_history_button.grid(row=0, column=0, ipadx=215, ipady=5)
 
         # Attaching scrollbar to the text area
@@ -108,14 +109,14 @@ class Calculator:
 
         # Buttons that push the window to the top of other window or pull the window from the top of other window
         self.push_front_frame = Frame(self.master)
-        self.push_front_button = Button(self.push_front_frame, image=self.push_front_image, bg='white', activebackground='white', fg='black', relief='groove', compound='top', command=self.place_at_top)
+        self.push_front_button = Button(self.push_front_frame, image=self.push_front_image, bg='white', activebackground='white', fg='black', relief='groove', compound='top', cursor='hand2', command=self.place_at_top)
         self.push_front_button.grid(row=0, column=0, padx=1, ipadx=13, ipady=4)
         self.push_front_frame.place(x=391, y=10)
 
         # Clear and info Button
         self.clear_history_frame = Frame(self.master, bg='#cccccc')
-        self.info_button = Button(self.clear_history_frame, text='INFO', bg='white', activebackground='white', fg='black', relief='groove', command=self.info)
-        self.clear_history_button = Button(self.clear_history_frame, text='CLEAR', bg='white', activebackground='white', fg='black', relief='groove', command=self.clear_history)
+        self.info_button = Button(self.clear_history_frame, text='INFO', bg='white', activebackground='white', fg='black', relief='groove', cursor='hand2', command=self.info)
+        self.clear_history_button = Button(self.clear_history_frame, text='CLEAR', bg='white', activebackground='white', fg='black', relief='groove', cursor='hand2', command=self.clear_history)
         self.info_button.grid(row=0, column=1, padx=10, ipadx=8, ipady=2)
         self.clear_history_button.grid(row=0, column=2, ipadx=5, ipady=2)
 
