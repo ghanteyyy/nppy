@@ -1,6 +1,7 @@
 import os
 import sys
 from tkinter import *
+import tkinter.ttk as ttk
 from tkinter import messagebox
 from tkinter.ttk import Scrollbar
 
@@ -16,7 +17,9 @@ class SSNI:
 
         self.first_left_frame = Frame(self.master)
 
-        self.video_entry = Entry(self.first_left_frame, fg='grey', font=('Courier', 12), width=19, justify='center', highlightthickness=2, highlightbackground='grey')
+        self.video_entry_style = ttk.Style()
+        self.video_entry_style.configure('VE.TEntry', foreground='grey')
+        self.video_entry = ttk.Entry(self.first_left_frame, font=('Courier', 12), width=19, justify='center', style='VE.TEntry')
         self.video_entry.insert(END, 'Video Name')
         self.video_entry.pack(pady=10, padx=10, ipady=3)
 
@@ -38,8 +41,9 @@ class SSNI:
 
         self.text_area = Text(self.text_area_frame, width=27, height=13, state=DISABLED, cursor='arrow')
         self.scrollbar = Scrollbar(self.text_area_frame, orient="vertical", command=self.text_area.yview)
-
+        self.text_area.config(yscrollcommand=self.scrollbar.set)
         self.text_area.pack(side=LEFT, ipady=1)
+        self.scrollbar.pack(side=RIGHT, fill='y')
         self.text_area_frame.pack(pady=5, padx=4, anchor='w')
 
         self.text_area.config(state=NORMAL)
@@ -54,10 +58,14 @@ class SSNI:
         # Rename_window widgets
         self.rename_window_frame = Frame(self.master)
 
-        self.old_name_entry = Entry(self.rename_window_frame, fg='grey', font=('Courier', 12), width=19, justify='center', highlightthickness=2, highlightbackground='grey')
+        self.old_name_entry_style = ttk.Style()
+        self.old_name_entry_style.configure('O.TEntry', foreground='grey')
+        self.old_name_entry = ttk.Entry(self.rename_window_frame, font=('Courier', 12), width=19, justify='center', style='O.TEntry')
         self.old_name_entry.insert(END, 'Old Name')
 
-        self.new_name_entry = Entry(self.rename_window_frame, fg='grey', font=('Courier', 12), width=19, justify='center', highlightthickness=2, highlightbackground='grey')
+        self.new_name_entry_style = ttk.Style()
+        self.new_name_entry_style.configure('N.TEntry', foreground='grey')
+        self.new_name_entry = ttk.Entry(self.rename_window_frame, font=('Courier', 12), width=19, justify='center', style='N.TEntry')
         self.new_name_entry.insert(END, 'New Name')
 
         self.rename_button = Button(self.rename_window_frame, text='RENAME', bg='green', fg='white', activebackground='green', activeforeground='white', cursor='hand2', command=self.rename_command)
@@ -72,7 +80,6 @@ class SSNI:
 
         self.master.after(0, self.center_window)
         self.master.after(0, self.insert_text_area)
-        self.master.after(0, self.show_scrollbar)
 
         self.master.bind('<F5>', lambda e: self.insert_text_area())
         self.master.bind_class('Button', '<FocusIn>', lambda event, focus_out=True: self.key_bindings(event, focus_out))
@@ -88,29 +95,39 @@ class SSNI:
         width, height = self.master.winfo_width(), self.master.winfo_height()
         self.master.geometry(f'{width}x{height}+{screen_width - width // 2}+{screen_height - height // 2}')
 
+        self.widgets = {self.video_entry: ('Video Name', {self.video_entry_style: 'VE.TEntry'}), self.old_name_entry: ('Old Name', {self.old_name_entry_style: 'O.TEntry'}),
+                        self.new_name_entry: ('New Name', {self.new_name_entry_style: 'N.TEntry'})}
+
         self.master.deiconify()
+
+    def config_entry(self, widget, color, insert=False):
+        '''Configure behaviour of entries widget when user clicks in or out of them'''
+
+        widget.delete(0, END)
+        key = list(self.widgets[widget][1].keys())[0]
+        key.configure(self.widgets[widget][1][key], foreground=color)
+
+        if insert:
+            widget.insert(END, self.widgets[widget][0])
 
     def key_bindings(self, event, focus_out=False):
         '''When user clicks in and out of the entry boxes'''
 
         widget = event.widget
-        widgets = {self.video_entry: 'Video Name', self.old_name_entry: 'Old Name', self.new_name_entry: 'New Name'}
 
-        if widget in widgets and widget.get().strip() == widgets[widget]:
-            widget.delete(0, END)
-            widget.config(fg='black')
+        if widget in self.widgets and widget.get().strip() == self.widgets[widget][0]:
+            self.config_entry(widget, 'black')
 
             if widget == self.new_name_entry and not self.old_name_entry.get().strip():
-                self.old_name_entry.delete(0, END)
-                self.old_name_entry.config(fg='grey')
-                self.old_name_entry.insert(END, widgets[self.old_name_entry])
+                self.config_entry(self.old_name_entry, 'grey', True)
 
-        elif widget not in widgets or focus_out:
-            for _widget in widgets:
+            if widget == self.old_name_entry and not self.new_name_entry.get().strip():
+                self.config_entry(self.new_name_entry, 'grey', True)
+
+        elif widget not in self.widgets or focus_out:
+            for _widget in self.widgets:
                 if not _widget.get().strip():
-                    _widget.delete(0, END)
-                    _widget.config(fg='grey')
-                    _widget.insert(END, widgets[_widget])
+                    self.config_entry(_widget, 'grey', True)
 
         if widget in [self.master, self.rename_window_frame, self.first_left_frame]:
             self.master.focus()
@@ -118,6 +135,7 @@ class SSNI:
     def rename_window(self):
         '''Rename window when user clicks rename button'''
 
+        self.master.focus()
         self.first_left_frame.pack_forget()
         self.text_area_frame.pack_forget()
 
@@ -140,25 +158,6 @@ class SSNI:
         self.text_area_frame.pack(pady=5, padx=5, anchor='w')
 
         self.back_button.pack_forget()
-
-    def show_scrollbar(self):
-        '''Show scrollbar when the character in the text is more than the height of the text widget'''
-
-        if self.text_area.cget('height') < int(self.text_area.index('end-1c').split('.')[0]):
-            self.scrollbar.pack(side=LEFT, fill='y')
-            self.text_area.config(yscrollcommand=self.scrollbar.set)
-            self.master.after(100, self.hide_scrollbar)
-
-        else:
-            self.master.after(100, self.show_scrollbar)
-
-    def hide_scrollbar(self):
-        '''Hide scrollbar when the character in the text is less than the height of the text widget'''
-
-        if self.text_area.cget('height') >= int(self.text_area.index('end-1c').split('.')[0]):
-            self.scrollbar.pack_forget()
-            self.text_area.config(yscrollcommand=None)
-            self.master.after(100, self.show_scrollbar)
 
     def read_file(self):
         '''Getting everything from file'''
@@ -237,7 +236,7 @@ class SSNI:
                 if option:
                     contents.append(from_entry)
 
-        elif button_name == 'SEARCH':
+        else:
             if from_entry in contents:
                 messagebox.showinfo('Exists', f'"{from_entry}" is in file')
 
@@ -247,9 +246,7 @@ class SSNI:
                 if option:
                     contents.append(from_entry)
 
-        self.video_entry.delete(0, END)
-        self.video_entry.insert(END, 'Video Name')
-        self.video_entry.config(fg='grey')
+        self.config_entry(self.video_entry, 'grey', True)
 
         self.insert_text_area(contents)
         self.master.focus()
@@ -276,10 +273,8 @@ class SSNI:
 
             self.insert_text_area(contents)
 
-            for widget, text in {self.old_name_entry: 'Old Name', self.new_name_entry: 'New Name'}.items():
-                widget.delete(0, END)
-                widget.insert(END, text)
-                widget.config(fg='grey')
+            for widget in [self.old_name_entry, self.new_name_entry]:
+                self.config_entry(widget, 'grey', True)
 
             self.master.focus()
             messagebox.showinfo('Renamed', f'{old_name} renamed to {new_name}')
