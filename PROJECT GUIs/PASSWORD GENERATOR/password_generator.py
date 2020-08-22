@@ -1,9 +1,11 @@
 import os
 import sys
+import wincap
 import string
 import random
 import pyperclip
 from tkinter import *
+import tkinter.ttk as ttk
 from tkinter import messagebox
 
 
@@ -14,20 +16,21 @@ class Password_Generator:
         self.master.resizable(0, 0)
         self.master.title('Password GENERATOR')
         self.master.iconbitmap(self.resource_path('included_files/icon.ico'))
-        self.master.geometry(f'362x529+{self.master.winfo_screenwidth() // 2 - 362 // 2}+{self.master.winfo_screenheight() // 2 - 529 // 2}')
 
-        self.title = Label(self.master, text='Password GENERATOR', font=('Calibri', 20))
-        self.title.pack(pady=5)
+        self.width, self.height = 310, 505
+        self.master.geometry(f'{self.width}x{self.height}+{self.master.winfo_screenwidth() // 2 - self.width // 2}+{self.master.winfo_screenheight() // 2 - self.height // 2}')
 
+        self.cap = wincap.CAP(self.master)
         self.image = PhotoImage(file=self.resource_path('included_files/title_image.png'))
-
         self.image_label = Label(self.master, image=self.image)
         self.image_label.pack(pady=5)
 
         self.number_box_var = StringVar()
-        self.number_box = Entry(self.master, width=25, fg='grey', font=('Calibri', 12), justify='center', textvariable=self.number_box_var)
+        self.number_box_style = ttk.Style()
+        self.number_box_style.configure('N.TEntry', foreground='grey', font=('Calibri', 12))
+        self.number_box = ttk.Entry(self.master, width=35, textvariable=self.number_box_var, style='N.TEntry', justify='center')
         self.number_box_var.set('Number of Character')
-        self.number_box.pack(pady=5)
+        self.number_box.pack(pady=5, ipady=3)
 
         self.check_box_frame = Frame(self.master)
         self.check_box_items = ['UPPERCASE', 'LOWERCASE', 'NUMBERS', 'SPECIAL CHARACTERS', 'ALL']  # Options for generating password
@@ -35,18 +38,21 @@ class Password_Generator:
         self.upper_var, self.lower_var, self.num_var, self.special_var, self.all_var = IntVar(), IntVar(), IntVar(), IntVar(), IntVar()
         self.vars = [self.upper_var, self.lower_var, self.num_var, self.special_var, self.all_var]
 
+        self.check_box_style = ttk.Style()
+        self.check_box_style.configure('C.TCheckbutton', font=('Calibri', 12))
         for index, value in enumerate(self.check_box_items):  # Creating Checkbuttons as per name in "self.check_box_items" and variables as per in self.vars
-            self.check_box = Checkbutton(self.check_box_frame, text=value, anchor='w', bd=0, variable=self.vars[index], font=('Calibri', 12))
+            self.check_box = ttk.Checkbutton(self.check_box_frame, text=value, variable=self.vars[index], cursor='hand2', style='C.TCheckbutton')
             self.check_box.grid(row=index, column=0, sticky='w')
 
-        self.check_box_frame.pack(pady=5)
+        self.check_box_frame.pack(pady=10)
 
         self.generate_password_button = Button(self.master, text='Generate Password', bg='Green', fg='white', activeforeground='white', activebackground='Green', font=('Calibri', 12), relief=FLAT, cursor='hand2', command=self.generate_button)
-        self.generate_password_button.pack(pady=5)
+        self.generate_password_button.pack(pady=10)
 
         self.password_label = Label(self.master, font=('Calibri', 20))
         self.copy_button = Button(self.master, text='Copy', width=6, bg='Green', fg='white', activeforeground='white', activebackground='Green', font=('Calibri', 12), relief=FLAT, cursor='hand2', command=self.copy_to_clipboard)
 
+        self.master.bind('<Control-g>', lambda e: self.cap.capture('1.png'))
         self.master.bind('<Button-1>', self.bind_keys)
         self.number_box.bind('<FocusIn>', self.bind_keys)
         self.number_box.bind('<Return>', self.generate_button)
@@ -66,12 +72,12 @@ class Password_Generator:
         if event.widget == self.number_box and not focus_out:
             if get == 'Number of Character':
                 self.number_box_var.set('')
-                self.number_box.config(fg='black')
+                self.number_box_style.configure('N.TEntry', foreground='black', font=('Calibri', 12))
 
         elif focus_out or event.widget != self.number_box:
             if not get:
                 self.number_box_var.set('Number of Character')
-                self.number_box.config(fg='grey')
+                self.number_box_style.configure('N.TEntry', foreground='grey', font=('Calibri', 12))
 
         if event.widget != self.number_box:
             self.master.focus()
@@ -105,7 +111,7 @@ class Password_Generator:
             self.password_label.config(text=password)
             self.password_label.pack()
 
-            self.master.geometry(f'362x546')
+            self.master.geometry(f'{self.width}x{self.height + 15}')
             self.copy_button.pack(side=RIGHT)
 
         except ValueError:
