@@ -23,15 +23,19 @@ class FILE_MOVER:
         self.master.title('File MOVER')
         self.master.iconbitmap(self.resource_path('included_files/icon.ico'))
 
-        self.title_label = Label(self.master, text='File MOVER', fg='silver', background='green', font=('Times New Roman', 32, 'bold'))
+        self.title_label = Label(self.master, text='File MOVER', fg='white', background='green', font=('Times New Roman', 32, 'bold'))
         self.title_label.pack(pady=5)
 
         self.from_entry_var, self.to_entry_var = StringVar(), StringVar()
-        self.from_entry = Entry(self.master, width=40, fg='grey', justify='center', textvariable=self.from_entry_var)
+        self.from_entry_style = ttk.Style()
+        self.from_entry_style.configure('F.TEntry', foreground='grey')
+        self.from_entry = ttk.Entry(self.master, width=40, justify='center', textvariable=self.from_entry_var, style='F.TEntry')
         self.from_entry_var.set('From Path')
         self.from_entry.pack(ipady=2)
 
-        self.to_entry = Entry(self.master, width=40, fg='grey', justify='center', textvariable=self.to_entry_var)
+        self.to_entry_style = ttk.Style()
+        self.to_entry_style.configure('T.TEntry', foreground='grey')
+        self.to_entry = ttk.Entry(self.master, width=40, justify='center', textvariable=self.to_entry_var, style='T.TEntry')
         self.to_entry_var.set('To Path')
         self.to_entry.pack(pady=10, ipady=2)
 
@@ -40,13 +44,13 @@ class FILE_MOVER:
         self.combo_box.pack(ipady=1)
 
         self.style = ttk.Style()
-        self.style.configure('S.TRadiobutton', foreground='silver', background='green')
+        self.style.configure('S.TRadiobutton', foreground='white', background='green')
 
         self.var = IntVar()
         self.radio_submit_buttons_frame = Frame(self.master, bg='green')
         self.radio_button_frame = Frame(self.radio_submit_buttons_frame, bg='green')
-        self.copy_radio_button = ttk.Radiobutton(self.radio_button_frame, text='COPY', variable=self.var, value=1, style='S.TRadiobutton')
-        self.move_radio_button = ttk.Radiobutton(self.radio_button_frame, text='MOVE', variable=self.var, value=2, style='S.TRadiobutton')
+        self.copy_radio_button = ttk.Radiobutton(self.radio_button_frame, text='COPY', variable=self.var, value=1, style='S.TRadiobutton', cursor='hand2')
+        self.move_radio_button = ttk.Radiobutton(self.radio_button_frame, text='MOVE', variable=self.var, value=2, style='S.TRadiobutton', cursor='hand2')
 
         self.submit_button_frame = Frame(self.radio_submit_buttons_frame)
         self.submit_button = Button(self.submit_button_frame, text='SUBMIT', fg='white', bg='green', activebackground='green', activeforeground='white', cursor='hand2', relief=RIDGE, command=self.submit_command)
@@ -77,29 +81,29 @@ class FILE_MOVER:
         if event.widget == self.from_entry or focus_out:
             if get_from_entry == 'From Path' and not focus_out:
                 self.from_entry_var.set('')
-                self.from_entry.config(fg='black')
+                self.from_entry_style.configure('F.TEntry', foreground='black')
 
             if not get_to_entry:
                 self.to_entry_var.set('To Path')
-                self.to_entry.config(fg='grey')
+                self.to_entry_style.configure('T.TEntry', foreground='grey')
 
         elif event.widget == self.to_entry:
             if get_to_entry == 'To Path':
                 self.to_entry_var.set('')
-                self.to_entry.config(fg='black')
+                self.to_entry_style.configure('T.TEntry', foreground='black')
 
             if not get_from_entry:
                 self.from_entry_var.set('From Path')
-                self.from_entry.config(fg='grey')
+                self.from_entry_style.configure('F.TEntry', foreground='grey')
 
         if event.widget not in [self.from_entry, self.to_entry]:
             if not get_from_entry:
                 self.from_entry_var.set('From Path')
-                self.from_entry.config(fg='grey')
+                self.from_entry_style.configure('F.TEntry', foreground='grey')
 
             if not get_to_entry:
                 self.to_entry_var.set('To Path')
-                self.to_entry.config(fg='grey')
+                self.to_entry_style.configure('T.TEntry', foreground='grey')
 
             self.master.focus()
 
