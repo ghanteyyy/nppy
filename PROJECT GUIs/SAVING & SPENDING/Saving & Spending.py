@@ -67,12 +67,14 @@ class Saving_Spending:
         self.back_button_button.config(command=lambda: self.back_button_command(self.home_frame, 'Saving & Spending'))
 
         self.text_area_frame = Frame(self.earned_spent_frame)
-        self.text_area = Text(self.text_area_frame, width=47, height=27, highlightcolor='grey', highlightthickness=2, cursor='arrow')
+        self.text_area = Text(self.text_area_frame, width=47, height=27, cursor='arrow')
         self.text_area.grid(row=0, column=0)
         self.text_area_frame.place(x=450, y=50)
 
         self.scrollbar = Scrollbar(self.text_area_frame, orient="vertical", command=self.text_area.yview)
         self.text_area['yscrollcommand'] = self.scrollbar.set
+        self.scrollbar.grid(column=1, row=0, sticky=N + S)
+        self.text_area.config(yscrollcommand=self.scrollbar.set)
 
         self.title_frame = Frame(self.earned_spent_frame, bg='White')
         self.title_label = Label(self.title_frame, text=text, bg='White', fg='Black', font=self.font2, takefocus=False)
@@ -118,7 +120,6 @@ class Saving_Spending:
             self.label.pack(anchor='center')
 
         self.text_area.config(state=DISABLED)
-        self.master.after(0, lambda: self.show_scrollbar(self.text_area, self.scrollbar))
 
     def add_saving_or_spending_window(self):
         '''Create window to enter source of spending'''
@@ -146,41 +147,43 @@ class Saving_Spending:
 
         self.earn_frame = Frame(self.add_earned_spent_frame, bg='white', height=250, highlightthickness=1, highlightbackground='silver')
         self.earn_label = Label(self.earn_frame, padx=20, pady=20, bg='White', font=self.font1, text='Source of Money', takefocus=False)
-        self.source_of_money = Entry(self.earn_frame, width=50, bg='White', highlightthickness=2, highlightbackground='silver')
+        self.source_of_money = ttk.Entry(self.earn_frame, width=50)
         self.earn_label.grid(row=0, column=0)
         self.source_of_money.grid(row=0, column=1)
         self.earn_frame.place(x=350, y=150)
 
         self.entry_label = Label(self.earn_frame, padx=20, pady=20, bg='White', text='Amount', font=self.font1, takefocus=False)
-        self.money_entry_box = Entry(self.earn_frame, bg='White', width=50, highlightthickness=2, highlightbackground='silver')
+        self.money_entry_box = ttk.Entry(self.earn_frame, width=50)
         self.entry_label.grid(row=1, column=0)
         self.money_entry_box.grid(row=1, column=1, padx=10)
 
-        self.check_button_frame = Frame(self.add_earned_spent_frame)
-        self.add_check_button = Checkbutton(self.check_button_frame, bd=0, text='ADD', anchor='e', bg='White', variable=self.var_one, onvalue=1, activebackground='white')
-        self.del_check_button = Checkbutton(self.check_button_frame, bd=0, bg='White', anchor='w', variable=self.var_two, text='DELETE', onvalue=1, offvalue=0, padx=20, activebackground='white')
-        self.add_check_button.grid(row=2, column=0, padx=0, sticky='ewns')
-        self.del_check_button.grid(row=2, column=1, padx=0, sticky='ewns')
-        self.check_button_frame.place(x=548, y=290)
+        self.checkbutton_style = ttk.Style()
+        self.checkbutton_style.configure('C.TCheckbutton', background='white')
+        self.check_button_frame = Frame(self.add_earned_spent_frame, bg='white')
+        self.add_check_button = ttk.Checkbutton(self.check_button_frame, text='ADD', variable=self.var_one, style='C.TCheckbutton', cursor='hand2')
+        self.del_check_button = ttk.Checkbutton(self.check_button_frame, text='DELETE', variable=self.var_two, style='C.TCheckbutton', cursor='hand2')
+        self.add_check_button.grid(row=2, column=0, sticky='ewns')
+        self.del_check_button.grid(row=2, column=1, padx=21, sticky='ewns')
+        self.check_button_frame.place(x=545, y=290)
 
         self.check_button_frame_two = Frame(self.add_earned_spent_frame)
-        self.earn_check_button = Checkbutton(self.check_button_frame_two, bd=0, text='INCOME', anchor='e', bg='White', variable=self.var_three, onvalue=1, activebackground='white')
-        self.expenditure_check_button = Checkbutton(self.check_button_frame_two, bd=0, text='SPENT', anchor='w', bg='White', variable=self.var_four, onvalue=1, activebackground='white')
+        self.earn_check_button = ttk.Checkbutton(self.check_button_frame_two, text='INCOME', variable=self.var_three, style='C.TCheckbutton', cursor='hand2')
+        self.expenditure_check_button = ttk.Checkbutton(self.check_button_frame_two, text='SPENT', variable=self.var_four, style='C.TCheckbutton', cursor='hand2')
         self.earn_check_button.grid(row=0, column=0)
         self.expenditure_check_button.grid(row=0, column=1)
-        self.check_button_frame_two.place(x=548, y=312)
+        self.check_button_frame_two.place(x=545, y=312)
 
         self.delete_check_button_frame = Frame(self.add_earned_spent_frame)
-        self.delete_all_button = Checkbutton(self.delete_check_button_frame, text='DELETE ALL', bg='White', variable=self.var_five, onvalue=1, activebackground='white')
+        self.delete_all_button = ttk.Checkbutton(self.delete_check_button_frame, text='DELETE ALL', variable=self.var_five, style='C.TCheckbutton', cursor='hand2')
         self.delete_all_button.grid(row=0, column=0)
-        self.delete_check_button_frame.place(x=548, y=334)
+        self.delete_check_button_frame.place(x=545, y=334)
 
         self.edit_frame = Frame(self.add_earned_spent_frame)
-        self.edit_check_box = Checkbutton(self.edit_frame, text='EDIT', bg='White', variable=self.var_six, onvalue=1, command=self.edit_window, activebackground='white')
+        self.edit_check_box = ttk.Checkbutton(self.edit_frame, text='EDIT', variable=self.var_six, command=self.edit_window, style='C.TCheckbutton', cursor='hand2')
         self.edit_check_box.grid(row=0, column=0)
-        self.edit_frame.place(x=548, y=357)
+        self.edit_frame.place(x=545, y=357)
 
-        self.submit_button = Button(self.earn_frame, height=4, width=16, fg='white', bg='#01912f', activebackground='#01912f', activeforeground='white', text='SUBMIT', font=self.font1, cursor='hand2', command=lambda: self.add_details(self.source_of_money, self.money_entry_box, self._vars))
+        self.submit_button = Button(self.earn_frame, text='SUBMIT', height=4, width=16, fg='white', bg='#01912f', activebackground='#01912f', activeforeground='white', font=self.font1, cursor='hand2', command=lambda: self.add_details(self.source_of_money, self.money_entry_box, self._vars))
         self.submit_button.grid(row=3, column=1, pady=11, padx=5, sticky='e')
 
     def edit_window(self):
@@ -203,23 +206,23 @@ class Saving_Spending:
 
         self.m_frame = Frame(self.edit_window_frame, bg='white', height=250, highlightthickness=1, highlightbackground='silver')
         self.source_label = Label(self.m_frame, padx=20, pady=20, bg='White', font=self.font1, text='Source of Money', takefocus=False)
-        self.source_entry_box = Entry(self.m_frame, width=50, bg='White', highlightthickness=2, highlightbackground='silver')
+        self.source_entry_box = ttk.Entry(self.m_frame, width=50)
         self.source_label.grid(row=0, column=0)
         self.source_entry_box.grid(row=0, column=1)
         self.m_frame.place(x=300, y=80)
 
         self.new_source_label = Label(self.m_frame, padx=20, pady=20, bg='White', font=self.font1, text='New Source of Money', takefocus=False)
-        self.new_source_entry_box = Entry(self.m_frame, width=50, bg='White', highlightthickness=2, highlightbackground='silver')
+        self.new_source_entry_box = ttk.Entry(self.m_frame, width=50)
         self.new_source_label.grid(row=1, column=0)
         self.new_source_entry_box.grid(row=1, column=1)
 
         self.old_money_label = Label(self.m_frame, padx=20, pady=20, bg='White', text='Old Amount', font=self.font1, takefocus=False)
-        self.old_money_entry = Entry(self.m_frame, bg='White', width=50, highlightthickness=2, highlightbackground='silver')
+        self.old_money_entry = ttk.Entry(self.m_frame, width=50)
         self.old_money_label.grid(row=2, column=0)
         self.old_money_entry.grid(row=2, column=1, padx=10)
 
         self.new_money_label = Label(self.m_frame, padx=20, pady=20, bg='White', text='New Amount', font=self.font1, takefocus=False)
-        self.new_money_entry = Entry(self.m_frame, bg='White', width=50, highlightthickness=2, highlightbackground='silver')
+        self.new_money_entry = ttk.Entry(self.m_frame, width=50)
         self.new_money_label.grid(row=3, column=0)
         self.new_money_entry.grid(row=3, column=1, padx=10)
 
@@ -228,36 +231,14 @@ class Saving_Spending:
         self.style.configure('R.TRadiobutton', background='white', foreground='black')
 
         self.radio_button_frame = Frame(self.edit_window_frame, bg='white')
-        self.save_radio_buttons = ttk.Radiobutton(self.radio_button_frame, text='Saving', value=1, variable=self.var, style='R.TRadiobutton')
-        self.spend_radio_buttons = ttk.Radiobutton(self.radio_button_frame, text='Spending', value=2, variable=self.var, style='R.TRadiobutton')
+        self.save_radio_buttons = ttk.Radiobutton(self.radio_button_frame, text='Saving', value=1, variable=self.var, style='R.TRadiobutton', cursor='hand2')
+        self.spend_radio_buttons = ttk.Radiobutton(self.radio_button_frame, text='Spending', value=2, variable=self.var, style='R.TRadiobutton', cursor='hand2')
         self.save_radio_buttons.grid(row=0, column=0)
         self.spend_radio_buttons.grid(row=0, column=1)
         self.radio_button_frame.place(x=720, y=320)
 
-        self.append_button = Button(self.m_frame, height=3, width=16, fg='white', bg='#01912f', activebackground='#01912f', activeforeground='white', text='APPEND', font=self.font1, command=lambda: self.edit_command(self.source_entry_box, self.new_source_entry_box, self.old_money_entry, self.new_money_entry, self.var))
+        self.append_button = Button(self.m_frame, height=3, width=16, fg='white', bg='#01912f', activebackground='#01912f', activeforeground='white', text='APPEND', font=self.font1, cursor='hand2', command=lambda: self.edit_command(self.source_entry_box, self.new_source_entry_box, self.old_money_entry, self.new_money_entry, self.var))
         self.append_button.grid(row=4, column=1, pady=11, padx=5, sticky='e')
-
-    def show_scrollbar(self, _text_widget, _scrollbar):
-        '''show scrollbar when text is more than the text area'''
-
-        if _text_widget.cget('height') < int(_text_widget.index('end-1c').split('.')[0]):
-            scrollbar.grid(column=1, row=0, sticky=N + S)
-            _text_widget.config(yscrollcommand=_scrollbar.set)
-            self.master.after(100, lambda: self.hide_scrollbar(_text_widget, _scrollbar))
-
-        else:
-            self.master.after(100, lambda: self.show_scrollbar(_text_widget, _scrollbar))
-
-    def hide_scrollbar(self, _text_widget, _scrollbar):
-        '''hide scrollbar when text is less than the text area'''
-
-        if _text_widget.cget('height') >= int(_text_widget.index('end-1c').split('.')[0]):
-            _scrollbar.grid_forget()
-            _text_widget.config(yscrollcommand=None)
-            self.master.after(100, lambda: self.show_scrollbar(_text_widget, _scrollbar))
-
-        else:
-            self.master.after(100, lambda: self.hide_scrollbar(_text_widget, _scrollbar))
 
     def back_button_command(self, add_frame, title):
         '''Command when user clicks back button'''
