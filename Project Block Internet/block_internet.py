@@ -4,10 +4,9 @@ from datetime import datetime as dt
 
 
 class Block_Internet:
-    '''Blocks internet access to the provided sites '''
+    '''Blocks INTERNET access to the provided sites '''
 
     def __init__(self, starting_time=10, ending_time=17):
-        self.newline = False
         self.localhost = '127.0.0.1'
         self.site_file = 'sites.txt'
         self.ending_time = ending_time
@@ -26,62 +25,52 @@ class Block_Internet:
     def is_working_hour(self):
         '''Checking if it is still working hour'''
 
-        if dt(dt.now().year, dt.now().month, dt.now().day, self.starting_time) < dt.now() < dt(dt.now().year, dt.now().month, dt.now().day, self.ending_time):
-            return True
-
-        return False
+        return dt(dt.now().year, dt.now().month, dt.now().day, self.starting_time) < dt.now() < dt(dt.now().year, dt.now().month, dt.now().day, self.ending_time)
 
     def read_file(self, file):
         '''Reading hosts file'''
 
         with open(file, 'r') as f:
-            lines = [file.strip('\n') for file in f.readlines()]
+            return [line.strip('\n') for line in f.readlines() if line.strip('\n')]
 
-            return lines
+    def write_file(self, contents):
+        '''Writing site with localhost in the hostfile'''
 
-    def remove_last_newlines(self):
-        '''Removing all blank_lines from the files'''
-
-        with open(self.host_file, 'r') as f:
-            contents = f.read().strip('\n')
+        is_newline = False
 
         with open(self.host_file, 'w') as f:
-            f.write(contents)
+            for content in contents:
+                if content.startswith(self.localhost) and not is_newline:  # Adding newline before adding any site in the host_file
+                    f.write(f'\n{content}\n')
+                    is_newline = True
+
+                else:
+                    f.write(f'{content}\n')
 
     def main(self):
-        '''Blocking internet'''
+        '''Blocking INTERNET'''
 
         lines = self.read_file(self.host_file)
         sites = self.read_file(self.site_file)
 
         if self.is_working_hour():
-            with open(self.host_file, 'a') as f:
-                if not self.newline:
-                    f.write('\n')
-                    self.newline = True
+            for site in sites:
+                exclude = f'{self.localhost} \t{site}'
 
-                for site in sites:
-                    exclude = f'{self.localhost} \t{site}'
-
-                    if exclude not in lines:    # writing 127.0.0.1 "site name" to the file if there is not which means no access to that site
-                        f.write(f'{exclude}\n')
+                if exclude not in lines:
+                    lines.append(exclude)
 
         else:
-            with open(self.host_file, 'w') as f:
-                for line in lines:
-                    if not line.startswith(self.localhost):   # Removing all added sites
-                        f.write(f'{line}\n')
+            lines = [line for line in lines if not line.startswith(self.localhost)]
 
-            self.newline = False
-            self.remove_last_newlines()
+        self.write_file(lines)
 
 
 if __name__ == '__main__':
-    run = True
     block_internet = Block_Internet()
 
     if block_internet.is_admin():
-        while run:
+        while True:
             block_internet.main()
 
     else:
