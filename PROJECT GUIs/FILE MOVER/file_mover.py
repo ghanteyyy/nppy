@@ -23,7 +23,7 @@ class FILE_MOVER:
         self.master.title('File MOVER')
         self.master.iconbitmap(self.resource_path('included_files/icon.ico'))
 
-        self.title_label = Label(self.master, text='File MOVER', fg='white', background='green', font=('Times New Roman', 32, 'bold'))
+        self.title_label = Label(self.master, text='File MOVER', fg='white', background='green', font=('Helvetica', 32, 'bold'))
         self.title_label.pack(pady=5)
 
         self.from_entry_var, self.to_entry_var = StringVar(), StringVar()
