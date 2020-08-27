@@ -1,9 +1,7 @@
 import os
 import sys
-import wincap
 import string
 import random
-import pyperclip
 from tkinter import *
 import tkinter.ttk as ttk
 from tkinter import messagebox
@@ -20,7 +18,6 @@ class Password_Generator:
         self.width, self.height = 310, 505
         self.master.geometry(f'{self.width}x{self.height}+{self.master.winfo_screenwidth() // 2 - self.width // 2}+{self.master.winfo_screenheight() // 2 - self.height // 2}')
 
-        self.cap = wincap.CAP(self.master)
         self.image = PhotoImage(file=self.resource_path('included_files/title_image.png'))
         self.image_label = Label(self.master, image=self.image)
         self.image_label.pack(pady=5)
@@ -40,6 +37,7 @@ class Password_Generator:
 
         self.check_box_style = ttk.Style()
         self.check_box_style.configure('C.TCheckbutton', font=('Calibri', 12))
+
         for index, value in enumerate(self.check_box_items):  # Creating Checkbuttons as per name in "self.check_box_items" and variables as per in self.vars
             self.check_box = ttk.Checkbutton(self.check_box_frame, text=value, variable=self.vars[index], cursor='hand2', style='C.TCheckbutton')
             self.check_box.grid(row=index, column=0, sticky='w')
@@ -50,7 +48,7 @@ class Password_Generator:
         self.generate_password_button.pack(pady=10)
 
         self.password_label = Label(self.master, font=('Calibri', 20))
-        self.copy_button = Button(self.master, text='Copy', width=6, bg='Green', fg='white', activeforeground='white', activebackground='Green', font=('Calibri', 12), relief=FLAT, cursor='hand2', command=self.copy_to_clipboard)
+        self.copy_button = Button(self.master, text='Copy', width=6, bd=0, bg='Green', fg='white', activeforeground='white', activebackground='Green', font=('Calibri', 12), relief=FLAT, cursor='hand2', command=self.copy_to_clipboard)
 
         self.master.bind('<Control-g>', lambda e: self.cap.capture('1.png'))
         self.master.bind('<Button-1>', self.bind_keys)
@@ -93,9 +91,13 @@ class Password_Generator:
         text = self.password_label['text']
 
         if text:
-            pyperclip.copy(text)
+            self.master.clipboard_clear()  # Clearing everything from the clipboard
+            self.master.clipboard_append(text)  # Adding the randomly generated password to the clipboard
             self.copy_button['text'] = 'Copied!'
             self.master.after(1000, lambda: self.copy_button.config(text='Copy'))
+
+        else:
+            messagebox.showerror('ERROR', 'Not yet generated password')
 
     def generate_button(self, event=None):
         '''Command when user clicks generate button'''
