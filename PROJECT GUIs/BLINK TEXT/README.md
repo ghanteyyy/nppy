@@ -2,4 +2,4 @@
 
 Blink any text per second
 
-<img src="included_files/1.jpg">
+<img src="included_files/1.png">

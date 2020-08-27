@@ -30,7 +30,7 @@ class Birthday_Remainder:
         self.name_label = Label(self.label_entry_frame, text='Name', fg='white', font=('Courier', 12), bg='dark green')
         self.name_box = Entry(self.label_entry_frame, width=30)
         self.name_label.grid(row=0, column=0)
-        self.name_box.grid(row=0, column=1, padx=30, pady=20)
+        self.name_box.grid(row=0, column=1, padx=30, pady=20, ipady=2)
 
         self.birthday_label = Label(self.label_entry_frame, text='Date of Birth', fg='white', font=('Courier', 12), bg='dark green')
         self.birthday_label.grid(row=1, column=0)
@@ -45,15 +45,15 @@ class Birthday_Remainder:
         self.date_box.set('Select Date')
         self.date_box.grid(row=0, column=1, padx=5)
 
-        self.combo_box_frame.place(x=235, y=300)
+        self.combo_box_frame.place(x=235, y=305)
 
         self.var = IntVar()
         self.style = ttk.Style()
         self.style.configure('R.TRadiobutton', background='dark green', foreground='white')
 
         self.radio_frame = Frame(self.master, bg='dark green')
-        self.add_radio_button = ttk.Radiobutton(self.radio_frame, text='Add', value=1, variable=self.var, style='R.TRadiobutton')
-        self.delete_radio_button = ttk.Radiobutton(self.radio_frame, text='Delete', value=2, variable=self.var, style='R.TRadiobutton')
+        self.add_radio_button = ttk.Radiobutton(self.radio_frame, text='Add', value=1, variable=self.var, style='R.TRadiobutton', cursor='hand2')
+        self.delete_radio_button = ttk.Radiobutton(self.radio_frame, text='Delete', value=2, variable=self.var, style='R.TRadiobutton', cursor='hand2')
         self.add_radio_button.grid(row=0, column=0, padx=10)
         self.delete_radio_button.grid(row=0, column=1)
         self.radio_frame.place(x=255, y=350)
