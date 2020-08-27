@@ -17,13 +17,13 @@ class Infinity_Countdown:
         self.time = Label(self.master, fg='silver', text='00:00:00', font=("Helvetica", 40), bg='dark blue')
         self.time.pack(side='bottom')
 
-        self.start_button = Button(self.master, text='START', font=("Arial", 16), bg='dark blue', fg='white', activebackground='dark blue', width=8, command=self.start)
+        self.start_button = Button(self.master, text='START', font=("Arial", 16), bg='dark blue', fg='white', activebackground='dark blue', width=8, cursor='hand2', command=self.start)
         self.start_button.pack(side='left')
 
-        self.pause_button = Button(self.master, text='PAUSE', font=("Arial", 16), bg='dark blue', fg='white', activebackground='dark blue', width=8, state='disabled', command=self.pause)
+        self.pause_button = Button(self.master, text='PAUSE', font=("Arial", 16), bg='dark blue', fg='white', activebackground='dark blue', width=8, state='disabled', cursor='hand2', command=self.pause)
         self.pause_button.pack(side='left')
 
-        self.reset_button = Button(self.master, text='RESET', font=("Arial", 16), bg='dark blue', fg='white', activebackground='dark blue', width=10, state='disabled', command=self.reset)
+        self.reset_button = Button(self.master, text='RESET', font=("Arial", 16), bg='dark blue', fg='white', activebackground='dark blue', width=10, state='disabled', cursor='hand2', command=self.reset)
         self.reset_button.pack(side='left', fill='both')
 
         self.hour = 0
