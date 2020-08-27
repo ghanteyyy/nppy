@@ -2,7 +2,7 @@
 
 <img src="included_files/1.png">
 
-TUTION, a python script thats let you:
+**A python script that lets you:**
 
 ## [Store]
 
