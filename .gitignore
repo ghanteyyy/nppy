@@ -1,6 +1,7 @@
 SSNI/
 *.txt
 icons/
+*.json
 wincap/
 OTHERS/
 Packages/
