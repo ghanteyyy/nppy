@@ -9,6 +9,22 @@ from tkinter import messagebox
 from tkinter.ttk import Scrollbar
 
 
+class Widgets:
+    '''Create label and text_widgets for displaying corresponding values'''
+
+    def __init__(self, container_frame, text, width=13):
+            self.label_text_frame = Frame(container_frame, bg='silver')
+            self.label = Label(self.label_text_frame, text=text, bg='silver', font=('Courier', 12))
+            self.label.pack()
+
+            self.text_frame = Frame(self.label_text_frame, bg='silver')
+            self.text_widget = Text(self.text_frame, width=width, height=10, cursor='arrow')
+            self.text_widget.pack(side=LEFT)
+            self.text_frame.pack()
+
+            self.label_text_frame.pack(side=LEFT)
+
+
 class Tution:
     def __init__(self):
         self.success = False
@@ -61,72 +77,25 @@ class Tution:
         self.add_details_frame.pack(pady=10)
 
         self.container_frame = Frame(self.master, bg='silver')
-        self.student_name_frame = Frame(self.container_frame, bg='silver')
-        self.fee_frame = Frame(self.container_frame, bg='silver')
-        self.join_date_frame = Frame(self.container_frame, bg='silver')
-        self.prev_pay_frame = Frame(self.container_frame, bg='silver')
-        self.next_pay_frame = Frame(self.container_frame, bg='silver')
-        self.left_frame = Frame(self.container_frame, bg='silver')
-        self.late_pay_frame = Frame(self.container_frame, bg='silver')
+        self.container_frame.pack(padx=3)
 
-        self.label_font = ('Courier', 12)
-
-        self.student_name_label = Label(self.student_name_frame, text='NAME', bg='silver', font=self.label_font)
-        self.student_name_label.pack()
-        self.student_name_text = Text(self.student_name_frame, width=18, height=10, cursor='arrow')
-        self.student_name_text.pack(pady=5)
-
-        self.fee_label = Label(self.fee_frame, text='FEE', bg='silver', font=self.label_font)
-        self.fee_label.pack()
-        self.fee_text = Text(self.fee_frame, width=10, height=10)
-        self.fee_text.pack(pady=5)
-
-        self.join_date_label = Label(self.join_date_frame, text='Joined', bg='silver', font=self.label_font)
-        self.join_date_label.pack()
-        self.join_date_text = Text(self.join_date_frame, width=13, height=10)
-        self.join_date_text.pack(pady=5)
-
-        self.prev_pay_label = Label(self.prev_pay_frame, text='Prev Pay', bg='silver', font=self.label_font)
-        self.prev_pay_label.pack()
-        self.prev_pay_text = Text(self.prev_pay_frame, width=13, height=10)
-        self.prev_pay_text.pack(pady=5)
-
-        self.next_pay_label = Label(self.next_pay_frame, text='Next Pay', bg='silver', font=self.label_font)
-        self.next_pay_label.pack()
-        self.next_pay_text = Text(self.next_pay_frame, width=13, height=10)
-        self.next_pay_text.pack(pady=5)
-
-        self.left_label = Label(self.left_frame, text='LEFT', bg='silver', font=self.label_font)
-        self.left_label.pack()
-        self.left_text = Text(self.left_frame, width=13, height=10)
-        self.left_text.pack(pady=5)
-
-        self.late_pay_label = Label(self.late_pay_frame, text='LATE PAY', bg='silver', font=self.label_font)
-        self.late_pay_label.pack()
-
-        self.late_pay_text_frame = Frame(self.late_pay_frame)
-        self.late_pay_text = Text(self.late_pay_text_frame, width=13, height=10)
-        self.late_pay_text.pack(side=LEFT)
+        # Creating text-widgets and labels
+        self.student_name = Widgets(self.container_frame, 'NAME', 18)
+        self.student_fee = Widgets(self.container_frame, 'FEE', 10)
+        self.join_date = Widgets(self.container_frame, 'JOINED')
+        self.prev_pay = Widgets(self.container_frame, 'PREV PAY')
+        self.next_pay = Widgets(self.container_frame, 'NEXT PAY')
+        self.left = Widgets(self.container_frame, 'LEFT')
+        self.late = Widgets(self.container_frame, 'LATE PAY')
 
         # Adding scrollbar
-        self.text_widgets = [self.student_name_text, self.fee_text, self.join_date_text, self.left_text]
+        self.text_widgets = [self.student_name.text_widget, self.student_fee.text_widget, self.join_date.text_widget, self.prev_pay.text_widget, self.next_pay.text_widget, self.left.text_widget, self.late.text_widget]
 
-        self.scrollbar = Scrollbar(self.late_pay_text_frame, orient="vertical", command=self.multiple_yview)
+        self.scrollbar = Scrollbar(self.late.text_frame, orient="vertical", command=self.multiple_yview)
         self.scrollbar.pack(side=LEFT, fill='y')
-        self.late_pay_text_frame.pack(pady=5)
 
         for widgets in self.text_widgets:  # Setting scrollbar for all text_widgets
             widgets.config(yscrollcommand=self.scrollbar.set)
-
-        self.student_name_frame.pack(side=LEFT)
-        self.fee_frame.pack(side=LEFT)
-        self.join_date_frame.pack(side=LEFT)
-        self.prev_pay_frame.pack(side=LEFT)
-        self.next_pay_frame.pack(side=LEFT)
-        self.left_frame.pack(side=LEFT)
-        self.late_pay_frame.pack(side=LEFT)
-
-        self.container_frame.pack(padx=3)
 
         self.master.bind('<Button-1>', self.widgets_bindings)
         self.entry_name.bind('<FocusIn>', self.widgets_bindings)
@@ -145,7 +114,7 @@ class Tution:
 
         self.master.resizable(0, 0)
         self.master.iconbitmap(self.resource_path('included_files\\icon.ico'))
-        width, height = self.master.winfo_width(), self.master.winfo_height()
+        width, height = self.master.winfo_width(), self.master.winfo_height() + 5
         screenwidth, screenheight = self.master.winfo_screenwidth() // 2, self.master.winfo_screenheight() // 2
         self.master.geometry(f'{width}x{height}+{screenwidth - width // 2}+{screenheight - height // 2}')
 
@@ -248,7 +217,7 @@ class Tution:
         return f'{next_payment.year}-{calendar.month_abbr[next_payment.month]}-{str(next_payment.day).zfill(2)}'
 
     def add_command(self, name, fee, month, day, var):
-        '''When user selects REMOVE checkbutton and clicks SUBMIT button'''
+        '''When user selects REMOVE check-button and clicks SUBMIT button'''
 
         joined_str = f'{datetime.date.today().year}-{month}-{str(day).zfill(2)}'
         next_pay = self.get_next_payment_date(joined_str)
@@ -267,7 +236,7 @@ class Tution:
             return head
 
     def remove_command(self, name):
-        '''When user selects ADD checkbutton and clicks SUBMIT button'''
+        '''When user selects ADD check-button and clicks SUBMIT button'''
 
         contents = self.read_json()
 
@@ -310,15 +279,15 @@ class Tution:
         else:
             contents = self.add_command(name, fee, month, day, var)
 
-        if self.success:
-            self.success = False
-            self.write_json(contents)
+            if self.success:
+                self.success = False
+                self.write_json(contents)
 
-            self.reset()
-            self.insert_at_first()
+                self.reset()
+                self.insert_at_first()
 
     def reset(self):
-        '''Reset entries buttons and radiobutton to initial state'''
+        '''Reset entries buttons and radio-button to initial state'''
 
         self.entry_fee_style.configure('EntryFee.TEntry', foreground='silver')
         self.entry_name_style.configure('EntryName.TEntry', foreground='silver')
@@ -334,11 +303,9 @@ class Tution:
         self.master.focus()
 
     def config_text_widget(self, state, clear=False):
-        '''Enabling TEXT widgets to insert datas and Disabling them after all data has been inserted'''
+        '''Enabling TEXT widgets to insert data and Disabling them after all data has been inserted'''
 
-        widgets = [self.fee_text, self.left_text, self.student_name_text, self.prev_pay_text, self.next_pay_text, self.join_date_text, self.late_pay_text]
-
-        for widget in widgets:
+        for widget in self.text_widgets:
             widget.config(state=state, cursor='arrow')
 
             if clear:
@@ -374,7 +341,7 @@ class Tution:
                 prev_pay_obj = datetime.date(year=joined_obj.year, month=joined_obj.month, day=joined_obj.day)
 
             if left <= 0:  # When its the day to get pay
-                if messagebox.askyesno('Got Payemnt?', f'Did you get paid from {name}?'):
+                if messagebox.askyesno('Got Payment?', f'Did you get paid from {name}?'):
                     late_pay = today.day - prev_pay_obj.day
 
                     prev_pay = f'{today.year}-{calendar.month_abbr[today.month]}-{str(today.day).zfill(2)}'
@@ -404,7 +371,11 @@ class Tution:
                 else:  # If there is not last payment in the file
                     late_pay = '0 days'
 
-            for widget, text in {self.fee_text: fee, self.left_text: f'{left} days', self.join_date_text: joined, self.next_pay_text: next_pay, self.late_pay_text: late_pay, self.student_name_text: name, self.prev_pay_text: prev_pay}.items():
+            # Creating dictionary of text_widgets and its corresponding values for insertion
+            values = [name, fee, joined, prev_pay, next_pay, f'{left} days', late_pay]
+            _dict = {widget: values[index] for index, widget in enumerate(self.text_widgets)}
+
+            for widget, text in _dict.items():
                 widget.insert(END, f'{text}\n')
 
         self.master.focus()
