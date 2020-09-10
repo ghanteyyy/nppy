@@ -13,16 +13,16 @@ class Widgets:
     '''Create label and text_widgets for displaying corresponding values'''
 
     def __init__(self, container_frame, text, width=13):
-            self.label_text_frame = Frame(container_frame, bg='silver')
-            self.label = Label(self.label_text_frame, text=text, bg='silver', font=('Courier', 12))
-            self.label.pack()
+        self.label_text_frame = Frame(container_frame, bg='silver')
+        self.label = Label(self.label_text_frame, text=text, bg='silver', font=('Courier', 12))
+        self.label.pack()
 
-            self.text_frame = Frame(self.label_text_frame, bg='silver')
-            self.text_widget = Text(self.text_frame, width=width, height=10, cursor='arrow')
-            self.text_widget.pack(side=LEFT)
-            self.text_frame.pack()
+        self.text_frame = Frame(self.label_text_frame, bg='silver')
+        self.text_widget = Text(self.text_frame, width=width, height=10, cursor='arrow')
+        self.text_widget.pack(side=LEFT)
+        self.text_frame.pack()
 
-            self.label_text_frame.pack(side=LEFT)
+        self.label_text_frame.pack(side=LEFT)
 
 
 class Tution:
