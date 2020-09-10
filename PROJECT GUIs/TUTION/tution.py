@@ -332,18 +332,14 @@ class Tution:
 
             if prev_pay:
                 prev_pay = prev_pay[-1]
-                prev_pay_obj = datetime.datetime.strptime(prev_pay, '%Y-%b-%d')
-                prev_pay_obj = datetime.date(year=prev_pay_obj.year, month=prev_pay_obj.month, day=prev_pay_obj.day)
 
             else:
                 prev_pay = 'Not Yet'
-                joined_obj = datetime.datetime.strptime(joined, '%Y-%b-%d')
-                prev_pay_obj = datetime.date(year=joined_obj.year, month=joined_obj.month, day=joined_obj.day)
 
             if left <= 0:  # When its the day to get pay
-                if messagebox.askyesno('Got Payment?', f'Did you get paid from {name}?'):
-                    late_pay = today.day - prev_pay_obj.day
+                late_pay = (today - next_pay_obj).days
 
+                if messagebox.askyesno('Got Payment?', f'Did you get paid from {name}?'):
                     prev_pay = f'{today.year}-{calendar.month_abbr[today.month]}-{str(today.day).zfill(2)}'
                     contents[name]['prev_pay'].append(prev_pay)
 
@@ -357,10 +353,7 @@ class Tution:
 
                     late_pay = contents[name]['late_pay'][str(today)]
 
-                else:  # If user don't get payment in exact next_pay date
-                    late_pay = f'{today.day - next_pay_obj.day} days'
-
-                if left < 0:
+                if left < 0:  # When user does not get paid then it becomes late_pay where left becomes negative. So, in that case left becomes 0
                     left = '0'
 
             else:  # When its not the time to get pay
