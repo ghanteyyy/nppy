@@ -9,6 +9,7 @@ from tkinter import messagebox
 
 class Quiz:
     def __init__(self):
+        self.prev_widget = ''
         self.quiz_numbers = []
         self.file_name = 'quiz.json'
 
@@ -93,7 +94,7 @@ class Quiz:
                           self.pick_question_entry: (self.pick_question_entry_style, 'QN.TEntry')}
 
         for wid in entries_widgets:
-            if not wid.get().strip():
+            if not wid.get().strip() and widget != self.prev_widget:
                 wid.delete(0, END)
                 wid.insert(END, entries_widgets[wid])
                 style, style_name = entries_styles[wid]
@@ -113,6 +114,7 @@ class Quiz:
         if widget in entries_widgets:
             if widget.get().strip() == entries_widgets[widget]:
                 widget.delete(0, END)
+                self.prev_widget = widget
                 style, style_name = entries_styles[widget]
                 style.configure(style_name, foreground='black')
 
@@ -156,11 +158,9 @@ class Quiz:
 
         if question in ['', 'QUESTION']:
             messagebox.showerror('Invalid Entry', 'Provide a valid question')
-            self.master.focus()
 
         elif answer in ['', 'ANSWER']:
             messagebox.showerror('Invalid Entry', 'Provide a valid answer')
-            self.master.focus()
 
         else:
             contents = self.read_json()
