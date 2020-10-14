@@ -8,7 +8,7 @@ class About:
     def __init__(self, master):
         self.master = master
         self.author_page_link = 'http://github.com/ghanteyyy'
-        self.source_code_link = 'http://github.com/ghanteyyy/Project GUIs/ZPAD'
+        self.source_code_link = 'https://github.com/ghanteyyy/nppy/tree/master/PROJECT GUIs/ZPAD'
 
         self.top_level = Toplevel(self.master)
         self.top_level.grab_set()
@@ -66,7 +66,7 @@ class About:
     def initial_position(self):
         '''Set initial position of the about window'''
 
-        width, height = 400, 130
+        width, height = 460, 130
         master_width, master_height = self.master.winfo_width() // 2, self.master.winfo_height() // 2
         offset_x, offset_y = self.master.winfo_x() + master_width - width // 2, self.master.winfo_y() + master_height - height // 2
         self.top_level.geometry(f'{width}x{height}+{offset_x}+{offset_y}')
