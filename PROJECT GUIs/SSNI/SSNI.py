@@ -8,6 +8,7 @@ from tkinter.ttk import Scrollbar
 
 class SSNI:
     def __init__(self):
+        self.after_id = None
         self.file_name = 'video_file.txt'
 
         self.master = Tk()
@@ -212,23 +213,25 @@ class SSNI:
         '''Commands when user clicks either ADD, REMOVE or SEARCH buttons'''
 
         contents = self.read_file()
-        from_entry = self.video_entry.get().strip().title()
+        from_entry = self.video_entry.get().strip()
 
         if not from_entry or from_entry == 'Video Name':
             messagebox.showerror('Invalid Name', 'No Name given')
 
         elif button_name == 'ADD':
             if from_entry in contents:
-                messagebox.showinfo('Already Exists', f'"{from_entry}" is already in file')
+                self.highlight(from_entry, '#784da8')
 
             else:
                 contents.append(from_entry)
-                messagebox.showinfo('Value Added', f'"{from_entry}" added in file')
+                self.insert_text_area(contents)
+                self.highlight(from_entry, 'green')
 
         elif button_name == 'REMOVE':
             if from_entry in contents:
                 contents.remove(from_entry)
-                messagebox.showinfo('Value Removed', f'"{from_entry}" reomved from file')
+                self.highlight(from_entry, 'red')
+                self.master.after(3000, lambda: self.insert_text_area(contents))
 
             else:
                 option = messagebox.askyesno('Add Value?', f'"{from_entry}" not in file. Do you want to add it?')
@@ -238,7 +241,7 @@ class SSNI:
 
         else:
             if from_entry in contents:
-                messagebox.showinfo('Exists', f'"{from_entry}" is in file')
+                self.highlight(from_entry, '#00b3ff')
 
             else:
                 option = messagebox.askyesno('Add Value?', f'"{from_entry}" not in file. Do you want to add it?')
@@ -247,8 +250,6 @@ class SSNI:
                     contents.append(from_entry)
 
         self.config_entry(self.video_entry, 'grey', True)
-
-        self.insert_text_area(contents)
         self.master.focus()
 
     def rename_command(self, event=None):
@@ -256,7 +257,7 @@ class SSNI:
 
         contents = self.read_file()
         old_name = self.old_name_entry.get().strip()
-        new_name = self.new_name_entry.get().strip().title()
+        new_name = self.new_name_entry.get().strip()
 
         if old_name in ['', 'Old Name'] or new_name in ['', 'New Name']:
             messagebox.showerror('Invalid Video Name', 'The input video name is invlaid')
@@ -277,7 +278,21 @@ class SSNI:
                 self.config_entry(widget, 'grey', True)
 
             self.master.focus()
-            messagebox.showinfo('Renamed', f'{old_name} renamed to {new_name}')
+            self.highlight(new_name, '#ff006f')
+
+    def highlight(self, value, color):
+        '''Fill color when value is added, removed and searched'''
+
+        line = self.text_area.search(value, '1.0', 'end')
+        self.text_area.tag_add('highlight', line, f'{line.split(".")[0]}.end+1c')
+        self.text_area.tag_config('highlight', background=color, foreground='white')
+        self.text_area.see(f'{line}+2lines')
+
+        if self.after_id:
+            self.master.after_cancel(self.after_id)
+            self.after_id = None
+
+        self.after_id = self.master.after(3000, lambda: self.text_area.tag_delete('highlight'))
 
     def resource_path(self, relative_path):
         '''Get absolute path to resource from temporary directory
