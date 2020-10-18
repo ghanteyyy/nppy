@@ -212,6 +212,7 @@ class SSNI:
     def add_remove_search_command(self, button_name):
         '''Commands when user clicks either ADD, REMOVE or SEARCH buttons'''
 
+        success = False
         contents = self.read_file()
         from_entry = self.video_entry.get().strip()
 
@@ -223,9 +224,7 @@ class SSNI:
                 self.highlight(from_entry, '#784da8')
 
             else:
-                contents.append(from_entry)
-                self.insert_text_area(contents)
-                self.highlight(from_entry, 'green')
+                success = True
 
         elif button_name == 'REMOVE':
             if from_entry in contents:
@@ -237,17 +236,22 @@ class SSNI:
                 option = messagebox.askyesno('Add Value?', f'"{from_entry}" not in file. Do you want to add it?')
 
                 if option:
-                    contents.append(from_entry)
+                    success = True
 
         else:
             if from_entry in contents:
-                self.highlight(from_entry, '#00b3ff')
+                self.highlight(from_entry, '#784da8')
 
             else:
                 option = messagebox.askyesno('Add Value?', f'"{from_entry}" not in file. Do you want to add it?')
 
                 if option:
-                    contents.append(from_entry)
+                    success = True
+
+        if success:
+            contents.append(from_entry)
+            self.insert_text_area(contents)
+            self.highlight(from_entry, 'green')
 
         self.config_entry(self.video_entry, 'grey', True)
         self.master.focus()
