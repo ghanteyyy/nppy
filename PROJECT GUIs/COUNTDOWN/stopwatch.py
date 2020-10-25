@@ -1,5 +1,4 @@
 import time
-import wincap
 from tkinter import *
 from tkinter import font
 
@@ -30,7 +29,6 @@ class StopWatch:
         self.reset_button = Button(self.buttons_frame, text='Reset', width=7, font=font.Font(size=15), cursor='hand2', bg='dark blue', fg='white', activebackground='dark blue', activeforeground='white', command=self.reset)
         self.reset_button.grid(row=0, column=1, padx=10)
 
-        self.master.bind('<Control-g>', lambda e: wincap.CAP(self.master).capture('included_files\\4.png'))
         self.master.after(0, self.initial_position)
         self.master.mainloop()
 
