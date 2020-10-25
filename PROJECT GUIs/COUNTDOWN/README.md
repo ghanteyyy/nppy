@@ -15,3 +15,7 @@ Countdown zero to infinity having functionality to pause and reset the running t
 Countdown to the given amount of hour, minute and second having functionality to pause and reset the running time
 
 <img src="included_files/3.png">
+
+# STOPWATCH
+
+<img src="included_files/4.png">
