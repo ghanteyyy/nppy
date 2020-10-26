@@ -1,6 +1,7 @@
 import os
 import sys
 from tkinter import *
+from tkinter import messagebox
 
 
 class Custom_Countdown:
@@ -9,29 +10,29 @@ class Custom_Countdown:
         self.master.withdraw()
         self.master.after(0, self.master.deiconify)
         self.master.title('CUSTOM COUNTDOWN')
-        self.master.geometry(f'342x81+{self.master.winfo_screenwidth() // 2 - 342 // 2}+{self.master.winfo_screenheight() // 2 - 81 // 2}')
+        self.master.geometry(f'295x88+{self.master.winfo_screenwidth() // 2 - 295 // 2}+{self.master.winfo_screenheight() // 2 - 88 // 2}')
         self.master.resizable(0, 0)
         self.master.iconbitmap(self.resource_path('included_files/icon.ico'))
 
-        self.start_button = Button(self.master, text='START', font=("Courier", 16), bg='dark blue', fg='white', activebackground='dark blue', width=8, cursor='hand2', command=self.start)
+        self.buttons_attributes = {'font': ('Courier', 16), 'bg': 'dark blue', 'fg': 'white', 'activebackground': 'dark blue', 'width': 11, 'cursor': 'hand2'}
+        self.entry_attributes = {'width': 5, 'justify': 'center', 'font': ('Courier', 18, 'bold'), 'disabledforeground': 'black'}
+
+        self.start_button = Button(self.master, text='START', **self.buttons_attributes, command=self.start)
         self.start_button.grid(row=1, column=0, sticky='e')
 
-        self.pause_button = Button(self.master, text='PAUSE', font=("Courier", 16), bg='dark blue', fg='white', activebackground='dark blue', width=8, cursor='hand2', state='disabled', command=self.pause)
-        self.pause_button.grid(row=1, column=1)
-
-        self.reset_button = Button(self.master, text='RESET', font=("Courier", 16), bg='dark blue', fg='white', activebackground='dark blue', width=8, cursor='hand2', state='disabled', command=self.reset)
+        self.reset_button = Button(self.master, text='RESET', **self.buttons_attributes, command=self.reset)
         self.reset_button.grid(row=1, column=2)
 
         self.hr_var, self.min_var, self.sec_var = StringVar(), StringVar(), StringVar()
 
         self.time_frame = Frame(self.master, bg='dark blue')
-        self.hour_entry = Entry(self.time_frame, bg='red', width=5, textvariable=self.hr_var, justify='center', font=("Courier", 18, 'bold'), disabledbackground='red', disabledforeground='black')
+        self.hour_entry = Entry(self.time_frame, bg='red', textvariable=self.hr_var, disabledbackground='red', **self.entry_attributes)
         self.hour_entry.grid(row=0, column=0, padx=2, pady=5)
-        self.minute_entry = Entry(self.time_frame, bg='orange', width=5, textvariable=self.min_var, justify='center', font=("Courier", 18, 'bold'), disabledbackground='orange', disabledforeground='black')
+        self.minute_entry = Entry(self.time_frame, bg='orange', textvariable=self.min_var, disabledbackground='orange', **self.entry_attributes)
         self.minute_entry.grid(row=0, column=1, padx=2, pady=5)
-        self.second_entry = Entry(self.time_frame, bg='brown', width=5, textvariable=self.sec_var, justify='center', font=("Courier", 18, 'bold'), disabledbackground='brown', disabledforeground='black')
+        self.second_entry = Entry(self.time_frame, bg='brown', textvariable=self.sec_var, disabledbackground='brown', **self.entry_attributes)
         self.second_entry.grid(row=0, column=2, padx=2, pady=5)
-        self.time_frame.grid(row=2, column=0, columnspan=3)
+        self.time_frame.grid(row=2, column=0, columnspan=3, pady=5)
 
         self.hour_entry.insert(END, 'HH')
         self.minute_entry.insert(END, 'MM')
@@ -50,15 +51,12 @@ class Custom_Countdown:
         self.second_entry.bind('<Return>', self.start)
 
         self.start_button.bind('<Return>', self.start)
-        self.pause_button.bind('<Return>', self.pause)
         self.reset_button.bind('<Return>', self.reset)
 
         self.master['bg'] = 'dark blue'
 
-        self.hour = 0
-        self.minute = 0
-        self.second = 0
-        self.pause = False
+        self.is_paused = False
+        self.hour, self.minute, self.second = 0, 0, 0
 
         self.master.mainloop()
 
@@ -76,30 +74,20 @@ class Custom_Countdown:
             widget.insert(END, text)
             widget.focus()
 
-    def activate_deactivate_buttons(self, widgets=None, entries=None):
-        '''Enable or disable buttons or entry_boxes'''
-
-        if widgets:   # Enabling or disabling buttons
-            for widget, state in widgets.items():
-                widget.config(state=state)
-
-        if entries:   # Enabling or disabling entry_boxes
-            for widget in entries[0]:
-                widget.config(state=entries[1][0], cursor=entries[1][1])
-
-    def pause(self, event=None):
-        '''Command for self.pause button'''
-
-        self.pause = True
-        self.activate_deactivate_buttons(widgets={self.pause_button: 'disabled'}, entries=[(self.hour_entry, self.minute_entry, self.second_entry), ('normal', 'xterm')])
-
     def reset(self, event=None):
         '''Command for RESET button'''
 
-        self.pause = True
-        self.activate_deactivate_buttons(widgets={self.start_button: 'normal', self.pause_button: 'disabled', self.reset_button: 'disabled'}, entries=[(self.hour_entry, self.minute_entry, self.second_entry), ('normal', 'xterm')])
+        self.is_paused = False
+        self.change_state('normal')
         self.set_var('HH', 'MM', 'SS')
+        self.start_button.config(text='START')
         self.hour, self.minute, self.second = 0, 0, 0
+
+        try:
+            self.master.after_cancel(self.timer)
+
+        except AttributeError:
+            pass
 
     def set_var(self, hrs, mins, secs):
         '''Appending hour, minute and second values'''
@@ -111,55 +99,62 @@ class Custom_Countdown:
     def Counter(self):
         '''Updating hour, minute and seconds'''
 
-        if self.pause is False:
-            self.activate_deactivate_buttons(widgets={self.start_button: 'disabled'})
+        if self.hour == self.minute == self.second == 0:
+            messagebox.showinfo('Finished', 'Time UP!')
+            self.reset()
+            return
 
-            if self.hour == self.minute == self.second == 0:
-                self.reset()
-                self.activate_deactivate_buttons(entries=[(self.hour_entry, self.minute_entry, self.second_entry), ('normal', 'xterm')])
-                return
-
-            elif self.second == self.minute == 0:
-                self.hour -= 1
-                self.second = 60
-                self.minute = 59
-
-            elif self.second == 0:
-                self.minute -= 1
-                self.second = 60
-
-            self.second -= 1
-
-            self.set_var(self.hour, self.minute, self.second)
-            self.master.after(1000, self.Counter)
-
-        else:
-            self.activate_deactivate_buttons(widgets={self.start_button: 'normal'})
-
-    def start(self, event=None):
-        '''Command for START button'''
-
-        self.pause = False
-
-        get_hour, get_minute, get_second = self.hour_entry.get().strip(), self.minute_entry.get().strip(), self.second_entry.get().strip()
-
-        if not get_hour or not get_hour.isdigit():
-            self.hour = 24
-
-        elif not get_minute or not get_minute.isdigit():
+        elif self.second == self.minute == 0:
+            self.hour -= 1
+            self.second = 60
             self.minute = 59
 
-        elif not get_second or not get_second.isdigit():
+        elif self.second == 0:
+            self.minute -= 1
             self.second = 60
 
-        else:
-            self.hour, self.minute, self.second = int(get_hour), int(get_minute), int(get_second)
+        self.second -= 1
 
         self.set_var(self.hour, self.minute, self.second)
+        self.timer = self.master.after(1000, self.Counter)
 
-        self.activate_deactivate_buttons(widgets={self.start_button: 'disabled', self.pause_button: 'normal', self.reset_button: 'normal'}, entries=[(self.hour_entry, self.minute_entry, self.second_entry), ('disabled', 'arrow')])
-        self.master.focus()
-        self.master.after(1000, self.Counter)
+    def start(self, event=None):
+        '''Command for START / PAUSE button'''
+
+        if not self.is_paused:  # When user clicks "START" button
+            self.is_paused = True
+            self.change_state('disabled')
+            self.start_button.config(text='PAUSE')
+            get_hour, get_minute, get_second = self.hour_entry.get().strip(), self.minute_entry.get().strip(), self.second_entry.get().strip()
+
+            if not get_hour or not get_hour.isdigit():
+                self.hour = 24
+
+            elif not get_minute or not get_minute.isdigit():
+                self.minute = 59
+
+            elif not get_second or not get_second.isdigit():
+                self.second = 60
+
+            else:
+                self.hour, self.minute, self.second = int(get_hour), int(get_minute), int(get_second)
+
+            self.set_var(self.hour, self.minute, self.second)
+
+            self.master.focus()
+            self.master.after(1000, self.Counter)
+
+        else:  # When user "PASTE" button
+            self.is_paused = False
+            self.change_state('normal')
+            self.master.after_cancel(self.timer)
+            self.start_button.config(text='START')
+
+    def change_state(self, state):
+        '''Change the state of entries widget as per "state" parameter '''
+
+        for entry in [self.hour_entry, self.minute_entry, self.second_entry]:
+            entry.config(state=state)
 
     def resource_path(self, relative_path):
         '''Get absolute path to resource from temporary directory
