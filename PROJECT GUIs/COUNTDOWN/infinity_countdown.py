@@ -9,77 +9,68 @@ class Infinity_Countdown:
         self.master.withdraw()
         self.master.after(0, self.master.deiconify)
         self.master.title('INFINITY COUNTDOWN')
-        self.master.geometry('{}x{}+{}+{}'.format(342, 108, self.master.winfo_screenwidth() // 2 - 342 // 2, self.master.winfo_screenheight() // 2 - 108 // 2))
+        self.master.geometry('{}x{}+{}+{}'.format(295, 108, self.master.winfo_screenwidth() // 2 - 342 // 2, self.master.winfo_screenheight() // 2 - 108 // 2))
         self.master.resizable(0, 0)
         self.master.iconbitmap(self.resource_path('included_files/icon.ico'))
         self.master.config(bg='dark blue')
 
+        self.buttons_attributes = {'font': ('Arial', 16), 'fg': 'white', 'bg': 'dark blue', 'activebackground': 'dark blue', 'activeforeground': 'white', 'cursor': 'hand2', 'width': 12, 'takefocus': False}
         self.time = Label(self.master, fg='silver', text='00:00:00', font=("Helvetica", 40), bg='dark blue')
         self.time.pack(side='bottom')
 
-        self.start_button = Button(self.master, text='START', font=("Arial", 16), bg='dark blue', fg='white', activebackground='dark blue', width=8, cursor='hand2', command=self.start)
-        self.start_button.pack(side='left')
+        self.start_pause_button = Button(self.master, text='START', **self.buttons_attributes, command=self.start)
+        self.start_pause_button.pack(side='left')
 
-        self.pause_button = Button(self.master, text='PAUSE', font=("Arial", 16), bg='dark blue', fg='white', activebackground='dark blue', width=8, state='disabled', cursor='hand2', command=self.pause)
-        self.pause_button.pack(side='left')
-
-        self.reset_button = Button(self.master, text='RESET', font=("Arial", 16), bg='dark blue', fg='white', activebackground='dark blue', width=10, state='disabled', cursor='hand2', command=self.reset)
+        self.reset_button = Button(self.master, text='RESET', **self.buttons_attributes, command=self.reset)
         self.reset_button.pack(side='left', fill='both')
 
-        self.hour = 0
-        self.minute = 0
-        self.second = 0
-        self.pause = False
+        self.hour = self.minute = self.second = 0
+        self.is_paused = False
 
         self.master.mainloop()
 
     def start(self):
         '''Command for START button'''
 
-        self.pause = False
-        self.start_button['state'] = 'disabled'
-        self.pause_button['state'] = 'normal'
-        self.reset_button['state'] = 'normal'
-        self.master.after(1000, self.Counter)
+        if not self.is_paused:
+            self.is_paused = True
+            self.start_pause_button.config(text='PAUSE')
+            self.master.after(1000, self.Counter)
 
-    def pause(self):
-        '''Command for PAUSE button'''
-
-        self.pause = True
-        self.pause_button['state'] = 'disabled'
+        else:
+            self.is_paused = False
+            self.master.after_cancel(self.timer)
+            self.start_pause_button.config(text="START")
 
     def reset(self):
         '''Command for RESET button'''
 
-        self.pause = True
-        self.pause_button['state'] = 'disabled'
-        self.reset_button['state'] = 'disabled'
+        self.is_paused = False
         self.time['text'] = '00:00:00'
+        self.hour = self.minute = self.second = 0
 
-        self.hour, self.minute, self.second = 0, 0, 0
+        try:
+            self.master.after_cancel(self.timer)
+
+        except AttributeError:
+            pass
 
     def Counter(self):
         '''Updating hour, minute and seconds'''
 
-        if self.pause is False:
-            self.start_button['state'] = 'disabled'
+        if self.second == self.minute == 59:
+            self.hour += 1
+            self.minute = 0
+            self.second = -1
 
-            if self.second == self.minute == 59:
-                self.hour += 1
-                self.minute = 0
-                self.second = -1
+        elif self.second == 59:
+            self.minute += 1
+            self.second = -1
 
-            elif self.second == 59:
-                self.minute += 1
-                self.second = -1
+        self.second += 1
 
-            self.second += 1
-
-            self.time.config(text='{}:{}:{}'.format(str(self.hour).zfill(2), str(self.minute).zfill(2), str(self.second).zfill(2)))
-            self.master.after(1000, self.Counter)
-
-        else:
-            self.start_button['state'] = 'normal'
+        self.time.config(text='{}:{}:{}'.format(str(self.hour).zfill(2), str(self.minute).zfill(2), str(self.second).zfill(2)))
+        self.timer = self.master.after(1000, self.Counter)
 
     def resource_path(self, relative_path):
         '''Get absolute path to resource from temporary directory
