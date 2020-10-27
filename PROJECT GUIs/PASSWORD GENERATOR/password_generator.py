@@ -2,6 +2,7 @@ import os
 import sys
 import string
 import random
+import pyperclip
 from tkinter import *
 import tkinter.ttk as ttk
 from tkinter import messagebox
@@ -91,8 +92,7 @@ class Password_Generator:
         text = self.password_label['text']
 
         if text:
-            self.master.clipboard_clear()  # Clearing everything from the clipboard
-            self.master.clipboard_append(text)  # Adding the randomly generated password to the clipboard
+            pyperclip.copy(text)
             self.copy_button['text'] = 'Copied!'
             self.master.after(1000, lambda: self.copy_button.config(text='Copy'))
 
