@@ -70,6 +70,7 @@ class To_Do_List:
         self.exit_button = Button(self.exit_frame, text='X', font=('Arial Black', 9, 'bold'), fg='white', bg='red', activebackground='red', activeforeground='white', bd=0, command=self.master.destroy)
         self.exit_button.grid(row=0, column=0, ipadx=2, ipady=1)
 
+        self.master.bind('<Button-3>', self.popup_menu)
         self.master.bind('<Button-1>', self.key_bindings)
         self.entry_box.bind('<FocusIn>', self.key_bindings)
         self.add_button.bind('<FocusIn>', self.key_bindings)
@@ -162,7 +163,17 @@ class To_Do_List:
         '''Display menu when right click is clicked'''
 
         try:
-            self.delete_menu.tk_popup(event.x_root, event.y_root, 0)
+            selection = self.list_box.curselection()
+
+            if selection:
+                self.delete_menu.entryconfig(0, state=NORMAL)
+                self.delete_menu.entryconfig(1, state=NORMAL)
+
+            else:
+                self.delete_menu.entryconfig(0, state=DISABLED)
+                self.delete_menu.entryconfig(1, state=DISABLED)
+
+            self.delete_menu.tk_popup(event.x_root, event.y_root)
 
         finally:
             self.delete_menu.grab_release()
