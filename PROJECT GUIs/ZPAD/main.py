@@ -6,6 +6,7 @@ import edit_menu
 import format_menu
 import view_menu
 import about
+import right_click
 
 
 class ZPAD:
@@ -37,7 +38,7 @@ class ZPAD:
 
         self.text_widget_frame = Frame(self.master, width=659, height=424)
         self.text_widget_frame.grid_propagate(False)
-        self.text_widget = Text(master=self.text_widget_frame, bd=0, undo=True, font=self.font)
+        self.text_widget = Text(master=self.text_widget_frame, bd=0, undo=True, font=self.font, maxundo=-1, autoseparators=True)
         self.vsb = Scrollbar(self.text_widget_frame, orient='vertical', command=self.text_widget.yview)
         self.hsb = Scrollbar(self.text_widget_frame, orient='horizontal', command=self.text_widget.xview)
         self.text_widget.configure(yscrollcommand=self.vsb.set, xscrollcommand=self.hsb.set)
@@ -133,40 +134,41 @@ class ZPAD:
         self.update_line_column()
         self.enable_disable_menu()
 
-        self.master.bind('<Key>', self.change_title)
+        self.text_widget.bind('<Button-3>', self.button_3)
         self.text_widget.bind('<Delete>', self.emc.delete)
         self.text_widget.bind('<Control-n>', self.fmc.new)
-        self.text_widget.bind('<Control-N>', self.fmc.new_window)
+        self.text_widget.bind('<Control-x>', self.emc.cut)
         self.text_widget.bind('<Control-o>', self.fmc.open)
         self.text_widget.bind('<Control-s>', self.fmc.save)
-        self.text_widget.bind('<Control-S>', self.fmc.save_as)
         self.text_widget.bind('<Control-q>', self.fmc.exit)
         self.text_widget.bind('<Control-z>', self.emc.undo)
         self.text_widget.bind('<Control-c>', self.emc.copy)
-        self.text_widget.bind('<Control-x>', self.emc.cut)
         self.text_widget.bind('<Control-v>', self.emc.paste)
-        self.text_widget.bind('<Control-a>', self.emc.select_all)
-        self.text_widget.bind('<Control-e>', self.emc.search_with_google)
-        self.text_widget.bind('<Control-f>', self.show_find_widget)
-        self.text_widget.bind('<Control-h>', self.show_replace_widget)
-        self.text_widget.bind('<Control-g>', self.emc.go_to_widget)
+        self.text_widget.bind('<Key>', self.remove_selection)
         self.text_widget.bind('<F5>', self.emc.get_date_time)
-        self.text_widget.bind('<Alt-Return>', self.activate_strip_whitespace)
-        self.text_widget.bind('<Alt-l>', lambda e: self.view_menu.invoke(3))
+        self.master.bind('<F12>', self.help_menu_commands[0])
+        self.text_widget.bind('<Control-S>', self.fmc.save_as)
+        self.master.protocol('WM_DELETE_WINDOW', self.fmc.exit)
+        self.text_widget.bind('<Control-a>', self.emc.select_all)
+        self.text_widget.bind('<Control-N>', self.fmc.new_window)
+        self.text_widget.bind('<Control-plus>', self.vmc.zoom_in)
+        self.text_widget.bind('<Button-1>', self.button_1_command)
+        self.text_widget.bind('<Control-minus>', self.vmc.zoom_out)
+        self.text_widget.bind('<Control-f>', self.show_find_widget)
+        self.text_widget.bind('<Control-g>', self.emc.go_to_widget)
+        self.text_widget.bind('<Control-0>', self.vmc.default_zoom)
+        self.text_widget.bind('<Double-Button-1>', self.double_click)
         self.master.bind('<F11>', lambda e: self.view_menu.invoke(2))
+        self.text_widget.bind('<Triple-Button-1>', self.triple_click)
         self.master.bind('<Alt-s>', lambda e: self.view_menu.invoke(1))
+        self.text_widget.bind('<Control-h>', self.show_replace_widget)
+        self.text_widget.bind('<Control-e>', self.emc.search_with_google)
+        self.master.after(0, lambda: include.initial_position(self.master))
+        self.text_widget.bind('<Alt-l>', lambda e: self.view_menu.invoke(3))
+        self.text_widget.bind('<Alt-Return>', self.activate_strip_whitespace)
         self.text_widget.bind('<Control-F>', lambda e: self.Fmc.font_selection())
         self.text_widget.bind('<Control-w>', lambda e: self.format_menu.invoke(0))
-        self.text_widget.bind('<Control-plus>', self.vmc.zoom_in)
-        self.text_widget.bind('<Control-minus>', self.vmc.zoom_out)
-        self.text_widget.bind('<Control-0>', self.vmc.default_zoom)
-        self.master.protocol('WM_DELETE_WINDOW', self.fmc.exit)
-        self.master.bind('<F12>', self.help_menu_commands[0])
-        self.text_widget.bind('<Button-1>', self.button_1_command)
-        self.text_widget.bind('<Double-Button-1>', self.double_click)
-        self.master.after(0, lambda: include.initial_position(self.master))
         self.text_widget.bind('<Configure>', lambda e: self.text_widget.configure(scrollregion=self.text_widget.bbox('end')))
-        self.text_widget.bind('<Triple-Button-1>', self.triple_click)
         self.master.mainloop()
 
     def button_1_command(self, event=None):
@@ -181,11 +183,19 @@ class ZPAD:
         if self.text_widget['insertofftime'] == 1000000:
             self.text_widget.config(insertofftime=300, insertontime=600)
 
-    def change_title(self, event=None):
-        '''Insert * to the title of the window when user makes any change to the content'''
+    def button_3(self, event=None):
+        '''When user right clicks'''
+
+        right_click.Right_Click(self.master, self.text_widget, self.fmc).show_popup(event=event)
+
+    def remove_selection(self, event=None):
+        '''Remove "found" and "triple_click" tags from the text_widget annd reset the blinking time to default'''
 
         if event.keysym in ['Up', 'Down', 'Right', 'Left']:
             self.button_1_command()
+
+    def change_title(self, event=None):
+        '''Insert * to the title of the window when user makes any change to the content'''
 
         title = self.master.title()
 
@@ -202,6 +212,7 @@ class ZPAD:
         line, column = tuple(self.text_widget.index(INSERT).split('.'))
         self.line_column_var.set(f'Ln {line}, Col {int(column) + 1}')
 
+        self.change_title()
         self.master.after(50, self.update_line_column)
 
     def enable_disable_menu(self):
