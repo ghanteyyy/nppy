@@ -69,6 +69,7 @@ class Edit_Menu:
                 self.text_widget.delete(f'{line}.0', f'{line}.end+1c')
 
         pyperclip.copy(text)
+        self.text_widget.config(insertofftime=300, insertontime=600)
 
         return 'break'
 
