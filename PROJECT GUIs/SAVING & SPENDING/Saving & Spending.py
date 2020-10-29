@@ -7,6 +7,8 @@ class Saving_Spending:
     def __init__(self):
         self.font1, self.font2 = ('Courier', 13), ('Courier', 30)
         self.saving_file, self.spent_file = 'saving.txt', 'spending.txt'
+        self.label_attributes = {'padx': 20, 'pady': 20, 'bg': 'white', 'font': self.font1, 'takefocus': False}
+        self.home_button_attributes = {'height': 3, 'width': 60, 'fg': 'white', 'activeforeground': 'white', 'cursor': 'hand2'}
 
         self.master = Tk()
         self.master.withdraw()
@@ -36,17 +38,17 @@ class Saving_Spending:
         self.label_image_frame.place(x=3, y=200)
 
         self.earned_button_frame = Frame(self.home_frame)
-        self.earned_button = Button(self.earned_button_frame, bd=3, bg='Red', activebackground='Red', activeforeground='white', height=3, width=60, fg='White', borderwidth=2, text='MY EARNING', cursor='hand2', command=lambda: self.show_details_window('Earned details', 'MY\n EARNING', 'save.png', self.saving_file, 'Not Earned Yet'))
+        self.earned_button = Button(self.earned_button_frame, bg='Red', activebackground='Red', text='MY EARNING', **self.home_button_attributes, command=lambda: self.show_details_window('Earned details', 'MY\n EARNING', 'save.png', self.saving_file, 'Not Earned Yet'))
         self.earned_button.grid(row=0, column=0)
         self.earned_button_frame.place(x=425, y=200)
 
         self.spent_button_frame = Frame(self.home_frame)
-        self.spent_button = Button(self.spent_button_frame, bd=3, height=3, width=60, fg='White', bg='#01912f', activebackground='#01912f', activeforeground='white', borderwidth=2, text='MY SPENDING', cursor='hand2', command=lambda: self.show_details_window('Spent details', 'MY\nSPENDING', 'spent.png', self.spent_file, 'Not Spent Yet'))
+        self.spent_button = Button(self.spent_button_frame, bg='#01912f', activebackground='#01912f', text='MY SPENDING', **self.home_button_attributes, command=lambda: self.show_details_window('Spent details', 'MY\nSPENDING', 'spent.png', self.spent_file, 'Not Spent Yet'))
         self.spent_button.grid(row=0, column=0)
         self.spent_button_frame.place(x=425, y=260)
 
         self.add_button_frame = Frame(self.home_frame)
-        self.add_button = Button(self.add_button_frame, bd=3, height=3, width=60, fg='White', bg='Purple', activebackground='Purple', activeforeground='white', borderwidth=2, text='ADD SOURCE OF EARNING | EXPENDITURE', cursor='hand2', command=self.add_saving_or_spending_window)
+        self.add_button = Button(self.add_button_frame, bg='Purple', activebackground='Purple', text='ADD SOURCE OF EARNING | EXPENDITURE', **self.home_button_attributes, command=self.add_saving_or_spending_window)
         self.add_button.grid(row=0, column=0)
         self.add_button_frame.place(x=425, y=320)
 
@@ -131,7 +133,7 @@ class Saving_Spending:
         self.back_button_frame.place(x=10, y=10)
         self.back_button_button.config(command=lambda: self.back_button_command(self.home_frame, 'Saving & Spending'))
 
-        self.var_one, self.var_two, self.var_three, self.var_four, self.var_five, self.var_six = IntVar(), IntVar(), IntVar(), IntVar(), IntVar(), IntVar()
+        self.var_one, self.var_two, self.var_three, self.var_four, self.var_five, self.var_six = (IntVar() for _ in range(6))
         self._vars = [self.var_one, self.var_two, self.var_three, self.var_four, self.var_five, self.var_six]
 
         self.title_frame = Frame(self.add_earned_spent_frame, bg='White')
@@ -146,13 +148,13 @@ class Saving_Spending:
         self.spent_image_frame.place(x=70, y=200)
 
         self.earn_frame = Frame(self.add_earned_spent_frame, bg='white', height=250, highlightthickness=1, highlightbackground='silver')
-        self.earn_label = Label(self.earn_frame, padx=20, pady=20, bg='White', font=self.font1, text='Source of Money', takefocus=False)
+        self.earn_label = Label(self.earn_frame, text='Source of Money', **self.label_attributes)
         self.source_of_money = ttk.Entry(self.earn_frame, width=50)
         self.earn_label.grid(row=0, column=0)
         self.source_of_money.grid(row=0, column=1)
         self.earn_frame.place(x=350, y=150)
 
-        self.entry_label = Label(self.earn_frame, padx=20, pady=20, bg='White', text='Amount', font=self.font1, takefocus=False)
+        self.entry_label = Label(self.earn_frame, text='Amount', **self.label_attributes)
         self.money_entry_box = ttk.Entry(self.earn_frame, width=50)
         self.entry_label.grid(row=1, column=0)
         self.money_entry_box.grid(row=1, column=1, padx=10)
@@ -205,23 +207,23 @@ class Saving_Spending:
         self.edit_frame.place(x=80, y=120)
 
         self.m_frame = Frame(self.edit_window_frame, bg='white', height=250, highlightthickness=1, highlightbackground='silver')
-        self.source_label = Label(self.m_frame, padx=20, pady=20, bg='White', font=self.font1, text='Source of Money', takefocus=False)
+        self.source_label = Label(self.m_frame, text='Source of Money', **self.label_attributes)
         self.source_entry_box = ttk.Entry(self.m_frame, width=50)
         self.source_label.grid(row=0, column=0)
         self.source_entry_box.grid(row=0, column=1)
         self.m_frame.place(x=300, y=80)
 
-        self.new_source_label = Label(self.m_frame, padx=20, pady=20, bg='White', font=self.font1, text='New Source of Money', takefocus=False)
+        self.new_source_label = Label(self.m_frame, text='New Source of Money', **self.label_attributes)
         self.new_source_entry_box = ttk.Entry(self.m_frame, width=50)
         self.new_source_label.grid(row=1, column=0)
         self.new_source_entry_box.grid(row=1, column=1)
 
-        self.old_money_label = Label(self.m_frame, padx=20, pady=20, bg='White', text='Old Amount', font=self.font1, takefocus=False)
+        self.old_money_label = Label(self.m_frame, text='Old Amount', **self.label_attributes)
         self.old_money_entry = ttk.Entry(self.m_frame, width=50)
         self.old_money_label.grid(row=2, column=0)
         self.old_money_entry.grid(row=2, column=1, padx=10)
 
-        self.new_money_label = Label(self.m_frame, padx=20, pady=20, bg='White', text='New Amount', font=self.font1, takefocus=False)
+        self.new_money_label = Label(self.m_frame, text='New Amount', **self.label_attributes)
         self.new_money_entry = ttk.Entry(self.m_frame, width=50)
         self.new_money_label.grid(row=3, column=0)
         self.new_money_entry.grid(row=3, column=1, padx=10)
