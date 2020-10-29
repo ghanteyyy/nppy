@@ -10,6 +10,7 @@ class SSNI:
     def __init__(self):
         self.after_id = None
         self.file_name = 'video_file.txt'
+        self.buttons_attributes = {'bg': 'green', 'fg': 'white', 'activebackground': 'green', 'activeforeground': 'white', 'cursor': 'hand2'}
 
         self.master = Tk()
         self.master.withdraw()
@@ -24,16 +25,16 @@ class SSNI:
         self.video_entry.insert(END, 'Video Name')
         self.video_entry.pack(pady=10, padx=10, ipady=3)
 
-        self.add_button = Button(self.first_left_frame, text='ADD', bg='green', fg='white', activebackground='green', activeforeground='white', cursor='hand2', command=lambda: self.add_remove_search_command(button_name='ADD'))
+        self.add_button = Button(self.first_left_frame, text='ADD', **self.buttons_attributes, command=lambda: self.add_remove_search_command(button_name='ADD'))
         self.add_button.pack(pady=5, ipady=3, ipadx=80)
 
-        self.remove_button = Button(self.first_left_frame, text='REMOVE', bg='green', fg='white', activebackground='green', activeforeground='white', cursor='hand2', command=lambda: self.add_remove_search_command(button_name='REMOVE'))
+        self.remove_button = Button(self.first_left_frame, text='REMOVE', **self.buttons_attributes, command=lambda: self.add_remove_search_command(button_name='REMOVE'))
         self.remove_button.pack(pady=5, ipady=3, ipadx=70)
 
-        self.search_button = Button(self.first_left_frame, text='SEARCH', bg='green', fg='white', activebackground='green', activeforeground='white', cursor='hand2', command=lambda: self.add_remove_search_command(button_name='SEARCH'))
+        self.search_button = Button(self.first_left_frame, text='SEARCH', **self.buttons_attributes, command=lambda: self.add_remove_search_command(button_name='SEARCH'))
         self.search_button.pack(pady=5, ipady=3, ipadx=70)
 
-        self.rename_window_button = Button(self.first_left_frame, text='RENAME', bg='green', fg='white', activebackground='green', activeforeground='white', cursor='hand2', command=self.rename_window)
+        self.rename_window_button = Button(self.first_left_frame, text='RENAME', **self.buttons_attributes, command=self.rename_window)
         self.rename_window_button.pack(pady=5, ipady=3, ipadx=69)
 
         self.first_left_frame.pack(padx=5, side=LEFT, ipady=2)
@@ -101,7 +102,7 @@ class SSNI:
 
         self.master.deiconify()
 
-    def config_entry(self, widget, color, insert=False):
+    def config_entry(self, widget, color, insert=True):
         '''Configure behaviour of entries widget when user clicks in or out of them'''
 
         widget.delete(0, END)
@@ -117,18 +118,18 @@ class SSNI:
         widget = event.widget
 
         if widget in self.widgets and widget.get().strip() == self.widgets[widget][0]:
-            self.config_entry(widget, 'black')
+            self.config_entry(widget, 'black', False)
 
             if widget == self.new_name_entry and not self.old_name_entry.get().strip():
-                self.config_entry(self.old_name_entry, 'grey', True)
+                self.config_entry(self.old_name_entry, 'grey')
 
             if widget == self.old_name_entry and not self.new_name_entry.get().strip():
-                self.config_entry(self.new_name_entry, 'grey', True)
+                self.config_entry(self.new_name_entry, 'grey')
 
         elif widget not in self.widgets or focus_out:
             for _widget in self.widgets:
                 if not _widget.get().strip():
-                    self.config_entry(_widget, 'grey', True)
+                    self.config_entry(_widget, 'grey')
 
         if widget in [self.master, self.rename_window_frame, self.first_left_frame]:
             self.master.focus()
@@ -209,6 +210,13 @@ class SSNI:
 
         self.text_area.config(state=DISABLED)
 
+        try:
+            self.text_area.yview(self.line)
+            self.line = None
+
+        except (AttributeError, TclError):
+            pass
+
     def add_remove_search_command(self, button_name):
         '''Commands when user clicks either ADD, REMOVE or SEARCH buttons'''
 
@@ -253,7 +261,7 @@ class SSNI:
             self.insert_text_area(contents)
             self.highlight(from_entry, 'green')
 
-        self.config_entry(self.video_entry, 'grey', True)
+        self.config_entry(self.video_entry, 'grey')
         self.master.focus()
 
     def rename_command(self, event=None):
@@ -279,7 +287,7 @@ class SSNI:
             self.insert_text_area(contents)
 
             for widget in [self.old_name_entry, self.new_name_entry]:
-                self.config_entry(widget, 'grey', True)
+                self.config_entry(widget, 'grey')
 
             self.master.focus()
             self.highlight(new_name, '#ff006f')
@@ -287,10 +295,10 @@ class SSNI:
     def highlight(self, value, color):
         '''Fill color when value is added, removed and searched'''
 
-        line = self.text_area.search(value, '1.0', 'end')
-        self.text_area.tag_add('highlight', line, f'{line.split(".")[0]}.end+1c')
+        self.line = self.text_area.search(value, '1.0', 'end')
+        self.text_area.tag_add('highlight', self.line, f'{self.line.split(".")[0]}.end+1c')
         self.text_area.tag_config('highlight', background=color, foreground='white')
-        self.text_area.see(f'{line}+2lines')
+        self.text_area.yview(self.line)
 
         if self.after_id:
             self.master.after_cancel(self.after_id)

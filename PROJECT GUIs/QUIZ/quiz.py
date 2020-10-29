@@ -12,6 +12,7 @@ class Quiz:
         self.prev_widget = ''
         self.quiz_numbers = []
         self.file_name = 'quiz.json'
+        self.buttons_attributes = {'fg': 'white', 'activeforeground': 'white', 'cursor': 'hand2', 'relief': RIDGE}
 
         self.master = Tk()
 
@@ -32,7 +33,7 @@ class Quiz:
         self.answer_entry.insert(END, 'ANSWER')
         self.answer_entry.pack(pady=5, ipady=3)
 
-        self.add_button = Button(self.add_labelframe, text='ADD QUESTION', bg='red', fg='white', activebackground='red', activeforeground='white', cursor='hand2', relief=RIDGE, command=self.add_button_command)
+        self.add_button = Button(self.add_labelframe, text='ADD QUESTION', bg='red', activebackground='red', **self.buttons_attributes, command=self.add_button_command)
         self.add_button.pack(pady=5, ipady=3, ipadx=73)
         self.add_labelframe.pack(pady=10, ipadx=10)
 
@@ -43,10 +44,10 @@ class Quiz:
         self.pick_question_entry.insert(END, 'QUESTION NUMBER')
         self.pick_question_entry.pack(pady=5, ipady=3)
 
-        self.pick_button = Button(self.pick_labelframe, text='PICK', bg='green', fg='white', activebackground='green', activeforeground='white', cursor='hand2', relief=RIDGE, command=self.manual_pick_question)
+        self.pick_button = Button(self.pick_labelframe, text='PICK', bg='green', activebackground='green', **self.buttons_attributes, command=self.manual_pick_question)
         self.pick_button.pack(pady=5, ipady=3, ipadx=107)
 
-        self.random_pick_button = Button(self.pick_labelframe, text='PICK RANDOM QUESTION', bg='blue', fg='white', activebackground='blue', activeforeground='white', cursor='hand2', relief=RIDGE, command=self.random_pick_question)
+        self.random_pick_button = Button(self.pick_labelframe, text='PICK RANDOM QUESTION', bg='blue', activebackground='blue', **self.buttons_attributes, command=self.random_pick_question)
         self.random_pick_button.pack(pady=5, ipady=3, ipadx=47)
         self.pick_labelframe.pack(ipadx=10)
 

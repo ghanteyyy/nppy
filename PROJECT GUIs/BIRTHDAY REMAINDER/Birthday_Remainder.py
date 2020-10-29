@@ -9,6 +9,7 @@ class Birthday_Remainder:
     def __init__(self):
         self.file = 'birthday_remainder.txt'
         self.month_number = {'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'}
+        self.label_attributes = {'fg': 'white', 'font': ('Courier', 12), 'bg': 'dark green'}
 
         self.master = Tk()
         self.master.withdraw()
@@ -27,12 +28,12 @@ class Birthday_Remainder:
         self.birthday_quote_frame.place(x=0, y=0)
 
         self.label_entry_frame = Frame(self.master, bg='dark green')
-        self.name_label = Label(self.label_entry_frame, text='Name', fg='white', font=('Courier', 12), bg='dark green')
+        self.name_label = Label(self.label_entry_frame, text='Name', **self.label_attributes)
         self.name_box = Entry(self.label_entry_frame, width=30)
         self.name_label.grid(row=0, column=0)
         self.name_box.grid(row=0, column=1, padx=30, pady=20, ipady=2)
 
-        self.birthday_label = Label(self.label_entry_frame, text='Date of Birth', fg='white', font=('Courier', 12), bg='dark green')
+        self.birthday_label = Label(self.label_entry_frame, text='Date of Birth', **self.label_attributes)
         self.birthday_label.grid(row=1, column=0)
         self.label_entry_frame.place(x=70, y=240)
 
