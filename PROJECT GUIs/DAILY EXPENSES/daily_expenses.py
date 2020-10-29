@@ -10,10 +10,13 @@ class Daily_Expenses:
 
     def __init__(self):
         self.file = 'daily_expenses.txt'
+        self.entry_attributes = {'width': 70, 'fg': 'grey', 'highlightbackground': 'blue', 'highlightcolor': 'blue', 'highlightthickness': 2, 'justify': CENTER}
 
         self.master = Tk()
+        self.master.withdraw()
         self.master.resizable(0, 0)
         self.master.title('DAILY EXPENSES')
+        self.master.after(0, self.master.deiconify)
         self.master.iconbitmap(self.resource_path('included_files/icon.ico'))
 
         self.width, self.height = 448, 570
@@ -21,12 +24,12 @@ class Daily_Expenses:
         self.master.geometry(f'{self.width}x{self.height}+{self.screen_width- self.width // 2}+{self.screen_height - self.height // 2}')
 
         self.items_box_var = StringVar()
-        self.items_box = Entry(self.master, width=70, fg='grey', highlightbackground='blue', highlightcolor='blue', highlightthickness=2, justify=CENTER, textvariable=self.items_box_var)
+        self.items_box = Entry(self.master, **self.entry_attributes, textvariable=self.items_box_var)
         self.items_box_var.set('ITEMS')
         self.items_box.grid(row=0, column=0, ipady=7, padx=10, pady=10)
 
         self.price_box_var = StringVar()
-        self.price_box = Entry(self.master, width=70, fg='grey', highlightbackground='blue', highlightcolor='blue', highlightthickness=2, justify=CENTER, textvariable=self.price_box_var)
+        self.price_box = Entry(self.master, **self.entry_attributes, textvariable=self.price_box_var)
         self.price_box_var.set('PRICE')
         self.price_box.grid(row=1, column=0, ipady=7, padx=10, pady=5)
 
