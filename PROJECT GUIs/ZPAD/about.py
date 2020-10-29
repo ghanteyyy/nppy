@@ -6,6 +6,8 @@ import search
 
 class About:
     def __init__(self, master):
+        self.build_number = '1.0.5'
+
         self.master = master
         self.author_page_link = 'http://github.com/ghanteyyy'
         self.source_code_link = 'https://github.com/ghanteyyy/nppy/tree/master/PROJECT GUIs/ZPAD'
@@ -21,7 +23,7 @@ class About:
         self.search = search.Search(self.top_level)
         self.description_frame = Frame(self.top_level, bg='white')
         self.build_label = Label(self.description_frame, text='Build:', bg='white')
-        self.build_number = Label(self.description_frame, text='1.0.0', bg='white')
+        self.build_number_label = Label(self.description_frame, text=self.build_number, bg='white')
 
         self.author_label = Label(self.description_frame, text='Author:', bg='white')
         self.author_name_button = Button(self.description_frame, text='\t\tghanteyyy', bg='white', activebackground='white', activeforeground='black', fg='black', bd=0, command=self.author_page)
@@ -30,7 +32,7 @@ class About:
         self.source_code_button = Button(self.description_frame, text='\t\tZPAD', bg='white', activebackground='white', activeforeground='black', fg='black', bd=0, command=self.source_code_page)
 
         self.build_label.grid(row=0, column=0, sticky='w')
-        self.build_number.grid(row=0, column=1, sticky='e')
+        self.build_number_label.grid(row=0, column=1, sticky='e')
         self.author_label.grid(row=1, column=0, sticky='w')
         self.author_name_button.grid(row=1, column=1, sticky='e')
         self.source_code_label.grid(row=2, column=0, sticky='w')
