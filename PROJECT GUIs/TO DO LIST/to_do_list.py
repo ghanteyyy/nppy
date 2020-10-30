@@ -1,6 +1,7 @@
 import os
 import sys
 import ctypes
+import wincap
 from tkinter import *
 from tkinter import messagebox
 
@@ -16,13 +17,22 @@ class To_Do_List:
         self.master.wm_attributes("-topmost", 'true')
         self.master.iconbitmap(self.resource_path('included_files/icon.ico'))
 
+        self.buttons_attributes = {'bd': 1,
+                                   'fg': 'white',
+                                   'bg': '#002157',
+                                   'relief': GROOVE,
+                                   'cursor': 'hand2',
+                                   'activeforeground': 'white',
+                                   'activebackground': '#002157'}
+
         self.screenwidth, self.screenheight = self.master.winfo_screenwidth() - 401, self.master.winfo_screenheight()
         self.width, self.height = 400, self.screenheight - 74
         self.master.geometry(f'{self.width}x{self.height}+{self.screenwidth}+0')
 
+        self.master.bind('<Control-g>', lambda e: wincap.CAP(self.master).capture('1.png'))
         self.is_collapsed = False
         self.collapse_frame = Frame(self.master)
-        self.collapse_button = Button(self.collapse_frame, text='>>', bg='#002157', activebackground='#002157', activeforeground='white', fg='white', height=47, relief=GROOVE, command=self.collapse)
+        self.collapse_button = Button(self.collapse_frame, text='>>', **self.buttons_attributes, height=47, command=self.collapse)
         self.collapse_button.grid(row=0, column=0)
         self.collapse_frame.place(x=0, y=0)
 
@@ -52,23 +62,23 @@ class To_Do_List:
         self.delete_menu.add_command(label="Delete from list and file", command=lambda: self.popup_delete(mode='from both file and list'))
 
         self.load_prev_frame = Frame(self.master)
-        self.load_prev_button = Button(self.load_prev_frame, text='LOAD PREVIOUS DATA', width=30, height=2, fg='white', bg='#002157', activebackground='#002157', activeforeground='white', bd=1, relief=GROOVE, cursor='hand2', command=self.add_to_list)
+        self.load_prev_button = Button(self.load_prev_frame, text='LOAD PREVIOUS DATA', width=30, height=2, **self.buttons_attributes, command=self.add_to_list)
         self.load_prev_button.grid(row=0, column=0)
         self.load_prev_frame.place(x=150, y=self.master.winfo_screenheight() - 153)
 
         self.del_prev_frame = Frame(self.master)
-        self.del_prev_button = Button(self.del_prev_frame, text='DELETE ALL PREVIOUS DATA', width=30, height=2, fg='white', bg='#002157', activebackground='#002157', activeforeground='white', bd=1, relief=GROOVE, cursor='hand2', command=lambda: self.check_for_file(clear_all=True))
+        self.del_prev_button = Button(self.del_prev_frame, text='DELETE ALL PREVIOUS DATA', width=30, height=2, **self.buttons_attributes, command=lambda: self.check_for_file(clear_all=True))
         self.del_prev_button.grid(row=0, column=0)
         self.del_prev_frame.place(x=150, y=self.master.winfo_screenheight() - 114)
 
         self.clear_frame = Frame(self.master)
-        self.clear_button = Button(self.clear_frame, text='CLEAR', width=13, height=4, fg='white', bg='#002157', activebackground='#002157', activeforeground='white', bd=1, relief=GROOVE, cursor='hand2', command=self.clear)
+        self.clear_button = Button(self.clear_frame, text='CLEAR', width=13, height=4, **self.buttons_attributes, command=self.clear)
         self.clear_button.grid(row=0, column=0, ipadx=4, ipady=4)
         self.clear_frame.place(x=40, y=self.master.winfo_screenheight() - 152)
 
         self.exit_frame = Frame(self.master)
         self.exit_button = Button(self.exit_frame, text='X', font=('Arial Black', 9, 'bold'), fg='white', bg='red', activebackground='red', activeforeground='white', bd=0, command=self.master.destroy)
-        self.exit_button.grid(row=0, column=0, ipadx=2, ipady=1)
+        self.exit_button.grid(row=0, column=0, ipadx=1, ipady=1)
 
         self.master.bind('<Button-3>', self.popup_menu)
         self.master.bind('<Button-1>', self.key_bindings)
