@@ -39,21 +39,22 @@ class Sticky_Notes:
         self.text_widget.config(yscrollcommand=self.scrollbar.set)
 
         self.format_frame = Frame(self.master, bg='#fffed1')
+        self.button_attributes = {'master': self.format_frame, 'bd': 0, 'bg': '#fffed1', 'activebackground': '#fffed1', 'cursor': 'hand2'}
 
         self.bold_image = PhotoImage(file=self.resource_path('included_files/bold.png'))
-        self.bold_button = Button(self.format_frame, image=self.bold_image, bd=0, bg='#fffed1', activebackground='#fffed1', cursor='hand2', command=lambda: self.change_tags('bold', 'sel.first', 'sel.last'))
+        self.bold_button = Button(image=self.bold_image, **self.button_attributes, command=lambda: self.change_tags('bold', 'sel.first', 'sel.last'))
         self.bold_button.pack(side=LEFT)
 
         self.italic_image = PhotoImage(file=self.resource_path('included_files/italic.png'))
-        self.italic_button = Button(self.format_frame, image=self.italic_image, bd=0, bg='#fffed1', activebackground='#fffed1', cursor='hand2', command=lambda: self.change_tags('italic', 'sel.first', 'sel.last'))
+        self.italic_button = Button(image=self.italic_image, **self.button_attributes, command=lambda: self.change_tags('italic', 'sel.first', 'sel.last'))
         self.italic_button.pack(side=LEFT, padx=5)
 
         self.underline_image = PhotoImage(file=self.resource_path('included_files/underline.png'))
-        self.underline_button = Button(self.format_frame, image=self.underline_image, bd=0, bg='#fffed1', activebackground='#fffed1', cursor='hand2', command=lambda: self.change_tags('underline', 'sel.first', 'sel.last'))
+        self.underline_button = Button(image=self.underline_image, **self.button_attributes, command=lambda: self.change_tags('underline', 'sel.first', 'sel.last'))
         self.underline_button.pack(side=LEFT)
 
         self.overstrike_image = PhotoImage(file=self.resource_path('included_files/overstrike.png'))
-        self.overstrike_button = Button(self.format_frame, image=self.overstrike_image, bd=0, bg='#fffed1', activebackground='#fffed1', cursor='hand2', command=lambda: self.change_tags('overstrike', 'sel.first', 'sel.last'))
+        self.overstrike_button = Button(image=self.overstrike_image, **self.button_attributes, command=lambda: self.change_tags('overstrike', 'sel.first', 'sel.last'))
         self.overstrike_button.pack(side=LEFT, padx=5)
 
         self.format_frame.pack()
