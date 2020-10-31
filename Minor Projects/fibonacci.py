@@ -9,7 +9,7 @@ class Fibonacci:
         self.expensive_function_calls = {}
 
     def recursive_method(self, steps):
-        '''Getting fibonacci series using recursive method'''
+        '''Getting Fibonacci series using recursive method'''
 
         if steps <= 1:
             return steps
@@ -40,7 +40,7 @@ class Fibonacci:
 
     @lru_cache(maxsize=None)
     def optimized_recursive_builtin_method(self, steps):
-        '''Using built-in memoization tools called lru_cached. So that we
+        '''Using built-in Memoization tools called lru_cached. So that we
            don't need to make our own(like in optimized_recursive_method).'''
 
         if steps < 2:
@@ -49,7 +49,7 @@ class Fibonacci:
         return self.optimized_recursive_method(steps - 1) + self.optimized_recursive_method(steps - 2)
 
     def space_optimized_method_1(self, first_value, second_value, steps):
-        '''The simplest method to print the fibonacci series where
+        '''The simplest method to print the Fibonacci series where
            swapping is done in two lines'''
 
         for _ in range(steps):
@@ -60,7 +60,7 @@ class Fibonacci:
             second_value = third_value
 
     def space_optimized_method_2(self, first_value, second_value, steps):
-        '''The simplest method to print the fibonacci series where
+        '''The simplest method to print the Fibonacci series where
            swapping is done in a single line'''
 
         for _ in range(steps):
@@ -88,4 +88,4 @@ if __name__ == '__main__':
     fibonacci.space_optimized_method_1(0, 1, 30)
 
     print('\nSpace Optimized Method 2')
-    fibonacci.space_optimized_method_1(0, 1, 30)
+    fibonacci.space_optimized_method_2(0, 1, 30)
