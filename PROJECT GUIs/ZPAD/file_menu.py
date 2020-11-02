@@ -7,12 +7,19 @@ import include
 
 
 class File_Menu:
-    def __init__(self, master, text_widget):
+    def __init__(self, master, text_widget, var):
+        self.var = var
         self.file_name = ''
         self.master = master
         self.is_saved = False
         self.text_widget = text_widget
-        self.previous_signature = self.get_signature(self.get_contents)
+        self.extensions = ([("Plain Text", "*.txt"), ('Python', '*.py')])
+        self.previous_signature = self.get_signature(self.get_contents())
+
+    def set_var(self, text, time=4000):
+        '''Config text to the status_label'''
+
+        include.set_var(self.master, self.var, text, time)
 
     def get_contents(self):
         '''Get everything that is in text_widget'''
@@ -28,16 +35,17 @@ class File_Menu:
         '''Check if the signature of the the previous content in text_widet is
            not the same of the current content in text_widget.'''
 
-        current_signature = self.get_signature(self.get_contents)
+        current_signature = self.get_signature(self.get_contents())
         return current_signature != self.previous_signature
 
     def write_to_file(self):
         '''Write the content of the text_widget to the given filename'''
 
-        with open(self.file_name, 'w') as f:
+        with open(self.file_name, 'w', encoding='utf-8') as f:
             self.is_saved = True
             f.write(self.get_contents())
             self.previous_signature = self.get_signature(self.get_contents())
+            self.set_var(f'Saved to {self.file_name}')
             return True
 
         title = self.master.title()
@@ -63,6 +71,7 @@ class File_Menu:
         if self.is_saved:
             self.file_name = ''
             self.is_saved = False
+            self.set_var('New File Created')
             self.text_widget.delete('1.0', 'end')
             self.master.title('Untitled - ZPAD')
             self.previous_signature = self.get_signature(self.get_contents)
@@ -88,17 +97,19 @@ class File_Menu:
                 return 'break'
 
         self.master.update()
-        self.file_name = filedialog.askopenfilename(title="Select file", filetypes=(("text files", "*.txt"), ("text files")))
+        file_name = filedialog.askopenfilename(title="Select file", filetypes=self.extensions, initialdir=os.getcwd(), defaultextension=self.extensions)
 
-        if self.file_name:
+        if file_name:
+            self.file_name = file_name
             self.text_widget.delete('1.0', 'end')
 
             with open(self.file_name, 'r') as f:
                 lines = f.read()
                 self.text_widget.insert('end', lines)
 
+            self.set_var(f'Opened {self.file_name}')
             self.previous_signature = self.get_signature(self.get_contents)
-            self.title = os.path.basename(self.file_name).rstrip('.txt') + ' - ZPAD'
+            self.title = os.path.basename(self.file_name) + ' - ZPAD'
             self.master.title(self.title)
 
         return 'break'
@@ -116,14 +127,12 @@ class File_Menu:
         '''When user presses ctrl+shift+s or clicks save_as option from the file_menu'''
 
         self.master.update()
-        self.file_name = filedialog.asksaveasfilename(initialdir="/", title="Save", filetypes=(("Text Documents (*.txt)", "*.txt"), ("All Files", "*.txt")))
+        file_name = filedialog.asksaveasfilename(title="Save", filetypes=self.extensions, initialdir=os.getcwd(), defaultextension=self.extensions)
 
-        if self.file_name:
-            if not self.file_name.endswith('.txt'):
-                self.file_name += '.txt'
-
+        if file_name:
+            self.file_name = file_name
             self.write_to_file()
-            self.master.title(os.path.basename(self.file_name).rstrip('.txt') + ' - ZPAD')
+            self.master.title(os.path.basename(self.file_name) + ' - ZPAD')
 
         else:
             self.is_saved = False

@@ -6,11 +6,11 @@ import edit_menu
 
 
 class Right_Click:
-    def __init__(self, master, text_widget, fmc):
+    def __init__(self, master, text_widget, fmc, var):
         self.master = master
         self.file_name = fmc.file_name
         self.text_widget = text_widget
-        self.emc = edit_menu.Edit_Menu(self.master, self.text_widget)
+        self.emc = edit_menu.Edit_Menu(self.master, self.text_widget, var)
 
         self.menu_names = ('Undo', 'Cut', 'Copy', 'Paste', 'Delete', 'Select All', 'Search with Google', 'Open Containing Folder')
         self.commands = (self.emc.undo, self.emc.cut, self.emc.copy, self.emc.paste, self.emc.delete, self.emc.select_all, self.emc.search_with_google, self.open_file_location)

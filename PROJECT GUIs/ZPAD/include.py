@@ -4,6 +4,9 @@ import json
 import ctypes
 
 
+timer = None
+
+
 def initial_position(master):
     '''Start the program in the center of the screen'''
 
@@ -118,3 +121,20 @@ def config_font_style(font_style, font_obj):
 
     if 'overstrike' not in font_style:
         font_obj.configure(overstrike=0)
+
+
+def set_var(master, var, text, time):
+    '''Config text to the status_label'''
+
+    global timer
+
+    try:
+        master.after_cancel(timer)
+
+    except ValueError:
+        pass
+
+    var.set(text)
+
+    if time:
+        timer = master.after(time, lambda: var.set(''))

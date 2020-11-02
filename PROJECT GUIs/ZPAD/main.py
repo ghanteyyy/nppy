@@ -53,26 +53,29 @@ class ZPAD:
         self.text_widget_frame.pack(side='top', fill='both', expand=True)
 
         self.line_column_var = StringVar()
+        self.status_label_var = StringVar()
         self.line_column_var.set('Ln 1, Col 1')
+
         self.status_bar_frame = Frame(self.text_widget_frame)
+        self.status_bar_frame.grid(row=2, column=0, sticky='e')
+
+        self.status_label = Label(self.status_bar_frame, textvariable=self.status_label_var)
+        self.status_label.grid(row=0, column=0, sticky='w')
         self.line_column = Label(self.status_bar_frame, textvariable=self.line_column_var)
-        self.line_column.grid(row=0, column=1, ipadx=50)
+        self.line_column.grid(row=0, column=1, ipadx=20)
         self.zoom_label = Label(self.status_bar_frame, text='100%')
         self.zoom_label.grid(row=0, column=2, ipadx=10)
         self.text_formatter = Label(self.status_bar_frame, text='Windows (CRLF)')
         self.text_formatter.grid(row=0, column=3, ipadx=14)
         self.encoding = Label(self.status_bar_frame, text='UTF-8')
         self.encoding.grid(row=0, column=4, ipadx=10)
-        self.dummpy = Label(self.status_bar_frame, text=' ')
-        self.dummpy.grid(row=0, column=5, ipadx=20)
-        self.status_bar_frame.grid(row=2, column=0, sticky='e')
 
-        self.fmc = file_menu.File_Menu(self.master, self.text_widget)
+        self.fmc = file_menu.File_Menu(self.master, self.text_widget, self.status_label_var)
         self.file_menu_options = ['New', 'New Window ', 'Open... ', 'Save', 'SaveAs...', 'Exit']
         self.file_menu_commands = [self.fmc.new, self.fmc.new_window, self.fmc.open, self.fmc.save, self.fmc.save_as, self.fmc.exit]
         self.file_menu_acclerator = ['Ctrl+N', 'Ctrl+Shift+N', 'Ctrl+O', 'Ctrl+S', 'Ctrl+Shift+S', 'Ctrl+Q']
 
-        self.emc = edit_menu.Edit_Menu(self.master, self.text_widget)
+        self.emc = edit_menu.Edit_Menu(self.master, self.text_widget, self.status_label_var)
         self.edit_menu_options = ['Undo', 'Cut', 'Copy', 'Paste', 'Delete', 'Search with Google', 'Find...', 'Replace...', 'Go To...', 'Select All', 'Time / Date', 'Strip Trailing Whitespace']
         self.edit_menu_commands = [self.emc.undo, self.emc.cut, self.emc.copy, self.emc.paste, self.emc.delete, self.emc.search_with_google, self.emc.find_widget, self.emc.replace_widget, self.emc.go_to_widget, self.emc.select_all, self.emc.get_date_time, self.emc.strip_whitespaces]
         self.edit_menu_accelerator = ['Ctrl+Z', 'Ctrl+X', 'Ctrl+C', 'Ctrl+V', 'DEL', 'Ctrl+E', 'Ctrl+F', 'Ctrl+H', 'Ctr+G', 'Ctrl+A', 'F5', 'Alt+Enter']
@@ -133,6 +136,7 @@ class ZPAD:
         self.vmc.toggle_linenumber()
         self.update_line_column()
         self.enable_disable_menu()
+        self.update_label_text()
 
         self.text_widget.bind('<Button-3>', self.button_3)
         self.text_widget.bind('<Delete>', self.emc.delete)
@@ -168,11 +172,26 @@ class ZPAD:
         self.text_widget.bind('<Alt-Return>', self.activate_strip_whitespace)
         self.text_widget.bind('<Control-F>', lambda e: self.Fmc.font_selection())
         self.text_widget.bind('<Control-w>', lambda e: self.format_menu.invoke(0))
+        self.text_widget.bind('<BackSpace>', lambda e: self.status_label_var.set(''))
         self.text_widget.bind('<Configure>', lambda e: self.text_widget.configure(scrollregion=self.text_widget.bbox('end')))
         self.master.mainloop()
 
+    def update_label_text(self):
+        '''Show the number of text selected, number of text copied or cut'''
+
+        try:
+            selected_text = self.text_widget.get('sel.first', 'sel.last')
+            self.status_label_var.set(f'{len(selected_text)} characters selected')
+
+        except TclError:
+            pass
+
+        self.master.after(10, self.update_label_text)
+
     def button_1_command(self, event=None):
         '''Remove "found" tag and restore the blinking time to default'''
+
+        self.status_label_var.set('')
 
         if 'triple_click' in self.text_widget.tag_names():
             self.text_widget.tag_delete('triple_click', '1.0', 'end')
@@ -186,13 +205,16 @@ class ZPAD:
     def button_3(self, event=None):
         '''When user right clicks'''
 
-        right_click.Right_Click(self.master, self.text_widget, self.fmc).show_popup(event=event)
+        right_click.Right_Click(self.master, self.text_widget, self.fmc, self.status_label_var).show_popup(event=event)
 
     def remove_selection(self, event=None):
         '''Remove "found" and "triple_click" tags from the text_widget annd reset the blinking time to default'''
 
         if event.keysym in ['Up', 'Down', 'Right', 'Left']:
             self.button_1_command()
+
+        if self.fmc.is_file_changed():
+            self.status_label_var.set('')
 
     def change_title(self, event=None):
         '''Insert * to the title of the window when user makes any change to the content'''

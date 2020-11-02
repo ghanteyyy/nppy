@@ -6,12 +6,19 @@ import find
 import replace
 import go_to
 import search
+import include
 
 
 class Edit_Menu:
-    def __init__(self, master, text_widget):
+    def __init__(self, master, text_widget, var):
+        self.var = var
         self.master = master
         self.text_widget = text_widget
+
+    def set_var(self, text, time=4000):
+        '''Config text to the status_label'''
+
+        include.set_var(self.master, self.var, text, time)
 
     def get_selected_text(self):
         '''Returns text which user tends to copy or cut'''
@@ -69,6 +76,7 @@ class Edit_Menu:
                 self.text_widget.delete(f'{line}.0', f'{line}.end+1c')
 
         pyperclip.copy(text)
+        self.set_var(f'Cut {len(text)} characters')
         self.text_widget.config(insertofftime=300, insertontime=600)
 
         return 'break'
@@ -78,6 +86,7 @@ class Edit_Menu:
 
         text = self.get_selected_text()
         pyperclip.copy(text)
+        self.set_var(f'Copied {len(text)} characters')
 
         return 'break'
 
@@ -112,6 +121,7 @@ class Edit_Menu:
         if self.text_widget['insertofftime'] == 1000000:  # Restore time of blinking to default
             self.text_widget.config(insertofftime=300, insertontime=600)
 
+        self.var.set('')
         return 'break'
 
     def search_with_google(self, event=None):
@@ -143,11 +153,14 @@ class Edit_Menu:
     def select_all(self, event=None):
         '''Select all text when user clicks Select-All option or Ctrl+A'''
 
-        lines = len(self.text_widget.get('1.0', 'end-1c').split('\n'))
+        from_text_widget = self.text_widget.get('1.0', 'end-1c').strip('\n')
+        lines = len(from_text_widget.split('\n'))
+        no_of_characters = len(from_text_widget)
 
         for line in range(1, lines + 1):
             self.text_widget.tag_add('sel', f'{line}.0', f'{line}.end')
 
+        self.set_var(text=f'{no_of_characters} characters selected', time=None)
         self.text_widget.tag_add('triple_click', '1.0', 'end-1c')
         self.text_widget.config(insertofftime=1000000, insertontime=0)
 
