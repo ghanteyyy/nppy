@@ -1,6 +1,5 @@
 *.txt
 *.json
-wincap/
 OTHERS/
 Packages/
 __pycache__
