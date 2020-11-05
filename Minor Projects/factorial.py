@@ -37,6 +37,14 @@ class Factorial:
         get_factorial = math.factorial(self.number)
         return f'{self.number}! = {get_factorial}'
 
+    def method_four(self, number):
+        '''Using recursive method'''
+
+        if number == 1:
+            return number
+
+        return number * self.method_four(number - 1)
+
 
 if __name__ == '__main__':
     factorial = Factorial()
@@ -49,3 +57,6 @@ if __name__ == '__main__':
 
     print('\nMethod Three')
     print(factorial.method_three())
+
+    print('\nMethod Four')
+    print(factorial.method_four(factorial.number))
