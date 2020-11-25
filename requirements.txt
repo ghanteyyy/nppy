@@ -1,0 +1,13 @@
+numpy
+flask
+pygit2
+django
+pywin32
+requests
+pyautogui
+pyperclip
+matplotlib
+pyinstaller
+opencv-python
+auto-py-to-exe
+beautifulsoup4
