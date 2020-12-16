@@ -6,13 +6,14 @@ import search
 
 class About:
     def __init__(self, master):
-        self.build_number = '1.0.5'
+        self.build_number = '1.0.7'
 
         self.master = master
         self.author_page_link = 'http://github.com/ghanteyyy'
         self.source_code_link = 'https://github.com/ghanteyyy/nppy/tree/master/PROJECT GUIs/ZPAD'
 
         self.top_level = Toplevel(self.master)
+        self.top_level.transient(self.master)
         self.top_level.grab_set()
         self.top_level.withdraw()
         self.initial_position()
@@ -73,7 +74,6 @@ class About:
         offset_x, offset_y = self.master.winfo_x() + master_width - width // 2, self.master.winfo_y() + master_height - height // 2
         self.top_level.geometry(f'{width}x{height}+{offset_x}+{offset_y}')
         self.top_level.resizable(0, 0)
-        self.top_level.after(10, include.hide_or_show_maximize_minimize(self.top_level).hide_minimize_maximize)
 
     def enter(self, button, link):
         '''When the cursor enters the boundary of author-name and source-code link'''

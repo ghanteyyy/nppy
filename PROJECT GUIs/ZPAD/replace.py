@@ -18,10 +18,8 @@ class Replace:
         self.wrap_var.set(1)
 
         self.replace_master = Toplevel()
+        self.replace_master.transient(self.master)
         self.replace_master.grab_set()
-
-        self.hide_show = include.hide_or_show_maximize_minimize(self.replace_master)  # Hiding minimize and maximize button
-        self.replace_master.after(0, self.hide_show.hide_minimize_maximize)
 
         self.replace_master.withdraw()
         self.replace_master.after(0, self.replace_master.deiconify)

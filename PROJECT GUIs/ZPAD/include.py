@@ -42,38 +42,6 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 
-class hide_or_show_maximize_minimize:
-    '''Hide the minimize and maximize buton when the window is place at the top of other applications windows.
-       And show the minimize and maximize button when the window is not place at the top of other applications windows'''
-
-    def __init__(self, window):
-        self.window = window
-
-        # shortcuts to the WinAPI functionality
-        self.set_window_pos = ctypes.windll.user32.SetWindowPos
-        self.set_window_long = ctypes.windll.user32.SetWindowLongW
-        self.get_window_long = ctypes.windll.user32.GetWindowLongW
-        self.get_parent = ctypes.windll.user32.GetParent
-
-        # some of the WinAPI flags
-        self.SWP_NOSIZE = 1
-        self.SWP_NOMOVE = 2
-        self.GWL_STYLE = -16
-        self.SWP_NOZORDER = 4
-        self.SWP_FRAMECHANGED = 32
-        self.WS_MAXIMIZEBOX = 65536
-        self.WS_MINIMIZEBOX = 131072
-
-    def hide_minimize_maximize(self):
-        '''Hide minimize and maximize button of the window'''
-
-        hwnd = self.get_parent(self.window.winfo_id())
-        old_style = self.get_window_long(hwnd, self.GWL_STYLE)  # getting the old style
-        new_style = old_style & ~ self.WS_MAXIMIZEBOX & ~ self.WS_MINIMIZEBOX  # building the new style (old style AND NOT Maximize AND NOT Minimize)
-        self.set_window_long(hwnd, self.GWL_STYLE, new_style)  # setting new style
-        self.set_window_pos(hwnd, 0, 0, 0, 0, 0, self.SWP_NOMOVE | self.SWP_NOSIZE | self.SWP_NOZORDER | self.SWP_FRAMECHANGED)  # updating non-client area
-
-
 def get_font_details():
     '''Get font-family, font-size and font-style from the json file'''
 

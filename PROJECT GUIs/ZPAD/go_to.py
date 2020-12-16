@@ -7,10 +7,8 @@ class Go_To:
     def __init__(self, master, text_widget):
         self.text_widget = text_widget
         self.go_to_master = Toplevel(master)
+        self.go_to_master.transient(master)
         self.go_to_master.grab_set()
-
-        self.hide_show = include.hide_or_show_maximize_minimize(self.go_to_master)  # Hiding minimize and maximize button
-        self.go_to_master.after(0, self.hide_show.hide_minimize_maximize)
 
         self.go_to_master.withdraw()
         self.go_to_master.after(0, self.go_to_master.deiconify)

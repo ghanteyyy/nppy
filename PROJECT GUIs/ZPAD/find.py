@@ -16,11 +16,9 @@ class Find:
         self.transparent_ico = include.resource_path('included_files\\transparent.ico')
 
         self.find_master = Toplevel()
+        self.find_master.transient(self.master)
         self.find_master.grab_set()
         self.dummy_text_widget = Text(self.find_master)
-
-        self.hide_show = include.hide_or_show_maximize_minimize(self.find_master)  # Hiding minimize and maximize button
-        self.find_master.after(0, self.hide_show.hide_minimize_maximize)
 
         self.find_master.withdraw()
         self.find_master.after(0, self.find_master.deiconify)

@@ -55,13 +55,13 @@ class UI:
         self.transparent_ico = include.resource_path('included_files\\transparent.ico')
 
         self.top_level = Toplevel(self.master)
+        self.top_level.transient(self.master)
         self.top_level.withdraw()
         self.top_level.title('Font')
         self.top_level.grab_set()
         self.top_level.iconbitmap(self.transparent_ico)
         self.top_level.resizable(0, 0)
 
-        self.hide_show = include.hide_or_show_maximize_minimize(self.top_level)
         self.pos_x, self.pos_y = self.master.winfo_x() + 30, self.master.winfo_y() + 60
         self.top_level.geometry(f'415x245+{self.pos_x}+{self.pos_y}')
 
@@ -110,7 +110,6 @@ class UI:
 
         self.non_duplicates_fonts()
         self.master.after(0, self.top_level.deiconify)
-        self.master.after(0, lambda: self.hide_show.hide_minimize_maximize())
         self.top_level.bind('<Escape>', lambda e: self.top_level.destroy())
         self.top_level.after(250, lambda: select_font.set_selection(self.font_families_frame.entry, self.font_families_frame.entry_var))
         self.top_level.after(100, self.ok_cmd.config_sample_label)

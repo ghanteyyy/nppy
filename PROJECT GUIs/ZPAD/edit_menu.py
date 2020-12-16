@@ -170,7 +170,17 @@ class Edit_Menu:
         '''Inserts current date and time'''
 
         cursor_pos = self.text_widget.index('insert')
-        self.text_widget.insert(cursor_pos, time.strftime('%I:%M %p %m/%d/%Y'))
+        today_time = time.strftime('%I:%M %p %m/%d/%Y')
+        cursor_index = self.text_widget.index('insert')
+
+        try:
+            if self.text_widget.get('1.0', cursor_index)[-1] != ' ':
+                today_time = ' ' + today_time
+
+        except IndexError:
+            pass
+
+        self.text_widget.insert(cursor_pos, today_time)
 
     def strip_whitespaces(self):
         '''Strip white-spaces from each line'''
