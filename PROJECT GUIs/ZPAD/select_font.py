@@ -5,12 +5,11 @@ import include
 class Bindings:
     def __init__(self, master, frame):
         self.master = master
-        self.click_bind_value = None
         self.listbox = frame.listbox
         self.entry_widget = frame.entry
         self.entry_var = frame.entry_var
         self.list_box_values = frame.values
-        self.click_bind()
+        self.listbox.bind('<<ListboxSelect>>', self.click_bind)
 
     def key_bind(self, *args):
         '''Filter the value in listbox as per given in entry widget'''
@@ -20,34 +19,27 @@ class Bindings:
             check_list = [value.lower() for value in self.list_box_values]
             starting_value = [fv for fv in check_list if fv.startswith(var_get.lower())]
 
-            if len(starting_value) < 100:
-                index = check_list.index(starting_value[0])
-                self.listbox.yview(index)
+            index = check_list.index(starting_value[0])
+            self.listbox.see(index)
 
-                if var_get.lower() == starting_value[0].lower():
-                    self.listbox.selection_set(index)
+            if var_get.lower() == starting_value[0].lower():
+                self.listbox.selection_set(index)
 
-                else:
-                    now = self.listbox.curselection()
-                    self.listbox.selection_clear(now[0])
+            else:
+                now = self.listbox.curselection()
+                self.listbox.selection_clear(now[0])
 
         except IndexError:
             pass
 
-    def click_bind(self):
+    def click_bind(self, event=None):
         '''Insert value of selected text from the listbox in entry widget'''
 
-        now = self.listbox.curselection()
+        selection_index = self.listbox.curselection()[0]
+        data = self.listbox.get(selection_index)
 
-        if now != self.click_bind_value:
-            self.click_bind_value = now
-
-            if self.click_bind_value and self.listbox.get(self.click_bind_value[0]):
-                value = self.listbox.get(self.click_bind_value[0])
-                self.entry_var.set(value)
-                self.master.after(10, lambda: set_selection(self.entry_widget, self.entry_var))
-
-        self.master.after(10, self.click_bind)
+        self.entry_var.set(data)
+        self.master.after(10, lambda: set_selection(self.entry_widget, self.entry_var))
 
 
 class Commands:
