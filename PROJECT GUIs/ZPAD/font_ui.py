@@ -22,29 +22,16 @@ class Widgets:
         self.entry = ttk.Entry(self.frame, textvariable=self.entry_var, width=entry_size)
 
         self.listbox_frame = Frame(self.frame)
-        self.listbox = Listbox(self.listbox_frame, width=listbox_size, height=6, selectmode=SINGLE, highlightthickness=0, exportselection=0, activestyle='none')
+        self.text_variable = Variable(value=values)
+        self.listbox = Listbox(self.listbox_frame, listvariable=self.text_variable, width=listbox_size, height=6, selectmode=SINGLE, highlightthickness=0, exportselection=0, activestyle='none')
         self.scrollbar = Scrollbar(self.listbox_frame, orient='vertical', command=self.listbox.yview)
         self.listbox.config(yscrollcommand=self.scrollbar.set)
-
-        self.insert()
 
         self.label.pack(anchor='w')
         self.entry.pack(anchor='w')
         self.listbox_frame.pack(anchor='w')
         self.listbox.pack(side=LEFT)
         self.scrollbar.pack(side=LEFT, fill='y')
-
-    def insert(self):
-        '''Insert respective value to the entry-widget and to the list-box'''
-
-        if self.label_text == 'Font:':
-            self.entry_var.set('Courier')
-
-        else:
-            self.entry_var.set(self.values[0])
-
-        for index, value in enumerate(self.values):
-            self.listbox.insert(index, value)
 
 
 class UI:
@@ -81,7 +68,7 @@ class UI:
 
         self.sample_labelframe = LabelFrame(self.top_level, text='Sample')
         self.pixel = PhotoImage(width=1, height=1)
-        self.sample_label = Label(self.sample_labelframe, text='AaBbYyZz', compound='center', image=self.pixel, width=200, height=40)
+        self.sample_label = Label(self.sample_labelframe, text='AaBbYyZz', compound='center', image=self.pixel, width=200, height=40, takefocus=False)
         self.sample_label.grid(row=0, column=0)
         self.sample_labelframe.pack()
 
@@ -108,12 +95,58 @@ class UI:
         self.font_style_frame.entry_var.trace('w', self.ffsmuic.key_bind)
         self.font_size_frame.entry_var.trace('w', self.ffssmuic.key_bind)
 
+        self.entry_listbox = {self.font_families_frame.entry: self.font_families_frame.listbox,
+                              self.font_style_frame.entry: self.font_style_frame.listbox,
+                              self.font_size_frame.entry: self.font_size_frame.listbox}
+
         self.non_duplicates_fonts()
         self.master.after(0, self.top_level.deiconify)
+        self.top_level.bind('<Key>', self.up_down)
         self.top_level.bind('<Escape>', lambda e: self.top_level.destroy())
         self.top_level.after(250, lambda: select_font.set_selection(self.font_families_frame.entry, self.font_families_frame.entry_var))
         self.top_level.after(100, self.ok_cmd.config_sample_label)
         self.top_level.mainloop()
+
+    def up_down(self, event):
+        '''When user wants to select value using up or down arrows in select_font window'''
+
+        arrow_key = event.keysym
+
+        if arrow_key in ['Up', 'Down']:
+            focused_widget = self.top_level.focus_get()
+
+            if isinstance(focused_widget, Listbox):
+                # When user selects listbox using keyboard with TAB key then focus is set to the respective listbox
+                # Since we do not have listbox-entry pair like we have entry-listbox pair in self.entry_listbox which causes KeyError
+                # when we try to get values using listbox as key
+                # To fix this we need to check if the instance of focused_widget is Listbox
+                # If yes, then we need to get respective entry_widget from focused_listbox using list comprehension
+                # And setting focused_widget to that extracted entry_widget
+
+                # You might be thinking why I have changed focused_widget from listbox to entry_widget. I did so because
+                # when I designed this program I used entry_widget to know the respective listbox. But when user sets focus
+                # to the listbox using TAB from keyboard then I need to write another function to map listbox-entry widget
+                # which is redundant. In-order to fix this redundancy I used list comprehension to extract keys with respect to values
+                # from self.entry_listbox and use it to get respective entry_widget.
+
+                focused_widget = [key for key, value in self.entry_listbox.items() if value == focused_widget][0]
+
+            focused_listbox = self.entry_listbox[focused_widget]
+            values_length = len(focused_listbox.get(0, "end")) - 1
+            focused_listbox_value_index = focused_listbox.curselection()[0]
+
+            if arrow_key == 'Up':
+                if focused_listbox_value_index > 0:
+                    focused_listbox.selection_clear(focused_listbox_value_index)
+                    focused_listbox_value_index -= 1
+
+            else:
+                if focused_listbox_value_index < values_length:
+                    focused_listbox.selection_clear(focused_listbox_value_index)
+                    focused_listbox_value_index += 1
+
+            focused_listbox.selection_set(focused_listbox_value_index)
+            focused_listbox.event_generate('<<ListboxSelect>>')
 
     def non_duplicates_fonts(self):
         '''Filter fonts starting with same name'''
