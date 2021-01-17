@@ -1,6 +1,9 @@
 import os
+import random
+import string
 import subprocess
 from tkinter import *
+import tkcap
 import pyperclip
 import edit_menu
 
@@ -12,8 +15,8 @@ class Right_Click:
         self.text_widget = text_widget
         self.emc = edit_menu.Edit_Menu(self.master, self.text_widget, var)
 
-        self.menu_names = ('Undo', 'Cut', 'Copy', 'Paste', 'Delete', 'Select All', 'Search with Google', 'Open Containing Folder')
-        self.commands = (self.emc.undo, self.emc.cut, self.emc.copy, self.emc.paste, self.emc.delete, self.emc.select_all, self.emc.search_with_google, self.open_file_location)
+        self.menu_names = ('Undo', 'Cut', 'Copy', 'Paste', 'Delete', 'Select All', 'Take Screenshot', 'Search with Google', 'Open Containing Folder')
+        self.commands = (self.emc.undo, self.emc.cut, self.emc.copy, self.emc.paste, self.emc.delete, self.emc.select_all, self.take_screenshot, self.emc.search_with_google, self.open_file_location)
 
         self.menu = Menu(self.master, tearoff=False)
 
@@ -42,6 +45,13 @@ class Right_Click:
         path = os.path.normpath(self.file_name)
         self.master.after(0, lambda: subprocess.run([FILEBROWSER_PATH, '/select,', path]))
 
+    def take_screenshot(self, event=None):
+        '''Take screenshot of the entire window'''
+
+        random_name = ''.join(random.choice(string.ascii_letters) for _ in range(8)) + '.png'
+        cap = tkcap.CAP(self.master)
+        self.master.after(250, lambda: cap.capture(random_name))
+
     def show_popup(self, event=None):
         '''Display popup menu when user right clicks'''
 
@@ -66,17 +76,17 @@ class Right_Click:
 
             if self.is_selection_available():  # Enabling 'Delete', Search with Google' option if there is any text is selected in text_widget
                 self.menu.entryconfig(5, state=NORMAL)
-                self.menu.entryconfig(8, state=NORMAL)
+                self.menu.entryconfig(9, state=NORMAL)
 
             else:  # Disabling 'Delete', Search with Google' option if there is no any text is selected in text_widget
                 self.menu.entryconfig(5, state=DISABLED)
-                self.menu.entryconfig(8, state=DISABLED)
+                self.menu.entryconfig(9, state=DISABLED)
 
             if self.file_name:  # Enabling 'Open File Location' option if the file is saved
-                self.menu.entryconfig(9, state=NORMAL)
+                self.menu.entryconfig(10, state=NORMAL)
 
             else:  # Disabling 'Open File Location' option if the file is not saved
-                self.menu.entryconfig(9, state=DISABLED)
+                self.menu.entryconfig(10, state=DISABLED)
 
             self.menu.tk_popup(event.x_root, event.y_root)
 
