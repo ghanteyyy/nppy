@@ -14,7 +14,7 @@ class Guessing_Game:
     def get_user_guess(self):
         '''Ask user to enter their guess until the valid guess is entered.'''
 
-        guess = False
+        guess = None
 
         while not guess:
             try:
@@ -22,7 +22,7 @@ class Guessing_Game:
 
                 if not self.is_guess_within_range(guess):
                     print(f'Your guess must be in {self.low}-{self.high}')
-                    guess = False
+                    guess = None
 
             except ValueError:
                 print('Your guess is not valid. Guess was expected in integer')
