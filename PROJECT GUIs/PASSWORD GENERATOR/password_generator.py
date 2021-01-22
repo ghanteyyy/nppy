@@ -51,7 +51,6 @@ class Password_Generator:
         self.password_label = Label(self.master, font=('Calibri', 20))
         self.copy_button = Button(self.master, text='Copy', width=6, bd=0, bg='Green', fg='white', activeforeground='white', activebackground='Green', font=('Calibri', 12), relief=FLAT, cursor='hand2', command=self.copy_to_clipboard)
 
-        self.master.bind('<Control-g>', lambda e: self.cap.capture('1.png'))
         self.master.bind('<Button-1>', self.bind_keys)
         self.number_box.bind('<FocusIn>', self.bind_keys)
         self.number_box.bind('<Return>', self.generate_button)
@@ -84,7 +83,7 @@ class Password_Generator:
     def generate_password(self, string_combination, lengths):
         '''Generating random generated password'''
 
-        return ''.join([random.choice(string_combination) for lenght in range(lengths)])
+        return ''.join([random.choice(string_combination) for _ in range(lengths)])
 
     def copy_to_clipboard(self, event=None):
         '''Copy Generated Password to the clipboard'''
