@@ -135,8 +135,8 @@ class FILE_MOVER:
             self.from_entry_var.set('From Path')
             self.to_entry_var.set('To Path')
 
-            self.from_entry.config(fg='grey')
-            self.to_entry.config(fg='grey')
+            self.from_entry_style.configure('F.TEntry', foreground='grey')
+            self.to_entry_style.configure('T.TEntry', foreground='grey')
 
             self.combo_box.set('Select File Types')
             self.master.focus()
@@ -174,10 +174,8 @@ class move_or_copy:
     def __init__(self, from_path, to_path, file_type, var):
         self.var = var
         self.to_path = to_path
-        self.common_files = []
         self.file_type = file_type
         self.from_path = from_path
-        self.files = [os.path.join(self.from_path, f) for f in os.listdir(self.from_path)]
         self.extensions_list = {'PDF': 'pdf',
                                 'Text File': ['txt'],
                                 'Programs': ['exe', 'msi'],
@@ -194,15 +192,12 @@ class move_or_copy:
         elif self.file_type != 'ALL':
             self.extensions = self.extensions_list[self.file_type]
 
-    def duplicates(self):
+    def duplicates(self, files):
         '''Checking duplicates files of from_path and to_path'''
 
-        from_file_path = os.listdir(self.from_path)
-        to_fie_path = os.listdir(self.to_path)
-
-        for file in from_file_path:
-            if file in to_fie_path:
-                self.common_files.append(os.path.join(self.from_path, file))
+        from_file_path = set([os.path.basename(file) for file in files])
+        to_file_path = set(os.listdir(self.to_path))
+        self.common_files = from_file_path & to_file_path
 
         if self.common_files:
             return True
@@ -235,13 +230,15 @@ class move_or_copy:
         '''Main function for copying/moving file/folders'''
 
         try:
+            all_files = [os.path.join(self.from_path, f) for f in os.listdir(self.from_path)]
+
             if self.file_type == 'ALL':
-                files = self.files
+                files = all_files
 
             else:
-                files = list(filter(self.filter_function, self.files))
+                files = list(filter(self.filter_function, all_files))
 
-            if self.duplicates():
+            if self.duplicates(files):
                 if not messagebox.askyesno('File Already Exists', 'Some files already exists. Do you want to overwrite the files?'):
                     files = [file for file in files if file not in self.common_files]    # Removing self.common_files from files if user clicks NO
 
