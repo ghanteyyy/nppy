@@ -1,7 +1,6 @@
 import os
 import sys
 import ctypes
-import wincap
 from tkinter import *
 from tkinter import messagebox
 
@@ -17,19 +16,13 @@ class To_Do_List:
         self.master.wm_attributes("-topmost", 'true')
         self.master.iconbitmap(self.resource_path('included_files/icon.ico'))
 
-        self.buttons_attributes = {'bd': 1,
-                                   'fg': 'white',
-                                   'bg': '#002157',
-                                   'relief': GROOVE,
-                                   'cursor': 'hand2',
-                                   'activeforeground': 'white',
-                                   'activebackground': '#002157'}
+        self.buttons_attributes = {'bd': 1, 'fg': 'white', 'bg': '#002157', 'relief': GROOVE,
+                                   'cursor': 'hand2', 'activeforeground': 'white', 'activebackground': '#002157'}
 
         self.screenwidth, self.screenheight = self.master.winfo_screenwidth() - 401, self.master.winfo_screenheight()
         self.width, self.height = 400, self.screenheight - 74
         self.master.geometry(f'{self.width}x{self.height}+{self.screenwidth}+0')
 
-        self.master.bind('<Control-g>', lambda e: wincap.CAP(self.master).capture('1.png'))
         self.is_collapsed = False
         self.collapse_frame = Frame(self.master)
         self.collapse_button = Button(self.collapse_frame, text='>>', **self.buttons_attributes, height=47, command=self.collapse)
