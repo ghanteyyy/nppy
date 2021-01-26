@@ -95,7 +95,7 @@ class Calendar:
                 date_label.grid(row=0, column=0)
 
                 # Setting border color of current date to blue
-                if time.strftime('%m') == str(self.month) and time.strftime('%Y') == str(self.year) and time.strftime('%d') == str(d):
+                if time.strftime('%m') == str(self.month).zfill(2) and time.strftime('%Y') == str(self.year) and time.strftime('%d') == str(d).zfill(2):
                     date_frame.config(highlightbackground="blue", highlightcolor="blue", highlightthickness=2, bd=0)
 
                 # Setting the color of sunday to red because Sunday is holiday
