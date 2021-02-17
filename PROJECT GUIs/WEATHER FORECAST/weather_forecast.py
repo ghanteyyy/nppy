@@ -26,7 +26,7 @@ class Weather:
     '''
 
     def __init__(self):
-        self.api_key = '28df47ad9b5edbccb3703471d8917aca'
+        self.api_key = 'your api id'
 
         self.master = Tk()
         self.master.withdraw()
