@@ -26,7 +26,7 @@ class Weather:
     '''
 
     def __init__(self):
-        self.api_key = 'your api id'
+        self.api_key = 'Your API Key'
 
         self.master = Tk()
         self.master.withdraw()
@@ -95,33 +95,40 @@ class Weather:
     def get_details(self, location, link):
         '''Get weather details from user given location'''
 
-        content = requests.get(link).text
-        _content = json.loads(content)
+        try:
+            content = requests.get(link).text
+            _content = json.loads(content)
 
-        if _content['cod'] == 200:
-            location = f'{"Location".ljust(31)} : {location}'
-            sunrise = str(time.ctime(_content['sys']['sunrise'])).split()[-2].split(':')
-            sunrise = f' : {sunrise[0].zfill(2)}:{sunrise[1].zfill(2)}:{sunrise[2].zfill(2)}'
-            sunset = str(time.ctime(_content['sys']['sunset'])).split()[-2].split(':')
-            sunset = f' : {sunset[0].zfill(2)}:{sunset[1].zfill(2)}:{sunset[2].zfill(2)}'
+            if _content['cod'] == 401:
+                messagebox.showerror('ERR', 'API key is invalid')
 
-            temp = f'{"Temperature".ljust(27)} : {round(_content["main"]["temp"] - 273, 3)} °C'
-            max_temp = f'{"Max Temperature".ljust(24)} : {str(round(_content["main"]["temp_max"] - 273, 3))} °C'
-            min_temp = f'{"Min Temperature".ljust(25)} : {str(round(_content["main"]["temp_min"] - 273, 3))} °C'
-            Humidity = f'{"Humidity".ljust(31)} : {str(_content["main"]["humidity"])} %'
-            feels_like = f'{"Feels Like".ljust(31)} : {str(round(_content["main"]["feels_like"] - 273, 3))} °C'
-            sky_desc = f'{"Sky".ljust(34)} : {_content["weather"][0]["description"].title()}'
-            wind = f'{"Wind".ljust(33)} : {round((_content["wind"]["speed"] * 3.6), 3)} km/hr'
+            elif _content['cod'] == 200:
+                location = f'{"Location".ljust(31)} : {location}'
+                sunrise = str(time.ctime(_content['sys']['sunrise'])).split()[-2].split(':')
+                sunrise = f' : {sunrise[0].zfill(2)}:{sunrise[1].zfill(2)}:{sunrise[2].zfill(2)}'
+                sunset = str(time.ctime(_content['sys']['sunset'])).split()[-2].split(':')
+                sunset = f' : {sunset[0].zfill(2)}:{sunset[1].zfill(2)}:{sunset[2].zfill(2)}'
 
-            details = f'''{location}\n{sky_desc}\n{Humidity}\n{temp}\n{max_temp}\n{min_temp}\n{feels_like}\n{wind}\n'''
-            self.details.pack_forget()
-            self.var.set(details)
-            self.details.pack(pady=10)
+                temp = f'{"Temperature".ljust(27)} : {round(_content["main"]["temp"] - 273, 3)} °C'
+                max_temp = f'{"Max Temperature".ljust(24)} : {str(round(_content["main"]["temp_max"] - 273, 3))} °C'
+                min_temp = f'{"Min Temperature".ljust(25)} : {str(round(_content["main"]["temp_min"] - 273, 3))} °C'
+                Humidity = f'{"Humidity".ljust(31)} : {str(_content["main"]["humidity"])} %'
+                feels_like = f'{"Feels Like".ljust(31)} : {str(round(_content["main"]["feels_like"] - 273, 3))} °C'
+                sky_desc = f'{"Sky".ljust(34)} : {_content["weather"][0]["description"].title()}'
+                wind = f'{"Wind".ljust(33)} : {round((_content["wind"]["speed"] * 3.6), 3)} km/hr'
 
-            self.master.geometry('306x350')
+                details = f'''{location}\n{sky_desc}\n{Humidity}\n{temp}\n{max_temp}\n{min_temp}\n{feels_like}\n{wind}\n'''
+                self.details.pack_forget()
+                self.var.set(details)
+                self.details.pack(pady=10)
 
-        else:
-            messagebox.showerror('ERR', 'Location Not Found')
+                self.master.geometry('306x350')
+
+            else:
+                messagebox.showerror('ERR', 'Location Not Found')
+
+        except requests.ConnectionError:
+            messagebox.showerror('ERR', 'No Internet Connection')
 
     def show_weather_details(self, event=None):
         '''Get weather details and dispaly them to the user'''
