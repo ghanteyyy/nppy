@@ -27,7 +27,6 @@ class Widgets:
 
 class Tution:
     def __init__(self):
-        self.success = False
         self.file_name = 'tution.json'
 
         self.master = Tk()
@@ -231,8 +230,6 @@ class Tution:
             tails = {name: {'fee': fee, 'joined': joined_str, 'prev_pay': [], 'late_pay': {}, 'next_pay': next_pay}}
 
             head.update(tails)
-            self.success = True
-
             return head
 
     def remove_command(self, name):
@@ -242,7 +239,6 @@ class Tution:
 
         try:
             contents.pop(name)
-            self.success = True
 
             return contents
 
@@ -276,15 +272,18 @@ class Tution:
         elif not day.isdigit() or int(day) > 32:
             messagebox.showerror('Invalid Day', 'Day is expected between 1-32.')
 
-        else:
+        elif var == 1:
             contents = self.add_command(name, fee, month, day, var)
 
-            if self.success:
-                self.success = False
+        try:
+            if contents:
                 self.write_json(contents)
 
                 self.reset()
                 self.insert_at_first()
+
+        except UnboundLocalError:
+            pass
 
     def reset(self):
         '''Reset entries buttons and radio-button to initial state'''
