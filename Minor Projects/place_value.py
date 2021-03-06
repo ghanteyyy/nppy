@@ -48,41 +48,35 @@ class Place_Value:
         '''Getting the number in words with respect to their place value'''
 
         in_words = ''
+        length = len(value)
 
-        if len(value) == 1:  # If single digit number is inputed
-            in_words += self.map_num[value[:]]
+        if length == 1:
+            if value == '0':
+                if not self.in_words:
+                    in_words = 'Zero'
 
-        elif len(value) == 2:  # If double digit number is inputed i.e ones and tenth place only
-            if value[0] == '1' or value[1] == '0':  # If a double digit number starts with '1' i.e. 10-19
-                in_words += self.map_num[value[:]]
+            else:
+                in_words += self.map_num[value]
 
-            else:  # If a double digit number is between 10-99
+        elif length == 2:
+            if value[0] == '1' or value[1] == '0':
+                in_words += self.map_num[value]
+
+            else:
                 in_words += f'{self.map_num[value[0] + "0"]}-{self.map_num[value[1]]}'
 
-        elif value[:2] == '00' and value[2] != '0':  # If a number between 001-009 is inputed
-            in_words += self.map_num[value[2]]
+        if len(value) == 3:
+            if value[1:] == '00':
+                in_words += f'{self.map_num[value[0]]} hundred'
 
-        elif value[0] == value[2] == '0' and value[1] != '0':  # If a number between 010-090 is inputed
-            in_words += self.map_num[value[1:]]
+            elif value[1] == '0':
+                in_words += f'{self.map_num[value[0]]} hundred {self.map_num[value[2]]}'
 
-        elif value[0] == '0' and value[1] != '0' and value[2] != '0':  # If a number between 011-099 is inputed
-            if value[1] == '1':  # If number between 011-019 is inputed i.e '1' in tenth place
-                in_words += self.map_num[value[1:]]
+            elif value[1] == '1' or value[-1] == '0':
+                in_words += f'{self.map_num[value[0]]} hundred {self.map_num[value[1:]]}'
 
-            else:  # If a number between 021-099 is inputed
-                in_words += f'{self.map_num[value[1] + "0"]}-{self.map_num[value[2]]}'
-
-        elif value[1:] == '00' and value[0] != '0':  # If a number where last two digits are '0' i.e 100, 200, 700, etc.
-            in_words += self.map_num[value[0]] + ' hundred'
-
-        elif value[1] == '0' and value[0] != '0' and value[2] != '0':  # If a number between 101, 907, 503, etc are inputed i.e '0' at the tenth place
-            in_words += f'{self.map_num[value[0]]} hundred {self.map_num[value[2]]}'
-
-        elif value[0] != '0' and (value[1] == '1' or value[2] == '0'):  # If a number whose last value is 0 or second last value starts with '1'
-            in_words += f'{self.map_num[value[0]]} hundred {self.map_num[value[1:]]}'
-
-        else:  # If a number has no any '0's
-            in_words += f'{self.map_num[value[0]]} hundred {self.map_num[value[1] + "0"]}-{self.map_num[value[2]]}'
+            else:
+                in_words += f'{self.map_num[value[0]]} hundred {self.map_num[value[1] + "0"]}-{self.map_num[value[2]]}'
 
         return in_words
 
@@ -94,19 +88,14 @@ class Place_Value:
         place_value_group = self.make_group(place_value)[::-1]
 
         for index, value in enumerate(num_group):
-            if index < len(num_group) - 1:  # Checking if the loops has not reached to the last index of num_group
-                if value != '000':  # If the value is not '000' except in last-index
+            value = str(int(value))
+
+            if index < len(num_group) - 1:
+                if value != '0':
                     self.in_words += f'{self.getting_in_words(value)} {place_value_group[index][-1]} '
 
             else:
-                # If the loop is at the last index of num_group
-
-                if value in ['0', '00', '000']:  # If last three digit of a number is '0'
-                    if not self.in_words:
-                        self.in_words += 'Zero'
-
-                else:  # If the last three number is between 001-999
-                    self.in_words += self.getting_in_words(value)
+                self.in_words += self.getting_in_words(value)
 
         return self.in_words.lower()
 
@@ -114,8 +103,7 @@ class Place_Value:
 if __name__ == '__main__':
     try:
         value = str(int(input('Enter a number: ')))
-        pv = Place_Value(value)
-        in_words = pv.main()
+        in_words = Place_Value(value).main()
         print(in_words)
 
     except ValueError:
