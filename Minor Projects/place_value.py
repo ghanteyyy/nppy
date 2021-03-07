@@ -91,8 +91,7 @@ class Place_Value:
             value = str(int(value))
 
             if index < len(num_group) - 1:
-                if value != '0':
-                    self.in_words += f'{self.getting_in_words(value)} {place_value_group[index][-1]} '
+                self.in_words += f'{self.getting_in_words(value)} {place_value_group[index][-1]} '
 
             else:
                 self.in_words += self.getting_in_words(value)
