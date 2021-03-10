@@ -1,17 +1,21 @@
+import string
 from tkinter import *
 from tkinter import font
 import tkinter.ttk as ttk
 import include
-import select_font
 
 
 class Widgets:
     '''Create a label, entry-widget and listbox'''
 
     def __init__(self, master, frame, label_text, values, entry_size, listbox_size):
+        self.keys = []
+        self.entry_index = 0
+
         self.master = master
         self.values = values
         self.label_text = label_text
+        self.lower_case_values = [v.lower() for v in values]
 
         self.frame = Frame(frame)
         self.frame.pack(side=LEFT, padx=5)
@@ -33,11 +37,118 @@ class Widgets:
         self.listbox.pack(side=LEFT)
         self.scrollbar.pack(side=LEFT, fill='y')
 
+        self.listbox.bind('<<ListboxSelect>>', self.click_bind)
+
+    def click_bind(self, event=None):
+        '''Insert value of selected text from the listbox in entry widget'''
+
+        selection_index = self.listbox.curselection()[0]
+        data = self.listbox.get(selection_index)
+
+        self.entry_var.set(data)
+        self.master.after(10, lambda: set_selection(self.entry, self.entry_var))
+
+    def key_pressed(self, event=None):
+        '''When keys are pressed down'''
+
+        key = event.keysym
+
+        if key == 'space':
+            key = ' '
+
+        if key in string.printable:
+            self.keys.append(key)
+
+            if self.entry.selection_present():
+                self.sel = self.entry.index('sel.first') + 1
+                self.entry.delete('sel.first', 'sel.last')
+
+            else:
+                self.sel = self.entry.index('insert') + 1
+
+            value = self.entry_var.get() + key
+            self.entry_var.set(value)
+            self.entry_index += 1
+
+            self.entry.icursor(self.entry_index)
+            self.auto_complete()
+
+        return 'break'
+
+    def key_released(self, event=None):
+        '''When the pressed keys are relased'''
+
+        key = event.keysym
+
+        if key == ' ':
+            key = 'space'
+
+        if key in self.keys:
+            self.keys.pop(self.keys.index(key))
+
+        return 'break'
+
+    def backspace(self, event=None):
+        '''When backspace key is pressed'''
+
+        value = self.entry_var.get()[:-1]
+        self.entry_var.set(value)
+
+        if self.entry_index != 0:
+            if self.entry.selection_present():
+                self.entry.delete('sel.first', 'sel.last')
+                self.entry_index = len(self.entry_var.get())
+
+            else:
+                self.entry_index -= 1
+
+        return 'break'
+
+    def tab_completion(self, event=None):
+        '''Select all text in entry widget of matched one.
+           Also select the same value in listbox'''
+
+        value = self.entry_var.get()
+
+        self.entry.selection_range(0, 'end')
+        self.entry.icursor('end')
+
+        index = self.values.index(value)
+        self.listbox.selection_clear(0, 'end')
+        self.listbox.selection_set(index)
+        return 'break'
+
+    def auto_complete(self):
+        '''Get matched fonts from the user entered font and if the whole
+           font name is same as the first matched font then select the whole
+           text in entry widget'''
+
+        value = self.entry_var.get().strip().lower()
+        matched = [f for f in self.lower_case_values if f.startswith(value)]
+
+        if matched:
+            matched = matched[0]
+            index = self.lower_case_values.index(matched)
+
+            self.entry_var.set(self.values[index])
+
+            if self.entry.index('insert') == len(matched):
+                self.entry.selection_range(0, 'end')
+                self.listbox.selection_clear(0, 'end')
+                self.listbox.selection_set(index)
+                self.listbox.see(index)
+
+            else:
+                self.listbox.see(index)
+                self.entry.selection_range(self.sel, 'end')
+
 
 class UI:
     '''Main window for selecting fonts'''
 
     def __init__(self, master, _font):
+        self.font = _font
+
         self.master = master
         self.transparent_ico = include.resource_path('included_files\\transparent.ico')
 
@@ -56,7 +167,10 @@ class UI:
         self.font_families.sort()
         self.font_families = self.font_families[26:]
         self.non_duplicates_fonts()
+        self.lower_font_name = [f.lower() for f in self.font_families]
+
         self.font_styles = ['Regular', 'Italic', 'Bold', 'Bold Italic', 'Underline', 'Overstrike']
+        self.lower_font_style = [s.lower() for s in self.font_styles]
         self.font_sizes = [str(i) for i in range(9, 73)]
 
         self.container_frame = Frame(self.top_level)
@@ -66,34 +180,31 @@ class UI:
         self.font_style_frame = Widgets(self.top_level, self.container_frame, 'Font Style:', self.font_styles, 21, 19)
         self.font_size_frame = Widgets(self.top_level, self.container_frame, 'Size:', self.font_sizes, 9, 7)
 
+        for frame in [self.font_families_frame, self.font_style_frame, self.font_size_frame]:
+            frame.entry.bind('<Tab>', frame.tab_completion)
+            frame.entry.bind('<BackSpace>', frame.backspace)
+            frame.entry.bind('<KeyPress>', frame.key_pressed)
+            frame.entry.bind('<KeyRelease>', frame.key_released)
+            frame.entry.bind('<Escape>', lambda e: self.top_level.destroy())
+
         self.sample_labelframe = LabelFrame(self.top_level, text='Sample')
         self.pixel = PhotoImage(width=1, height=1)
         self.sample_label = Label(self.sample_labelframe, text='AaBbYyZz', compound='center', image=self.pixel, width=200, height=40, takefocus=False)
         self.sample_label.grid(row=0, column=0)
         self.sample_labelframe.pack()
 
-        self.ok_cmd = select_font.Commands(self.top_level, _font, self.sample_label, self.font_families_frame, self.font_style_frame, self.font_size_frame)
-
         self.bottom_frame = Frame(self.top_level)
-        self.ok_button = ttk.Button(self.bottom_frame, text='OK', command=self.ok_cmd.cmd)
+        self.ok_button = ttk.Button(self.bottom_frame, text='OK', command=self.apply_and_save_details)
         self.cancel_button = ttk.Button(self.bottom_frame, text='Cancel', command=self.top_level.destroy)
         self.ok_button.pack(side=LEFT)
         self.cancel_button.pack(side=LEFT, padx=5)
         self.bottom_frame.pack(side=RIGHT, pady=5)
 
-        self.ffsmuic = select_font.Bindings(self.top_level, self.font_style_frame)
-        self.ffssmuic = select_font.Bindings(self.top_level, self.font_size_frame)
-        self.fffmuic = select_font.Bindings(self.top_level, self.font_families_frame)
+        self.set_to_default()
 
-        self.ok_cmd.set_to_default()
-
-        self.font_families_frame.entry.bind('<Return>', self.ok_cmd.cmd)
-        self.font_style_frame.entry.bind('<Return>', self.ok_cmd.cmd)
-        self.font_style_frame.entry.bind('<Return>', self.ok_cmd.cmd)
-
-        self.font_families_frame.entry_var.trace('w', self.fffmuic.key_bind)
-        self.font_style_frame.entry_var.trace('w', self.ffsmuic.key_bind)
-        self.font_size_frame.entry_var.trace('w', self.ffssmuic.key_bind)
+        self.font_families_frame.entry.bind('<Return>', self.apply_and_save_details)
+        self.font_style_frame.entry.bind('<Return>', self.apply_and_save_details)
+        self.font_style_frame.entry.bind('<Return>', self.apply_and_save_details)
 
         self.entry_listbox = {self.font_families_frame.entry: self.font_families_frame.listbox,
                               self.font_style_frame.entry: self.font_style_frame.listbox,
@@ -101,10 +212,10 @@ class UI:
 
         self.non_duplicates_fonts()
         self.master.after(0, self.top_level.deiconify)
+
         self.top_level.bind('<Key>', self.up_down)
-        self.top_level.bind('<Escape>', lambda e: self.top_level.destroy())
-        self.top_level.after(250, lambda: select_font.set_selection(self.font_families_frame.entry, self.font_families_frame.entry_var))
-        self.top_level.after(100, self.ok_cmd.config_sample_label)
+        self.top_level.after(250, lambda: set_selection(self.font_families_frame.entry, self.font_families_frame.entry_var))
+        self.top_level.after(100, self.config_sample_label)
         self.top_level.mainloop()
 
     def up_down(self, event):
@@ -160,3 +271,115 @@ class UI:
                 prev_family = family
 
         self.font_families = font_families
+
+    def config_sample_label(self):
+        '''Configure sample text as per the font_name, font_size and font_style
+           from the entries widgets'''
+
+        try:
+            font_name = self.font_families_frame.entry.get()
+            font_style = self.font_style_frame.entry.get().lower()
+            font_size = int(self.font_size_frame.entry.get())
+
+            if font_style == 'regular':
+                _font = (font_name, font_size, 'normal')
+
+            else:
+                _font = (font_name, font_size, font_style)
+
+            if font_name.lower() not in self.lower_font_name or font_style not in self.lower_font_style:
+                _font = ('Courier', 9, 'normal')
+
+            self.sample_label.config(font=_font)
+            self.top_level.after(250, self.config_sample_label)\
+
+        except ValueError:
+            pass
+
+    def apply_and_save_details(self, event=None):
+        '''Set font_family, font_size and font_style to the text-widget and save
+           them to the file so that same font details are used when the program
+           runs next time.'''
+
+        font_family = self.font_families_frame.entry_var.get().strip()
+        font_style = self.font_style_frame.entry_var.get().strip().lower()
+        font_size = self.font_size_frame.entry_var.get().strip()
+
+        if font_family.lower() not in self.lower_font_name:
+            messagebox.showinfo('Font', 'There is no font with that name.\nChoose a font from the list of fonts.', parent=self.top_level)
+            return
+
+        elif font_style not in self.lower_font_style:
+            messagebox.showinfo('Font', 'This font is not available in that style.\nChoose a style from the list of styles.', parent=self.top_level)
+            return
+
+        if not font_size.isdigit():
+            font_size = 9
+
+        if font_size.isdigit() and isinstance(font_size, str):
+            font_size = int(font_size)
+
+        if font_style == 'regular':
+            font_style = 'normal'
+
+        include.config_font_style(font_style, self.font)
+        font_details = include.get_font_details()
+
+        if 'Zoomed' in font_details:
+            self.font.configure(family=font_family, size=font_size + font_details['Zoomed'])
+
+        else:
+            self.font.configure(family=font_family, size=font_size)
+
+        font_index = self.lower_font_name.index(font_family.lower())  # Getting index of the font_family in entry_widget
+
+        font_details['Font Family'] = self.font_families[font_index]
+        font_details['Font Size'] = font_size
+        font_details['Font Style'] = font_style
+
+        include.save_font_details(font_details)  # Saving font_details in file
+        self.top_level.destroy()
+
+    def set_to_default(self):
+        '''Get font_family, font_size and font_styles from the file and set
+           details to the text-widget when the program opens for the first
+           time'''
+
+        self.font_families_frame.entry_var.set('')
+        self.font_style_frame.entry_var.set('')
+        self.font_size_frame.entry_var.set('')
+
+        curr_font = include.get_font_details()  # Getting font details
+        font_family, font_size, font_style = curr_font['Font Family'], curr_font['Font Size'], curr_font['Font Style']
+
+        if font_style == 'normal':
+            font_style = 'Regular'
+
+        self.font_families_frame.entry_var.set(font_family)
+        self.font_size_frame.entry_var.set(font_size)
+        self.font_style_frame.entry_var.set(font_style)
+
+        # List boxes
+        font_family_listbox = self.font_families_frame.listbox
+        font_size_listbox = self.font_size_frame.listbox
+        font_style_listbox = self.font_style_frame.listbox
+
+        # Getting index of the font_family, font_size and font_style from the json file
+        font_family_index = self.font_families.index(font_family)
+        font_family_listbox.yview(font_family_index)
+        font_family_listbox.selection_set(font_family_index)
+
+        if str(font_size) in self.font_sizes:
+            font_size_index = self.font_sizes.index(str(font_size))
+            font_size_listbox.yview(font_size_index)
+            font_size_listbox.selection_set(font_size_index)
+
+        font_style_index = self.font_styles.index(font_style)
+        font_style_listbox.selection_set(font_style_index)
+
+
+def set_selection(entry_widget, var):
+    # Selecting font_family in entry_widget
+
+    entry_widget.select_range(0, len(var.get()) + 1)
+    entry_widget.focus()
