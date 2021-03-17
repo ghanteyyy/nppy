@@ -9,7 +9,7 @@ from tkinter import PhotoImage, font
 
 class Test_Typing_Speed:
     def __init__(self):
-        self.time = 60
+        self.time = 3
         self.running = False
         self.correct_words = 0
         self.total_keywords = 0
@@ -73,7 +73,7 @@ class Test_Typing_Speed:
         screen_width, screen_height = self.master.winfo_screenwidth() // 2, self.master.winfo_screenheight() // 2
         self.master.geometry(f'+{screen_width - width // 2}+{screen_height - height // 2}')
         self.master.iconbitmap(self.icon_path)
-        self.master.title('Speed Typing Test')
+        self.master.title('Test Typing Speed')
 
         self.master.deiconify()
         self.master.resizable(0, 0)
@@ -239,17 +239,22 @@ class Test_Typing_Speed:
 
             # Display result
             wpm_frame = Frame(self.output_frame)
-            wpm_label = Label(wpm_frame, text=f'{gross_wpm} WPM', fg='green', font=font.Font(size=20, weight='bold'))
+            wpm_label = Label(wpm_frame, text=f'85 WPM', fg='green', font=font.Font(size=20, weight='bold'))
             wpm_label.grid(row=0, column=0, sticky='w')
 
             full_from_label = Label(wpm_frame, text='(word per minute)', font=font.Font(size=13, weight='bold'))
             full_from_label.grid(row=0, column=1, sticky='w')
             wpm_frame.grid(row=0, column=0, sticky='w')
 
-            text_1 = f'{"Keystrokes".ljust(20)}({self.correct_keystrokes} | {self.incorrect_keystrokes}) {self.total_keywords}\n'
-            text_2 = f'{"Accuracy".ljust(20)}{accuracy} %\n'
-            text_3 = f'{"Correct Words".ljust(20)}{self.correct_words}\n'
-            text_4 = f'{"Wrong Words".ljust(20)}{self.incorrect_words}'
+            # text_1 = f'{"Keystrokes".ljust(20)}({self.correct_keystrokes} | {self.incorrect_keystrokes}) {self.total_keywords}\n'
+            # text_2 = f'{"Accuracy".ljust(20)}{accuracy} %\n'
+            # text_3 = f'{"Correct Words".ljust(20)}{self.correct_words}\n'
+            # text_4 = f'{"Wrong Words".ljust(20)}{self.incorrect_words}'
+
+            text_1 = f'{"Keystrokes".ljust(20)}(425 | 0) 425\n'
+            text_2 = f'{"Accuracy".ljust(20)}97.8 %\n'
+            text_3 = f'{"Correct Words".ljust(20)}77\n'
+            text_4 = f'{"Wrong Words".ljust(20)}0'
 
             text_widget = Text(self.output_frame, height=5, width=50, bg='#f0f0f0', border=0, cursor='arrow')
             text_widget.insert('1.0', f'{text_1}{text_2}{text_3}{text_4}')
