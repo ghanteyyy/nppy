@@ -9,7 +9,7 @@ from tkinter import PhotoImage, font
 
 class Test_Typing_Speed:
     def __init__(self):
-        self.time = 3
+        self.time = 60
         self.running = False
         self.correct_words = 0
         self.total_keywords = 0
@@ -99,7 +99,7 @@ class Test_Typing_Speed:
 
             if self.running is False:
                 self.running = True
-                self.track_time()
+                self.master.after(1000, self.track_time)
 
             return 'break'
 
