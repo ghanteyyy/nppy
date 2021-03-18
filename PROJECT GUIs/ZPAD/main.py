@@ -147,6 +147,7 @@ class ZPAD:
         self.text_widget.bind('<Control-q>', self.fmc.exit)
         self.text_widget.bind('<Control-z>', self.emc.undo)
         self.text_widget.bind('<Control-c>', self.emc.copy)
+        self.text_widget.bind('<BackSpace>', self.backspace)
         self.text_widget.bind('<Control-v>', self.emc.paste)
         self.text_widget.bind('<Key>', self.remove_selection)
         self.text_widget.bind('<F5>', self.emc.get_date_time)
@@ -172,9 +173,14 @@ class ZPAD:
         self.text_widget.bind('<Alt-Return>', self.activate_strip_whitespace)
         self.text_widget.bind('<Control-F>', lambda e: self.Fmc.font_selection())
         self.text_widget.bind('<Control-w>', lambda e: self.format_menu.invoke(0))
-        self.text_widget.bind('<BackSpace>', lambda e: self.status_label_var.set(''))
         self.text_widget.bind('<Configure>', lambda e: self.text_widget.configure(scrollregion=self.text_widget.bbox('end')))
         self.master.mainloop()
+
+    def backspace(self, event=None):
+        '''When backspace key is pressed'''
+
+        self.status_label_var.set('')
+        self.text_widget.config(insertofftime=300, insertontime=600)
 
     def update_label_text(self):
         '''Show the number of text selected, number of text copied or cut'''
