@@ -1,5 +1,8 @@
+import os
+import sys
 from tkinter import *
 from tkinter import ttk
+from tkinter import PhotoImage
 from tkinter import messagebox
 
 
@@ -20,6 +23,16 @@ class Saving_Spending:
         self.pos_x, self.pos_y = self.master.winfo_screenwidth() // 2 - 900 // 2, self.master.winfo_screenheight() - 650
         self.master.geometry(f'900x500+{self.pos_x}+{self.pos_y}')
 
+        # PhotoImage Objects
+        self.edit_image_obj = PhotoImage(file=self.resource_path('edit.png'))
+        self.name_image_obj = PhotoImage(file=self.resource_path('name.png'))
+        self.save_image_obj = PhotoImage(file=self.resource_path('save.png'))
+        self.spent_image_obj = PhotoImage(file=self.resource_path('spent.png'))
+        self.istock_image_obj = PhotoImage(file=self.resource_path('istock.png'))
+        self.rupees_image_obj = PhotoImage(file=self.resource_path('rupees.png'))
+        self.earning_image_obj = PhotoImage(file=self.resource_path('earning.png'))
+        self.back_image_obj = PhotoImage(file=self.resource_path('back_button.png'))
+
         self.home_frame = Frame(self.master, bg='white')
         self.edit_window_frame = Frame(self.master, bg='white')
         self.earned_spent_frame = Frame(self.master, bg='white')
@@ -32,8 +45,7 @@ class Saving_Spending:
         self.title_frame.place(x=100, y=30)
 
         self.label_image_frame = Frame(self.home_frame, bd=0, width=237, height=280)
-        self.file_image_file = PhotoImage(file='included files\\istock.png')
-        self.label_image = Label(self.label_image_frame, image=self.file_image_file, bg='blue', borderwidth=0, takefocus=False)
+        self.label_image = Label(self.label_image_frame, image=self.istock_image_obj, bg='blue', borderwidth=0, takefocus=False)
         self.label_image.grid(row=0, column=0)
         self.label_image_frame.place(x=3, y=200)
 
@@ -53,8 +65,7 @@ class Saving_Spending:
         self.add_button_frame.place(x=425, y=320)
 
         self.back_button_frame = Frame(self.master, bg='white')
-        self.back_button_image = PhotoImage(file='included files\\back_button.png')
-        self.back_button_button = Button(self.back_button_frame, image=self.back_button_image, bg='white', activebackground='white', relief=GROOVE, bd=0, cursor='hand2', takefocus=False)
+        self.back_button_button = Button(self.back_button_frame, image=self.back_image_obj, bg='white', activebackground='white', relief=GROOVE, bd=0, cursor='hand2', takefocus=False)
         self.back_button_button.grid(row=0, column=0)
 
         self.master.mainloop()
@@ -84,20 +95,17 @@ class Saving_Spending:
         self.title_frame.place(x=100, y=30)
 
         self.spent_image_frame = Frame(self.earned_spent_frame, bd=0, bg='white')
-        self.spent_image = PhotoImage(file=f'included files\\{image}')
-        self.spent_label_image = Label(self.spent_image_frame, image=self.spent_image, bd=0, bg='white', takefocus=False)
+        self.spent_label_image = Label(self.spent_image_frame, image=self.spent_image_obj, bd=0, bg='white', takefocus=False)
         self.spent_label_image.grid(row=0, column=0)
         self.spent_image_frame.place(x=10, y=220)
 
         self.name_image_frame = Frame(self.earned_spent_frame, bd=0)
-        self.name_image = PhotoImage(file='included files\\name.png')
-        self.name_label_image = Label(self.name_image_frame, image=self.name_image, bd=0, takefocus=False)
+        self.name_label_image = Label(self.name_image_frame, image=self.name_image_obj, bd=0, takefocus=False)
         self.name_label_image.grid(row=0, column=0)
         self.name_image_frame.place(x=460, y=10)
 
         self.rupee_image_frame = Frame(self.earned_spent_frame, bd=0)
-        self.rupee_image = PhotoImage(file='included files\\rupees.png')
-        self.rupee_label_name = Label(self.rupee_image_frame, image=self.rupee_image, bd=0, takefocus=False)
+        self.rupee_label_name = Label(self.rupee_image_frame, image=self.rupees_image_obj, bd=0, takefocus=False)
         self.rupee_label_name.grid(row=0, column=0)
         self.rupee_image_frame.place(x=715, y=10)
 
@@ -142,8 +150,7 @@ class Saving_Spending:
         self.title_frame.place(x=50, y=10)
 
         self.spent_image_frame = Frame(self.add_earned_spent_frame, bd=0)
-        self.spent_image = PhotoImage(file='included files\\earning.png')
-        self.spent_label_image = Label(self.spent_image_frame, image=self.spent_image, borderwidth=0, takefocus=False)
+        self.spent_label_image = Label(self.spent_image_frame, image=self.spent_image_obj, borderwidth=0, takefocus=False)
         self.spent_label_image.grid(row=0, column=0)
         self.spent_image_frame.place(x=70, y=200)
 
@@ -201,8 +208,7 @@ class Saving_Spending:
         self.back_button_button.config(command=lambda: self.back_button_command(self.add_earned_spent_frame, 'Add Earning | Expenditure'))
 
         self.edit_frame = Frame(self.edit_window_frame, bd=0)
-        self.edit_image = PhotoImage(file='included files\\edit.png')
-        self.edit_label_image = Label(self.edit_frame, image=self.edit_image, borderwidth=0, takefocus=False)
+        self.edit_label_image = Label(self.edit_frame, image=self.edit_image_obj, borderwidth=0, takefocus=False)
         self.edit_label_image.grid(row=0, column=0)
         self.edit_frame.place(x=80, y=120)
 
@@ -427,6 +433,23 @@ class Saving_Spending:
                 _var.set(0)
 
             self.master.focus()
+
+    def resource_path(self, relative_path):
+        '''Get absolute path to resource from temporary directory
+
+        In development:
+            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+
+        After compiling to .exe with pyinstaller and using --add-data flag:
+            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
+
+        try:
+            base_path = os.path.join(sys._MEIPASS)  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS.
+
+        except AttributeError:
+            base_path = os.path.abspath(".")
+
+        return os.path.join(base_path, 'included files', relative_path)
 
 
 if __name__ == '__main__':
