@@ -86,10 +86,6 @@ class Remainder_Window:
            when this script runs'''
 
         if self.var.get() == 1:
-            if not os.path.exists(self.files[1]):
-                with open(self.files[1], 'w'):
-                    pass
-
             with open(self.files[1], 'a') as tf:
                 tf.write(f'{name.ljust(30)}:{self.birthdates[name].rjust(10)}\n')
 
@@ -115,8 +111,8 @@ class Remainder_Window:
 
         if self.birthdates:
             for name, date in self.birthdates.items():
-                winsound.PlaySound(self.resource_path('included_files/tone.wav'), winsound.SND_LOOP + winsound.SND_ASYNC)
-                self.Window(name.lower(), date)
+                winsound.PlaySound(self.resource_path('tone.wav'), winsound.SND_LOOP + winsound.SND_ASYNC)
+                self.Window(name, date)
 
     def resource_path(self, relative_path):
         '''Get absolute path to resource from temporary directory
@@ -133,7 +129,7 @@ class Remainder_Window:
         except AttributeError:
             base_path = os.path.abspath(".")
 
-        return os.path.join(base_path, relative_path)
+        return os.path.join(base_path, 'included_files', relative_path)
 
 
 if __name__ == '__main__':
