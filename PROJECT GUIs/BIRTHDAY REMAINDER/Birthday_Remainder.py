@@ -14,7 +14,7 @@ class Birthday_Remainder:
         self.master = Tk()
         self.master.withdraw()
         self.master.resizable(0, 0)
-        self.master.iconbitmap(self.resource_path('included_files/icon.ico'))
+        self.master.iconbitmap(self.resource_path('icon.ico'))
         self.master.title('Birthday Remainder')
 
         self.width, self.height = 426, 470
@@ -22,7 +22,7 @@ class Birthday_Remainder:
         self.master.geometry(f'{self.width}x{self.height}+{self.screen_width // 2 - self.width // 2}+{self.screen_height // 2 - self.height // 2}')
 
         self.birthday_quote_frame = Frame(self.master)
-        self.birthday_quote_image = PhotoImage(file=self.resource_path('included_files/image.png'))
+        self.birthday_quote_image = PhotoImage(file=self.resource_path('image.png'))
         self.label_birthday_quote = Label(self.birthday_quote_frame, image=self.birthday_quote_image)
         self.label_birthday_quote.grid(row=0, column=0)
         self.birthday_quote_frame.place(x=0, y=0)
@@ -166,7 +166,7 @@ class Birthday_Remainder:
         except AttributeError:
             base_path = os.path.abspath(".")
 
-        return os.path.join(base_path, relative_path)
+        return os.path.join(base_path, 'included_files', relative_path)
 
 
 if __name__ == '__main__':
