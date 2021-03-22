@@ -24,14 +24,14 @@ class Saving_Spending:
         self.master.geometry(f'900x500+{self.pos_x}+{self.pos_y}')
 
         # PhotoImage Objects
-        self.edit_image_obj = PhotoImage(file=self.resource_path('edit.png'))
-        self.name_image_obj = PhotoImage(file=self.resource_path('name.png'))
-        self.save_image_obj = PhotoImage(file=self.resource_path('save.png'))
-        self.spent_image_obj = PhotoImage(file=self.resource_path('spent.png'))
-        self.istock_image_obj = PhotoImage(file=self.resource_path('istock.png'))
-        self.rupees_image_obj = PhotoImage(file=self.resource_path('rupees.png'))
-        self.earning_image_obj = PhotoImage(file=self.resource_path('earning.png'))
-        self.back_image_obj = PhotoImage(file=self.resource_path('back_button.png'))
+        self.edit_image_obj = PhotoImage(file=self.resource_path('included files/edit.png'))
+        self.name_image_obj = PhotoImage(file=self.resource_path('included files/name.png'))
+        self.save_image_obj = PhotoImage(file=self.resource_path('included files/save.png'))
+        self.spent_image_obj = PhotoImage(file=self.resource_path('included files/spent.png'))
+        self.istock_image_obj = PhotoImage(file=self.resource_path('included files/istock.png'))
+        self.rupees_image_obj = PhotoImage(file=self.resource_path('included files/rupees.png'))
+        self.earning_image_obj = PhotoImage(file=self.resource_path('included files/earning.png'))
+        self.back_image_obj = PhotoImage(file=self.resource_path('included files/back_button.png'))
 
         self.home_frame = Frame(self.master, bg='white')
         self.edit_window_frame = Frame(self.master, bg='white')
@@ -50,12 +50,12 @@ class Saving_Spending:
         self.label_image_frame.place(x=3, y=200)
 
         self.earned_button_frame = Frame(self.home_frame)
-        self.earned_button = Button(self.earned_button_frame, bg='Red', activebackground='Red', text='MY EARNING', **self.home_button_attributes, command=lambda: self.show_details_window('Earned details', 'MY\n EARNING', 'save.png', self.saving_file, 'Not Earned Yet'))
+        self.earned_button = Button(self.earned_button_frame, bg='Red', activebackground='Red', text='MY EARNING', **self.home_button_attributes, command=lambda title='Earned details', text='MY\n EARNING', image=self.save_image_obj, file_name=self.saving_file, yet='Not Earned Yet': self.show_details_window(title, text, image, file_name, yet))
         self.earned_button.grid(row=0, column=0)
         self.earned_button_frame.place(x=425, y=200)
 
         self.spent_button_frame = Frame(self.home_frame)
-        self.spent_button = Button(self.spent_button_frame, bg='#01912f', activebackground='#01912f', text='MY SPENDING', **self.home_button_attributes, command=lambda: self.show_details_window('Spent details', 'MY\nSPENDING', 'spent.png', self.spent_file, 'Not Spent Yet'))
+        self.spent_button = Button(self.spent_button_frame, bg='#01912f', activebackground='#01912f', text='MY SPENDING', **self.home_button_attributes, command=lambda title='Spent details', text='MY\n SPENDING', image=self.spent_image_obj, file_name=self.spent_file, yet='Not Spent Yet': self.show_details_window(title, text, image, file_name, yet))
         self.spent_button.grid(row=0, column=0)
         self.spent_button_frame.place(x=425, y=260)
 
@@ -95,14 +95,14 @@ class Saving_Spending:
         self.title_frame.place(x=100, y=30)
 
         self.spent_image_frame = Frame(self.earned_spent_frame, bd=0, bg='white')
-        self.spent_label_image = Label(self.spent_image_frame, image=self.spent_image_obj, bd=0, bg='white', takefocus=False)
+        self.spent_label_image = Label(self.spent_image_frame, image=image, bd=0, bg='white', takefocus=False)
         self.spent_label_image.grid(row=0, column=0)
         self.spent_image_frame.place(x=10, y=220)
 
         self.name_image_frame = Frame(self.earned_spent_frame, bd=0)
         self.name_label_image = Label(self.name_image_frame, image=self.name_image_obj, bd=0, takefocus=False)
         self.name_label_image.grid(row=0, column=0)
-        self.name_image_frame.place(x=460, y=10)
+        self.name_image_frame.place(x=460, y=11)
 
         self.rupee_image_frame = Frame(self.earned_spent_frame, bd=0)
         self.rupee_label_name = Label(self.rupee_image_frame, image=self.rupees_image_obj, bd=0, takefocus=False)
@@ -150,7 +150,7 @@ class Saving_Spending:
         self.title_frame.place(x=50, y=10)
 
         self.spent_image_frame = Frame(self.add_earned_spent_frame, bd=0)
-        self.spent_label_image = Label(self.spent_image_frame, image=self.spent_image_obj, borderwidth=0, takefocus=False)
+        self.spent_label_image = Label(self.spent_image_frame, image=self.earning_image_obj, borderwidth=0, takefocus=False)
         self.spent_label_image.grid(row=0, column=0)
         self.spent_image_frame.place(x=70, y=200)
 
@@ -254,10 +254,14 @@ class Saving_Spending:
         self.master.title(title)
         frames = [self.home_frame, self.edit_window_frame, self.earned_spent_frame, self.add_earned_spent_frame]
 
+        if self.spent_label_image.cget('image') is not None:
+            self.spent_label_image.config(image='')
+
         if add_frame == self.home_frame:
             self.back_button_frame.place_forget()
 
         if add_frame == self.add_earned_spent_frame:
+            self.spent_label_image.config(image=self.earning_image_obj)
             self.back_button_button.config(command=lambda: self.back_button_command(self.home_frame, 'Saving & Spending'))
 
         for frame in frames:
@@ -449,7 +453,7 @@ class Saving_Spending:
         except AttributeError:
             base_path = os.path.abspath(".")
 
-        return os.path.join(base_path, 'included files', relative_path)
+        return os.path.join(base_path, relative_path)
 
 
 if __name__ == '__main__':
