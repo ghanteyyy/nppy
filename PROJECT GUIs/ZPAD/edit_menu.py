@@ -160,7 +160,9 @@ class Edit_Menu:
         for line in range(1, lines + 1):
             self.text_widget.tag_add('sel', f'{line}.0', f'{line}.end')
 
-        self.set_var(text=f'{no_of_characters} characters selected', time=None)
+        if no_of_characters > 0:
+            self.set_var(text=f'{no_of_characters} characters selected', time=None)
+
         self.text_widget.tag_add('triple_click', '1.0', 'end-1c')
         self.text_widget.config(insertofftime=1000000, insertontime=0)
 
