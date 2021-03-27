@@ -12,7 +12,7 @@ def initial_position(master):
     master.update()
 
     master.iconbitmap(resource_path('included_files\\icon.ico'))
-    master.title('Untitled - ZPAD')
+    master.title('Untitled - GPAD')
 
     width, height = master.winfo_width() + 348, master.winfo_height() + 60
     screen_width, screen_height = master.winfo_screenwidth() // 2, master.winfo_screenheight() // 2

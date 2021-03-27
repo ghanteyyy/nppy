@@ -133,7 +133,7 @@ class Edit_Menu:
             self.master.after(250, lambda: search.Search(self.master).open_link(f'https://www.google.com/search?q={text}'))
 
         else:
-            messagebox.showerror('ZPAD', 'You need to select text to make search')
+            messagebox.showerror('GPAD', 'You need to select text to make search')
 
     def find_widget(self, event=None):
         '''Display find GUI window when user clicks find option or presses Ctrl+F'''

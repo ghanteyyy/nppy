@@ -6,11 +6,11 @@ import search
 
 class About:
     def __init__(self, master):
-        self.build_number = '1.1.5'
+        self.build_number = '2.0.0'
 
         self.master = master
         self.author_page_link = 'http://github.com/ghanteyyy'
-        self.source_code_link = 'https://github.com/ghanteyyy/nppy/tree/master/PROJECT GUIs/ZPAD'
+        self.source_code_link = 'https://github.com/ghanteyyy/nppy/tree/master/PROJECT GUIs/GPAD'
 
         self.top_level = Toplevel(self.master)
         self.top_level.transient(self.master)
@@ -30,7 +30,7 @@ class About:
         self.author_name_button = Button(self.description_frame, text='\t\tghanteyyy', bg='white', activebackground='white', activeforeground='black', fg='black', bd=0, command=self.author_page)
 
         self.source_code_label = Label(self.description_frame, text='Source Code:', bg='white')
-        self.source_code_button = Button(self.description_frame, text='\t\tZPAD', bg='white', activebackground='white', activeforeground='black', fg='black', bd=0, command=self.source_code_page)
+        self.source_code_button = Button(self.description_frame, text='\t\tGPAD', bg='white', activebackground='white', activeforeground='black', fg='black', bd=0, command=self.source_code_page)
 
         self.build_label.grid(row=0, column=0, sticky='w')
         self.build_number_label.grid(row=0, column=1, sticky='e')

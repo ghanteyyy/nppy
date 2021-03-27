@@ -9,7 +9,7 @@ import about
 import right_click
 
 
-class ZPAD:
+class GPAD:
     def __init__(self):
         self.get_font = include.get_font_details()
 
@@ -362,4 +362,4 @@ class ZPAD:
 
 
 if __name__ == '__main__':
-    ZPAD()
+    GPAD()

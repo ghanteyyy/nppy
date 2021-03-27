@@ -66,7 +66,7 @@ class Go_To:
                 self.go_to_master.destroy()
 
             else:
-                messagebox.showinfo('ZPAD - Goto Line', f'The line number must not be beyond or below the total number of lines [{get_from_text}].', parent=self.go_to_master)
+                messagebox.showinfo('GPAD - Goto Line', f'The line number must not be beyond or below the total number of lines [{get_from_text}].', parent=self.go_to_master)
 
         except ValueError:
-            messagebox.showinfo('ZPAD - Goto Line', 'Line number must be in number', parent=self.go_to_master)
+            messagebox.showinfo('GPAD - Goto Line', 'Line number must be in number', parent=self.go_to_master)

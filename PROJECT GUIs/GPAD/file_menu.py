@@ -73,13 +73,13 @@ class File_Menu:
             self.is_saved = False
             self.set_var('New File Created')
             self.text_widget.delete('1.0', 'end')
-            self.master.title('Untitled - ZPAD')
+            self.master.title('Untitled - GPAD')
             self.previous_signature = self.get_signature(self.get_contents)
 
     def new_window(self, event=None):
         '''When user presses ctrl+shift+n or clicks new_window option from file_menu'''
 
-        main.ZPAD()
+        main.GPAD()
 
     def open(self, event=None):
         '''When user presses ctrl+o or clicks open option from file menu'''
@@ -109,7 +109,7 @@ class File_Menu:
 
             self.set_var(f'Opened {self.file_name}')
             self.previous_signature = self.get_signature(self.get_contents)
-            self.title = os.path.basename(self.file_name) + ' - ZPAD'
+            self.title = os.path.basename(self.file_name) + ' - GPAD'
             self.master.title(self.title)
 
         return 'break'
@@ -132,7 +132,7 @@ class File_Menu:
         if file_name:
             self.file_name = file_name
             self.write_to_file()
-            self.master.title(os.path.basename(self.file_name) + ' - ZPAD')
+            self.master.title(os.path.basename(self.file_name) + ' - GPAD')
 
         else:
             self.is_saved = False
@@ -151,7 +151,7 @@ class File_Menu:
         '''When user wants to exit the program'''
 
         if self.is_file_changed():
-            choice = messagebox.askyesnocancel('ZPAD', 'Do you really want to quit without saving?')
+            choice = messagebox.askyesnocancel('GPAD', 'Do you really want to quit without saving?')
 
             if choice is True:
                 self.delete_zoom()

@@ -159,7 +159,7 @@ class Find:
         wrap_around = self.wrap_around_var.get()
 
         if not find_what:
-            messagebox.showinfo('ZPAD', f'Could not found "{find_what}"', parent=self.find_master)
+            messagebox.showinfo('GPAD', f'Could not found "{find_what}"', parent=self.find_master)
             self.find_what_entry.focus()
             return
 
@@ -201,7 +201,7 @@ class Find:
                     self.find_index = self.get_cursor_position()
 
         if not self.word_indexes:
-            messagebox.showinfo('ZPAD', f'Could not found "{find_what}"', parent=self.find_master)
+            messagebox.showinfo('GPAD', f'Could not found "{find_what}"', parent=self.find_master)
             return
 
         if self.find_index is None:  # If finding is being done first time
@@ -223,14 +223,14 @@ class Find:
         else:  # When 'Wrap Around' checkbutton is not selected
             if direction == 1:  # When 'Up' checkbutton is selected
                 if self.find_index <= 0:  # When self.find_index is equal to first index of the self.word_indexes
-                    messagebox.showinfo('ZPAD', f'Could not found "{find_what}"', parent=self.find_master)
+                    messagebox.showinfo('GPAD', f'Could not found "{find_what}"', parent=self.find_master)
                     return
 
                 self.find_index -= 1  # Decreasing the self.find_index by 1 each time so that the finding looks like it is going in UP direction.
 
             else:  # When 'Down' checkbutton is selected
                 if self.find_index > len(self.word_indexes) - 2:  # When self.find_index is beyond the index of the self.word_indexes
-                    messagebox.showinfo('ZPAD', f'Could not found "{find_what}"', parent=self.find_master)
+                    messagebox.showinfo('GPAD', f'Could not found "{find_what}"', parent=self.find_master)
                     return
 
                 self.find_index += 1  # Increasing the self.find_index by 1 each time so that the finding looks like it is going in DOWN direction.
@@ -242,7 +242,7 @@ class Find:
             self.add_tag(start_pos, end_pos)  # Selecting the matched word
 
         except IndexError:
-            messagebox.showinfo('ZPAD', f'Could not found "{find_what}"', parent=self.find_master)
+            messagebox.showinfo('GPAD', f'Could not found "{find_what}"', parent=self.find_master)
 
     def exit(self, event=None):
         '''When user quits the find window'''

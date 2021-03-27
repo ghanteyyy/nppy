@@ -169,7 +169,7 @@ class Replace:
         wrap_around = self.wrap_var.get()
 
         if not replace_what:
-            messagebox.showinfo('ZPAD', f'Could not found "{replace_what}"', parent=self.replace_master)
+            messagebox.showinfo('GPAD', f'Could not found "{replace_what}"', parent=self.replace_master)
             return
 
         if match_case == 1:  # When user selects "Match Case" check-button we need the content as it is in text_widget
@@ -183,7 +183,7 @@ class Replace:
             self.search_index(self.dummy_text_widget, replace_what.lower())
 
         if not self.word_indexes:
-            messagebox.showinfo('ZPAD', f'Could not found "{replace_what}"', parent=self.replace_master)
+            messagebox.showinfo('GPAD', f'Could not found "{replace_what}"', parent=self.replace_master)
             return
 
         if self.find_index is None:
@@ -206,7 +206,7 @@ class Replace:
         self.find_index += 1
 
         if self.find_index >= len(self.word_indexes):
-            messagebox.showinfo('ZPAD', f'Could not found "{replace_what}"', parent=self.replace_master)
+            messagebox.showinfo('GPAD', f'Could not found "{replace_what}"', parent=self.replace_master)
 
         else:
             start_pos = self.word_indexes[self.find_index]
@@ -248,7 +248,7 @@ class Replace:
         match_case = self.match_var.get()
 
         if not old_text or old_text not in self.text_widget.get('1.0', END):
-            messagebox.showinfo('ZPAD', f'Could not found "{old_text}"', parent=self.replace_master)
+            messagebox.showinfo('GPAD', f'Could not found "{old_text}"', parent=self.replace_master)
             return
 
         contents = self.text_widget.get('1.0', 'end-1c')
