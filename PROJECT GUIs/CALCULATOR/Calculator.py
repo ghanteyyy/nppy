@@ -341,7 +341,7 @@ class Calculator:
             elif char.lower() == 't':
                 self.place_at_top()
 
-            elif char == 'Prev Ans':
+            elif char == 'Prev\nAns':
                 set_var = self.edge_case_8(entry_get)  # Edge Case 8
 
             if set_var:
