@@ -1,245 +1,129 @@
 import os
 import sys
-import ctypes
-import string
 from math import *
 from tkinter import *
 from tkinter import messagebox
 
 
 class Calculator:
-    '''Calculator is a GUI script purely written in Python. This calculator is capable of performing addition, subtraction,
-       multiplication, division, percentage of any digits numbers and calculation of some trigonometric functions. Moreover,
-       this calculator is able to store history of each calculation and is able to place itself to the top of any other
-       application windows so that you could do calculation above any window.'''
-
     def __init__(self):
+        self.track = 0
         self.prev_ans = '0'
+        self.is_at_top = False
         self.operators = '+-*/^'
         self.digits = '0123456789'
         self.is_valid_brackets = True
         self.decimal_placeable = True
-        self.hide_minimiz_maximize = False
-        self.is_shown = False   # History is not shown yet
+        self.width, self.height = 505, 286
         self.zero_division_error = 'Cannot Divide By Zero'
         self.trigonometric_functions = ['sin', 'sin-\u00B9', 'cos', 'cos-\u00B9', 'log', 'tan', 'tan-\u00B9', 'abs', 'deg', 'rad']
+        self.buttons_names = ['AC', 'DEL', '%', '/', 'x^y', 'abs', '(', '7', '8', '9', '*', 'n!', 'π', ')', '4', '5', '6', '-', 'sin', 'sin-\u00B9', 'deg', '1', '2', '3', '+', 'cos',
+                              'cos-\u00B9', 'rad', '.', '0', '=', 'log', 'tan', 'tan-\u00B9', 'Prev\nAns']   # buttons name
 
         self.master = Tk()
-        self.master.withdraw()
         self.master.title('Calculator')
-        self.master.iconbitmap(self.resource_path('included_files/icon.ico'))
-
-        self.hide_or_show = hide_or_show_maximize_minimize(self.master)
 
         self.var = StringVar()
         self.text_frame = Frame(self.master)
-        self.text_area = Entry(self.text_frame, textvariable=self.var, borderwidth=1, width=47, bg='silver', font=("Arial", 20), cursor='arrow', justify=RIGHT, disabledbackground='white', disabledforeground='black', state='disabled')
+        self.text_area = Entry(self.text_frame, textvariable=self.var, borderwidth=1, width=47, bg='silver', font=('Arial', 20), cursor='arrow', justify=RIGHT, disabledbackground='white', disabledforeground='black', state='disabled')
         self.var.set('0')
-        self.text_area.grid(row=0, column=0)
+        self.text_area.grid(row=0, column=0, sticky='NSEW')
 
         # Creating image object
         self.pull_back_image = PhotoImage(file=self.resource_path('included_files\\pull_back.png'))
         self.push_front_image = PhotoImage(file=self.resource_path('included_files\\push_front.png'))
 
-        # Buttons that push the window to the top of other window or pull the window from the top of other window
         self.push_front_button = Button(self.text_frame, image=self.push_front_image, bg='white', activebackground='white', fg='black', relief='groove', compound='top', cursor='hand2', command=self.place_at_top)
-        self.push_front_button.grid(row=0, column=1, ipadx=15, ipady=3)
-        self.text_frame.pack(anchor='w')
+        self.push_front_button.grid(row=0, column=1, ipadx=15, ipady=3, sticky='NSEW')
+        self.text_frame.grid(row=0, column=0, sticky='NSEW')
 
-        # Buttons
-        self.track = 0
-        self.buttons_frame = Frame(self.master)  # Frame to place all buttons
-        self.buttons_names = ['AC', 'DEL', '%', '/', 'x^y', 'abs', '(', '7', '8', '9', '*', 'n!', 'π', ')', '4', '5', '6', '-', 'sin', 'sin-\u00B9', 'deg', '1', '2', '3', '+', 'cos',
-                              'cos-\u00B9', 'rad', '.', '0', '=', 'log', 'tan', 'tan-\u00B9', 'Prev Ans']   # buttons name
+        self.buttons_frame = Frame(self.master)
+        self.buttons_frame.grid(row=1, column=0, sticky='nsew')
 
-        # Adding buttons to the window
         for row in range(5):
             text = self.buttons_names[self.track: self.track + 7]
 
             for col, txt in enumerate(text):
-                self.buttons = Button(self.buttons_frame, text=txt, width=10, height=2, bg='white', fg='black', activebackground='#cccccc', relief='groove', font=('Courier', 12))
+                button = Button(self.buttons_frame, text=txt, width=10, height=2, bg='white', fg='black', activebackground='#cccccc', relief='groove', font=('Courier', 12))
+                button.grid(row=row, column=col, sticky='NSEW')
 
                 if txt == 'AC':
-                    self.buttons.config(command=self.ac_command)
+                    button.config(command=self.ac_command)
 
                 elif txt == 'DEL':
-                    self.buttons.config(command=self.del_command)
+                    button.config(command=self.del_command)
 
                 elif txt == '=':
-                    self.buttons.config(command=self.equals_to)
+                    button.config(command=self.equals_to)
 
                 elif txt in self.trigonometric_functions:
                     txt += '('
-                    self.buttons.config(command=lambda txt=txt: self.keyaction(values=txt))
+                    button.config(command=lambda txt=txt: self.keyaction(values=txt))
 
                 else:
-                    self.buttons.config(command=lambda txt=txt: self.keyaction(values=txt))
-
-                self.buttons.grid(row=row, column=col)
+                    button.config(command=lambda txt=txt: self.keyaction(values=txt))
 
             self.track += 7
 
-        self.buttons_frame.pack()
+        self.master.grid_rowconfigure(0, weight=1)
+        self.master.grid_columnconfigure(0, weight=1)
+        self.master.grid_rowconfigure(1, weight=1)
 
-        # History title
-        self.history_frame = Frame(self.master, bg='#cccccc')
-        self.history_label = Label(self.history_frame, text='History', font=('Courier', 15, 'bold'), bg='#cccccc')
-        self.history_label.grid(row=0, column=0, sticky='w')
+        self.text_frame.grid_rowconfigure(0, weight=1)
+        self.text_frame.grid_columnconfigure(0, weight=1)
 
-        # Clear and info Button
-        self.button_framme = Frame(self.history_frame, bg='#cccccc')
-        self.info_button = Button(self.button_framme, text='INFO', bg='white', activebackground='white', fg='black', relief='groove', cursor='hand2', command=self.info)
-        self.clear_history_button = Button(self.button_framme, text='CLEAR', bg='white', activebackground='white', fg='black', relief='groove', cursor='hand2', command=self.clear_history)
-        self.info_button.grid(row=0, column=1, padx=10, ipadx=8, ipady=2)
-        self.clear_history_button.grid(row=0, column=2, ipadx=5, ipady=2)
-        self.button_framme.grid(row=0, column=1)
+        for i in range(7):
+            if i < 5:
+                self.buttons_frame.grid_rowconfigure(i, weight=1)
 
-        self.history_area_frame = Frame(self.history_frame)
-        self.history_area = Text(self.history_area_frame, width=52, height=13, borderwidth=0, cursor='arrow', bg='#cccccc')
-        self.history_area.insert(END, 'There\'s no history yet.')
-        self.history_area.grid(row=0, column=0)
-        self.history_area_frame.grid(row=1, column=0)
+            self.buttons_frame.grid_columnconfigure(i, weight=1)
 
-        # Button that has label "Show History"
-        self.show_history_frame = Frame(self.master, bg='#cccccc')
-        self.show_history_button = Button(self.show_history_frame, text='Show History', relief=GROOVE, bg='#cccccc', activebackground='#cccccc', cursor='hand2', width=47, command=self.show_history)
-        self.show_history_button.grid(row=0, column=0, ipadx=215, ipady=5)
-        self.show_history_frame.pack(anchor='w')
-
-        # Attaching scrollbar to the text area
-        self.scrollbar = Scrollbar(self.history_area_frame, orient="vertical", command=self.history_area.yview, cursor='arrow')
-        self.history_area['yscrollcommand'] = self.scrollbar.set
-
-        self.master.config(bg='#cccccc')
-        self.history_area.config(state=DISABLED)
+        self.initial_position()
 
         self.master.bind('<Key>', self.keyaction)
-        self.master.bind('<Control-h>', lambda e: self.ctrl_h())
-        self.master.bind('<Control-H>', lambda e: self.ctrl_h())
+        self.master.minsize(self.width, self.height)
         self.master.bind('<Return>', lambda e: self.equals_to())
         self.master.bind('<BackSpace>', lambda e: self.del_command())
 
-        self.show_scrollbar()
-        self.master.after(10, self.insert_zero)
-        self.initial_position()
-        self.re_position()
         self.master.mainloop()
 
     def initial_position(self):
         '''Position when the program opens'''
 
+        self.master.withdraw()
         self.master.update_idletasks()
 
-        # Getting screen width and height of any system
-        self.screen_width = self.master.winfo_screenwidth()
-        self.screen_height = self.master.winfo_screenheight()
+        self.master.iconbitmap(self.resource_path('included_files\\icon.ico'))
 
-        # pos_x and pos_y are calculated such that the window is at the center of the screen
-        self.pos_x = self.screen_width // 2 - self.master.winfo_reqwidth() // 2
-        self.pos_y = self.screen_height // 2 - self.master.winfo_reqheight() // 2
+        screen_width = self.master.winfo_screenwidth()
+        screen_height = self.master.winfo_screenheight()
 
-        self.master.geometry('+{}+{}'.format(self.pos_x, self.pos_y))
+        pos_x = screen_width // 2 - self.width // 2
+        pos_y = screen_height // 2 - self.height // 2
+
+        self.master.geometry(f'{self.width}x{self.height}+{pos_x}+{pos_y}')
         self.master.after(250, self.master.deiconify)
-        self.master.resizable(0, 0)
+        self.master.deiconify()
 
-    def re_position(self):
-        '''Position the window the window gets out of the screen'''
-
-        self.master.update_idletasks()
-
-        x_pos = self.master.winfo_x()
-        y_pos = self.master.winfo_y()
-
-        width = self.master.winfo_reqwidth()
-        height = self.master.winfo_reqheight()
-
-        if x_pos < 0:
-            x_pos = 10
-
-        if x_pos + width > self.screen_width:
-            x_pos = self.screen_width - width - 10
-
-        if y_pos + height > self.screen_height:
-            y_pos = self.screen_height - height - 80
-
-        self.master.geometry(f'+{x_pos}+{y_pos}')
-        self.master.after(50, self.re_position)
-
-    def show_history(self):
-        '''Show history area and insert history label, history area, clear button, info button, place at top button and up arrow button'''
-
-        self.is_shown = True
-        self.history_frame.pack()
-        self.show_history_frame.pack_forget()
-        self.show_history_frame.pack()
-        self.history_frame.pack(anchor='w', padx=10, pady=5)
-        self.show_history_button.config(text='Hide History', command=self.hide_history)
-
-    def hide_history(self):
-        '''Hide history area and remove history label, history area, clear button, info button, place at top button and insert down arrow button'''
-
-        self.is_shown = False
-        self.history_frame.pack_forget()
-        self.show_history_button.config(text='Show History', command=self.show_history)
+        self.master.after(10, self.insert_zero)
 
     def place_at_top(self):
         '''Place the window to the top of any window opened in the background and resize some widgets'''
 
-        if not self.hide_minimiz_maximize:
-            self.hide_minimiz_maximize = True
-            self.hide_or_show.hide_minimize_maximize()
-            self.push_front_button.config(image=self.pull_back_image)
-
-            self.master.attributes('-topmost', True)
-            self.hide_history()
-
-        else:
-            self.hide_minimiz_maximize = False
+        if self.is_at_top:
+            self.master.overrideredirect(False)
+            self.is_at_top = False
             self.master.attributes('-topmost', False)
-            self.hide_or_show.show_minimize_maximize()
             self.push_front_button.config(image=self.push_front_image)
-            self.master.resizable(0, 0)
-
-    def show_scrollbar(self):
-        '''show scrollbar when text is more than the height of text area'''
-
-        if self.history_area.cget('height') < int(self.history_area.index('end-1c').split('.')[0]):
-            self.scrollbar.grid(column=1, row=0, sticky=N + S)
-            self.history_area.config(yscrollcommand=self.scrollbar.set)
-            self.master.after(100, self.hide_scrollbar)
 
         else:
-            self.master.after(100, self.show_scrollbar)
+            self.is_at_top = True
+            self.push_front_button.config(image=self.pull_back_image)
+            self.master.attributes('-topmost', True)
+            self.master.overrideredirect(True)
 
-    def hide_scrollbar(self):
-        '''hide scrollbar when text is less than the height of text area'''
-
-        if self.history_area.cget('height') >= int(self.history_area.index('end-1c').split('.')[0]):
-            self.scrollbar.grid_forget()
-            self.history_area.config(yscrollcommand=None)
-            self.master.after(100, self.show_scrollbar)
-
-        else:
-            self.master.after(100, self.hide_scrollbar)
-
-    def history(self, value=None):
-        '''Display previous calculations'''
-
-        self.history_area.config(state=NORMAL)
-
-        if self.history_area.get('1.0', 'end-1c') == 'There\'s no history yet.':
-            self.history_area.delete('1.0', END)
-
-        self.history_area.insert(END, value)
-        self.history_area.config(state=DISABLED)
-
-    def clear_history(self):
-        '''Clear calculation history'''
-
-        self.history_area.config(state=NORMAL)
-        self.history_area.delete('1.0', 'end')
-        self.history_area.insert('end', 'There\'s no history yet.')
-        self.history_area.config(state=DISABLED)
+            pos_x = self.master.winfo_screenwidth() - self.width - 10
+            self.master.geometry(f'{self.width}x{self.height}+{pos_x}+3')
 
     def ac_command(self):
         '''Remove everything from entry_box and insert '0' when ac_button or 'a' key is pressed'''
@@ -261,35 +145,6 @@ class Calculator:
             self.var.set('0')
 
         self.master.after(10, self.insert_zero)
-
-    def ctrl_h(self):
-        '''Command for Ctrl+h'''
-
-        if not self.is_shown:
-            self.show_history()
-
-        else:
-            self.hide_history()
-
-    def clear_all(self, event=None):
-        '''Function to bind with key 'a' or 'A' '''
-
-        self.ac_command()
-        self.clear_history()
-
-    def info(self, event=None):
-        '''Show information about binded keys for different actions'''
-
-        key_bindings = ['Q = Quit',
-                        'A = Clear all',
-                        'T = Place At Top',
-                        'H = Clear history',
-                        'C = Clear text box',
-                        'I = Show this window',
-                        'Ctrl+h = Hide / Show history']
-
-        values = '\n'.join(key_bindings)
-        messagebox.showinfo('Key Bindings', values)
 
     def del_command(self):
         '''Remove last character of entry_box when del_button or backspace is pressed'''
@@ -358,7 +213,7 @@ class Calculator:
             for k, v in replace.items():     # iii.
                 to_calculate = to_calculate.replace(k, v)
 
-            if entry_get.count('(') != entry_get.count(')'):  # Edge Case 9(vi)
+            if entry_get.count('(') != entry_get.count(')'):  # Edge Case 9(vii)
                 messagebox.showerror('Invalid Brackets', 'Brackets are not inserted in order')
                 return
 
@@ -371,7 +226,6 @@ class Calculator:
                 calculated = self.prev_ans = str(eval(to_calculate))
 
                 self.var.set(calculated)
-                self.history(f'{entry_get} = {calculated}\n')
 
                 if '.' in calculated:
                     self.decimal_placeable = False    # Making '.' unacceptable if the answer has '.' in it
@@ -426,11 +280,12 @@ class Calculator:
 
                 9. When '(' or ')' button is pressed:
                     i.  If initial_value in entry_box is '0' then remove that and insert '('.
-                    ii. Don't insert ')' if the initial value is '('.
-                    iii. Don't insert '(' if last_value is in numbers, ')%'.
-                    iv. Don't insert ')' if number of '(' is 0.
-                    v. Don't insert ')' if the number of '(' and ')' are equal.
-                    vi. Do not do calculation if the number of  '(' and ')' are equal.'''
+                    ii. Don't insert ')' if the initial value in entry_box is '0'.
+                    iii. Don't insert ')' if the initial value is '('.
+                    iv. Don't insert '(' if last_value is in numbers, ')%'.
+                    v. Don't insert ')' if number of '(' is 0.
+                    vi. Don't insert ')' if the number of '(' and ')' are equal.
+                    vii. Do not do calculation if the number of  '(' and ')' are equal.'''
 
         try:
             valid = list(self.digits + self.operators) + [x + '(' for x in self.trigonometric_functions] + ['(', ')', '%', '.', 'π', 'x^y', 'n!']
@@ -477,16 +332,10 @@ class Calculator:
             elif char.lower() == 'q':
                 self.master.destroy()
 
-            elif char.lower() == 'a':
-                self.clear_all()
-
             elif char.lower() == 'i':
                 self.info()
 
-            elif char.lower() == 'h':
-                self.clear_history()
-
-            elif char.lower() == 'c':
+            elif char.lower() in 'ac':
                 self.ac_command()
 
             elif char.lower() == 't':
@@ -614,24 +463,37 @@ class Calculator:
         end_bracket = entry_get.count(')')
 
         if len(entry_get) == 1 and entry_get[0] == '0':  # Edge Case 9(i)
-            set_var = char
+            if char != ')':  # Edge Case 9(ii)
+                set_var = char
 
-        elif entry_get[-1] == '(' and char == ')':  # Edge Case 9(ii)
+        elif entry_get[-1] == '(' and char == ')':  # Edge Case 9(iii)
             return
 
-        elif entry_get[-1] in self.digits + ')%' and char == '(':  # Edge Case 9(iii)
+        elif entry_get[-1] in self.digits + ')%' and char == '(':  # Edge Case 9(iv)
             return
 
-        elif start_bracket == 0 and char == ')':  # Edge Case 9(iv)
+        elif start_bracket == 0 and char == ')':  # Edge Case 9(v)
             return
 
-        elif start_bracket == end_bracket and char == ')':  # Edge Case 9(v)
+        elif start_bracket == end_bracket and char == ')':  # Edge Case 9(vi)
             return
 
         else:
             set_var = entry_get + char
 
         return set_var
+
+    def info(self, event=None):
+        '''Show information about binded keys for different actions'''
+
+        key_bindings = ['Q = Quit',
+                        'A = Clear all',
+                        'T = Place At Top',
+                        'C = Clear text box',
+                        'I = Show this window']
+
+        values = '\n'.join(key_bindings)
+        messagebox.showinfo('Key Bindings', values)
 
     def resource_path(self, relative_path):
         '''Get absolute path to resource from temporary directory
@@ -649,47 +511,6 @@ class Calculator:
             base_path = os.path.abspath(".")
 
         return os.path.join(base_path, relative_path)
-
-
-class hide_or_show_maximize_minimize:
-    '''Hide the minimize and maximize button when the window is place at the top of other applications windows.
-       And show the minimize and maximize button when the window is not place at the top of other applications windows'''
-
-    def __init__(self, window):
-        self.window = window
-
-        #   shortcuts to the WinAPI functionality
-        self.set_window_pos = ctypes.windll.user32.SetWindowPos
-        self.set_window_long = ctypes.windll.user32.SetWindowLongW
-        self.get_window_long = ctypes.windll.user32.GetWindowLongW
-        self.get_parent = ctypes.windll.user32.GetParent
-
-        #   some of the WinAPI flags
-        self.SWP_NOSIZE = 1
-        self.SWP_NOMOVE = 2
-        self.GWL_STYLE = -16
-        self.SWP_NOZORDER = 4
-        self.SWP_FRAMECHANGED = 32
-        self.WS_MAXIMIZEBOX = 65536
-        self.WS_MINIMIZEBOX = 131072
-
-    def hide_minimize_maximize(self):
-        '''Hide minimize and maximize button of the window'''
-
-        hwnd = self.get_parent(self.window.winfo_id())
-        old_style = self.get_window_long(hwnd, self.GWL_STYLE)  # getting the old style
-        new_style = old_style & ~ self.WS_MAXIMIZEBOX & ~ self.WS_MINIMIZEBOX  # building the new style (old style AND NOT Maximize AND NOT Minimize)
-        self.set_window_long(hwnd, self.GWL_STYLE, new_style)  # setting new style
-        self.set_window_pos(hwnd, 0, 0, 0, 0, 0, self.SWP_NOMOVE | self.SWP_NOSIZE | self.SWP_NOZORDER | self.SWP_FRAMECHANGED)  # updating non-client area
-
-    def show_minimize_maximize(self,):
-        '''Hide minimize and maximize button of the window'''
-
-        hwnd = self.get_parent(self.window.winfo_id())
-        old_style = self.get_window_long(hwnd, self.GWL_STYLE)  # getting the old style
-        new_style = old_style | self.WS_MAXIMIZEBOX | self.WS_MINIMIZEBOX  # building the new style (old style OR Maximize OR Minimize)
-        self.set_window_long(hwnd, self.GWL_STYLE, new_style)  # setting new style
-        self.set_window_pos(hwnd, 0, 0, 0, 0, 0, self.SWP_NOMOVE | self.SWP_NOSIZE | self.SWP_NOZORDER | self.SWP_FRAMECHANGED)  # updating non-client area
 
 
 if __name__ == '__main__':
