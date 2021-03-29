@@ -70,6 +70,11 @@ class Saving_Spending:
 
         self.master.mainloop()
 
+    def forbid_default_bindings(self, event=None):
+        '''Stop tkinter to execute its default bindings'''
+
+        return 'break'
+
     def show_details_window(self, title, text, image, file_name, yet):
         '''Displays saving or spending details'''
 
@@ -111,6 +116,11 @@ class Saving_Spending:
 
         self.label_frame = Frame(self.earned_spent_frame, bg='White')
         self.label_frame.place(x=480, y=250)
+
+        self.text_area.bind('<Enter>', self.forbid_default_bindings)
+        self.text_area.bind('<Leave>', self.forbid_default_bindings)
+        self.text_area.bind('<Motion>', self.forbid_default_bindings)
+        self.text_area.bind('<Double-Button-1>', self.forbid_default_bindings)
 
         contents = self.read_details(file_name)
 
