@@ -42,40 +42,83 @@ class Sticky_Notes:
         self.button_attributes = {'master': self.format_frame, 'bd': 0, 'bg': '#fffed1', 'activebackground': '#fffed1', 'cursor': 'hand2'}
 
         self.bold_image = PhotoImage(file=self.resource_path('included_files/bold.png'))
-        self.bold_button = Button(image=self.bold_image, **self.button_attributes, command=lambda: self.change_tags('bold', 'sel.first', 'sel.last'))
+        self.bold_button = Button(image=self.bold_image, **self.button_attributes, command=lambda: self.change_tags('bold'))
         self.bold_button.pack(side=LEFT)
 
         self.italic_image = PhotoImage(file=self.resource_path('included_files/italic.png'))
-        self.italic_button = Button(image=self.italic_image, **self.button_attributes, command=lambda: self.change_tags('italic', 'sel.first', 'sel.last'))
+        self.italic_button = Button(image=self.italic_image, **self.button_attributes, command=lambda: self.change_tags('italic'))
         self.italic_button.pack(side=LEFT, padx=5)
 
         self.underline_image = PhotoImage(file=self.resource_path('included_files/underline.png'))
-        self.underline_button = Button(image=self.underline_image, **self.button_attributes, command=lambda: self.change_tags('underline', 'sel.first', 'sel.last'))
+        self.underline_button = Button(image=self.underline_image, **self.button_attributes, command=lambda: self.change_tags('underline'))
         self.underline_button.pack(side=LEFT)
 
         self.overstrike_image = PhotoImage(file=self.resource_path('included_files/overstrike.png'))
-        self.overstrike_button = Button(image=self.overstrike_image, **self.button_attributes, command=lambda: self.change_tags('overstrike', 'sel.first', 'sel.last'))
+        self.overstrike_button = Button(image=self.overstrike_image, **self.button_attributes, command=lambda: self.change_tags('overstrike'))
         self.overstrike_button.pack(side=LEFT, padx=5)
 
         self.format_frame.pack()
 
-        self.text_widget.bind('<Control-b>', lambda e: self.change_tags('bold', 'sel.first', 'sel.last'))
-        self.text_widget.bind('<Control-B>', lambda e: self.change_tags('bold', 'sel.first', 'sel.last'))
-        self.text_widget.bind('<Control-i>', lambda e: self.change_tags('italic', 'sel.first', 'sel.last'))
-        self.text_widget.bind('<Control-I>', lambda e: self.change_tags('italic', 'sel.first', 'sel.last'))
-        self.text_widget.bind('<Control-u>', lambda e: self.change_tags('underline', 'sel.first', 'sel.last'))
-        self.text_widget.bind('<Control-U>', lambda e: self.change_tags('underline', 'sel.first', 'sel.last'))
-        self.text_widget.bind('<Control-o>', lambda e: self.change_tags('overstrike', 'sel.first', 'sel.last'))
-        self.text_widget.bind('<Control-O>', lambda e: self.change_tags('overstrike', 'sel.first', 'sel.last'))
+        self.text_widget.bind('<Control-a>', self.select_all)
+        self.text_widget.bind('<BackSpace>', self.left_click)
+        self.text_widget.bind('<Double-Button-1>', self.double_click)
+        self.text_widget.bind('<Triple-Button-1>', self.triple_click)
+        self.text_widget.bind('<Control-b>', lambda e: self.change_tags('bold'))
+        self.text_widget.bind('<Control-B>', lambda e: self.change_tags('bold'))
+        self.text_widget.bind('<Control-i>', lambda e: self.change_tags('italic'))
+        self.text_widget.bind('<Control-I>', lambda e: self.change_tags('italic'))
+        self.text_widget.bind('<Control-u>', lambda e: self.change_tags('underline'))
+        self.text_widget.bind('<Control-U>', lambda e: self.change_tags('underline'))
+        self.text_widget.bind('<Control-o>', lambda e: self.change_tags('overstrike'))
+        self.text_widget.bind('<Control-O>', lambda e: self.change_tags('overstrike'))
 
         self.text_widget.focus()
 
-        self.master.after(0, self.insert_on_startup)
-        self.master.bind('<Alt-Key-F4>', lambda e: self.on_exit())
-        self.master.protocol('WM_DELETE_WINDOW', self.on_exit)
         self.master.after(0, self.master.deiconify)
+        self.master.after(0, self.insert_on_startup)
+        self.master.bind('<Alt-Key-F4>', self.on_exit)
+        self.master.bind('<Button-1>', self.left_click)
+        self.master.protocol('WM_DELETE_WINDOW', self.on_exit)
+
         self.master.config(bg='#fffed1')
         self.master.mainloop()
+
+    def double_click(self, event=None):
+        '''Make selection up-to the end of the line when user makes double left clicks'''
+
+        self.text_widget.tag_delete('sel', '1.0', 'end')
+        cursor_pos = self.text_widget.index('insert')
+        line_end = self.text_widget.index(f'{cursor_pos.split(".")[0]}.end')
+
+        if cursor_pos == line_end:
+            return 'break'
+
+    def triple_click(self, event=None):
+        cursor_index = self.text_widget.index('insert').split('.')[0]
+        text = self.text_widget.get(f'{cursor_index}.0', f'{cursor_index}.end').strip()
+
+        if text:
+            self.text_widget.tag_add('sel', f'{cursor_index}.0', f'{cursor_index}.end')
+
+        return 'break'
+
+    def left_click(self, event=None):
+        '''Make cursor visible when user left clicks if hidden previously when selecting all text with 'Ctrl + A' '''
+
+        if self.text_widget['insertofftime'] > 300:
+            self.text_widget.config(insertofftime=300, insertontime=600)
+
+    def select_all(self, event=None):
+        '''Select all text when user clicks Select-All option or Ctrl+A'''
+
+        total_lines = int(self.text_widget.index('end-1c').split('.')[0]) + 1
+
+        for line in range(1, total_lines):
+            self.text_widget.tag_add('sel', f'{line}.0', f'{line}.end')
+
+        self.text_widget.config(insertofftime=1000000, insertontime=0)
+
+        return 'break'
 
     def save_formatting(self, event=None):
         '''Saves text styles like bold, italic, underline or overstrike as well as sarting_index and ending_index of that style in config.json'''
@@ -112,11 +155,15 @@ class Sticky_Notes:
     def apply_formatting(self):
         '''Apply text styles stored in config.json within starting_index and ending_index'''
 
-        with open(self.json_filename, 'r') as f:
-            contents = json.load(f)
+        try:
+            with open(self.json_filename, 'r') as f:
+                contents = json.load(f)
 
-            for content in contents:
-                self.change_tags(content['style'], content['start_index'], content['end_index'])
+                for content in contents:
+                    self.change_tags(content['style'], content['start_index'], content['end_index'])
+
+        except json.decoder.JSONDecodeError:
+            pass
 
     def insert_on_startup(self):
         '''Inserts text stored in 'sticky_notes.txt' and apply the formatting(if available) to the text widget right after the program starts.'''
@@ -136,7 +183,7 @@ class Sticky_Notes:
         except FileNotFoundError:  # When sticky_notes.txt doesn't exists.
             pass
 
-    def on_exit(self):
+    def on_exit(self, event=None):
         '''Saves text in sticky_notes.txt, styling and indexes in config.json before destorying the window'''
 
         contents = self.text_widget.get('1.0', END).strip('\n')
@@ -148,6 +195,7 @@ class Sticky_Notes:
             self.save_formatting()
 
         self.master.destroy()
+        return 'break'
 
     def tag_exists(self, start_index):
         '''Checking if the selected text has already another tag'''
@@ -157,7 +205,7 @@ class Sticky_Notes:
 
         return False
 
-    def change_tags(self, tag, start_index, end_index):
+    def change_tags(self, tag, start_index='sel.first', end_index='sel.last'):
         '''Change text styles to bold, italic, underline or overstrike'''
 
         new_tag = ''.join([random.choice(string.ascii_letters) for _ in range(10)])   # Generating new tags.
