@@ -100,6 +100,10 @@ class Multiplication_Table:
         widget = event.widget
 
         if widget == self.num_entry:
+            if not self.upto_var.get().strip():
+                self.upto_var.set('Upto')
+                self.upto_style.configure('U.TEntry', foreground='grey')
+
             if self.num_var.get().strip() == 'Number':
                 self.num_var.set('')
                 self.num_style.configure('N.TEntry', foreground='black')
@@ -124,6 +128,10 @@ class Multiplication_Table:
 
         try:
             num = int(num)
+
+            if not upto or upto == 'Upto':
+                upto = 10
+
             upto = int(upto) + 1
             self.table_text.config(state='normal')
             self.table_text.delete('1.0', 'end')
@@ -139,7 +147,7 @@ class Multiplication_Table:
             self.table_text.config(state='disabled')
 
         except ValueError:
-            messagebox.showinfo('ERR', 'Number or Upto must be integer')
+            messagebox.showinfo('ERR', 'Number must be integer')
 
     def copy_to_clipboard(self, event=None):
         '''Copy the multiplication table to the clipboard'''
