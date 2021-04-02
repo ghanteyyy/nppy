@@ -39,6 +39,40 @@ class Widgets:
 
         self.listbox.bind('<<ListboxSelect>>', self.click_bind)
 
+    def down_direction(self, event=None):
+        '''Move selection in downwards direction in listbox'''
+
+        index = self.listbox.curselection()[0]
+
+        if index < len(self.values) - 1:
+            index += 1
+
+            self.listbox.selection_clear(0, 'end')
+            self.listbox.selection_set(index)
+            self.listbox.see(index)
+
+            self.entry_var.set(self.values[index])
+            self.entry.selection_range(0, 'end')
+
+        return 'break'
+
+    def up_direction(self, event=None):
+        '''Move selection in upwards direction in listbox'''
+
+        index = self.listbox.curselection()[0]
+
+        if index > 0:
+            index -= 1
+
+            self.listbox.selection_clear(0, 'end')
+            self.listbox.selection_set(index)
+            self.listbox.see(index)
+
+            self.entry_var.set(self.values[index])
+            self.entry.selection_range(0, 'end')
+
+        return 'break'
+
     def click_bind(self, event=None):
         '''Insert value of selected text from the listbox in entry widget'''
 
@@ -181,8 +215,10 @@ class UI:
         self.font_size_frame = Widgets(self.top_level, self.container_frame, 'Size:', self.font_sizes, 9, 7)
 
         for frame in [self.font_families_frame, self.font_style_frame, self.font_size_frame]:
+            frame.entry.bind('<Up>', frame.up_direction)
             frame.entry.bind('<Tab>', frame.tab_completion)
             frame.entry.bind('<BackSpace>', frame.backspace)
+            frame.entry.bind('<Down>', frame.down_direction)
             frame.entry.bind('<KeyPress>', frame.key_pressed)
             frame.entry.bind('<KeyRelease>', frame.key_released)
             frame.entry.bind('<Escape>', lambda e: self.top_level.destroy())
