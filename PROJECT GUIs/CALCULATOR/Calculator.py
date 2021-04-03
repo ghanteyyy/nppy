@@ -91,7 +91,7 @@ class Calculator:
         '''Position when the program opens'''
 
         self.master.withdraw()
-        self.master.update_idletasks()
+        self.master.update()
 
         self.master.iconbitmap(self.resource_path('included_files\\icon.ico'))
 
@@ -102,7 +102,6 @@ class Calculator:
         pos_y = screen_height // 2 - self.height // 2
 
         self.master.geometry(f'{self.width}x{self.height}+{pos_x}+{pos_y}')
-        self.master.after(250, self.master.deiconify)
         self.master.deiconify()
 
         self.master.after(10, self.insert_zero)
@@ -111,16 +110,16 @@ class Calculator:
         '''Place the window to the top of any window opened in the background and resize some widgets'''
 
         if self.is_at_top:
-            self.master.overrideredirect(False)
             self.is_at_top = False
+            self.master.overrideredirect(False)
             self.master.attributes('-topmost', False)
             self.push_front_button.config(image=self.push_front_image)
 
         else:
             self.is_at_top = True
-            self.push_front_button.config(image=self.pull_back_image)
-            self.master.attributes('-topmost', True)
             self.master.overrideredirect(True)
+            self.master.attributes('-topmost', True)
+            self.push_front_button.config(image=self.pull_back_image)
 
             pos_x = self.master.winfo_screenwidth() - self.width - 10
             self.master.geometry(f'{self.width}x{self.height}+{pos_x}+3')
