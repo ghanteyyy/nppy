@@ -1,31 +1,30 @@
 import os
 import sys
-import ctypes
 from tkinter import *
 from tkinter import messagebox
 
 
 class To_Do_List:
-    def __init__(self, master):
-        self.master = master
+    def __init__(self):
+        self.master = Tk()
         self.master.withdraw()
         self.master.resizable(0, 0)
+        self.master.overrideredirect(True)
         self.master.title('TO-DO LIST')
         self.file_name = 'to_do_list.txt'
         self.master.after(0, self.master.deiconify)
         self.master.wm_attributes("-topmost", 'true')
         self.master.iconbitmap(self.resource_path('included_files/icon.ico'))
 
-        self.buttons_attributes = {'bd': 1, 'fg': 'white', 'bg': '#002157', 'relief': GROOVE,
-                                   'cursor': 'hand2', 'activeforeground': 'white', 'activebackground': '#002157'}
+        self.buttons_attributes = {'bd': 1, 'fg': 'white', 'bg': '#002157', 'relief': GROOVE, 'cursor': 'hand2', 'activeforeground': 'white', 'activebackground': '#002157'}
 
-        self.screenwidth, self.screenheight = self.master.winfo_screenwidth() - 401, self.master.winfo_screenheight()
-        self.width, self.height = 400, self.screenheight - 74
+        self.screenwidth, self.screenheight = self.master.winfo_screenwidth() - 400, self.master.winfo_screenheight()
+        self.width, self.height = 400, self.screenheight - 40
         self.master.geometry(f'{self.width}x{self.height}+{self.screenwidth}+0')
 
         self.is_collapsed = False
         self.collapse_frame = Frame(self.master)
-        self.collapse_button = Button(self.collapse_frame, text='>>', **self.buttons_attributes, height=47, command=self.collapse)
+        self.collapse_button = Button(self.collapse_frame, text='>>', **self.buttons_attributes, height=46, command=self.collapse)
         self.collapse_button.grid(row=0, column=0)
         self.collapse_frame.place(x=0, y=0)
 
@@ -44,7 +43,7 @@ class To_Do_List:
         self.entry_frame.place(x=40, y=50)
 
         self.list_box_frame = Frame(self.master, relief="sunken")
-        self.list_box = Listbox(self.list_box_frame, bg='#002157', fg='white', width=27, height=22, font=('Courier', 15), selectmode=MULTIPLE)
+        self.list_box = Listbox(self.list_box_frame, bg='#002157', fg='white', width=27, height=23, font=('Courier', 15), selectmode=MULTIPLE)
         self.list_box.grid(row=0, column=0)
         self.list_box_frame.place(x=40, y=103)
 
@@ -57,21 +56,22 @@ class To_Do_List:
         self.load_prev_frame = Frame(self.master)
         self.load_prev_button = Button(self.load_prev_frame, text='LOAD PREVIOUS DATA', width=30, height=2, **self.buttons_attributes, command=self.add_to_list)
         self.load_prev_button.grid(row=0, column=0)
-        self.load_prev_frame.place(x=150, y=self.master.winfo_screenheight() - 153)
+        self.load_prev_frame.place(x=150, y=self.master.winfo_screenheight() - 126)
 
         self.del_prev_frame = Frame(self.master)
         self.del_prev_button = Button(self.del_prev_frame, text='DELETE ALL PREVIOUS DATA', width=30, height=2, **self.buttons_attributes, command=lambda: self.check_for_file(clear_all=True))
         self.del_prev_button.grid(row=0, column=0)
-        self.del_prev_frame.place(x=150, y=self.master.winfo_screenheight() - 114)
+        self.del_prev_frame.place(x=150, y=self.master.winfo_screenheight() - 87)
 
         self.clear_frame = Frame(self.master)
         self.clear_button = Button(self.clear_frame, text='CLEAR', width=13, height=4, **self.buttons_attributes, command=self.clear)
         self.clear_button.grid(row=0, column=0, ipadx=4, ipady=4)
-        self.clear_frame.place(x=40, y=self.master.winfo_screenheight() - 152)
+        self.clear_frame.place(x=40, y=self.master.winfo_screenheight() - 125)
 
         self.exit_frame = Frame(self.master)
         self.exit_button = Button(self.exit_frame, text='X', font=('Arial Black', 9, 'bold'), fg='white', bg='red', activebackground='red', activeforeground='white', bd=0, command=self.master.destroy)
-        self.exit_button.grid(row=0, column=0, ipadx=1, ipady=1)
+        self.exit_button.grid(row=0, column=0, ipadx=4, ipady=1)
+        self.exit_frame.place(x=0, y=self.master.winfo_screenheight() - 67)
 
         self.master.bind('<Button-3>', self.popup_menu)
         self.master.bind('<Button-1>', self.key_bindings)
@@ -80,9 +80,9 @@ class To_Do_List:
 
         self.add_to_list()
         self.show_scrollbar()
-        self.hide_minimize_maximize(self.master)
 
         self.master.config(bg='#002157')
+        self.master.mainloop()
 
     def key_bindings(self, event):
         '''Different actions when user click to different widgets '''
@@ -101,49 +101,23 @@ class To_Do_List:
         if event.widget not in [self.entry_box, self.add_button]:
             self.master.focus()
 
-    def hide_minimize_maximize(self, window):
-        '''Hide minimize and maximize button'''
-
-        # Shortcuts WinAPI functionality
-        set_window_pos = ctypes.windll.user32.SetWindowPos
-        set_window_long = ctypes.windll.user32.SetWindowLongW
-        get_window_long = ctypes.windll.user32.GetWindowLongW
-        get_parent = ctypes.windll.user32.GetParent
-
-        # Some WinAPI flags
-        GWL_STYLE = -16
-        WS_MINIMIZEBOX = 131072
-        WS_MAXIMIZEBOX = 65536
-        SWP_NOZORDER = 4
-        SWP_NOMOVE = 2
-        SWP_NOSIZE = 1
-        SWP_FRAMECHANGED = 32
-
-        hwnd = get_parent(window.winfo_id())
-        old_style = get_window_long(hwnd, GWL_STYLE)  # getting the old style
-        new_style = old_style & ~ WS_MAXIMIZEBOX & ~ WS_MINIMIZEBOX  # building the new style (old style AND NOT Maximize AND NOT Minimize)
-        set_window_long(hwnd, GWL_STYLE, new_style)  # setting new style
-        set_window_pos(hwnd, 0, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED)  # updating non-client area
-
     def collapse(self):
         '''Expand and shrink window'''
 
-        if not self.is_collapsed:
-            self.is_collapsed = True
-            self.master.geometry('{}x{}+{}+{}'.format(0, self.master.winfo_screenheight() - 74, self.master.winfo_screenwidth() - 33, 0))
-            self.collapse_button.config(text='<<')
-            self.exit_frame.place(x=4, y=self.master.winfo_screenheight() - 102)
+        if self.is_collapsed:
+            self.is_collapsed = False
+            self.master.geometry('{}x{}+{}+{}'.format(400, self.height, self.master.winfo_screenwidth() - 400, 0))
+            self.collapse_button.config(text='>>')
 
         else:
-            self.is_collapsed = False
-            self.master.geometry('{}x{}+{}+{}'.format(400, self.master.winfo_screenheight() - 74, self.master.winfo_screenwidth() - 401, 0))
-            self.collapse_button.config(text='>>')
-            self.exit_frame.place_forget()
+            self.is_collapsed = True
+            self.master.geometry('{}x{}+{}+{}'.format(25, self.height, self.master.winfo_screenwidth() - 25, 0))
+            self.collapse_button.config(text='<<')
 
     def show_scrollbar(self):
         '''show scrollbar when text is more than the text area'''
 
-        if len(self.list_box.get(0, END)) > 22:
+        if len(self.list_box.get(0, END)) > self.list_box.cget('height'):
             self.scrollbar.grid(column=1, row=0, sticky=N + S)
             self.list_box.config(yscrollcommand=self.scrollbar.set)
             self.master.after(100, self.hide_scrollbar)
@@ -154,7 +128,7 @@ class To_Do_List:
     def hide_scrollbar(self):
         '''hide scrollbar when text is less than the text area'''
 
-        if len(self.list_box.get(0, END)) <= 22:
+        if len(self.list_box.get(0, END)) <= self.list_box.cget('height'):
             self.scrollbar.grid_forget()
             self.list_box.config(yscrollcommand=None)
             self.master.after(100, self.show_scrollbar)
@@ -278,6 +252,4 @@ class To_Do_List:
 
 
 if __name__ == '__main__':
-    root = Tk()
-    To_Do_List(root)
-    root.mainloop()
+    To_Do_List()
