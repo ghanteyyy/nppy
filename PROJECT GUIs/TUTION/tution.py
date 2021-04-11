@@ -352,6 +352,9 @@ class Tution:
 
                     late_pay = contents[name]['late_pay'][str(today)]
 
+                else:
+                    late_pay = f'{late_pay} days'
+
                 if left < 0:  # When user does not get paid then it becomes late_pay where left becomes negative. So, in that case left becomes 0
                     left = '0'
 
