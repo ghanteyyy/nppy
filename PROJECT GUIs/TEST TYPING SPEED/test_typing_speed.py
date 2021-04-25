@@ -170,12 +170,14 @@ class Test_Typing_Speed:
             self.space_index.append(start_pos)
             start_pos = end_pos
 
-    def select_word(self, color='#dddddd'):
+    def select_word(self, color='#dddddd', tag='select'):
         '''Set background color to green if user types correct word else set red background color'''
 
-        self.show_words.tag_delete('select')
-        self.show_words.tag_add('select', self.prev_index, self.space_index[0])
-        self.show_words.tag_config('select', background=color)
+        if tag == 'select':
+            self.show_words.tag_delete(tag)
+
+        self.show_words.tag_add(tag, self.prev_index, self.space_index[0])
+        self.show_words.tag_config(tag, background=color)
 
     def next_word(self, event=None):
         '''Select another word when user presses space-bar'''
@@ -184,27 +186,27 @@ class Test_Typing_Speed:
             self.running = True
             self.track_time()
 
-        self.prev_index = f'{self.space_index[0]}+1c'
-        self.space_index.pop(0)
-
         get_value = self.typing_area_var.get().strip()
         selected_value = self.show_words.get('select.first', 'select.last')
         len_selected_value = len(selected_value)
 
-        if get_value:
-            self.total_keywords += len_selected_value
+        self.total_keywords += len_selected_value
 
-            if get_value == selected_value:  # When user typed word and selected word are same
-                self.correct_words += 1
-                self.correct_keystrokes += len_selected_value
+        if get_value == selected_value:  # When user typed word and selected word are same
+            self.correct_words += 1
+            self.correct_keystrokes += len_selected_value
 
-            elif get_value != selected_value:  # When user typed word and selected word are not same
-                self.incorrect_words += 1
-                self.incorrect_keystrokes += len_selected_value
+        elif get_value != selected_value:  # When user typed word and selected word are not same
+            self.incorrect_words += 1
+            self.select_word('red', 'incorrect')
+            self.incorrect_keystrokes += len_selected_value
 
-            self.select_word()
-            self.typing_area_var.set('')
-            self.show_words.see(self.space_index[0])
+        self.prev_index = f'{self.space_index[0]}+1c'
+        self.space_index.pop(0)
+        self.select_word()
+
+        self.typing_area_var.set('')
+        self.show_words.see(self.space_index[0])
 
         return 'break'
 
