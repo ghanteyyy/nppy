@@ -2,11 +2,12 @@ import os
 import sys
 import winsound
 from tkinter import *
-from tkinter.ttk import Combobox, Scrollbar
+import tkinter.ttk as ttk
 
 
 class Number_System:
-    def __init__(self):
+    def __init__(self, display_answer):
+        self.display_answer = display_answer
         self.hex_to_num = {'A': 10, 'B': 11, 'C': 12, 'D': 13, 'E': 14, 'F': 15}
         self.num_to_hex = {10: 'A', 11: 'B', 12: 'C', 13: 'D', 14: 'E', 15: 'F'}
 
@@ -19,7 +20,8 @@ class Number_System:
             return True
 
         winsound.MessageBeep()
-        gui.display_answer(f'Invalid {name} Number')
+        self.display_answer(f'Invalid {name} Number')
+
         return False
 
     def binary_to_decimal(self, binary_number):
@@ -376,15 +378,17 @@ class GUI:
                              'Quinary to Binary', 'Quinary to Decimal', 'Quinary to Octal', 'Quinary to Hexadecimal']
 
         self.entry_var = StringVar()
-        self.entry_box = Entry(self.master, width=33, fg='grey', textvariable=self.entry_var, justify='center')
+        self.entry_style = ttk.Style()
+        self.entry_style.configure('E.TEntry', foreground='grey')
+        self.entry_box = ttk.Entry(self.master, width=33, textvariable=self.entry_var, justify='center', style='E.TEntry')
         self.entry_var.set('Enter Number')
-        self.entry_box.place(x=30, y=130)
+        self.entry_box.place(x=30, y=130, height=27)
 
-        self.combo_box = Combobox(self.master, values=self.combo_values, width=30)
+        self.combo_box = ttk.Combobox(self.master, values=self.combo_values, width=30, justify='center')
         self.combo_box.set('Select Number System')
-        self.combo_box.place(x=30, y=160)
+        self.combo_box.place(x=30, y=160, height=27)
 
-        self.convert_button = Button(self.master, width=28, height=2, fg='white', bg='Green', activebackground='Green', activeforeground='white', text='CONVERT', command=self.calculation)
+        self.convert_button = Button(self.master, width=28, height=2, fg='white', bg='Green', bd='0', activebackground='Green', activeforeground='white', text='CONVERT', cursor='hand2', command=self.calculation)
         self.convert_button.place(x=30, y=190)
 
         self.text_area_frame = Frame(self.master)
@@ -392,7 +396,7 @@ class GUI:
         self.text_area.grid(column=0, row=0)
         self.text_area_frame.place(x=30, y=240)
 
-        self.scrollbar = Scrollbar(self.text_area_frame, orient="vertical", command=self.text_area.yview)
+        self.scrollbar = ttk.Scrollbar(self.text_area_frame, orient="vertical", command=self.text_area.yview)
         self.show_scrollbar()
 
         self.master.bind('<Button-1>', self.bind_keys)
@@ -412,19 +416,19 @@ class GUI:
 
         if event.widget == self.entry_box and entry_get == 'Enter Number' and not focus_out:
             self.entry_var.set('')
-            self.entry_box.config(fg='black')
+            self.entry_style.configure('E.TEntry', foreground='black')
 
             if not combo_get:
                 self.combo_box.set('Select Number System')
 
         elif event.widget == self.combo_box and not entry_get and not focus_out:
             self.entry_var.set('Enter Number')
-            self.entry_box.config(fg='grey')
+            self.entry_style.configure('E.TEntry', foreground='grey')
 
         else:
             if not entry_get:
                 self.entry_var.set('Enter Number')
-                self.entry_box.config(fg='grey')
+                self.entry_style.configure('E.TEntry', foreground='grey')
 
             if combo_get in ['', 'Select Number System']:
                 self.combo_box.set('Select Number System')
@@ -529,7 +533,7 @@ class GUI:
 
         else:
             combo_get = self.combo_box.get()
-            number_system = Number_System()
+            number_system = Number_System(self.display_answer)
 
             if combo_get == 'Binary to Decimal':
                 answer = number_system.binary_to_decimal(get_value)
