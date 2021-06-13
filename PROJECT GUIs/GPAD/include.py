@@ -17,7 +17,18 @@ def initial_position(master):
     width, height = master.winfo_width() + 348, master.winfo_height() + 60
     screen_width, screen_height = master.winfo_screenwidth() // 2, master.winfo_screenheight() // 2
 
-    master.geometry(f'{width}x{height}+{screen_width - width // 2}+{screen_height - height // 2}')
+    try:
+        win_details = get_font_details()['window_dimension']
+
+        if win_details:
+            master.geometry(win_details)
+
+        else:
+            master.geometry(f'{width}x{height}+{screen_width - width // 2}+{screen_height - height // 2}')
+
+    except KeyError:
+        master.geometry(f'{width}x{height}+{screen_width - width // 2}+{screen_height - height // 2}')
+
     master.deiconify()
 
 

@@ -153,20 +153,18 @@ class File_Menu:
         if self.is_file_changed():
             choice = messagebox.askyesnocancel('GPAD', 'Do you really want to quit without saving?')
 
-            if choice is True:
-                self.delete_zoom()
-                self.master.destroy()
-
-            elif choice is False:
+            if choice is False:
                 self.save()
 
-                if not self.is_file_changed():
-                    self.delete_zoom()
-                    self.master.destroy()
-
-            else:
-                return
-
         else:
-            self.delete_zoom()
+            choice = True
+
+        if choice:
+            content = include.get_font_details()
+
+            if 'Zoomed' in content:
+                content.pop('Zoomed')
+
+            content.update({'window_dimension': self.master.geometry()})
+            include.save_font_details(content)
             self.master.destroy()
