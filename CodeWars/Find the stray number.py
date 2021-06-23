@@ -1,13 +1,3 @@
-def get_mininum_value(values):
-    val = values[0]
-
-    for value in values[1:]:
-        if value < val:
-            val = value
-
-    return val
-
-
 def stray(arr):
     counter = {}
 
@@ -19,12 +9,9 @@ def stray(arr):
         else:
             counter.update({a: 1})
 
-    # Get the minimum repetition
-    values = get_mininum_value(list(counter.values()))
-
     # Get the key having the minium repetition value
     for k, v in counter.items():
-        if v == values:
+        if v == 1:
             return k
 
 
