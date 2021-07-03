@@ -70,13 +70,13 @@ class Place_Value:
                 in_words += f'{self.map_num[value[0]]} hundred'
 
             elif value[1] == '0':
-                in_words += f'{self.map_num[value[0]]} hundred {self.map_num[value[2]]}'
+                in_words += f'{self.map_num[value[0]]} hundred and {self.map_num[value[2]]}'
 
             elif value[1] == '1' or value[-1] == '0':
-                in_words += f'{self.map_num[value[0]]} hundred {self.map_num[value[1:]]}'
+                in_words += f'{self.map_num[value[0]]} hundred and {self.map_num[value[1:]]}'
 
             else:
-                in_words += f'{self.map_num[value[0]]} hundred {self.map_num[value[1] + "0"]}-{self.map_num[value[2]]}'
+                in_words += f'{self.map_num[value[0]]} hundred and {self.map_num[value[1] + "0"]}-{self.map_num[value[2]]}'
 
         return in_words
 
