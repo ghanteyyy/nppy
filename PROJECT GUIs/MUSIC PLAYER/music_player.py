@@ -12,6 +12,12 @@ from ttkbootstrap import Style
 from mutagen.mp3 import MP3
 
 
+'''To setup ttkbootstrap:
+        1. Install ttkbootstrap using python -m pip install ttkbootstrap
+        2. Create themes using python -m ttkcreator
+        3. Specify your desired color and save the themes'''
+
+
 class Music_Player:
     def __init__(self):
         mixer.init()
@@ -95,8 +101,8 @@ class Music_Player:
         self.master.bind('<Control-O>', self.open_files)
         self.master.bind('<Key>', self.up_down_direction)
         self.master.bind('<Control-p>', self.get_playlist)
-        self.master.bind('<Control-P>', self.get_playlist)
         self.master.bind('<Delete>', self.remove_from_list)
+        self.master.bind('<Control-P>', self.save_playlists)
         self.audio_list.bind('<Button-3>', self.right_click)
         self.audio_list.bind('<Button-1>', self.single_click)
         self.audio_list.bind('<Double-Button-1>', self.double_click)
@@ -283,7 +289,7 @@ class Music_Player:
         elif self.is_playing is False:  # Resume playing audio from where the audio is paused
             self.is_playing = True
             img = self.pause_image
-            mixer.music.unpause()
+            mixer.music.play(start=self.seek_var.get())
             self.update_scale()
 
         self.play_button.config(image=img)
@@ -363,7 +369,10 @@ class Music_Player:
                     skipped_at = 0
 
             self.seek_var.set(skipped_at)
-            mixer.music.play(start=skipped_at)
+
+            if self.is_playing:
+                mixer.music.play(start=skipped_at)
+
             self.escaped_time_var.set(time.strftime('%H:%M:%S', time.gmtime(skipped_at)))
 
     def prev_next_song(self, event=None, button_name=None):
@@ -420,9 +429,14 @@ class Music_Player:
     def save_playlists(self, event=None):
         '''Save audio path present in list-box'''
 
-        with open('playlists.json', 'w') as f:
-            contents = {'playlists': self.files}
-            json.dump(contents, f, indent=4)
+        if self.variable.get():
+            with open('playlists.json', 'w') as f:
+                contents = {'playlists': self.files}
+                json.dump(contents, f, indent=4)
+                messagebox.showinfo('Saved!', 'Playlist Saved !!')
+
+        else:
+            messagebox.showinfo('ERR', 'No audio found to save in Playlist')
 
     def show_remaining_time(self, event=None):
         '''Show remaining time of current playing audio'''
