@@ -191,8 +191,11 @@ class Music_Player:
             self.is_playing = None
             self.files.update({os.path.basename(f): f for f in files})
             self.variable.set(list(self.files.keys()))
-            self.audio_list.selection_set(0)
-            self.select_index = 0
+
+            if self.current_playing_index == -1:
+                self.select_index = 0
+
+            self.audio_list.selection_set(self.select_index)
 
             if len(files) == 1:  # Play audio if user opens only 1 audio file
                 self.play_or_pause_music()
@@ -416,15 +419,17 @@ class Music_Player:
                     contents = {}
 
         except (json.decoder.JSONDecodeError, FileNotFoundError):
+            contents = {}
             messagebox.showerror('ERR', 'Either playlists file is corrupt or does not exist')
 
-        files = list(contents['playlists'].values())
+        if contents:
+            files = list(contents['playlists'].values())
 
-        for name, path in contents['playlists'].items():
-            if not os.path.exists(path):
-                files.remove(name)
+            for name, path in contents['playlists'].items():
+                if not os.path.exists(path):
+                    files.remove(name)
 
-        self.open_files(files=files)
+            self.open_files(files=files)
 
     def save_playlists(self, event=None):
         '''Save audio path present in list-box'''
@@ -496,7 +501,7 @@ class Music_Player:
             if self.variable.get():
                 if self.clicked_at_empty_space():
                     self.audio_list.selection_clear(0, 'end')
-                    right_click_menu.add_command(label='Open')
+                    right_click_menu.add_command(label='Open', command=self.open_files)
 
                 else:
                     self.audio_list.selection_clear(0, 'end')
