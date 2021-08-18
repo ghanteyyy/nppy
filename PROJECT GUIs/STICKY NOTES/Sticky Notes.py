@@ -255,7 +255,13 @@ class Sticky_Notes:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
 
         except AttributeError:
-            base_path = os.path.abspath(".")
+            path = sys.argv
+
+            if path:
+                base_path = os.path.split(path[0])[0]
+
+            else:
+                base_path = os.path.abspath(".")
 
         return os.path.join(base_path, relative_path)
 
