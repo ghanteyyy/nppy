@@ -12,12 +12,12 @@ class Calendar:
         self.master.withdraw()
         self.master.title('Calendar')
         self.master.resizable(0, 0)
-        self.master.iconbitmap(self.resource_path('icon.ico'))
+        self.master.iconbitmap(self.resource_path('included_files\\icon.ico'))
 
         self.month_names = list(calendar.day_abbr)
 
-        self.prev_button_img_obj = PhotoImage(file=self.resource_path('prev.png'))
-        self.next_button_img_obj = PhotoImage(file=self.resource_path('next.png'))
+        self.prev_button_img_obj = PhotoImage(file=self.resource_path('included_files\\prev.png'))
+        self.next_button_img_obj = PhotoImage(file=self.resource_path('included_files\\next.png'))
 
         self.container_frame = Frame(self.master)
         self.container_frame.pack()
