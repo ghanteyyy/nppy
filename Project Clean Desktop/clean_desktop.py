@@ -59,20 +59,17 @@ class CLEAN_DESKTOP:
            parameter's basename and add 1 to it'''
 
         _dir, basename = os.path.split(file)
+        file_name = basename.split('.')[0]
 
         if os.path.isfile(file):
-            extension = '.' + basename.split('.')[1]
-            file_name = basename.split('.')[0]
-
+            extension = '.' + basename.split('.')[0]
             file_with_same_names = [f for f in os.listdir(self.cleanup_location) if f.startswith(file_name) and os.path.isfile(os.path.join(self.cleanup_location, f))]
-            file_with_same_names.sort(key=len)
 
         else:
             extension = ''
             file_with_same_names = [f for f in os.listdir(self.cleanup_location) if f.startswith(basename) and os.path.isdir(os.path.join(self.cleanup_location, f))]
-            file_with_same_names.sort(key=len)
 
-        file_name = basename.split('.')[0]
+        file_with_same_names.sort(key=len)
         last_file_name = file_with_same_names[-1].split('.')[0]  # Removing file extension
         file_number = last_file_name.replace(file_name, '')[1:-1]
 
