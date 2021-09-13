@@ -27,7 +27,7 @@ class Widgets:
 
 class Tution:
     def __init__(self):
-        self.file_name = 'tution.json'
+        self.file_name = self.resource_path('included_files\\tution.json')
 
         self.master = Tk()
         self.master.title('TUTION')
@@ -190,28 +190,26 @@ class Tution:
     def get_next_payment_date(self, joined_str, opt=False):
         '''Calculate next payment date when user adds data for the first time or when user gets monthly payment'''
 
-        days = 0
-        today = datetime.date.today().month
+        today = datetime.date.today()
         joined_obj = datetime.datetime.strptime(joined_str, '%Y-%b-%d')
-        difference = joined_obj - datetime.timedelta(days=joined_obj.day)
+
+        total_days_in_joined_month = calendar.monthrange(joined_obj.year, joined_obj.month)[1]
+        remaining_days_in_joined_month = total_days_in_joined_month - joined_obj.day
+
+        _to = today.month
         _from = joined_obj.month
 
-        if opt or _from == today:
-            _to = today + 1
+        if _to == _from:
+            _to += 1
 
-        else:
-            _to = today
+        for i in range(_from + 1, _to):
+            if i > 12:
+                remaining_days_in_joined_month += calendar.monthrange(today.year + 1, i - 12)[1]
 
-        if _from == 12:
-            month_list = [12]
+            else:
+                remaining_days_in_joined_month += calendar.monthrange(today.year, i)[1]
 
-        else:
-            month_list = list(range(_from, _to))
-
-        for month in month_list:
-            days += calendar.monthrange(joined_obj.year, month)[1]
-
-        next_payment = difference + datetime.timedelta(days=days + joined_obj.day)
+        next_payment = joined_obj + datetime.timedelta(days=remaining_days_in_joined_month + joined_obj.day)
 
         return f'{next_payment.year}-{calendar.month_abbr[next_payment.month]}-{str(next_payment.day).zfill(2)}'
 
