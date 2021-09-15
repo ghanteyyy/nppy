@@ -14,7 +14,7 @@ class Go_To:
         self.go_to_master.withdraw()
         self.go_to_master.after(0, self.go_to_master.deiconify)
         self.go_to_master.title('Go To Line')
-        self.go_to_master.iconbitmap(include.resource_path('included_files\\transparent.ico'))
+        self.go_to_master.iconbitmap(include.resource_path('transparent.ico'))
         pos_x, pos_y = master.winfo_x() + 55, master.winfo_y() + 170
         self.go_to_master.geometry('{}x{}+{}+{}'.format(250, 100, pos_x, pos_y))
         self.go_to_master.focus_set()

@@ -22,9 +22,9 @@ class Image_Downloader:
 
     def __init__(self):
         self.extensions = ([('PNG', '*.png'), ('JPG', '*.jpg')])
-        self.icon_path = self.resource_path('included_files\\icon.ico')
-        self.main_path = self.resource_path('included_files\\main.png')
-        self.download_path = self.resource_path('included_files\\download.png')
+        self.icon_path = self.resource_path('icon.ico')
+        self.main_path = self.resource_path('main.png')
+        self.download_path = self.resource_path('download.png')
 
         self.master = Tk()
         self.master.withdraw()
@@ -126,7 +126,7 @@ class Image_Downloader:
         except requests.exceptions.MissingSchema:
             messagebox.showerror('ERR', 'Provided URL does not contain any image')
 
-    def resource_path(self, relative_path):
+    def resource_path(self, file_name):
         '''Get absolute path to resource from temporary directory
 
         In development:
@@ -139,15 +139,9 @@ class Image_Downloader:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
 
         except AttributeError:
-            path = sys.argv
+            base_path = os.path.dirname(__file__)
 
-            if path:
-                base_path = os.path.split(path[0])[0]
-
-            else:
-                base_path = os.path.abspath(".")
-
-        return os.path.join(base_path, relative_path)
+        return os.path.join(base_path, 'included_files', file_name)
 
 
 if __name__ == '__main__':

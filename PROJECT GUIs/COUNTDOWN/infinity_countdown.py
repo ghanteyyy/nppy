@@ -11,7 +11,7 @@ class Infinity_Countdown:
         self.master.title('INFINITY COUNTDOWN')
         self.master.geometry('{}x{}+{}+{}'.format(295, 108, self.master.winfo_screenwidth() // 2 - 342 // 2, self.master.winfo_screenheight() // 2 - 108 // 2))
         self.master.resizable(0, 0)
-        self.master.iconbitmap(self.resource_path('included_files/icon.ico'))
+        self.master.iconbitmap(self.resource_path('icon.ico'))
         self.master.config(bg='dark blue')
 
         self.buttons_attributes = {'font': ('Arial', 16), 'fg': 'white', 'bg': 'dark blue', 'activebackground': 'dark blue', 'activeforeground': 'white', 'cursor': 'hand2', 'width': 12, 'takefocus': False}
@@ -72,7 +72,7 @@ class Infinity_Countdown:
         self.time.config(text='{}:{}:{}'.format(str(self.hour).zfill(2), str(self.minute).zfill(2), str(self.second).zfill(2)))
         self.timer = self.master.after(1000, self.Counter)
 
-    def resource_path(self, relative_path):
+    def resource_path(self, file_name):
         '''Get absolute path to resource from temporary directory
 
         In development:
@@ -85,15 +85,9 @@ class Infinity_Countdown:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
 
         except AttributeError:
-            path = sys.argv
+            base_path = os.path.dirname(__file__)
 
-            if path:
-                base_path = os.path.split(path[0])[0]
-
-            else:
-                base_path = os.path.abspath(".")
-
-        return os.path.join(base_path, relative_path)
+        return os.path.join(base_path, 'included_files', file_name)
 
 
 if __name__ == '__main__':

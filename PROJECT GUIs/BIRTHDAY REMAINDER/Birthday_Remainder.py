@@ -7,7 +7,7 @@ import tkinter.messagebox as messagebox
 
 class Birthday_Remainder:
     def __init__(self):
-        self.file = 'birthday_remainder.txt'
+        self.file = self.resource_path('birthday_remainder.txt')
         self.month_number = {'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'}
         self.label_attributes = {'fg': 'white', 'font': ('Courier', 12), 'bg': 'dark green'}
 
@@ -151,7 +151,7 @@ class Birthday_Remainder:
                 self.date_box.set('Select Date')
                 self.month_box.set('Select Month')
 
-    def resource_path(self, relative_path):
+    def resource_path(self, file_name):
         '''Get absolute path to resource from temporary directory
 
         In development:
@@ -164,15 +164,9 @@ class Birthday_Remainder:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
 
         except AttributeError:
-            path = sys.argv
+            base_path = os.path.dirname(__file__)
 
-            if path:
-                base_path = os.path.split(path[0])[0]
-
-            else:
-                base_path = os.path.abspath(".")
-
-        return os.path.join(base_path, relative_path)
+        return os.path.join(base_path, 'included_files', file_name)
 
 
 if __name__ == '__main__':

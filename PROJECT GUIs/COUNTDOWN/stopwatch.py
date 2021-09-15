@@ -13,7 +13,7 @@ class StopWatch:
         self.master = Tk()
         self.master.withdraw()
         self.master.title('StopWatch')
-        self.master.iconbitmap(self.resource_path('included_files\\icon.ico'))
+        self.master.iconbitmap(self.resource_path('icon.ico'))
         self.master.resizable(0, 0)
         self.master.config(bg='dark blue')
         self.time_var = StringVar()
@@ -88,7 +88,7 @@ class StopWatch:
         self.time_var.set(f'{str(minutes).zfill(2)}:{str(seconds).zfill(2)}:{str(hseconds).zfill(2)}')
         self.timer = self.master.after(50, self.update)
 
-    def resource_path(self, relative_path):
+    def resource_path(self, file_name):
         '''Get absolute path to resource from temporary directory
 
         In development:
@@ -98,12 +98,12 @@ class StopWatch:
             Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
 
         try:
-            base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS.
+            base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
 
         except AttributeError:
-            base_path = os.path.abspath(".")
+            base_path = os.path.dirname(__file__)
 
-        return os.path.join(base_path, relative_path)
+        return os.path.join(base_path, 'included_files', file_name)
 
 
 if __name__ == '__main__':

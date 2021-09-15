@@ -9,13 +9,13 @@ from tkinter.ttk import Scrollbar
 class SSNI:
     def __init__(self):
         self.after_id = None
-        self.file_name = 'video_file.txt'
+        self.file_name = self.resource_path('video_file.txt')
         self.buttons_attributes = {'bg': 'green', 'fg': 'white', 'activebackground': 'green', 'activeforeground': 'white', 'cursor': 'hand2'}
 
         self.master = Tk()
         self.master.withdraw()
         self.master.title('SSNI')
-        self.master.iconbitmap(self.resource_path('included_files\\icon.ico'))
+        self.master.iconbitmap(self.resource_path('icon.ico'))
 
         self.first_left_frame = Frame(self.master)
 
@@ -306,7 +306,7 @@ class SSNI:
 
         self.after_id = self.master.after(3000, lambda: self.text_area.tag_delete('highlight'))
 
-    def resource_path(self, relative_path):
+    def resource_path(self, file_name):
         '''Get absolute path to resource from temporary directory
 
         In development:
@@ -319,15 +319,9 @@ class SSNI:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
 
         except AttributeError:
-            path = sys.argv
+            base_path = os.path.dirname(__file__)
 
-            if path:
-                base_path = os.path.split(path[0])[0]
-
-            else:
-                base_path = os.path.abspath(".")
-
-        return os.path.join(base_path, relative_path)
+        return os.path.join(base_path, 'included_files', file_name)
 
 
 if __name__ == '__main__':

@@ -11,14 +11,14 @@ from tkinter.ttk import Scrollbar
 class Sticky_Notes:
     def __init__(self):
         self.all_tags = {}
-        self.json_filename = 'config.json'
-        self.text_filename = 'sticky_notes.txt'
+        self.json_filename = self.resource_path('config.json')
+        self.text_filename = self.resource_path('sticky_notes.txt')
 
         self.master = Tk()
         self.master.withdraw()
         self.master.resizable(0, 0)
         self.master.wm_attributes('-topmost', True)
-        self.master.iconbitmap(self.resource_path('included_files/icon.ico'))
+        self.master.iconbitmap(self.resource_path('icon.ico'))
 
         self.master.title('STICKY NOTES')
         self.width, self.height = 301, 290
@@ -41,19 +41,19 @@ class Sticky_Notes:
         self.format_frame = Frame(self.master, bg='#fffed1')
         self.button_attributes = {'master': self.format_frame, 'bd': 0, 'bg': '#fffed1', 'activebackground': '#fffed1', 'cursor': 'hand2'}
 
-        self.bold_image = PhotoImage(file=self.resource_path('included_files/bold.png'))
+        self.bold_image = PhotoImage(file=self.resource_path('bold.png'))
         self.bold_button = Button(image=self.bold_image, **self.button_attributes, command=lambda: self.change_tags('bold'))
         self.bold_button.pack(side=LEFT)
 
-        self.italic_image = PhotoImage(file=self.resource_path('included_files/italic.png'))
+        self.italic_image = PhotoImage(file=self.resource_path('italic.png'))
         self.italic_button = Button(image=self.italic_image, **self.button_attributes, command=lambda: self.change_tags('italic'))
         self.italic_button.pack(side=LEFT, padx=5)
 
-        self.underline_image = PhotoImage(file=self.resource_path('included_files/underline.png'))
+        self.underline_image = PhotoImage(file=self.resource_path('underline.png'))
         self.underline_button = Button(image=self.underline_image, **self.button_attributes, command=lambda: self.change_tags('underline'))
         self.underline_button.pack(side=LEFT)
 
-        self.overstrike_image = PhotoImage(file=self.resource_path('included_files/overstrike.png'))
+        self.overstrike_image = PhotoImage(file=self.resource_path('overstrike.png'))
         self.overstrike_button = Button(image=self.overstrike_image, **self.button_attributes, command=lambda: self.change_tags('overstrike'))
         self.overstrike_button.pack(side=LEFT, padx=5)
 
@@ -242,7 +242,7 @@ class Sticky_Notes:
 
         return 'break'
 
-    def resource_path(self, relative_path):
+    def resource_path(self, file_name):
         '''Get absolute path to resource from temporary directory
 
         In development:
@@ -255,15 +255,9 @@ class Sticky_Notes:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
 
         except AttributeError:
-            path = sys.argv
+            base_path = os.path.dirname(__file__)
 
-            if path:
-                base_path = os.path.split(path[0])[0]
-
-            else:
-                base_path = os.path.abspath(".")
-
-        return os.path.join(base_path, relative_path)
+        return os.path.join(base_path, 'included_files', file_name)
 
 
 if __name__ == '__main__':

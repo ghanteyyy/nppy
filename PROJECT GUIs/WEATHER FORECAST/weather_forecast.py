@@ -30,9 +30,9 @@ class Weather:
 
         self.master = Tk()
         self.master.withdraw()
-        self.master.iconbitmap(self.resource_path('included_files\\icon.ico'))
+        self.master.iconbitmap(self.resource_path('icon.ico'))
         self.master.title('Weather Forecast')
-        self.image_obj = PhotoImage(file=self.resource_path('included_files\\1.png'))
+        self.image_obj = PhotoImage(file=self.resource_path('1.png'))
         self.image_label = Label(self.master, image=self.image_obj, bd=0)
         self.image_label.pack(pady=10)
 
@@ -139,7 +139,7 @@ class Weather:
         thread = threading.Thread(target=self.get_details, args=[location, link])
         thread.start()
 
-    def resource_path(self, relative_path):
+    def resource_path(self, file_name):
         '''Get absolute path to resource from temporary directory
 
         In development:
@@ -152,15 +152,9 @@ class Weather:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
 
         except AttributeError:
-            path = sys.argv
+            base_path = os.path.dirname(__file__)
 
-            if path:
-                base_path = os.path.split(path[0])[0]
-
-            else:
-                base_path = os.path.abspath(".")
-
-        return os.path.join(base_path, relative_path)
+        return os.path.join(base_path, 'included_files', file_name)
 
 
 if __name__ == '__main__':

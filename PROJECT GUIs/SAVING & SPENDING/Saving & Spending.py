@@ -9,7 +9,7 @@ from tkinter import messagebox
 class Saving_Spending:
     def __init__(self):
         self.font1, self.font2 = ('Courier', 13), ('Courier', 30)
-        self.saving_file, self.spent_file = 'saving.txt', 'spending.txt'
+        self.saving_file, self.spent_file = self.resource_path('saving.txt'), self.resource_path('spending.txt')
         self.label_attributes = {'padx': 20, 'pady': 20, 'bg': 'white', 'font': self.font1, 'takefocus': False}
         self.home_button_attributes = {'height': 3, 'width': 60, 'fg': 'white', 'activeforeground': 'white', 'cursor': 'hand2'}
 
@@ -17,21 +17,21 @@ class Saving_Spending:
         self.master.withdraw()
         self.master.after(0, self.master.deiconify)
         self.master.title('Saving & Spending')
-        self.master.iconbitmap('included files\\icon.ico')
+        self.master.iconbitmap(self.resource_path('icon.ico'))
         self.master.resizable(0, 0)
 
         self.pos_x, self.pos_y = self.master.winfo_screenwidth() // 2 - 900 // 2, self.master.winfo_screenheight() - 650
         self.master.geometry(f'900x500+{self.pos_x}+{self.pos_y}')
 
         # PhotoImage Objects
-        self.edit_image_obj = PhotoImage(file=self.resource_path('included files/edit.png'))
-        self.name_image_obj = PhotoImage(file=self.resource_path('included files/name.png'))
-        self.save_image_obj = PhotoImage(file=self.resource_path('included files/save.png'))
-        self.spent_image_obj = PhotoImage(file=self.resource_path('included files/spent.png'))
-        self.istock_image_obj = PhotoImage(file=self.resource_path('included files/istock.png'))
-        self.rupees_image_obj = PhotoImage(file=self.resource_path('included files/rupees.png'))
-        self.earning_image_obj = PhotoImage(file=self.resource_path('included files/earning.png'))
-        self.back_image_obj = PhotoImage(file=self.resource_path('included files/back_button.png'))
+        self.edit_image_obj = PhotoImage(file=self.resource_path('edit.png'))
+        self.name_image_obj = PhotoImage(file=self.resource_path('name.png'))
+        self.save_image_obj = PhotoImage(file=self.resource_path('save.png'))
+        self.spent_image_obj = PhotoImage(file=self.resource_path('spent.png'))
+        self.istock_image_obj = PhotoImage(file=self.resource_path('istock.png'))
+        self.rupees_image_obj = PhotoImage(file=self.resource_path('rupees.png'))
+        self.earning_image_obj = PhotoImage(file=self.resource_path('earning.png'))
+        self.back_image_obj = PhotoImage(file=self.resource_path('back_button.png'))
 
         self.home_frame = Frame(self.master, bg='white')
         self.edit_window_frame = Frame(self.master, bg='white')
@@ -448,7 +448,7 @@ class Saving_Spending:
 
             self.master.focus()
 
-    def resource_path(self, relative_path):
+    def resource_path(self, file_name):
         '''Get absolute path to resource from temporary directory
 
         In development:
@@ -461,15 +461,9 @@ class Saving_Spending:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
 
         except AttributeError:
-            path = sys.argv
+            base_path = os.path.dirname(__file__)
 
-            if path:
-                base_path = os.path.split(path[0])[0]
-
-            else:
-                base_path = os.path.abspath(".")
-
-        return os.path.join(base_path, relative_path)
+        return os.path.join(base_path, 'included files', file_name)
 
 
 if __name__ == '__main__':

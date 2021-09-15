@@ -184,7 +184,7 @@ class UI:
         self.font = _font
 
         self.master = master
-        self.transparent_ico = include.resource_path('included_files\\transparent.ico')
+        self.transparent_ico = include.resource_path('transparent.ico')
 
         self.top_level = Toplevel(self.master)
         self.top_level.transient(self.master)

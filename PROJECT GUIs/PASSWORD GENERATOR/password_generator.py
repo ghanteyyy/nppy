@@ -14,12 +14,12 @@ class Password_Generator:
         self.master.withdraw()
         self.master.resizable(0, 0)
         self.master.title('Password GENERATOR')
-        self.master.iconbitmap(self.resource_path('included_files/icon.ico'))
+        self.master.iconbitmap(self.resource_path('icon.ico'))
 
         self.width, self.height = 310, 505
         self.master.geometry(f'{self.width}x{self.height}+{self.master.winfo_screenwidth() // 2 - self.width // 2}+{self.master.winfo_screenheight() // 2 - self.height // 2}')
 
-        self.image = PhotoImage(file=self.resource_path('included_files/title_image.png'))
+        self.image = PhotoImage(file=self.resource_path('title_image.png'))
         self.image_label = Label(self.master, image=self.image)
         self.image_label.pack(pady=5)
 
@@ -121,7 +121,7 @@ class Password_Generator:
         except IndexError:
             messagebox.showerror('No Option', 'No option selected')
 
-    def resource_path(self, relative_path):
+    def resource_path(self, file_name):
         '''Get absolute path to resource from temporary directory
 
         In development:
@@ -134,15 +134,9 @@ class Password_Generator:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
 
         except AttributeError:
-            path = sys.argv
+            base_path = os.path.dirname(__file__)
 
-            if path:
-                base_path = os.path.split(path[0])[0]
-
-            else:
-                base_path = os.path.abspath(".")
-
-        return os.path.join(base_path, relative_path)
+        return os.path.join(base_path, 'included_files', file_name)
 
 
 if __name__ == '__main__':

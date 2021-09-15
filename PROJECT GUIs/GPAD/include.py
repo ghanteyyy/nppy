@@ -11,7 +11,7 @@ def initial_position(master):
     master.withdraw()
     master.update()
 
-    master.iconbitmap(resource_path('included_files\\icon.ico'))
+    master.iconbitmap(resource_path('icon.ico'))
     master.title('Untitled - GPAD')
 
     width, height = master.winfo_width() + 348, master.winfo_height() + 60
@@ -31,8 +31,7 @@ def initial_position(master):
 
     master.deiconify()
 
-
-def resource_path(relative_path):
+def resource_path(file_name):
     '''Get absolute path to resource from temporary directory
 
     In development:
@@ -45,15 +44,9 @@ def resource_path(relative_path):
         base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
 
     except AttributeError:
-        path = sys.argv
+        base_path = os.path.dirname(__file__)
 
-        if path:
-            base_path = os.path.split(path[0])[0]
-
-        else:
-            base_path = os.path.abspath(".")
-
-    return os.path.join(base_path, relative_path)
+    return os.path.join(base_path, 'included_files', file_name)
 
 
 def get_font_details():

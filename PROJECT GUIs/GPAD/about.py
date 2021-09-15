@@ -19,7 +19,7 @@ class About:
         self.initial_position()
         self.top_level.after(0, self.top_level.deiconify)
         self.top_level.title('About')
-        self.top_level.iconbitmap(include.resource_path('included_files\\transparent.ico'))
+        self.top_level.iconbitmap(include.resource_path('transparent.ico'))
 
         self.search = search.Search(self.top_level)
         self.description_frame = Frame(self.top_level, bg='white')

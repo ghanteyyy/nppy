@@ -10,7 +10,7 @@ class Remainder_Window:
     def __init__(self):
         self.birthdates = {}
         self.todays_date = time.strftime('%m-%d')
-        self.files = ['birthday_remainder.txt', 'seen_birthday.txt']
+        self.files = [self.resource_path('birthday_remainder.txt'), self.resource_path('seen_birthday.txt')]
         self.month_number = {'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'}
 
     def Window(self, name, date):
@@ -114,7 +114,7 @@ class Remainder_Window:
                 winsound.PlaySound(self.resource_path('tone.wav'), winsound.SND_LOOP + winsound.SND_ASYNC)
                 self.Window(name, date)
 
-    def resource_path(self, relative_path):
+    def resource_path(self, file_name):
         '''Get absolute path to resource from temporary directory
 
         In development:
@@ -127,15 +127,9 @@ class Remainder_Window:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
 
         except AttributeError:
-            path = sys.argv
+            base_path = os.path.dirname(__file__)
 
-            if path:
-                base_path = os.path.split(path[0])[0]
-
-            else:
-                base_path = os.path.abspath(".")
-
-        return os.path.join(base_path, relative_path)
+        return os.path.join(base_path, 'included_files', file_name)
 
 
 if __name__ == '__main__':

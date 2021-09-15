@@ -68,7 +68,7 @@ class GUI:
         self.master.resizable(0, 0)
         self.master.title('REMIND ME !')
         self.master.config(bg='#6200ff')
-        self.master.iconbitmap(self.resource_path('included_files/icon.ico'))
+        self.master.iconbitmap(self.resource_path('icon.ico'))
 
         self.master.deiconify()
 
@@ -147,7 +147,7 @@ class GUI:
         except ValueError:
             messagebox.showerror('Invalid Input', 'Date / Hour / Minute is excepted in numbers')
 
-    def resource_path(self, relative_path):
+    def resource_path(self, file_name):
         '''Get absolute path to resource from temporary directory
 
         In development:
@@ -160,15 +160,9 @@ class GUI:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
 
         except AttributeError:
-            path = sys.argv
+            base_path = os.path.dirname(__file__)
 
-            if path:
-                base_path = os.path.split(path[0])[0]
-
-            else:
-                base_path = os.path.abspath(".")
-
-        return os.path.join(base_path, relative_path)
+        return os.path.join(base_path, 'included_files', file_name)
 
 
 if __name__ == '__main__':

@@ -16,7 +16,7 @@ class Quiz:
 
         self.master = Tk()
 
-        self.title_img_obj = PhotoImage(file=self.resource_path(self.resource_path('included_files\\title.png')))
+        self.title_img_obj = PhotoImage(file=self.resource_path('title.png'))
         self.title_label = Label(self.master, image=self.title_img_obj, bd=0, bg='white')
         self.title_label.pack(ipadx=13)
 
@@ -79,7 +79,7 @@ class Quiz:
         width, height = self.master.winfo_width(), self.master.winfo_height() + 5
         screen_width, screen_height = self.master.winfo_screenwidth() // 2, self.master.winfo_screenheight() // 2
         self.master.geometry(f'{width}x{height}+{screen_width - width // 2}+{screen_height - height // 2}')
-        self.master.iconbitmap(self.resource_path('included_files\\icon.ico'))
+        self.master.iconbitmap(self.resource_path('icon.ico'))
         self.master.title('Quiz')
 
         self.master.deiconify()
@@ -237,7 +237,7 @@ class Quiz:
         numbers = [num for num in self.read_json().keys() if num not in self.quiz_numbers]
         messagebox.showinfo('Valid Numbers', ', '.join(numbers))
 
-    def resource_path(self, relative_path):
+    def resource_path(self, file_name):
         '''Get absolute path to resource from temporary directory
 
         In development:
@@ -250,15 +250,9 @@ class Quiz:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
 
         except AttributeError:
-            path = sys.argv
+            base_path = os.path.dirname(__file__)
 
-            if path:
-                base_path = os.path.split(path[0])[0]
-
-            else:
-                base_path = os.path.abspath(".")
-
-        return os.path.join(base_path, relative_path)
+        return os.path.join(base_path, 'included_files', file_name)
 
 
 if __name__ == '__main__':

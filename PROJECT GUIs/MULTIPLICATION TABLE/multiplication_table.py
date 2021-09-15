@@ -62,7 +62,7 @@ class Multiplication_Table:
         '''Position window to the center of screen when the program opens'''
 
         self.master.update()
-        self.master.iconbitmap(self.resource_path('included_files\\icon.ico'))
+        self.master.iconbitmap(self.resource_path('icon.ico'))
 
         width = self.master.winfo_width()
         height = self.master.winfo_height()
@@ -159,7 +159,7 @@ class Multiplication_Table:
             self.copy_button.config(text='Copied!')
             self.master.after(1000, lambda: self.copy_button.config(text='Copy'))
 
-    def resource_path(self, relative_path):
+    def resource_path(self, file_name):
         '''Get absolute path to resource from temporary directory
 
         In development:
@@ -172,15 +172,9 @@ class Multiplication_Table:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
 
         except AttributeError:
-            path = sys.argv
+            base_path = os.path.dirname(__file__)
 
-            if path:
-                base_path = os.path.split(path[0])[0]
-
-            else:
-                base_path = os.path.abspath(".")
-
-        return os.path.join(base_path, relative_path)
+        return os.path.join(base_path, 'included_files', file_name)
 
 
 if __name__ == '__main__':

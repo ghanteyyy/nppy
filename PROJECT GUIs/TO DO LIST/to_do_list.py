@@ -11,10 +11,10 @@ class To_Do_List:
         self.master.resizable(0, 0)
         self.master.overrideredirect(True)
         self.master.title('TO-DO LIST')
-        self.file_name = 'to_do_list.txt'
+        self.file_name = self.resource_path('to_do_list.txt')
         self.master.after(0, self.master.deiconify)
         self.master.wm_attributes("-topmost", 'true')
-        self.master.iconbitmap(self.resource_path('included_files/icon.ico'))
+        self.master.iconbitmap(self.resource_path('icon.ico'))
 
         self.buttons_attributes = {'bd': 1, 'fg': 'white', 'bg': '#002157', 'relief': GROOVE, 'cursor': 'hand2', 'activeforeground': 'white', 'activebackground': '#002157'}
 
@@ -233,7 +233,7 @@ class To_Do_List:
             if from_list:
                 self.add_to_list(from_list)
 
-    def resource_path(self, relative_path):
+    def resource_path(self, file_name):
         '''Get absolute path to resource from temporary directory
 
         In development:
@@ -246,15 +246,9 @@ class To_Do_List:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
 
         except AttributeError:
-            path = sys.argv
+            base_path = os.path.dirname(__file__)
 
-            if path:
-                base_path = os.path.split(path[0])[0]
-
-            else:
-                base_path = os.path.abspath(".")
-
-        return os.path.join(base_path, relative_path)
+        return os.path.join(base_path, 'included_files', file_name)
 
 
 if __name__ == '__main__':

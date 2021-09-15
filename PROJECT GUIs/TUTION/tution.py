@@ -27,7 +27,7 @@ class Widgets:
 
 class Tution:
     def __init__(self):
-        self.file_name = self.resource_path('included_files\\tution.json')
+        self.file_name = self.resource_path('tution.json')
 
         self.master = Tk()
         self.master.title('TUTION')
@@ -112,7 +112,7 @@ class Tution:
         self.master.update()
 
         self.master.resizable(0, 0)
-        self.master.iconbitmap(self.resource_path('included_files\\icon.ico'))
+        self.master.iconbitmap(self.resource_path('icon.ico'))
         width, height = self.master.winfo_width(), self.master.winfo_height() + 5
         screenwidth, screenheight = self.master.winfo_screenwidth() // 2, self.master.winfo_screenheight() // 2
         self.master.geometry(f'{width}x{height}+{screenwidth - width // 2}+{screenheight - height // 2}')
@@ -375,7 +375,7 @@ class Tution:
         self.write_json(contents)
         self.config_text_widget(state=DISABLED)
 
-    def resource_path(self, relative_path):
+    def resource_path(self, file_name):
         '''Get absolute path to resource from temporary directory
 
         In development:
@@ -388,15 +388,9 @@ class Tution:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
 
         except AttributeError:
-            path = sys.argv
+            base_path = os.path.dirname(__file__)
 
-            if path:
-                base_path = os.path.split(path[0])[0]
-
-            else:
-                base_path = os.path.abspath(".")
-
-        return os.path.join(base_path, relative_path)
+        return os.path.join(base_path, 'included_files', file_name)
 
 
 if __name__ == '__main__':

@@ -30,8 +30,8 @@ class Calculator:
         self.text_area.grid(row=0, column=0, sticky='NSEW')
 
         # Creating image object
-        self.pull_back_image = PhotoImage(file=self.resource_path('included_files\\pull_back.png'))
-        self.push_front_image = PhotoImage(file=self.resource_path('included_files\\push_front.png'))
+        self.pull_back_image = PhotoImage(file=self.resource_path('pull_back.png'))
+        self.push_front_image = PhotoImage(file=self.resource_path('push_front.png'))
 
         self.push_front_button = Button(self.text_frame, image=self.push_front_image, bg='white', activebackground='white', fg='black', relief='groove', compound='top', cursor='hand2', command=self.place_at_top)
         self.push_front_button.grid(row=0, column=1, ipadx=15, ipady=3, sticky='NSEW')
@@ -93,7 +93,7 @@ class Calculator:
         self.master.withdraw()
         self.master.update()
 
-        self.master.iconbitmap(self.resource_path('included_files\\icon.ico'))
+        self.master.iconbitmap(self.resource_path('icon.ico'))
 
         screen_width = self.master.winfo_screenwidth()
         screen_height = self.master.winfo_screenheight()
@@ -494,7 +494,7 @@ class Calculator:
         values = '\n'.join(key_bindings)
         messagebox.showinfo('Key Bindings', values)
 
-    def resource_path(self, relative_path):
+    def resource_path(self, file_name):
         '''Get absolute path to resource from temporary directory
 
         In development:
@@ -507,15 +507,9 @@ class Calculator:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
 
         except AttributeError:
-            path = sys.argv
+            base_path = os.path.dirname(__file__)
 
-            if path:
-                base_path = os.path.split(path[0])[0]
-
-            else:
-                base_path = os.path.abspath(".")
-
-        return os.path.join(base_path, relative_path)
+        return os.path.join(base_path, 'included_files', file_name)
 
 
 if __name__ == '__main__':

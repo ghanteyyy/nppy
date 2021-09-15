@@ -34,14 +34,14 @@ class Music_Player:
 
         self.master = Tk()
         self.master.withdraw()
-        self.master.iconbitmap(self.resource_path('included_files\\icon.ico'))
+        self.master.iconbitmap(self.resource_path('icon.ico'))
         self.master.title('Music Player')
 
-        self.play_image = PhotoImage(file=self.resource_path('included_files\\Play.png'))
-        self.pause_image = PhotoImage(file=self.resource_path('included_files\\Pause.png'))
-        self.previous_image = PhotoImage(file=self.resource_path('included_files\\Previous.png'))
-        self.stop_image = PhotoImage(file=self.resource_path('included_files\\Stop.png'))
-        self.next_image = PhotoImage(file=self.resource_path('included_files\\Next.png'))
+        self.play_image = PhotoImage(file=self.resource_path('Play.png'))
+        self.pause_image = PhotoImage(file=self.resource_path('Pause.png'))
+        self.previous_image = PhotoImage(file=self.resource_path('Previous.png'))
+        self.stop_image = PhotoImage(file=self.resource_path('Stop.png'))
+        self.next_image = PhotoImage(file=self.resource_path('Next.png'))
 
         self.menu = Menu(self.master)
         self.file_menu = Menu(self.menu, tearoff=0)
@@ -606,7 +606,7 @@ class Music_Player:
         for idx in range(from_, to_ + 1):
             self.audio_list.selection_set(idx)
 
-    def resource_path(self, relative_path):
+    def resource_path(self, file_name):
         '''Get absolute path to resource from temporary directory
 
         In development:
@@ -619,15 +619,9 @@ class Music_Player:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
 
         except AttributeError:
-            path = sys.argv
+            base_path = os.path.dirname(__file__)
 
-            if path:
-                base_path = os.path.split(path[0])[0]
-
-            else:
-                base_path = os.path.abspath(".")
-
-        return os.path.join(base_path, relative_path)
+        return os.path.join(base_path, 'included_files', file_name)
 
 
 if __name__ == '__main__':

@@ -19,9 +19,9 @@ class Test_Typing_Speed:
         self.incorrect_keystrokes = 0
 
         self.prev_index = '1.0'
-        self.redo_path = self.resource_path('included_files\\redo.png')
-        self.icon_path = self.resource_path('included_files\\icon.ico')
-        self.file_path = self.resource_path('included_files\\words.txt')
+        self.redo_path = self.resource_path('redo.png')
+        self.icon_path = self.resource_path('icon.ico')
+        self.file_path = self.resource_path('words.txt')
 
         with open(self.file_path, 'r') as f:
             self.contents = f.read().split()
@@ -303,7 +303,7 @@ class Test_Typing_Speed:
 
         self.master.after(5, self.insert_to_text_widget)
 
-    def resource_path(self, relative_path):
+    def resource_path(self, file_name):
         '''Get absolute path to resource from temporary directory
 
         In development:
@@ -316,15 +316,9 @@ class Test_Typing_Speed:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
 
         except AttributeError:
-            path = sys.argv
+            base_path = os.path.dirname(__file__)
 
-            if path:
-                base_path = os.path.split(path[0])[0]
-
-            else:
-                base_path = os.path.abspath(".")
-
-        return os.path.join(base_path, relative_path)
+        return os.path.join(base_path, 'included_files', file_name)
 
 
 if __name__ == '__main__':

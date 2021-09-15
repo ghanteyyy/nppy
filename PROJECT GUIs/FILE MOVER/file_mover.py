@@ -21,7 +21,7 @@ class FILE_MOVER:
         self.master.geometry(f'{self.width}x{self.height}+{self.screen_width - self.width // 2}+{self.screen_height - self.height // 2}')
         self.master.resizable(0, 0)
         self.master.title('File MOVER')
-        self.master.iconbitmap(self.resource_path('included_files/icon.ico'))
+        self.master.iconbitmap(self.resource_path('icon.ico'))
 
         self.title_label = Label(self.master, text='File MOVER', fg='white', background='green', font=('Helvetica', 32, 'bold'))
         self.title_label.pack(pady=5)
@@ -107,29 +107,6 @@ class FILE_MOVER:
 
             self.master.focus()
 
-    def resource_path(self, relative_path):
-        '''Get absolute path to resource from temporary directory
-
-        In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
-
-        After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
-
-        try:
-            base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
-
-        except AttributeError:
-            path = sys.argv
-
-            if path:
-                base_path = os.path.split(path[0])[0]
-
-            else:
-                base_path = os.path.abspath(".")
-
-        return os.path.join(base_path, relative_path)
-
     def is_thread_alive(self, thread, to_path):
         '''Call this function until the thread is not finished executing. If the thread
            finished executing the restore default values to the respective widgets and
@@ -175,6 +152,23 @@ class FILE_MOVER:
             thread.start()
 
             self.master.after(10, lambda: self.is_thread_alive(thread, to_path))
+
+    def resource_path(self, file_name):
+        '''Get absolute path to resource from temporary directory
+
+        In development:
+            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+
+        After compiling to .exe with pyinstaller and using --add-data flag:
+            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
+
+        try:
+            base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
+
+        except AttributeError:
+            base_path = os.path.dirname(__file__)
+
+        return os.path.join(base_path, 'included_files', file_name)
 
 
 class move_or_copy:

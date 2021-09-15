@@ -360,13 +360,13 @@ class GUI:
         self.master = Tk()
         self.master.withdraw()
         self.master.after(0, self.master.deiconify)
-        self.master.iconbitmap(self.resource_path('included_files/icon.ico'))
+        self.master.iconbitmap(self.resource_path('icon.ico'))
         self.master.title('Number System')
         self.pos_x, self.pos_y = self.master.winfo_screenwidth() // 2 - 300 // 2, self.master.winfo_screenheight() // 2 - 300 // 2
         self.master.geometry(f'260x369+{self.pos_x}+{self.pos_y}')
         self.master.resizable(0, 0)
 
-        self.file_image_file = PhotoImage(file='included_files/cover.png')
+        self.file_image_file = PhotoImage(file=self.resource_path('cover.png'))
 
         self.label_image = Label(self.master, image=self.file_image_file, bg='blue', borderwidth=0)
         self.label_image.place(x=0, y=0)
@@ -501,7 +501,7 @@ class GUI:
         else:
             self.text_area.config(state=DISABLED)
 
-    def resource_path(self, relative_path):
+    def resource_path(self, file_name):
         '''Get absolute path to resource from temporary directory
 
         In development:
@@ -514,15 +514,9 @@ class GUI:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
 
         except AttributeError:
-            path = sys.argv
+            base_path = os.path.dirname(__file__)
 
-            if path:
-                base_path = os.path.split(path[0])[0]
-
-            else:
-                base_path = os.path.abspath(".")
-
-        return os.path.join(base_path, relative_path)
+        return os.path.join(base_path, 'included_files', file_name)
 
     def calculation(self, event=None):
         '''Converting number with respective selected conversion'''

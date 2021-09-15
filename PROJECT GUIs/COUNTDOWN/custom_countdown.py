@@ -12,7 +12,7 @@ class Custom_Countdown:
         self.master.title('CUSTOM COUNTDOWN')
         self.master.geometry(f'295x88+{self.master.winfo_screenwidth() // 2 - 295 // 2}+{self.master.winfo_screenheight() // 2 - 88 // 2}')
         self.master.resizable(0, 0)
-        self.master.iconbitmap(self.resource_path('included_files/icon.ico'))
+        self.master.iconbitmap(self.resource_path('icon.ico'))
 
         self.buttons_attributes = {'font': ('Courier', 16), 'bg': 'dark blue', 'fg': 'white', 'activebackground': 'dark blue', 'width': 11, 'cursor': 'hand2'}
         self.entry_attributes = {'width': 5, 'justify': 'center', 'font': ('Courier', 18, 'bold'), 'disabledforeground': 'black'}
@@ -156,7 +156,7 @@ class Custom_Countdown:
         for entry in [self.hour_entry, self.minute_entry, self.second_entry]:
             entry.config(state=state)
 
-    def resource_path(self, relative_path):
+    def resource_path(self, file_name):
         '''Get absolute path to resource from temporary directory
 
         In development:
@@ -169,15 +169,9 @@ class Custom_Countdown:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
 
         except AttributeError:
-            path = sys.argv
+            base_path = os.path.dirname(__file__)
 
-            if path:
-                base_path = os.path.split(path[0])[0]
-
-            else:
-                base_path = os.path.abspath(".")
-
-        return os.path.join(base_path, relative_path)
+        return os.path.join(base_path, 'included_files', file_name)
 
 
 if __name__ == '__main__':

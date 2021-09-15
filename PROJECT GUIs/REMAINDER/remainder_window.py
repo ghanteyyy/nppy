@@ -87,7 +87,7 @@ class Remainder_Window:
                     split_rem_time = rem_time.split()
 
                     if curr_time == rem_time or (split_rem_time[2] == time.strftime('%I') and split_rem_time[3] < time.strftime('%M')) or (split_rem_time[2] < time.strftime('%I')):
-                        winsound.PlaySound(self.resource_path('included_files/tone.wav'), winsound.SND_LOOP + winsound.SND_ASYNC)  # Playing Sound before showing remainder window and till user clicks close button.
+                        winsound.PlaySound(self.resource_path('tone.wav'), winsound.SND_LOOP + winsound.SND_ASYNC)  # Playing Sound before showing remainder window and till user clicks close button.
                         self.window(rem)
                         winsound.PlaySound(None, winsound.SND_PURGE)  # Stopping sound when user clicks close button.
 
@@ -98,7 +98,7 @@ class Remainder_Window:
         except FileNotFoundError:
             return
 
-    def resource_path(self, relative_path):
+    def resource_path(self, file_name):
         '''Get absolute path to resource from temporary directory
 
         In development:
@@ -108,12 +108,12 @@ class Remainder_Window:
             Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
 
         try:
-            base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS.
+            base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
 
         except AttributeError:
-            base_path = os.path.abspath(".")
+            base_path = os.path.dirname(__file__)
 
-        return os.path.join(base_path, relative_path)
+        return os.path.join(base_path, 'included_files', file_name)
 
 
 class is_at_startup:

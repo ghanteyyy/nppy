@@ -8,7 +8,7 @@ class Replace:
     def __init__(self, master, text_widget):
         self.find_index = None
         self.word_indexes = []
-        self.transparent_ico = include.resource_path('included_files\\transparent.ico')
+        self.transparent_ico = include.resource_path('transparent.ico')
 
         self.master = master
         self.text_widget = text_widget
