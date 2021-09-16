@@ -25,6 +25,7 @@ class Music_Player:
         self.files = dict()
         self.current_playing_index = -1
         self.extensions = [('Music Files', '*.mp3')]
+        self.file_path = self.resource_path('playlists.json')
         self.song_name = None  # Store currently playing song's name
         self.eof = False  # Trigger to check if the last songs is about to play
         self.rem_timer = None  # Stores an alarm to call change_time function in every 500 ms
@@ -412,7 +413,7 @@ class Music_Player:
         '''Get audio path stored in a file'''
 
         try:
-            with open('playlists.json', 'r') as f:
+            with open(self.file_path, 'r') as f:
                 contents = json.load(f)
 
                 if not contents:
@@ -427,7 +428,7 @@ class Music_Player:
 
             for name, path in contents['playlists'].items():
                 if not os.path.exists(path):
-                    files.remove(name)
+                    files.remove(path)
 
             self.open_files(files=files)
 
@@ -435,7 +436,7 @@ class Music_Player:
         '''Save audio path present in list-box'''
 
         if self.variable.get():
-            with open('playlists.json', 'w') as f:
+            with open(self.file_path, 'w') as f:
                 contents = {'playlists': self.files}
                 json.dump(contents, f, indent=4)
                 messagebox.showinfo('Saved!', 'Playlist Saved !!')
