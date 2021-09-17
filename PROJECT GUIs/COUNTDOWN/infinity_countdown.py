@@ -5,6 +5,10 @@ from tkinter import *
 
 class Infinity_Countdown:
     def __init__(self):
+        self.hour = self.minute = self.second = 0
+        self.is_running = False  # Track if program has started running
+        self.is_paused = False  # Track if timer is paused. True for paused and False for not paused
+
         self.master = Tk()
         self.master.withdraw()
         self.master.after(0, self.master.deiconify)
@@ -24,23 +28,23 @@ class Infinity_Countdown:
         self.reset_button = Button(self.master, text='RESET', **self.buttons_attributes, command=self.reset)
         self.reset_button.pack(side='left', fill='both')
 
-        self.hour = self.minute = self.second = 0
-        self.is_paused = False
-
         self.master.mainloop()
 
     def start(self):
         '''Command for START button'''
 
-        if not self.is_paused:
-            self.is_paused = True
-            self.start_pause_button.config(text='PAUSE')
-            self.master.after(1000, self.Counter)
-
-        else:
+        if self.is_paused:  # Pause program if program is running.
             self.is_paused = False
-            self.master.after_cancel(self.timer)
             self.start_pause_button.config(text="START")
+
+        else:  # Resume program if program is paused.
+            self.is_paused = True
+
+            if self.is_running is False:  # Call counter method only is self.is_running is False
+                self.is_running = True
+                self.master.after(1000, self.counter)
+
+            self.start_pause_button.config(text='PAUSE')
 
     def reset(self):
         '''Command for RESET button'''
@@ -48,29 +52,25 @@ class Infinity_Countdown:
         self.is_paused = False
         self.time['text'] = '00:00:00'
         self.hour = self.minute = self.second = 0
+        self.start_pause_button.config(text='START')
 
-        try:
-            self.master.after_cancel(self.timer)
-
-        except AttributeError:
-            pass
-
-    def Counter(self):
+    def counter(self):
         '''Updating hour, minute and seconds'''
 
-        if self.second == self.minute == 59:
-            self.hour += 1
-            self.minute = 0
-            self.second = -1
+        if self.is_paused:
+            if self.second == self.minute == 59:
+                self.hour += 1
+                self.minute = 0
+                self.second = -1
 
-        elif self.second == 59:
-            self.minute += 1
-            self.second = -1
+            elif self.second == 59:
+                self.minute += 1
+                self.second = -1
 
-        self.second += 1
+            self.second += 1
+            self.time.config(text='{}:{}:{}'.format(str(self.hour).zfill(2), str(self.minute).zfill(2), str(self.second).zfill(2)))
 
-        self.time.config(text='{}:{}:{}'.format(str(self.hour).zfill(2), str(self.minute).zfill(2), str(self.second).zfill(2)))
-        self.timer = self.master.after(1000, self.Counter)
+        self.timer = self.master.after(1000, self.counter)
 
     def resource_path(self, file_name):
         '''Get absolute path to resource from temporary directory
