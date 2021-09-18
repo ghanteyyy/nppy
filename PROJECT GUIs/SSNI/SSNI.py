@@ -229,7 +229,7 @@ class SSNI:
 
         elif button_name == 'ADD':
             if from_entry in contents:
-                self.highlight(from_entry, '#784da8')
+                self.highlight(from_entry, '#e8cb10')
 
             else:
                 success = True
@@ -238,7 +238,7 @@ class SSNI:
             if from_entry in contents:
                 contents.remove(from_entry)
                 self.highlight(from_entry, 'red')
-                self.master.after(3000, lambda: self.insert_text_area(contents))
+                self.master.after(800, lambda: self.insert_text_area(contents))
 
             else:
                 option = messagebox.askyesno('Add Value?', f'"{from_entry}" not in file. Do you want to add it?')
@@ -248,7 +248,7 @@ class SSNI:
 
         else:
             if from_entry in contents:
-                self.highlight(from_entry, '#784da8')
+                self.highlight(from_entry, '#3ccbde')
 
             else:
                 option = messagebox.askyesno('Add Value?', f'"{from_entry}" not in file. Do you want to add it?')
@@ -290,7 +290,7 @@ class SSNI:
                 self.config_entry(widget, 'grey')
 
             self.master.focus()
-            self.highlight(new_name, '#ff006f')
+            self.highlight(new_name, '#45bf7c')
 
     def highlight(self, value, color):
         '''Fill color when value is added, removed and searched'''
@@ -304,7 +304,7 @@ class SSNI:
             self.master.after_cancel(self.after_id)
             self.after_id = None
 
-        self.after_id = self.master.after(3000, lambda: self.text_area.tag_delete('highlight'))
+        self.after_id = self.master.after(800, lambda: self.text_area.tag_delete('highlight'))
 
     def resource_path(self, file_name):
         '''Get absolute path to resource from temporary directory
