@@ -17,7 +17,7 @@ capwords = string.ascii_uppercase
 for index, value in enumerate(capwords):
     alphabets.update({capwords[index]: index + 1})
 
-with open('names.txt', 'r') as names:
+with open('p022_names.txt', 'r') as names:
     lines = [name.strip('"') for name in names.read().strip('\n').split(',')]
     lines.sort()
 
