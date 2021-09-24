@@ -116,6 +116,18 @@ class View:
     def default_zoom(self, evet=None):
         self.zoom.default_zoom()
 
+    def wheel_zoom(self, event=None):
+        '''Zoom in or out when pinching in and out on mousepad'''
+
+        if event.state == 44:
+            if event.delta > 0:
+                self.zoom.zoom_in()
+
+            else:
+                self.zoom.zoom_out()
+
+            return 'break'
+
     def toggle_statusbar(self, event=None):
         '''Show or hide status-bar when user clicks Status-bar sub-menu in
            View menu or when user presses Alt+S'''

@@ -157,6 +157,7 @@ class GPAD:
         self.text_widget.bind('<Control-a>', self.emc.select_all)
         self.text_widget.bind('<Control-N>', self.fmc.new_window)
         self.text_widget.bind('<Control-plus>', self.vmc.zoom_in)
+        self.text_widget.bind('<MouseWheel>', self.vmc.wheel_zoom)
         self.text_widget.bind('<Button-1>', self.button_1_command)
         self.text_widget.bind('<Control-minus>', self.vmc.zoom_out)
         self.text_widget.bind('<Control-f>', self.show_find_widget)
