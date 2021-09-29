@@ -15,14 +15,12 @@ sums = 1
 count = 0
 fractional_part = ''
 
-# Concating value from 1 to until the lenght
-# reaches 1000000
+# Concating value from 1 to until the length reaches 1000000
 while len(fractional_part) <= 1000000:
     count += 1
     fractional_part += str(count)
 
-# Getting value from repective index 1, 10, etc
-# and getting its product
+# Getting value from repective index 1, 10, etc and getting its product
 while num != 1000000:
     sums *= int(fractional_part[num - 1])
     num *= 10
