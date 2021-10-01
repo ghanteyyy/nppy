@@ -53,7 +53,7 @@ def get_font_details():
     '''Get font-family, font-size and font-style from the json file'''
 
     try:
-        with open('settings.json', 'r') as f:
+        with open(resource_path('settings.json'), 'r') as f:
             curr_font = json.load(f)
 
     except (FileNotFoundError, json.decoder.JSONDecodeError):
@@ -66,7 +66,7 @@ def get_font_details():
 def save_font_details(font_details):
     '''Saves font-family, font-size and font-style to the json file'''
 
-    with open('settings.json', 'w') as f:
+    with open(resource_path('settings.json'), 'w') as f:
         json.dump(font_details, f, indent=4)
 
 
