@@ -177,7 +177,12 @@ class Test_Typing_Speed:
             self.show_words.tag_delete(tag)
 
         self.show_words.tag_add(tag, self.prev_index, self.space_index[0])
-        self.show_words.tag_config(tag, background=color)
+
+        if tag == 'select':
+            self.show_words.tag_config(tag, background=color)
+
+        else:
+            self.show_words.tag_config(tag, foreground=color)
 
     def next_word(self, event=None):
         '''Select another word when user presses space-bar'''
@@ -194,6 +199,7 @@ class Test_Typing_Speed:
 
         if get_value == selected_value:  # When user typed word and selected word are same
             self.correct_words += 1
+            self.select_word('#008000', 'correct')
             self.correct_keystrokes += len_selected_value
 
         elif get_value != selected_value:  # When user typed word and selected word are not same
