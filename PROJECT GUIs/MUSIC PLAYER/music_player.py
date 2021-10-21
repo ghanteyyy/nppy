@@ -111,15 +111,17 @@ class Music_Player:
         self.master.bind('<Control-Q>', lambda e: self.master.destroy())
         self.total_time_label.bind('<Button-1>', self.show_remaining_time)
         self.audio_list.bind('<Shift-Button-1>', self.shift_multiple_selection)
+        self.master.bind('<n>', lambda event: self.prev_next_song(event, 'next'))
+        self.master.bind('<N>', lambda event: self.prev_next_song(event, 'next'))
+        self.master.bind('<p>', lambda event: self.prev_next_song(event, 'prev'))
+        self.master.bind('<P>', lambda event: self.prev_next_song(event, 'prev'))
         self.audio_list.bind('<Control-Button-1>', self.multiple_selection_one_by_one)
         self.master.bind('<Control-a>', lambda e: self.audio_list.selection_set(0, 'end'))
         self.master.bind('<Control-A>', lambda e: self.audio_list.selection_set(0, 'end'))
-        self.master.bind('<Control-Right>', lambda event, direc='forward': self.seek_song(event, direc))
-        self.master.bind('<Control-Left>', lambda event, direc='backward': self.seek_song(event, direc))
-        self.master.bind('<n>', lambda event, button_name='next': self.prev_next_song(event, button_name))
-        self.master.bind('<N>', lambda event, button_name='next': self.prev_next_song(event, button_name))
-        self.master.bind('<p>', lambda event, button_name='prev': self.prev_next_song(event, button_name))
-        self.master.bind('<P>', lambda event, button_name='prev': self.prev_next_song(event, button_name))
+        self.master.bind('<Control-Right>', lambda event: self.seek_song(event, 'forward'))
+        self.master.bind('<Control-Left>', lambda event: self.seek_song(event, 'backward'))
+        self.seek_scale.bind('<Button-1>', lambda event: self.SeekSingleClick(event, self.seek_scale, self.seek_song))
+        self.volume_slider.bind('<Button-1>', lambda event: self.SeekSingleClick(event, self.volume_slider, self.change_volume, True))
 
         self.master.mainloop()
 
@@ -147,6 +149,19 @@ class Music_Player:
 
         if bbox:
             return abs_coord_y > bbox[1] + bbox[-1]
+
+    def SeekSingleClick(self, event, widget, function, seek=False):
+        '''Hijacking Single Left Click to work like Single Right Click
+           to change the value of Scale to the position it is clicked
+
+           Setting seek parameter to True activates audio_slider but
+           not seek_scale when there is no audio in audio_list'''
+
+        if self.variable.get() or seek:
+            widget.event_generate('<Button-3>', x=event.x, y=event.y)
+            function()
+
+        return 'break'
 
     def single_click(self, event=None):
         '''When user single left clicks'''
@@ -366,7 +381,7 @@ class Music_Player:
                     self.prev_next_song()
                     return
 
-            else:
+            elif direc == 'backward':
                 skipped_at -= 5
 
                 if skipped_at <= 0:
