@@ -2,6 +2,7 @@ import string
 from tkinter import *
 from tkinter import font
 import tkinter.ttk as ttk
+from tkinter import messagebox
 import include
 
 
@@ -327,7 +328,7 @@ class UI:
                 _font = ('Courier', 9, 'normal')
 
             self.sample_label.config(font=_font)
-            self.top_level.after(250, self.config_sample_label)\
+            self.top_level.after(250, self.config_sample_label)
 
         except ValueError:
             pass
@@ -349,11 +350,11 @@ class UI:
             messagebox.showinfo('Font', 'This font is not available in that style.\nChoose a style from the list of styles.', parent=self.top_level)
             return
 
-        if not font_size.isdigit():
-            font_size = 9
-
-        if font_size.isdigit() and isinstance(font_size, str):
+        try:
             font_size = int(font_size)
+
+        except ValueError:
+            font_size = 9
 
         if font_style == 'regular':
             font_style = 'normal'
@@ -393,7 +394,7 @@ class UI:
 
         self.font_families_frame.entry_var.set(font_family)
         self.font_size_frame.entry_var.set(font_size)
-        self.font_style_frame.entry_var.set(font_style)
+        self.font_style_frame.entry_var.set(font_style.title())
 
         # List boxes
         font_family_listbox = self.font_families_frame.listbox
@@ -410,7 +411,7 @@ class UI:
             font_size_listbox.yview(font_size_index)
             font_size_listbox.selection_set(font_size_index)
 
-        font_style_index = self.font_styles.index(font_style)
+        font_style_index = self.font_styles.index(font_style.title())
         font_style_listbox.selection_set(font_style_index)
 
 
