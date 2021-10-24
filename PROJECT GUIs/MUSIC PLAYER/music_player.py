@@ -495,7 +495,7 @@ class Music_Player:
     def mute_unmute_volume(self, event=None):
         '''Mute and Unmute volume'''
 
-        if self.previous_volume is None:  # Volume is not mute before
+        if self.previous_volume is None:  # Volume is not muted before
             self.previous_volume = int(self.volume_label_var.get()[:-1])
             self.mute_unmute_button.config(image=self.mute_image)
             self.volume_slider.config(state='disabled')
@@ -503,7 +503,7 @@ class Music_Player:
             mixer.music.set_volume(0)
             self.volume_var.set(0)
 
-        else:  # Volume had been muted before
+        else:  # Volume is muted before
             self.volume_slider.config(state='normal')
             self.volume_var.set(self.previous_volume)
             mixer.music.set_volume(self.previous_volume / 100)
