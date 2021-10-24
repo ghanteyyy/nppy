@@ -39,10 +39,12 @@ class Music_Player:
         self.master.title('Music Player')
 
         self.play_image = PhotoImage(file=self.resource_path('Play.png'))
-        self.pause_image = PhotoImage(file=self.resource_path('Pause.png'))
-        self.previous_image = PhotoImage(file=self.resource_path('Previous.png'))
         self.stop_image = PhotoImage(file=self.resource_path('Stop.png'))
         self.next_image = PhotoImage(file=self.resource_path('Next.png'))
+        self.mute_image = PhotoImage(file=self.resource_path('Mute.png'))
+        self.pause_image = PhotoImage(file=self.resource_path('Pause.png'))
+        self.unmute_image = PhotoImage(file=self.resource_path('Unmute.png'))
+        self.previous_image = PhotoImage(file=self.resource_path('Previous.png'))
 
         self.menu = Menu(self.master)
         self.file_menu = Menu(self.menu, tearoff=0)
@@ -78,21 +80,30 @@ class Music_Player:
         self.volume_label_var = StringVar()
         self.volume_label_var.set('100%')
         self.volume_var.set(100)
-        self.buttons_frame = Frame(self.master)
+
+        self.bottom_frame = Frame(self.master)
+        self.bottom_frame.pack(side=BOTTOM, fill='x')
         self.buttons_attributes = {'bd': '0', 'bg': 'white', 'activebackground': 'white', 'takefocus': False}
+
+        self.buttons_frame = Frame(self.bottom_frame)
         self.play_button = Button(self.buttons_frame, image=self.play_image, **self.buttons_attributes, command=self.play_or_pause_music)
         self.play_button.pack(side=LEFT)
         self.previous_button = Button(self.buttons_frame, image=self.previous_image, **self.buttons_attributes, command=lambda: self.prev_next_song(button_name='prev'))
-        self.previous_button.pack(side=LEFT, padx=20, ipadx=5, ipady=5)
+        self.previous_button.pack(side=LEFT, padx=2, ipady=5)
         self.stop_button = Button(self.buttons_frame, image=self.stop_image, **self.buttons_attributes, command=self.stop)
         self.stop_button.pack(side=LEFT)
         self.next_button = Button(self.buttons_frame, image=self.next_image, **self.buttons_attributes, command=self.prev_next_song)
-        self.next_button.pack(side=LEFT, padx=20)
-        self.volume_slider = ttk.Scale(self.buttons_frame, from_=0, to=100, variable=self.volume_var, style='success.Horizontal.TScale', takefocus=False, command=self.change_volume)
+        self.next_button.pack(side=LEFT, padx=2)
+        self.buttons_frame.pack(side=LEFT)
+
+        self.volume_frame = Frame(self.bottom_frame)
+        self.mute_unmute_button = Button(self.volume_frame, image=self.unmute_image, **self.buttons_attributes, command=self.mute_unmute_volume)
+        self.mute_unmute_button.pack(side=LEFT)
+        self.volume_slider = ttk.Scale(self.volume_frame, from_=0, to=100, variable=self.volume_var, style='success.Horizontal.TScale', takefocus=False, command=self.change_volume)
         self.volume_slider.pack(side=LEFT)
-        self.volume_label = Label(self.buttons_frame, textvariable=self.volume_label_var, width=4, font=font.Font(weight='bold'))
+        self.volume_label = Label(self.volume_frame, textvariable=self.volume_label_var, width=4, font=font.Font(weight='bold'))
         self.volume_label.pack(side=LEFT)
-        self.buttons_frame.pack(side=BOTTOM, pady=5, expand=False)
+        self.volume_frame.pack(side=RIGHT)
 
         self.initial_position()
 
@@ -100,6 +111,8 @@ class Music_Player:
         self.master.bind('<Return>', self.return_bind)
         self.master.bind('<Control-o>', self.open_files)
         self.master.bind('<Control-O>', self.open_files)
+        self.master.bind('<m>', self.mute_unmute_volume)
+        self.master.bind('<M>', self.mute_unmute_volume)
         self.master.bind('<Key>', self.up_down_direction)
         self.master.bind('<Control-p>', self.get_playlist)
         self.master.bind('<Delete>', self.remove_from_list)
@@ -259,59 +272,59 @@ class Music_Player:
     def play_or_pause_music(self, event=None):
         '''Play or pause audio when play or pause button is pressed'''
 
-        if not self.files:
-            messagebox.showerror('ERR', 'No audio found to play')
-            return
+        try:
+            if self.is_playing is None:  # When any audio is not played before
+                curr_sel = self.audio_list.curselection()
 
-        if self.is_playing is None:  # When any audio is not played before
-            curr_sel = self.audio_list.curselection()
+                if curr_sel:
+                    curr_sel = curr_sel[0]
 
-            if curr_sel:
-                curr_sel = curr_sel[0]
+                else:
+                    curr_sel = 0
 
-            else:
-                curr_sel = 0
+                self.current_playing_index = self.select_index = curr_sel
+                self.audio_list.selection_set(self.current_playing_index)
+                self.audio_list.itemconfig(self.current_playing_index, bg='grey', fg='white')
+                self.audio_list.selection_clear(0, 'end')
+                self.song_name = self.audio_list.get(self.current_playing_index)
+                self.current_song_path = self.files[self.song_name]
 
-            self.current_playing_index = self.select_index = curr_sel
-            self.audio_list.selection_set(self.current_playing_index)
-            self.audio_list.itemconfig(self.current_playing_index, bg='grey', fg='white')
-            self.audio_list.selection_clear(0, 'end')
-            self.song_name = self.audio_list.get(self.current_playing_index)
-            self.current_song_path = self.files[self.song_name]
+                self.is_playing = True  # Here, True represents that the music is being played.
+                img = self.pause_image
+                mixer.music.load(self.current_song_path)  # Loading selected file for playing
+                mixer.music.play()  # Start playing loaded file
 
-            self.is_playing = True  # Here, True represents that the music is being played.
-            img = self.pause_image
-            mixer.music.load(self.current_song_path)  # Loading selected file for playing
-            mixer.music.play()  # Start playing loaded file
+                self.total_time = MP3(self.current_song_path).info.length  # Getting audio length
+                self.seek_scale.config(to=int(self.total_time))
+                self.seek_var.set(0)
+                self.audio_list.see(self.current_playing_index)  # Scrolling to currently playing audio
+                self.total_time_var.set(time.strftime('%H:%M:%S', time.gmtime(self.total_time)))
+                self.audio_list.selection_clear(0, 'end')
 
-            self.total_time = MP3(self.current_song_path).info.length  # Getting audio length
-            self.seek_scale.config(to=int(self.total_time))
-            self.seek_var.set(0)
-            self.audio_list.see(self.current_playing_index)  # Scrolling to currently playing audio
-            self.total_time_var.set(time.strftime('%H:%M:%S', time.gmtime(self.total_time)))
-            self.audio_list.selection_clear(0, 'end')
+                if self.current_playing_index != len(self.files) - 1:
+                    self.eof = False  # Here, setting self.eof to False means last song is not being played yet
 
-            if self.current_playing_index != len(self.files) - 1:
-                self.eof = False  # Here, setting self.eof to False means last song is not being played yet
+                if self.scale_timer:
+                    self.master.after_cancel(self.scale_timer)
 
-            if self.scale_timer:
+                self.update_scale()
+
+            elif self.is_playing is True:  # Pausing audio when another audio is playing
+                mixer.music.pause()
+                img = self.play_image
+                self.is_playing = False
                 self.master.after_cancel(self.scale_timer)
 
-            self.update_scale()
+            elif self.is_playing is False:  # Resume playing audio from where the audio is paused
+                self.is_playing = True
+                img = self.pause_image
+                mixer.music.play(start=self.seek_var.get())
+                self.update_scale()
 
-        elif self.is_playing is True:  # Pausing audio when another audio is playing
-            mixer.music.pause()
-            img = self.play_image
-            self.is_playing = False
-            self.master.after_cancel(self.scale_timer)
+            self.play_button.config(image=img)
 
-        elif self.is_playing is False:  # Resume playing audio from where the audio is paused
-            self.is_playing = True
-            img = self.pause_image
-            mixer.music.play(start=self.seek_var.get())
-            self.update_scale()
-
-        self.play_button.config(image=img)
+        except TclError:  # when user tries to play audio when no audio was added before
+            pass
 
     def stop(self, event=None):
         '''Stop playing audio'''
@@ -397,32 +410,32 @@ class Music_Player:
     def prev_next_song(self, event=None, button_name=None):
         '''Play previous and present audio present in list-box'''
 
-        if not self.files:
-            messagebox.showerror('ERR', 'No song to play')
-            return
+        try:
+            if self.current_playing_index > -1:
+                from_list_box = self.variable.get()
 
-        if self.current_playing_index > -1:
-            from_list_box = self.variable.get()
+                if button_name == 'prev':  # If previous buttons is clicked
+                    if self.current_playing_index == 0:
+                        return
 
-            if button_name == 'prev':  # If previous buttons is clicked
-                if self.current_playing_index == 0:
-                    return
+                    self.audio_list.itemconfig(self.current_playing_index, bg='white', fg='purple')
+                    self.current_playing_index -= 1
 
-                self.audio_list.itemconfig(self.current_playing_index, bg='white', fg='purple')
-                self.current_playing_index -= 1
+                else:  # If next button is clicked
+                    if self.current_playing_index == len(from_list_box) - 1:
+                        return
 
-            else:  # If next button is clicked
-                if self.current_playing_index == len(from_list_box) - 1:
-                    return
+                    self.audio_list.itemconfig(self.current_playing_index, bg='white', fg='purple')
+                    self.current_playing_index += 1
 
-                self.audio_list.itemconfig(self.current_playing_index, bg='white', fg='purple')
-                self.current_playing_index += 1
+                self.audio_list.selection_clear(0, 'end')
+                self.audio_list.see(self.current_playing_index)
+                self.audio_list.selection_set(self.current_playing_index)
+                self.is_playing = None
+                self.play_or_pause_music()
 
-            self.audio_list.selection_clear(0, 'end')
-            self.audio_list.see(self.current_playing_index)
-            self.audio_list.selection_set(self.current_playing_index)
-            self.is_playing = None
-            self.play_or_pause_music()
+        except TclError:
+            pass
 
     def get_playlist(self, event=None):
         '''Get audio path stored in a file'''
@@ -478,6 +491,25 @@ class Music_Player:
         gmtime = time.gmtime(self.total_time - self.current_pos)
         self.total_time_var.set(time.strftime('-%H:%M:%S', gmtime))
         self.rem_timer = self.master.after(500, self.change_time)
+
+    def mute_unmute_volume(self, event=None):
+        '''Mute and Unmute volume'''
+
+        if self.previous_volume is None:  # Volume is not mute before
+            self.previous_volume = int(self.volume_label_var.get()[:-1])
+            self.mute_unmute_button.config(image=self.mute_image)
+            self.volume_slider.config(state='disabled')
+            self.volume_label_var.set('0%')
+            mixer.music.set_volume(0)
+            self.volume_var.set(0)
+
+        else:  # Volume had been muted before
+            self.volume_slider.config(state='normal')
+            self.volume_var.set(self.previous_volume)
+            mixer.music.set_volume(self.previous_volume / 100)
+            self.volume_label_var.set(f'{self.previous_volume}%')
+            self.mute_unmute_button.config(image=self.unmute_image)
+            self.previous_volume = None
 
     def change_volume(self, event=None, change=None):
         '''Increase or decrease volume when user drags volume bar or
