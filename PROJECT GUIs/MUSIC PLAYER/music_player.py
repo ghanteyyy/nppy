@@ -23,6 +23,7 @@ class Music_Player:
         mixer.init()
 
         self.files = dict()
+        self.previous_volume = None
         self.current_playing_index = -1
         self.extensions = [('Music Files', '*.mp3')]
         self.file_path = self.resource_path('playlists.json')
