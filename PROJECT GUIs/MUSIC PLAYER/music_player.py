@@ -7,9 +7,9 @@ from tkinter import font
 import tkinter.ttk as ttk
 from tkinter import filedialog
 from tkinter import messagebox
-from pygame import mixer
-from ttkbootstrap import Style
+import pygame
 from mutagen.mp3 import MP3
+from ttkbootstrap import Style
 
 
 '''To setup ttkbootstrap:
@@ -20,7 +20,7 @@ from mutagen.mp3 import MP3
 
 class Music_Player:
     def __init__(self):
-        mixer.init()
+        pygame.mixer.init()
 
         self.files = dict()
         self.previous_volume = None
@@ -114,7 +114,8 @@ class Music_Player:
         self.master.bind('<Control-O>', self.open_files)
         self.master.bind('<m>', self.mute_unmute_volume)
         self.master.bind('<M>', self.mute_unmute_volume)
-        self.master.bind('<Key>', self.up_down_direction)
+        self.master.bind('<Up>', self.up_down_direction)
+        self.master.bind('<Down>', self.up_down_direction)
         self.master.bind('<Control-p>', self.get_playlist)
         self.master.bind('<Delete>', self.remove_from_list)
         self.master.bind('<Control-P>', self.save_playlists)
@@ -134,6 +135,10 @@ class Music_Player:
         self.master.bind('<Control-A>', lambda e: self.audio_list.selection_set(0, 'end'))
         self.master.bind('<Control-Right>', lambda event: self.seek_song(event, 'forward'))
         self.master.bind('<Control-Left>', lambda event: self.seek_song(event, 'backward'))
+        self.master.bind('<Left>', lambda event, change='decrease': self.change_volume(event, change))
+        self.master.bind('<Right>', lambda event, change='increase': self.change_volume(event, change))
+        self.audio_list.bind('<Left>', lambda event, change='decrease': self.change_volume(event, change))
+        self.audio_list.bind('<Right>', lambda event, change='increase': self.change_volume(event, change))
         self.seek_scale.bind('<Button-1>', lambda event: self.SeekSingleClick(event, self.seek_scale, self.seek_song))
         self.volume_slider.bind('<Button-1>', lambda event: self.SeekSingleClick(event, self.volume_slider, self.change_volume, True))
 
@@ -171,6 +176,9 @@ class Music_Player:
            Setting seek parameter to True activates audio_slider but
            not seek_scale when there is no audio in audio_list'''
 
+        if self.previous_volume and seek:  # Unmuting sound when user clicks anywhere in volume slider
+            self.mute_unmute_volume()
+
         if self.variable.get() or seek:
             widget.event_generate('<Button-3>', x=event.x, y=event.y)
             function()
@@ -188,6 +196,11 @@ class Music_Player:
             return 'break'
 
         if self.clicked_at_empty_space():
+            return 'break'
+
+        if self.audio_list.itemcget(self.audio_list.nearest(event.y), 'bg') == 'grey':
+            self.audio_list.select_clear(0, 'end')
+            self.select_index = self.audio_list.nearest(event.y)
             return 'break'
 
         self.audio_list.selection_clear(0, 'end')
@@ -218,16 +231,16 @@ class Music_Player:
             files = filedialog.askopenfilenames(filetypes=self.extensions, initialdir=os.getcwd(), defaultextension=self.extensions)
 
         if files:
-            self.is_playing = None
             self.files.update({os.path.basename(f): f for f in files})
             self.variable.set(list(self.files.keys()))
 
             if self.current_playing_index == -1:
                 self.select_index = 0
 
-            self.audio_list.selection_set(self.select_index)
+            if self.is_playing is None and not self.audio_list.curselection():
+                self.audio_list.selection_set(0)
 
-            if len(files) == 1:  # Play audio if user opens only 1 audio file
+            if len(self.files) == 1:  # Play audio if user opens only 1 audio file
                 self.play_or_pause_music()
 
         return 'break'
@@ -256,19 +269,11 @@ class Music_Player:
         if curr_index:
             curr_index = curr_index[0]
 
-            if self.current_playing_index == -1:
-                self.play_or_pause_music()
-
-            elif self.current_playing_index != curr_index:
+            if curr_index != self.current_playing_index:
                 self.is_playing = None
                 self.audio_list.itemconfig(self.current_playing_index, bg='white', fg='purple')
-                self.play_or_pause_music()
 
-            else:
-                self.play_or_pause_music()
-
-        else:
-            self.play_or_pause_music()
+        self.play_or_pause_music()
 
     def play_or_pause_music(self, event=None):
         '''Play or pause audio when play or pause button is pressed'''
@@ -292,8 +297,8 @@ class Music_Player:
 
                 self.is_playing = True  # Here, True represents that the music is being played.
                 img = self.pause_image
-                mixer.music.load(self.current_song_path)  # Loading selected file for playing
-                mixer.music.play()  # Start playing loaded file
+                pygame.mixer.music.load(self.current_song_path)  # Loading selected file for playing
+                pygame.mixer.music.play()  # Start playing loaded file
 
                 self.total_time = MP3(self.current_song_path).info.length  # Getting audio length
                 self.seek_scale.config(to=int(self.total_time))
@@ -311,7 +316,7 @@ class Music_Player:
                 self.update_scale()
 
             elif self.is_playing is True:  # Pausing audio when another audio is playing
-                mixer.music.pause()
+                pygame.mixer.music.pause()
                 img = self.play_image
                 self.is_playing = False
                 self.master.after_cancel(self.scale_timer)
@@ -319,10 +324,14 @@ class Music_Player:
             elif self.is_playing is False:  # Resume playing audio from where the audio is paused
                 self.is_playing = True
                 img = self.pause_image
-                mixer.music.play(start=self.seek_var.get())
+                pygame.mixer.music.play(start=self.seek_var.get())
                 self.update_scale()
 
             self.play_button.config(image=img)
+
+        except pygame.error:
+            self.is_playing = None
+            messagebox.showinfo('ERR', 'Audio format not supported')
 
         except TclError:  # when user tries to play audio when no audio was added before
             pass
@@ -331,7 +340,7 @@ class Music_Player:
         '''Stop playing audio'''
 
         if self.is_playing:
-            mixer.music.stop()
+            pygame.mixer.music.stop()
 
             if self.scale_timer is not None:
                 self.master.after_cancel(self.scale_timer)
@@ -349,7 +358,7 @@ class Music_Player:
         '''Continuously update escaping time and slider values
            until songs comes to end'''
 
-        self.current_pos = mixer.music.get_pos() / 1000
+        self.current_pos = pygame.mixer.music.get_pos() / 1000
 
         if self.seek_var.get() > int(self.current_pos):
             self.current_pos = self.seek_var.get() + 1
@@ -404,7 +413,7 @@ class Music_Player:
             self.seek_var.set(skipped_at)
 
             if self.is_playing:
-                mixer.music.play(start=skipped_at)
+                pygame.mixer.music.play(start=skipped_at)
 
             self.escaped_time_var.set(time.strftime('%H:%M:%S', time.gmtime(skipped_at)))
 
@@ -476,7 +485,7 @@ class Music_Player:
     def show_remaining_time(self, event=None):
         '''Show remaining time of current playing audio'''
 
-        if self.current_playing_index > -1:
+        if self.is_playing is not None and self.current_playing_index > -1:
             if self.showed_rem_time is False:  # If remaining time has not been shown
                 self.showed_rem_time = True
                 self.change_time()
@@ -501,13 +510,13 @@ class Music_Player:
             self.mute_unmute_button.config(image=self.mute_image)
             self.volume_slider.config(state='disabled')
             self.volume_label_var.set('0%')
-            mixer.music.set_volume(0)
+            pygame.mixer.music.set_volume(0)
             self.volume_var.set(0)
 
         else:  # Volume is muted before
             self.volume_slider.config(state='normal')
             self.volume_var.set(self.previous_volume)
-            mixer.music.set_volume(self.previous_volume / 100)
+            pygame.mixer.music.set_volume(self.previous_volume / 100)
             self.volume_label_var.set(f'{self.previous_volume}%')
             self.mute_unmute_button.config(image=self.unmute_image)
             self.previous_volume = None
@@ -533,8 +542,10 @@ class Music_Player:
 
         self.volume_var.set(curr_vol)
         curr_vol /= 100
-        mixer.music.set_volume(curr_vol)
+        pygame.mixer.music.set_volume(curr_vol)
         self.volume_label_var.set(f'{int(curr_vol * 100)}%')
+
+        return 'break'
 
     def right_click(self, event=None):
         '''When user right clicks inside list-box'''
@@ -581,12 +592,18 @@ class Music_Player:
                 if curr_index < 0:
                     curr_index = 0
 
+                if curr_index == self.current_playing_index:
+                    self.stop()
+
                 song_name = self.audio_list.get(curr_index)
                 self.files.pop(song_name)
                 self.audio_list.delete(curr_index)
 
-            self.stop()
-            self.audio_list.selection_set(curr_index)
+            if len(self.files) == 1:
+                self.audio_list.selection_set(0)
+
+            else:
+                self.audio_list.selection_set(curr_index)
 
     def remove_from_playlist(self, event=None):
         '''Remove selected item from the list-box as well from the playlist file'''
@@ -600,33 +617,27 @@ class Music_Player:
         direc = event.keysym
 
         if self.files:
-            if direc in ['Up', 'Down']:
-                curr_index = self.audio_list.curselection()
+            curr_index = self.audio_list.curselection()
 
-                if curr_index:
-                    curr_index = curr_index[0]
+            if curr_index:
+                curr_index = curr_index[0]
 
-                else:
-                    curr_index = self.select_index
+            else:
+                curr_index = self.select_index
 
-                if direc == 'Up':
-                    if curr_index != 0:
-                        curr_index -= 1
+            if direc == 'Up':
+                if curr_index != 0:
+                    curr_index -= 1
 
-                else:
-                    if curr_index < len(self.files) - 1:
-                        curr_index += 1
+            else:
+                if curr_index < len(self.files) - 1:
+                    curr_index += 1
 
-                self.audio_list.see(curr_index)
-                self.audio_list.selection_clear(0, 'end')
+            self.audio_list.see(curr_index)
+            self.audio_list.selection_clear(0, 'end')
+
+            if self.audio_list.itemcget(curr_index, 'bg') != 'grey':
                 self.audio_list.selection_set(curr_index)
-
-            elif direc in ['Right', 'Left']:
-                if direc == 'Right':
-                    self.change_volume(change='increase')
-
-                else:
-                    self.change_volume(change='decrease')
 
     def multiple_selection_one_by_one(self, event=None):
         '''Select multiple items in list-box holding control key'''
