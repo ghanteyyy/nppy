@@ -1,15 +1,9 @@
 import os
 import sys
 import time
+import winreg
 import winsound
-
-try:  # Python 3
-    import winreg
-    from tkinter import *
-
-except (ImportError, ModuleNotFoundError):  # Python 2
-    from Tkinter import *
-    import _winreg as winreg
+from tkinter import *
 
 
 class Remainder_Window:
