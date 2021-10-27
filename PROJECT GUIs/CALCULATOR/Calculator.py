@@ -1,5 +1,6 @@
 import os
 import sys
+import string
 from math import *
 from tkinter import *
 from tkinter import messagebox
