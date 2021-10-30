@@ -23,11 +23,12 @@ class Music_Player:
         pygame.mixer.init()
 
         self.AudioFiles = dict()
+        self.WindowNotMapped = False
         self.extensions = [('Music Files', '*.mp3')]
-        self.PlaylistPath = self.ResourcePath('playlists.json')
         self.AudioName = None  # Store currently playing song's name
         self.CurrentPlayingIndex = -1  # Index of current playing audio
         self.EOF = False  # Trigger to check if the last songs is about to play
+        self.PlaylistPath = os.path.join(os.path.dirname(__file__), 'playlists.json')
         self.RemTimer = None  # Stores an alarm to call change_time function in every 500 ms
         self.PreviousVolume = None  # Store previous value of volumen before muting and unmuting
         self.ScaleTimer = None  # Stores an alarm to call update_scale function in every 1000 ms
@@ -49,7 +50,10 @@ class Music_Player:
         self.UnmuteImage = PhotoImage(file=self.ResourcePath('Unmute.png'))
         self.PreviousImage = PhotoImage(file=self.ResourcePath('Previous.png'))
 
-        self.Menu = Menu(self.master)
+        self.container = Frame(self.master)
+        self.container.pack()
+
+        self.Menu = Menu(self.container)
         self.FileMenu = Menu(self.Menu, tearoff=0)
         self.Menu.add_cascade(label='File', menu=self.FileMenu)
         self.master.config(menu=self.Menu)
@@ -60,14 +64,15 @@ class Music_Player:
         self.FileMenu.add_command(label='Exit', accelerator='Ctrl + Q', command=self.master.destroy)
 
         self.AudioListBoxVar = Variable()
-        self.AudioListBox = Listbox(self.master, listvariable=self.AudioListBoxVar, activestyle='none', height=10, width=100, bg='#f9f9fa', fg='purple', selectmode=MULTIPLE)
+        self.AudioListBox = Listbox(self.container, listvariable=self.AudioListBoxVar, activestyle='none', height=10, width=100, bg='#f9f9fa', fg='purple', selectmode=MULTIPLE)
         self.AudioListBox.pack(fill='x')
 
         self.TotalTimeVar = StringVar()
         self.TotalTimeVar.set('--:--')
         self.EscapedTimeVar = StringVar()
         self.EscapedTimeVar.set('--:--')
-        self.TimeFrame = Frame(self.master)
+
+        self.TimeFrame = Frame(self.container)
         self.EscapedTimeLabel = Label(self.TimeFrame, textvariable=self.EscapedTimeVar, bd=0, takefocus=False)
         self.EscapedTimeLabel.pack(side=LEFT)
         self.TotalTimeLabel = Label(self.TimeFrame, textvariable=self.TotalTimeVar, bd=0)
@@ -76,7 +81,7 @@ class Music_Player:
 
         self.style = Style()
         self.AudioSliderVar = IntVar()
-        self.AudioSlider = ttk.Scale(self.master, from_=0, to=100, style='info.Horizontal.TScale', variable=self.AudioSliderVar)
+        self.AudioSlider = ttk.Scale(self.container, from_=0, to=100, style='info.Horizontal.TScale', variable=self.AudioSliderVar)
         self.AudioSlider.pack(fill='x')
 
         self.VolumeSliderVar = IntVar()
@@ -84,7 +89,7 @@ class Music_Player:
         self.VolumeLabelVar.set('100%')
         self.VolumeSliderVar.set(100)
 
-        self.BottomFrame = Frame(self.master)
+        self.BottomFrame = Frame(self.container)
         self.BottomFrame.pack(side=BOTTOM, fill='x')
         self.ButtonsAttributes = {'bd': '0', 'bg': 'white', 'activebackground': 'white', 'takefocus': False}
 
@@ -109,6 +114,7 @@ class Music_Player:
         self.VolumeFrame.pack(side=RIGHT)
 
         self.InitialPosition()
+        self.StopWindowFlicking()
 
         self.master.bind('<s>', self.StopAudio)
         self.master.bind('<S>', self.StopAudio)
@@ -121,6 +127,7 @@ class Music_Player:
         self.master.bind('<Control-O>', self.OpenFiles)
         self.master.bind('<Down>', self.UpDownDirection)
         self.master.bind('<Control-p>', self.GetPlaylist)
+        self.master.bind('<MouseWheel>', self.MouseWheel)
         self.master.bind('<Delete>', self.RemoveFromList)
         self.master.bind('<Control-P>', self.SavePlaylist)
         self.AudioSlider.bind('<Button-3>', self.SkipAudio)
@@ -152,6 +159,21 @@ class Music_Player:
         self.VolumeSlider.bind('<Button-1>', lambda event: self.SeekSingleClick(event, self.VolumeSlider, self.ChangeVolume, True))
 
         self.master.mainloop()
+
+    def StopWindowFlicking(self):
+        '''When window is minimize and maximized continusouly then black
+           color gets appear on the window for fraction of seconds which
+           looks like the window is flickering'''
+
+        if self.master.winfo_ismapped() == 0:  # When window is minimized
+            self.container.pack_forget()
+            self.WindowNotMapped = True
+
+        if self.master.winfo_ismapped() == 1 and self.WindowNotMapped:  # When window is restored
+            self.master.after(0, lambda: self.container.pack())
+            self.WindowNotMapped = False
+
+        self.master.after(5, self.StopWindowFlicking)
 
     def InitialPosition(self):
         '''Set window position to the center when program starts first time'''
@@ -185,9 +207,6 @@ class Music_Player:
            Setting seek parameter to True activates audio_slider but
            not seek_scale when there is no audio in audio_list'''
 
-        if self.PreviousVolume and seek:  # Unmuting sound when user clicks anywhere in volume slider
-            self.MuteUnmuteVolume()
-
         if self.AudioListBoxVar.get() or seek:
             if event.y not in [0, 1, 2, 3, 4, 12, 13, 14, 15]:
                 # I have noticed that we can click on some regions outside of ttk.Scale
@@ -195,8 +214,13 @@ class Music_Player:
                 # are [0, 1, 2, 3, 4, 12, 13, 14, 15] where [0, 1, 2, 3, 4] are the top
                 # regions of and [12 ,13, 14, 15] are the bottom regions of ttk.Scale.
                 # When user clicks to these regions must be ignored.
+
+                if str(self.VolumeSlider.cget('state')) == 'disabled':   # Enabling VolumeSlider if it is disabled and the user clicks on it
+                    self.VolumeSlider.config(state='normal')
+                    self.MuteUnmuteButton.config(image=self.UnmuteImage)
+
                 widget.event_generate('<Button-3>', x=event.x, y=event.y)
-                function()
+                function(event)
 
         return 'break'
 
@@ -215,6 +239,18 @@ class Music_Player:
             if self.PreviousScaleValue != self.AudioSliderVar.get():
                 self.PreviousScaleValue = self.AudioSliderVar.get()
                 self.SkipAudio()
+
+    def MouseWheel(self, event):
+        '''Change Volume or Skip Audio when ScrollWheel button'''
+
+        x, y = self.master.winfo_pointerxy()
+        widget = self.master.winfo_containing(x, y)
+
+        if widget in [self.BottomFrame, self.ButtonsFrame, self.VolumeFrame, self.VolumeLabel, self.VolumeSlider] or isinstance(widget, Button):  # Change Volme
+            self.ChangeVolume(event)
+
+        elif widget == self.AudioSlider:  # Skip audio
+            self.SkipAudio(event)
 
     def SingleClick(self, event=None):
         '''When user single left clicks'''
@@ -433,14 +469,14 @@ class Music_Player:
         if self.isPlaying:
             SkipAt = self.AudioSliderVar.get()
 
-            if direction == 'forward':
+            if direction == 'forward' or (not(isinstance(event, str)) and event.delta > 0):
                 SkipAt += 5
 
                 if SkipAt >= self.TotalTime:
                     self.PreviousNextSong()
                     return
 
-            elif direction == 'backward':
+            elif direction == 'backward' or (not(isinstance(event, str)) and event.delta < 0):
                 SkipAt -= 5
 
                 if SkipAt <= 0:
@@ -489,9 +525,6 @@ class Music_Player:
         try:
             with open(self.PlaylistPath, 'r') as f:
                 contents = json.load(f)
-
-                if not contents:
-                    contents = {}
 
         except (json.decoder.JSONDecodeError, FileNotFoundError):
             contents = {}
@@ -564,17 +597,17 @@ class Music_Player:
 
         CurrentVolume = self.VolumeSliderVar.get()
 
-        if change == 'increase':
+        if change == 'increase' or (not(isinstance(event, str)) and event.delta > 0):
             CurrentVolume += 5
 
             if CurrentVolume >= 100:
                 CurrentVolume = 100
 
-        elif change == 'decrease':
+        elif change == 'decrease' or (not(isinstance(event, str)) and event.delta < 0):
             CurrentVolume -= 5
 
             if CurrentVolume <= 0:
-                CurrentVolume = 0
+                CurrentVolume = 00
 
         if CurrentVolume == 0:
             self.PreviousVolume = None
@@ -583,6 +616,7 @@ class Music_Player:
             self.PreviousVolume = CurrentVolume
 
         self.MuteUnmuteVolume()
+
         self.VolumeSliderVar.set(CurrentVolume)
         CurrentVolume /= 100
         pygame.mixer.music.set_volume(CurrentVolume)
