@@ -8,87 +8,86 @@ import include
 
 class File_Menu:
     def __init__(self, master, text_widget, var):
-        self.var = var
-        self.file_name = ''
+        self.Var = var
+        self.FileName = ''
         self.master = master
-        self.is_saved = False
-        self.text_widget = text_widget
+        self.isSaved = False
+        self.TextWidget = text_widget
         self.extensions = ([("Plain Text", "*.txt"), ('Python', '*.py')])
-        self.previous_signature = self.get_signature(self.get_contents())
+        self.PreviousSignature = self.GetSignature(self.GetContents())
 
     def set_var(self, text, time=4000):
         '''Config text to the status_label'''
 
-        include.set_var(self.master, self.var, text, time)
+        include.set_var(self.master, self.Var, text, time)
 
-    def get_contents(self):
+    def GetContents(self):
         '''Get everything that is in text_widget'''
 
-        return self.text_widget.get('1.0', 'end-1c')
+        return self.TextWidget.get('1.0', 'end-1c')
 
-    def get_signature(self, contents):
+    def GetSignature(self, contents):
         '''Get the hash of the text inside of text_widget'''
 
-        return hashlib.md5(bytes(self.get_contents(), encoding='utf-8')).digest()
+        return hashlib.md5(bytes(self.GetContents(), encoding='utf-8')).digest()
 
-    def is_file_changed(self):
+    def IsFileChanged(self):
         '''Check if the signature of the the previous content in text_widet is
            not the same of the current content in text_widget.'''
 
-        current_signature = self.get_signature(self.get_contents())
-        return current_signature != self.previous_signature
+        return self.GetSignature(self.GetContents()) != self.PreviousSignature
 
-    def write_to_file(self):
+    def WriteToFile(self):
         '''Write the content of the text_widget to the given filename'''
 
-        with open(self.file_name, 'w', encoding='utf-8') as f:
-            self.is_saved = True
-            f.write(self.get_contents())
-            self.previous_signature = self.get_signature(self.get_contents())
-            self.set_var(f'Saved to {self.file_name}')
+        with open(self.FileName, 'w', encoding='utf-8') as f:
+            self.isSaved = True
+            f.write(self.GetContents())
+            self.PreviousSignature = self.GetSignature(self.GetContents())
+            self.set_var(f'Saved to {self.FileName}')
             return True
 
         title = self.master.title()
 
-        if title.startswith('*') and not self.is_file_changed():
+        if title.startswith('*') and not self.IsFileChanged():
             self.master.title(title[1:])
 
-    def new(self, event=None):
+    def New(self, event=None):
         '''When user presses ctrl+n or clicks new option from file menu'''
 
-        if self.is_file_changed():
+        if self.IsFileChanged():
             choice = messagebox.askyesnocancel('Z-PAD', 'Do you want to quit without saving?')
 
             if choice is True:
-                self.is_saved = True
+                self.isSaved = True
 
             elif choice is False:
-                self.save()
+                self.Save()
 
             else:
                 return
 
-        if self.is_saved:
-            self.file_name = ''
-            self.is_saved = False
+        if self.isSaved:
+            self.FileName = ''
+            self.isSaved = False
             self.set_var('New File Created')
-            self.text_widget.delete('1.0', 'end')
+            self.TextWidget.delete('1.0', 'end')
             self.master.title('Untitled - GPAD')
-            self.previous_signature = self.get_signature(self.get_contents)
+            self.PreviousSignature = self.GetSignature(self.GetContents)
 
-    def new_window(self, event=None):
+    def NewWindow(self, event=None):
         '''When user presses ctrl+shift+n or clicks new_window option from file_menu'''
 
         main.GPAD()
 
-    def open(self, event=None):
+    def Open(self, event=None):
         '''When user presses ctrl+o or clicks open option from file menu'''
 
-        if self.is_file_changed():
+        if self.IsFileChanged():
             choice = messagebox.askyesnocancel('Z-PAD', 'Do you want to open another file without saving the current one?')
 
             if choice is False:
-                saved = self.save()
+                saved = self.Save()
 
                 if not saved:  # If user does not save the contents
                     return 'break'
@@ -100,44 +99,44 @@ class File_Menu:
         file_name = filedialog.askopenfilename(title="Select file", filetypes=self.extensions, initialdir=os.getcwd(), defaultextension=self.extensions)
 
         if file_name:
-            self.file_name = file_name
-            self.text_widget.delete('1.0', 'end')
+            self.FileName = file_name
+            self.TextWidget.delete('1.0', 'end')
 
-            with open(self.file_name, 'r') as f:
+            with open(self.FileName, 'r') as f:
                 lines = f.read()
-                self.text_widget.insert('end', lines)
+                self.TextWidget.insert('end', lines)
 
-            self.set_var(f'Opened {self.file_name}')
-            self.previous_signature = self.get_signature(self.get_contents)
-            self.title = os.path.basename(self.file_name) + ' - GPAD'
+            self.set_var(f'Opened {self.FileName}')
+            self.PreviousSignature = self.GetSignature(self.GetContents)
+            self.title = os.path.basename(self.FileName) + ' - GPAD'
             self.master.title(self.title)
 
         return 'break'
 
-    def save(self, event=None):
+    def Save(self, event=None):
         '''When user presses ctrl+s or clicks save option from the file menu'''
 
-        if self.file_name and self.is_file_changed():  # When user wants to save the file that is already saved once.
-            self.write_to_file()
+        if self.FileName and self.IsFileChanged():  # When user wants to save the file that is already saved once.
+            self.WriteToFile()
 
-        elif not self.file_name:  # When user tries to save a file that is not saved previously.
-            self.save_as()
+        elif not self.FileName:  # When user tries to save a file that is not saved previously.
+            self.SaveAs()
 
-    def save_as(self, event=None):
+    def SaveAs(self, event=None):
         '''When user presses ctrl+shift+s or clicks save_as option from the file_menu'''
 
         self.master.update()
         file_name = filedialog.asksaveasfilename(title="Save", filetypes=self.extensions, initialdir=os.getcwd(), defaultextension=self.extensions)
 
         if file_name:
-            self.file_name = file_name
-            self.write_to_file()
-            self.master.title(os.path.basename(self.file_name) + ' - GPAD')
+            self.FileName = file_name
+            self.WriteToFile()
+            self.master.title(os.path.basename(self.FileName) + ' - GPAD')
 
         else:
-            self.is_saved = False
+            self.isSaved = False
 
-    def delete_zoom(self):
+    def DeleteZoom(self):
         '''Delete the amount of zoomed from the json file'''
 
         font_details = include.get_font_details()
@@ -150,21 +149,21 @@ class File_Menu:
     def exit(self, event=None):
         '''When user wants to exit the program'''
 
-        if self.is_file_changed():
+        if self.IsFileChanged():
             choice = messagebox.askyesnocancel('GPAD', 'Do you really want to quit without saving?')
 
             if choice is False:
-                self.save()
+                self.Save()
 
         else:
             choice = True
 
         if choice:
-            content = include.get_font_details()
+            content = include.GetFontDetails()
 
             if 'Zoomed' in content:
                 content.pop('Zoomed')
 
             content.update({'window_dimension': self.master.geometry()})
-            include.save_font_details(content)
+            include.SaveFontDetails(content)
             self.master.destroy()

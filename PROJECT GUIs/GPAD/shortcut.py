@@ -7,7 +7,7 @@ class ShortCut:
         self.master = master
         self.font = Font(size=8)
 
-    def show_shortcut(self, button, text, rely=None):
+    def ShowShortCut(self, button, text, rely=None):
         '''Show text aside of the button when the cursor enters to the button'''
 
         self.label = Label(self.master, text=text, border='1', relief='solid', font=self.font)

@@ -7,87 +7,87 @@ import shortcut
 
 class Replace:
     def __init__(self, master, text_widget):
-        self.find_index = None
-        self.word_indexes = []
-        self.transparent_ico = include.resource_path('transparent.ico')
+        self.FindIndex = None
+        self.WordIndexes = []
+        self.TransparentICO = include.resource_path('transparent.ico')
 
         self.master = master
-        self.text_widget = text_widget
-        self.dummy_text_widget = Text(master)
+        self.TextWidget = text_widget
+        self.DummyTextWidget = Text(master)
 
-        self.match_var, self.wrap_var = IntVar(), IntVar()
-        self.wrap_var.set(1)
+        self.MatchVar, self.WrapVar = IntVar(), IntVar()
+        self.WrapVar.set(1)
 
-        self.replace_master = Toplevel()
-        self.replace_master.transient(self.master)
-        self.replace_master.grab_set()
+        self.ReplaceWindow = Toplevel()
+        self.ReplaceWindow.transient(self.master)
+        self.ReplaceWindow.grab_set()
 
-        self.replace_master.withdraw()
-        self.replace_master.after(0, self.replace_master.deiconify)
-        self.replace_master.title('Replace')
-        self.replace_master.iconbitmap(self.transparent_ico)
+        self.ReplaceWindow.withdraw()
+        self.ReplaceWindow.after(0, self.ReplaceWindow.deiconify)
+        self.ReplaceWindow.title('Replace')
+        self.ReplaceWindow.iconbitmap(self.TransparentICO)
         self.pos_x, self.pos_y = self.master.winfo_x() + 55, self.master.winfo_y() + 170
-        self.replace_master.geometry('{}x{}+{}+{}'.format(350, 155, self.pos_x, self.pos_y))
-        self.replace_master.resizable(0, 0)
+        self.ReplaceWindow.geometry('{}x{}+{}+{}'.format(350, 155, self.pos_x, self.pos_y))
+        self.ReplaceWindow.resizable(0, 0)
 
-        self.find_what_frame = Frame(self.replace_master)
+        self.FindWhatFrame = Frame(self.ReplaceWindow)
 
-        self.find_what_label = ttk.Label(self.find_what_frame, text='Find what:')
-        self.replace_find_what_entry = ttk.Entry(self.find_what_frame, width=31)
-        self.find_what_label.grid(row=0, column=0)
-        self.replace_find_what_entry.focus_set()
-        self.replace_find_what_entry.grid(row=0, column=1, padx=18)
-        self.find_what_frame.place(x=0, y=5)
+        self.FindWhatLabel = ttk.Label(self.FindWhatFrame, text='Find what:')
+        self.ReplaceFindWhatEntry = ttk.Entry(self.FindWhatFrame, width=31)
+        self.FindWhatLabel.grid(row=0, column=0)
+        self.ReplaceFindWhatEntry.focus_set()
+        self.ReplaceFindWhatEntry.grid(row=0, column=1, padx=18)
+        self.FindWhatFrame.place(x=0, y=5)
 
-        self.replace_with_frame = Frame(self.replace_master)
-        self.replace_with_label = ttk.Label(self.replace_with_frame, text='Replace what:')
-        self.replace_with_entry = ttk.Entry(self.replace_with_frame, width=31)
-        self.replace_with_label.grid(row=0, column=0)
-        self.replace_with_entry.grid(row=0, column=1, pady=5)
-        self.replace_with_frame.place(x=0, y=30)
+        self.ReplaceWithFrame = Frame(self.ReplaceWindow)
+        self.ReplaceWithLabel = ttk.Label(self.ReplaceWithFrame, text='Replace what:')
+        self.ReplaceWithEntry = ttk.Entry(self.ReplaceWithFrame, width=31)
+        self.ReplaceWithLabel.grid(row=0, column=0)
+        self.ReplaceWithEntry.grid(row=0, column=1, pady=5)
+        self.ReplaceWithFrame.place(x=0, y=30)
 
-        self.buttons_frame = Frame(self.replace_master)
+        self.ButtonsFrame = Frame(self.ReplaceWindow)
         self.style = ttk.Style()
         self.style.configure('my.TButton', font=('Helvetica', 8))
-        self.find_next_button = ttk.Button(self.buttons_frame, text='Find Next', width=9, style='my.TButton', command=self.find_next)
-        self.replace_button = ttk.Button(self.buttons_frame, text='Replace', width=9, style='my.TButton', command=self.replace)
-        self.replace_all_button = ttk.Button(self.buttons_frame, text='Replace All', width=9, style='my.TButton', command=self.replace_all)
-        self.cancel_button = ttk.Button(self.buttons_frame, text='Cancel', width=9, style='my.TButton', command=self.exit)
-        self.find_next_button.grid(row=0, column=0, ipadx=3)
-        self.replace_button.grid(row=1, column=0, ipadx=3, pady=5)
-        self.replace_all_button.grid(row=2, column=0, ipadx=3)
-        self.cancel_button.grid(row=3, column=0, ipadx=3, pady=5)
-        self.buttons_frame.place(x=275, y=5)
+        self.FindNextButton = ttk.Button(self.ButtonsFrame, text='Find Next', width=9, style='my.TButton', command=self.FindNext)
+        self.ReplaceButton = ttk.Button(self.ButtonsFrame, text='Replace', width=9, style='my.TButton', command=self.Replace)
+        self.RepalceAllButton = ttk.Button(self.ButtonsFrame, text='Replace All', width=9, style='my.TButton', command=self.ReplaceAll)
+        self.CancelButton = ttk.Button(self.ButtonsFrame, text='Cancel', width=9, style='my.TButton', command=self.exit)
+        self.FindNextButton.grid(row=0, column=0, ipadx=3)
+        self.ReplaceButton.grid(row=1, column=0, ipadx=3, pady=5)
+        self.RepalceAllButton.grid(row=2, column=0, ipadx=3)
+        self.CancelButton.grid(row=3, column=0, ipadx=3, pady=5)
+        self.ButtonsFrame.place(x=275, y=5)
 
-        self.check_button_frame = Frame(self.replace_master)
-        self.match_case_checkbutton = ttk.Checkbutton(self.check_button_frame, text='Match case', variable=self.match_var, takefocus=False)
-        self.wrap_around_case_checkbutton = ttk.Checkbutton(self.check_button_frame, text='Wrap around', variable=self.wrap_var, takefocus=False)
-        self.match_case_checkbutton.pack(anchor='w')
-        self.wrap_around_case_checkbutton.pack(anchor='w', pady=5)
-        self.check_button_frame.place(x=5, y=100)
+        self.CheckButtonFrame = Frame(self.ReplaceWindow)
+        self.MatchCaseCheckButton = ttk.Checkbutton(self.CheckButtonFrame, text='Match case', variable=self.MatchVar, takefocus=False)
+        self.WrapAroundCaseCheckButton = ttk.Checkbutton(self.CheckButtonFrame, text='Wrap around', variable=self.WrapVar, takefocus=False)
+        self.MatchCaseCheckButton.pack(anchor='w')
+        self.WrapAroundCaseCheckButton.pack(anchor='w', pady=5)
+        self.CheckButtonFrame.place(x=5, y=100)
 
-        self.shortcut = shortcut.ShortCut(self.replace_master)
-        self.find_next_button.bind('<Enter>', lambda e: self.shortcut.show_shortcut(self.find_next_button, 'F3'))
-        self.find_next_button.bind('<Leave>', lambda e: self.shortcut.destroy())
-        self.replace_button.bind('<Enter>', lambda e: self.shortcut.show_shortcut(self.replace_button, 'Ctrl+Shift+H'))
-        self.replace_button.bind('<Leave>', lambda e: self.shortcut.destroy())
-        self.replace_all_button.bind('<Enter>', lambda e: self.shortcut.show_shortcut(self.replace_all_button, 'Ctrl+Alt+Enter'))
-        self.replace_all_button.bind('<Leave>', lambda e: self.shortcut.destroy())
-        self.cancel_button.bind('<Enter>', lambda e: self.shortcut.show_shortcut(self.cancel_button, 'Esc'))
-        self.cancel_button.bind('<Leave>', lambda e: self.shortcut.destroy())
+        self.shortcut = shortcut.ShortCut(self.ReplaceWindow)
+        self.FindNextButton.bind('<Enter>', lambda e: self.shortcut.ShowShortCut(self.FindNextButton, 'F3'))
+        self.FindNextButton.bind('<Leave>', lambda e: self.shortcut.destroy())
+        self.ReplaceButton.bind('<Enter>', lambda e: self.shortcut.ShowShortCut(self.ReplaceButton, 'Ctrl+Shift+H'))
+        self.ReplaceButton.bind('<Leave>', lambda e: self.shortcut.destroy())
+        self.RepalceAllButton.bind('<Enter>', lambda e: self.shortcut.ShowShortCut(self.RepalceAllButton, 'Ctrl+Alt+Enter'))
+        self.RepalceAllButton.bind('<Leave>', lambda e: self.shortcut.destroy())
+        self.CancelButton.bind('<Enter>', lambda e: self.shortcut.ShowShortCut(self.CancelButton, 'Esc'))
+        self.CancelButton.bind('<Leave>', lambda e: self.shortcut.destroy())
 
-        self.insert_selected_text()
-        self.replace_master.bind('<Control-Alt-Return>', self.replace_all)
-        self.replace_master.bind('<Control-H>', self.replace)
-        self.replace_master.bind('<Escape>', self.exit)
-        self.replace_with_entry.bind('<Control-h>', self.entry_bind)
-        self.replace_find_what_entry.bind('<Control-h>', self.entry_bind)
-        self.find_next_button.bind('<Return>', self.find_next)
-        self.replace_button.bind('<Return>', self.replace)
-        self.replace_all_button.bind('<Return>', self.replace_all)
-        self.cancel_button.bind('<Return>', self.exit)
-        self.replace_master.protocol('WM_DELETE_WINDOW', self.exit)
-        self.replace_master.mainloop()
+        self.InsertSelectedText()
+        self.ReplaceWindow.bind('<Control-Alt-Return>', self.ReplaceAll)
+        self.ReplaceWindow.bind('<Control-H>', self.Replace)
+        self.ReplaceWindow.bind('<Escape>', self.exit)
+        self.ReplaceWithEntry.bind('<Control-h>', self.entry_bind)
+        self.ReplaceFindWhatEntry.bind('<Control-h>', self.entry_bind)
+        self.FindNextButton.bind('<Return>', self.FindNext)
+        self.ReplaceButton.bind('<Return>', self.Replace)
+        self.RepalceAllButton.bind('<Return>', self.ReplaceAll)
+        self.CancelButton.bind('<Return>', self.exit)
+        self.ReplaceWindow.protocol('WM_DELETE_WINDOW', self.exit)
+        self.ReplaceWindow.mainloop()
 
     def entry_bind(self, event=None):
         '''When Ctrl+h is pressed while the focus is in Entry widgets, the last
@@ -97,58 +97,58 @@ class Replace:
 
         return 'break'
 
-    def insert_selected_text(self, event=None):
+    def InsertSelectedText(self, event=None):
         '''If user selects certain word and then gets the find-widget then
            inserting the selected word to the "Find what" entry widget to
            make more convenient.'''
 
         try:
-            selected_text = self.text_widget.get('sel.first', 'sel.last').strip().strip('\n')
-            self.text_widget.mark_set('insert', self.text_widget.index('sel.last'))
+            selected_text = self.TextWidget.get('sel.first', 'sel.last').strip().strip('\n')
+            self.TextWidget.mark_set('insert', self.TextWidget.index('sel.last'))
 
         except TclError:
-            if 'found' in self.text_widget.tag_names():
-                selected_text = self.text_widget.get('found.first', 'found.last').strip().strip('\n')
-                self.text_widget.mark_set('insert', self.text_widget.index('found.last'))
+            if 'found' in self.TextWidget.tag_names():
+                selected_text = self.TextWidget.get('found.first', 'found.last').strip().strip('\n')
+                self.TextWidget.mark_set('insert', self.TextWidget.index('found.last'))
 
             else:
                 selected_text = None
 
         if selected_text:
-            self.replace_with_entry.focus_set()
-            self.replace_find_what_entry.delete(0, 'end')
-            self.replace_find_what_entry.insert('end', selected_text)
+            self.ReplaceWithEntry.focus_set()
+            self.ReplaceFindWhatEntry.delete(0, 'end')
+            self.ReplaceFindWhatEntry.insert('end', selected_text)
 
-    def add_tag(self, start_pos, end_pos):
+    def AddTag(self, start_pos, end_pos):
         '''Add "found" tag to select the letters when match is replace by another word'''
 
         try:
-            self.text_widget.tag_delete('found', '1.0', 'end')
-            self.text_widget.tag_add('found', start_pos, end_pos)
-            self.text_widget.tag_config('found', background='#347afa', foreground='white')
-            self.text_widget.see(self.text_widget.index('found.last'))
-            self.text_widget.config(insertofftime=1000000, insertontime=0)
+            self.TextWidget.tag_delete('found', '1.0', 'end')
+            self.TextWidget.tag_add('found', start_pos, end_pos)
+            self.TextWidget.tag_config('found', background='#347afa', foreground='white')
+            self.TextWidget.see(self.TextWidget.index('found.last'))
+            self.TextWidget.config(insertofftime=1000000, insertontime=0)
 
         except TclError:
-            self.text_widget.tag_delete('found', '1.0', 'end')
+            self.TextWidget.tag_delete('found', '1.0', 'end')
 
-    def get_cursor_position(self):
+    def GetCurrentPosition(self):
         '''Getting the index of the word right after the position of the cursor'''
 
-        line, column = tuple(self.text_widget.index(INSERT).split('.'))
+        line, column = tuple(self.TextWidget.index(INSERT).split('.'))
 
-        for index, pos in enumerate(self.word_indexes):
+        for index, pos in enumerate(self.WordIndexes):
             ln, cl = tuple(pos.split('.'))
 
             if line == ln and (column == cl or int(cl) > int(column)):
                 return index - 1
 
-        return len(self.word_indexes) - 1
+        return len(self.WordIndexes) - 1
 
-    def search_index(self, text_widget, target_text):
+    def SearchIndex(self, text_widget, target_text):
         '''Getting index of word which we need to find'''
 
-        self.word_indexes = []
+        self.WordIndexes = []
 
         start_pos = '1.0'
 
@@ -159,100 +159,100 @@ class Replace:
                 return
 
             end_pos = f'{start_pos}+{len(target_text)}c'
-            self.word_indexes.append(start_pos)
+            self.WordIndexes.append(start_pos)
             start_pos = end_pos
 
-    def find_next(self, event=None):
+    def FindNext(self, event=None):
         '''Commands when user clicks "Find Next" button in Replace window'''
 
-        replace_what = self.replace_find_what_entry.get()
-        match_case = self.match_var.get()
-        wrap_around = self.wrap_var.get()
+        replace_what = self.ReplaceFindWhatEntry.get()
+        match_case = self.MatchVar.get()
+        wrap_around = self.WrapVar.get()
 
         if not replace_what:
-            messagebox.showinfo('GPAD', f'Could not found "{replace_what}"', parent=self.replace_master)
+            messagebox.showinfo('GPAD', f'Could not found "{replace_what}"', parent=self.ReplaceWindow)
             return
 
         if match_case == 1:  # When user selects "Match Case" check-button we need the content as it is in text_widget
-            self.search_index(self.text_widget, replace_what)
+            self.SearchIndex(self.TextWidget, replace_what)
 
         else:
             # But when user does not select "Match Case" check-button we need all content in lowercase in dummy_text_widget
             # We do this because we don't care whether the text is uppercase or lowercase while searching
-            self.dummy_text_widget.delete('1.0', END)
-            self.dummy_text_widget.insert(END, self.text_widget.get('1.0', END).lower())
-            self.search_index(self.dummy_text_widget, replace_what.lower())
+            self.DummyTextWidget.delete('1.0', END)
+            self.DummyTextWidget.insert(END, self.TextWidget.get('1.0', END).lower())
+            self.SearchIndex(self.DummyTextWidget, replace_what.lower())
 
-        if not self.word_indexes:
-            messagebox.showinfo('GPAD', f'Could not found "{replace_what}"', parent=self.replace_master)
+        if not self.WordIndexes:
+            messagebox.showinfo('GPAD', f'Could not found "{replace_what}"', parent=self.ReplaceWindow)
             return
 
-        if self.find_index is None:
-            self.find_index = self.get_cursor_position()
+        if self.FindIndex is None:
+            self.FindIndex = self.GetCurrentPosition()
 
         if wrap_around == 1:
-            try:  # Setting self.find_index to the starting position of the 'found' tag if it is in text_widget
-                found_tag_index = self.text_widget.index('found.first')
-                self.find_index = self.word_indexes.index(found_tag_index)
+            try:  # Setting self.FindIndex to the starting position of the 'found' tag if it is in text_widget
+                found_tag_index = self.TextWidget.index('found.first')
+                self.FindIndex = self.WordIndexes.index(found_tag_index)
 
-            except:  # If not found tag in text_widget then setting self.find_index to -1
-                self.find_index = self.get_cursor_position()
+            except:  # If not found tag in text_widget then setting self.FindIndex to -1
+                self.FindIndex = self.GetCurrentPosition()
 
-            if len(self.word_indexes) == 1:
-                self.find_index = -1
+            if len(self.WordIndexes) == 1:
+                self.FindIndex = -1
 
-            elif self.find_index == len(self.word_indexes) - 1:
-                self.find_index = -1
+            elif self.FindIndex == len(self.WordIndexes) - 1:
+                self.FindIndex = -1
 
-        self.find_index += 1
+        self.FindIndex += 1
 
-        if self.find_index >= len(self.word_indexes):
-            messagebox.showinfo('GPAD', f'Could not found "{replace_what}"', parent=self.replace_master)
+        if self.FindIndex >= len(self.WordIndexes):
+            messagebox.showinfo('GPAD', f'Could not found "{replace_what}"', parent=self.ReplaceWindow)
 
         else:
-            start_pos = self.word_indexes[self.find_index]
+            start_pos = self.WordIndexes[self.FindIndex]
             end_pos = f'{start_pos}+{len(replace_what)}c'
 
-            self.add_tag(start_pos, end_pos)
+            self.AddTag(start_pos, end_pos)
 
-    def replace(self, event=None):
+    def Replace(self, event=None):
         '''When user clicks "Replace" button in Replace window'''
 
-        self.find_next()  # Getting indexes of the text in replace
+        self.FindNext()  # Getting indexes of the text in replace
 
-        old_text = self.replace_find_what_entry.get()
-        new_text = self.replace_with_entry.get()
+        old_text = self.ReplaceFindWhatEntry.get()
+        new_text = self.ReplaceWithEntry.get()
 
-        if old_text not in self.text_widget.get('1.0', END):
+        if old_text not in self.TextWidget.get('1.0', END):
             return
 
         try:
-            tag_index = self.text_widget.index('found.first')
-            tag_index = self.word_indexes.index(tag_index)
-            start_pos = self.word_indexes[tag_index]
+            tag_index = self.TextWidget.index('found.first')
+            tag_index = self.WordIndexes.index(tag_index)
+            start_pos = self.WordIndexes[tag_index]
 
         except (ValueError, TclError):
             return
 
         end_pos = f'{start_pos}+{len(old_text)}c'
 
-        self.text_widget.delete(start_pos, end_pos)
-        self.text_widget.insert(start_pos, new_text)
+        self.TextWidget.delete(start_pos, end_pos)
+        self.TextWidget.insert(start_pos, new_text)
 
-        self.add_tag(start_pos, f'{start_pos}+{len(new_text)}c')
+        self.AddTag(start_pos, f'{start_pos}+{len(new_text)}c')
 
-    def replace_all(self, event=None):
+    def ReplaceAll(self, event=None):
         '''When user clicks "Replace All" button in Replace window'''
 
-        old_text = self.replace_find_what_entry.get()
-        new_text = self.replace_with_entry.get()
-        match_case = self.match_var.get()
+        old_text = self.ReplaceFindWhatEntry.get()
+        new_text = self.ReplaceWithEntry.get()
+        match_case = self.MatchVar.get()
 
-        if not old_text or old_text not in self.text_widget.get('1.0', END):
-            messagebox.showinfo('GPAD', f'Could not found "{old_text}"', parent=self.replace_master)
+        if not old_text or old_text not in self.TextWidget.get('1.0', END):
+            messagebox.showinfo('GPAD', f'Could not found "{old_text}"', parent=self.ReplaceWindow)
             return
 
-        contents = self.text_widget.get('1.0', 'end-1c')
+        contents = self.TextWidget.get('1.0', 'end-1c')
 
         if match_case == 1:
             contents = contents.replace(old_text, new_text)
@@ -260,16 +260,19 @@ class Replace:
         else:
             contents = contents.lower().replace(old_text, new_text)
 
-        self.text_widget.delete('1.0', END)
-        self.text_widget.insert('1.0', contents)
+        self.TextWidget.delete('1.0', END)
+        self.TextWidget.insert('1.0', contents)
 
     def exit(self, event=None):
         '''When user quits the find window'''
 
-        self.find_index = None
+        self.FindIndex = None
 
-        if 'found' in self.text_widget.tag_names():
-            found_tag_index = self.text_widget.index('found.first')
-            self.text_widget.mark_set('insert', found_tag_index)
+        try:
+            found_tag_index = self.TextWidget.index('found.first')
+            self.TextWidget.mark_set('insert', found_tag_index)
 
-        self.replace_master.destroy()
+        except TclError:
+            pass
+
+        self.ReplaceWindow.destroy()

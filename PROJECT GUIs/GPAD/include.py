@@ -18,7 +18,7 @@ def initial_position(master):
     screen_width, screen_height = master.winfo_screenwidth() // 2, master.winfo_screenheight() // 2
 
     try:
-        win_details = get_font_details()['window_dimension']
+        win_details = GetFontDetails()['window_dimension']
 
         if win_details:
             master.geometry(win_details)
@@ -49,7 +49,7 @@ def resource_path(file_name):
     return os.path.join(base_path, 'included_files', file_name)
 
 
-def get_font_details():
+def GetFontDetails():
     '''Get font-family, font-size and font-style from the json file'''
 
     try:
@@ -58,19 +58,19 @@ def get_font_details():
 
     except (FileNotFoundError, json.decoder.JSONDecodeError):
         curr_font = {'Font Family': 'Courier', 'Font Size': 9, 'Font Style': 'normal'}
-        save_font_details(curr_font)
+        SaveFontDetails(curr_font)
 
     return curr_font
 
 
-def save_font_details(font_details):
+def SaveFontDetails(font_details):
     '''Saves font-family, font-size and font-style to the json file'''
 
     with open(resource_path('settings.json'), 'w') as f:
         json.dump(font_details, f, indent=4)
 
 
-def config_font_style(font_style, font_obj):
+def ConfigFontStyle(font_style, font_obj):
     '''Configure font style to italic, bold, bold + italic and normal'''
 
     if 'bold' in font_style:

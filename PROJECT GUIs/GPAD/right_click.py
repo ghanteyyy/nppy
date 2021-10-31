@@ -8,55 +8,55 @@ import pyperclip
 import edit_menu
 
 
-class Right_Click:
+class RightClick:
     def __init__(self, master, text_widget, fmc, var):
         self.master = master
-        self.file_name = fmc.file_name
-        self.text_widget = text_widget
-        self.emc = edit_menu.Edit_Menu(self.master, self.text_widget, var)
+        self.FileName = fmc.FileName
+        self.TextWidget = text_widget
+        self.emc = edit_menu.Edit_Menu(self.master, self.TextWidget, var)
 
-        self.menu_names = ('Undo', 'Cut', 'Copy', 'Paste', 'Delete', 'Select All', 'Take Screenshot', 'Search with Google', 'Open Containing Folder')
-        self.commands = (self.emc.undo, self.emc.cut, self.emc.copy, self.emc.paste, self.emc.delete, self.emc.select_all, self.take_screenshot, self.emc.search_with_google, self.open_file_location)
+        self.MenuNames = ('Undo', 'Cut', 'Copy', 'Paste', 'Delete', 'Select All', 'Take Screenshot', 'Search with Google', 'Open Containing Folder')
+        self.commands = (self.emc.undo, self.emc.cut, self.emc.copy, self.emc.paste, self.emc.delete, self.emc.SelectAll, self.TakeScreenshot, self.emc.SearchWithGoogle, self.OpenFileLocation)
 
         self.menu = Menu(self.master, tearoff=False)
 
-        for index, value in enumerate(zip(self.menu_names, self.commands)):
+        for index, value in enumerate(zip(self.MenuNames, self.commands)):
             if index in [1, 6]:
                 self.menu.add_separator()
 
             self.menu.add_command(label=value[0], command=value[1])
 
-    def is_selection_available(self):
+    def IsSelectionAvailable(self):
         '''Check if any selection is made'''
 
         try:
-            self.text_widget.get('sel.first', 'sel.last')
+            self.TextWidget.get('sel.first', 'sel.last')
             return True
 
         except TclError:
             return False
 
-        return ('found' in self.text_widget.tag_names() or 'triple_click' in self.text_widget.tag_names())
+        return ('found' in self.TextWidget.tag_names() or 'triple_click' in self.TextWidget.tag_names())
 
-    def open_file_location(self, event=None):
+    def OpenFileLocation(self, event=None):
         '''Open the location of file and select it'''
 
         FILEBROWSER_PATH = os.path.join(os.getenv('WINDIR'), 'explorer.exe')
-        path = os.path.normpath(self.file_name)
+        path = os.path.normpath(self.FileName)
         self.master.after(0, lambda: subprocess.run([FILEBROWSER_PATH, '/select,', path]))
 
-    def take_screenshot(self, event=None):
+    def TakeScreenshot(self, event=None):
         '''Take screenshot of the entire window'''
 
         random_name = ''.join(random.choice(string.ascii_letters) for _ in range(8)) + '.png'
         cap = tkcap.CAP(self.master)
         self.master.after(250, lambda: cap.capture(random_name))
 
-    def show_popup(self, event=None):
+    def ShowPopUp(self, event=None):
         '''Display popup menu when user right clicks'''
 
         try:
-            if self.text_widget.get('1.0', 'end-1c').strip('\n'):  # Enabling 'Undo', 'Cut', 'Copy' and 'Select All' option if there is any text in text_widget
+            if self.TextWidget.get('1.0', 'end-1c').strip('\n'):  # Enabling 'Undo', 'Cut', 'Copy' and 'Select All' option if there is any text in text_widget
                 self.menu.entryconfig(0, state=NORMAL)
                 self.menu.entryconfig(2, state=NORMAL)
                 self.menu.entryconfig(3, state=NORMAL)
@@ -74,7 +74,7 @@ class Right_Click:
             else:  # Disabling 'Paste' option if there is no any text in clipboard
                 self.menu.entryconfig(4, state=DISABLED)
 
-            if self.is_selection_available():  # Enabling 'Delete', Search with Google' option if there is any text is selected in text_widget
+            if self.IsSelectionAvailable():  # Enabling 'Delete', Search with Google' option if there is any text is selected in text_widget
                 self.menu.entryconfig(5, state=NORMAL)
                 self.menu.entryconfig(9, state=NORMAL)
 
@@ -82,7 +82,7 @@ class Right_Click:
                 self.menu.entryconfig(5, state=DISABLED)
                 self.menu.entryconfig(9, state=DISABLED)
 
-            if self.file_name:  # Enabling 'Open File Location' option if the file is saved
+            if self.FileName:  # Enabling 'Open File Location' option if the file is saved
                 self.menu.entryconfig(10, state=NORMAL)
 
             else:  # Disabling 'Open File Location' option if the file is not saved

@@ -17,7 +17,7 @@ class Search:
         except requests.ConnectionError:
             return False
 
-    def open_link(self, link):
+    def OpenLink(self, link):
         '''Open link to the user's default browser'''
 
         if self.is_internet(link):

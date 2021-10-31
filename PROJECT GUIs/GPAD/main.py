@@ -11,11 +11,11 @@ import right_click
 
 class GPAD:
     def __init__(self):
-        self.get_font = include.get_font_details()
+        self.get_font = include.GetFontDetails()
 
         self.master = Tk()
         self.font = Font(family=self.get_font['Font Family'], size=self.get_font['Font Size'])
-        include.config_font_style(self.get_font['Font Style'], self.font)
+        include.ConfigFontStyle(self.get_font['Font Style'], self.font)
 
         self.menu = Menu(self.master)
         self.file_menu = Menu(self.menu, tearoff=0)
@@ -29,198 +29,198 @@ class GPAD:
 
         self.master.config(menu=self.menu)
 
-        self.canvas_frame = Frame(self.master)
-        self.line_canvas = Canvas(self.canvas_frame, width=50)
-        self.canvas_hsb = Scrollbar(self.canvas_frame, orient='horizontal', command=self.line_canvas.xview)
-        self.line_canvas.configure(xscrollcommand=self.canvas_hsb.set)
-        self.canvas_hsb.pack(side='bottom', fill='x')
-        self.line_canvas.pack(side='left', fill='y')
+        self.CanvasFrame = Frame(self.master)
+        self.LineCanvas = Canvas(self.CanvasFrame, width=50)
+        self.CanvasHSB = Scrollbar(self.CanvasFrame, orient='horizontal', command=self.LineCanvas.xview)
+        self.LineCanvas.configure(xscrollcommand=self.CanvasHSB.set)
+        self.CanvasHSB.pack(side='bottom', fill='x')
+        self.LineCanvas.pack(side='left', fill='y')
 
-        self.text_widget_frame = Frame(self.master, width=659, height=424)
-        self.text_widget_frame.grid_propagate(False)
-        self.text_widget = Text(master=self.text_widget_frame, bd=0, undo=True, font=self.font, maxundo=-1, autoseparators=True)
-        self.vsb = Scrollbar(self.text_widget_frame, orient='vertical', command=self.text_widget.yview)
-        self.hsb = Scrollbar(self.text_widget_frame, orient='horizontal', command=self.text_widget.xview)
-        self.text_widget.configure(yscrollcommand=self.vsb.set, xscrollcommand=self.hsb.set)
+        self.TextWidgetFrame = Frame(self.master, width=659, height=424)
+        self.TextWidgetFrame.grid_propagate(False)
+        self.TextWidget = Text(master=self.TextWidgetFrame, bd=0, undo=True, font=self.font, maxundo=-1, autoseparators=True)
+        self.VSB = Scrollbar(self.TextWidgetFrame, orient='vertical', command=self.TextWidget.yview)
+        self.HSB = Scrollbar(self.TextWidgetFrame, orient='horizontal', command=self.TextWidget.xview)
+        self.TextWidget.configure(yscrollcommand=self.VSB.set, xscrollcommand=self.HSB.set)
 
-        self.text_widget.grid(row=0, column=0, sticky='nsew')
-        self.vsb.grid(row=0, column=1, sticky='ns')
-        self.hsb.grid(row=1, column=0, sticky='ew')
+        self.TextWidget.grid(row=0, column=0, sticky='nsew')
+        self.VSB.grid(row=0, column=1, sticky='ns')
+        self.HSB.grid(row=1, column=0, sticky='ew')
 
-        self.text_widget_frame.grid_rowconfigure(0, weight=1)
-        self.text_widget_frame.grid_columnconfigure(0, weight=1)
-        self.text_widget.focus_set()
-        self.text_widget_frame.pack(side='top', fill='both', expand=True)
+        self.TextWidgetFrame.grid_rowconfigure(0, weight=1)
+        self.TextWidgetFrame.grid_columnconfigure(0, weight=1)
+        self.TextWidget.focus_set()
+        self.TextWidgetFrame.pack(side='top', fill='both', expand=True)
 
-        self.line_column_var = StringVar()
+        self.LineColumnVar = StringVar()
         self.status_label_var = StringVar()
-        self.line_column_var.set('Ln 1, Col 1')
+        self.LineColumnVar.set('Ln 1, Col 1')
 
-        self.status_bar_frame = Frame(self.text_widget_frame)
-        self.status_bar_frame.grid(row=2, column=0, sticky='e')
+        self.StatusBarFrame = Frame(self.TextWidgetFrame)
+        self.StatusBarFrame.grid(row=2, column=0, sticky='e')
 
-        self.status_label = Label(self.status_bar_frame, textvariable=self.status_label_var)
-        self.status_label.grid(row=0, column=0, sticky='w')
-        self.line_column = Label(self.status_bar_frame, textvariable=self.line_column_var)
-        self.line_column.grid(row=0, column=1, ipadx=20)
-        self.zoom_label = Label(self.status_bar_frame, text='100%')
-        self.zoom_label.grid(row=0, column=2, ipadx=10)
-        self.text_formatter = Label(self.status_bar_frame, text='Windows (CRLF)')
-        self.text_formatter.grid(row=0, column=3, ipadx=14)
-        self.encoding = Label(self.status_bar_frame, text='UTF-8')
+        self.StatusLabel = Label(self.StatusBarFrame, textvariable=self.status_label_var)
+        self.StatusLabel.grid(row=0, column=0, sticky='w')
+        self.LineColumn = Label(self.StatusBarFrame, textvariable=self.LineColumnVar)
+        self.LineColumn.grid(row=0, column=1, ipadx=20)
+        self.ZoomLabel = Label(self.StatusBarFrame, text='100%')
+        self.ZoomLabel.grid(row=0, column=2, ipadx=10)
+        self.TextFormatter = Label(self.StatusBarFrame, text='Windows (CRLF)')
+        self.TextFormatter.grid(row=0, column=3, ipadx=14)
+        self.encoding = Label(self.StatusBarFrame, text='UTF-8')
         self.encoding.grid(row=0, column=4, ipadx=10)
 
-        self.fmc = file_menu.File_Menu(self.master, self.text_widget, self.status_label_var)
-        self.file_menu_options = ['New', 'New Window ', 'Open... ', 'Save', 'SaveAs...', 'Exit']
-        self.file_menu_commands = [self.fmc.new, self.fmc.new_window, self.fmc.open, self.fmc.save, self.fmc.save_as, self.fmc.exit]
-        self.file_menu_acclerator = ['Ctrl+N', 'Ctrl+Shift+N', 'Ctrl+O', 'Ctrl+S', 'Ctrl+Shift+S', 'Ctrl+Q']
+        self.fmc = file_menu.File_Menu(self.master, self.TextWidget, self.status_label_var)
+        self.FileMenuOptions = ['New', 'New Window ', 'Open... ', 'Save', 'SaveAs...', 'Exit']
+        self.FileMenuCommands = [self.fmc.New, self.fmc.NewWindow, self.fmc.Open, self.fmc.Save, self.fmc.SaveAs, self.fmc.exit]
+        self.FileMenuAccelerator = ['Ctrl+N', 'Ctrl+Shift+N', 'Ctrl+O', 'Ctrl+S', 'Ctrl+Shift+S', 'Ctrl+Q']
 
-        self.emc = edit_menu.Edit_Menu(self.master, self.text_widget, self.status_label_var)
-        self.edit_menu_options = ['Undo', 'Cut', 'Copy', 'Paste', 'Delete', 'Search with Google', 'Find...', 'Replace...', 'Go To...', 'Select All', 'Time / Date', 'Strip Trailing Whitespace']
-        self.edit_menu_commands = [self.emc.undo, self.emc.cut, self.emc.copy, self.emc.paste, self.emc.delete, self.emc.search_with_google, self.emc.find_widget, self.emc.replace_widget, self.emc.go_to_widget, self.emc.select_all, self.emc.get_date_time, self.emc.strip_whitespaces]
-        self.edit_menu_accelerator = ['Ctrl+Z', 'Ctrl+X', 'Ctrl+C', 'Ctrl+V', 'DEL', 'Ctrl+E', 'Ctrl+F', 'Ctrl+H', 'Ctr+G', 'Ctrl+A', 'F5', 'Alt+Enter']
+        self.emc = edit_menu.Edit_Menu(self.master, self.TextWidget, self.status_label_var)
+        self.EditMenuOptions = ['Undo', 'Cut', 'Copy', 'Paste', 'Delete', 'Search with Google', 'Find...', 'Replace...', 'Go To...', 'Select All', 'Time / Date', 'Strip Trailing Whitespace']
+        self.EditMenuCommands = [self.emc.undo, self.emc.cut, self.emc.copy, self.emc.paste, self.emc.delete, self.emc.SearchWithGoogle, self.emc.FindWidget, self.emc.ReplaceWidget, self.emc.GoToWidget, self.emc.SelectAll, self.emc.GetDateTime, self.emc.StripWhitespaces]
+        self.EditMenuAccelerator = ['Ctrl+Z', 'Ctrl+X', 'Ctrl+C', 'Ctrl+V', 'DEL', 'Ctrl+E', 'Ctrl+F', 'Ctrl+H', 'Ctr+G', 'Ctrl+A', 'F5', 'Alt+Enter']
 
-        self.Fmc = format_menu.Format(self.master, self.text_widget, self.font)
-        self.format_menu_options = ['Word Wrap', 'Font...']
-        self.format_menu_accelerator = ['Ctrl+W', 'Ctrl+Shift+F']
+        self.Fmc = format_menu.Format(self.master, self.TextWidget, self.font)
+        self.FormatMenuOptions = ['Word Wrap', 'Font...']
+        self.FormatMenuAccelerator = ['Ctrl+W', 'Ctrl+Shift+F']
 
-        self.vmc = view_menu.View(self.master, self.text_widget, self.text_widget_frame, self.canvas_frame, self.line_canvas, self.status_bar_frame, self.zoom_label, self.font)
-        self.view_menu_options = ['Zoom', 'Status Bar', 'FullScreen', 'Show Line Numbers']
-        self.zoom_commands = [self.vmc.zoom_in, self.vmc.zoom_out, self.vmc.default_zoom]
-        self.view_menu_zoom_accelerator = {'Zoom In': '            Ctrl+Plus', 'Zoom Out': '        Ctrl+Minus', 'Restore Default Zoom': '                 Ctrl+0'}
+        self.vmc = view_menu.View(self.master, self.TextWidget, self.TextWidgetFrame, self.CanvasFrame, self.LineCanvas, self.StatusBarFrame, self.ZoomLabel, self.font)
+        self.ViewMenuOptions = ['Zoom', 'Status Bar', 'FullScreen', 'Show Line Numbers']
+        self.ZoomCommands = [self.vmc.ZoomIn, self.vmc.ZoomOut, self.vmc.DefaultZoom]
+        self.ViewMenuZoomAccelerator = {'Zoom In': '            Ctrl+Plus', 'Zoom Out': '        Ctrl+Minus', 'Restore Default Zoom': '                 Ctrl+0'}
 
-        self.help_menu_options = ['About']
-        self.help_menu_accelerator = ['F12']
-        self.help_menu_commands = [self.about]
+        self.HelpMenuOptions = ['About']
+        self.HelpMenuAccelerator = ['F12']
+        self.HelpMenuCommands = [self.about]
 
-        for index, value in enumerate(self.file_menu_options):
+        for index, value in enumerate(self.FileMenuOptions):
             if index in [5, 7]:
                 self.file_menu.add_separator()
 
-            self.file_menu.add_command(label=value.ljust(23), accelerator=self.file_menu_acclerator[index], command=self.file_menu_commands[index])
+            self.file_menu.add_command(label=value.ljust(23), accelerator=self.FileMenuAccelerator[index], command=self.FileMenuCommands[index])
 
-        for index, value in enumerate(self.edit_menu_options):
+        for index, value in enumerate(self.EditMenuOptions):
             if index in [1, 5, 11]:
                 self.edit_menu.add_separator()
 
-            self.edit_menu.add_command(label=value.ljust(40), accelerator=self.edit_menu_accelerator[index], command=self.edit_menu_commands[index])
+            self.edit_menu.add_command(label=value.ljust(40), accelerator=self.EditMenuAccelerator[index], command=self.EditMenuCommands[index])
 
-        for index, value in enumerate(self.format_menu_options):
+        for index, value in enumerate(self.FormatMenuOptions):
             if index == 1:
-                self.format_menu.add_command(label=value.ljust(30), accelerator=self.format_menu_accelerator[index], command=self.Fmc.font_selection)
+                self.format_menu.add_command(label=value.ljust(30), accelerator=self.FormatMenuAccelerator[index], command=self.Fmc.FontSelection)
 
             else:
-                self.format_menu.add_checkbutton(label=value, onvalue=True, offvalue=False, variable=self.Fmc.wrap_around_var, accelerator=self.format_menu_accelerator[index], command=self.Fmc.wrap_around)
+                self.format_menu.add_checkbutton(label=value, onvalue=True, offvalue=False, variable=self.Fmc.WrapAroundVar, accelerator=self.FormatMenuAccelerator[index], command=self.Fmc.WrapAround)
 
-        for index, value in enumerate(self.view_menu_options):
+        for index, value in enumerate(self.ViewMenuOptions):
             if index == 0:
                 self.sub_view_menu = Menu(self.view_menu, tearoff=0)
                 self.view_menu.add_cascade(label=value, menu=self.sub_view_menu)
 
-                for index, values in enumerate(self.view_menu_zoom_accelerator.items()):
-                    self.sub_view_menu.add_command(label=values[0], accelerator=values[1], command=self.zoom_commands[index])
+                for index, values in enumerate(self.ViewMenuZoomAccelerator.items()):
+                    self.sub_view_menu.add_command(label=values[0], accelerator=values[1], command=self.ZoomCommands[index])
 
             elif index == 1:
-                self.view_menu.add_checkbutton(label=value, onvalue=1, offvalue=False, variable=self.vmc.show_status_bar, accelerator='Alt+S'.rjust(30), command=self.vmc.toggle_statusbar)
+                self.view_menu.add_checkbutton(label=value, onvalue=1, offvalue=False, variable=self.vmc.ShowStatusBar, accelerator='Alt+S'.rjust(30), command=self.vmc.toggle_statusbar)
 
             elif index == 2:
-                self.view_menu.add_checkbutton(label=value, onvalue=1, offvalue=False, variable=self.vmc.fullscreen_var, accelerator='F11'.rjust(28), command=self.vmc.set_full_screen)
+                self.view_menu.add_checkbutton(label=value, onvalue=1, offvalue=False, variable=self.vmc.FullScreenVar, accelerator='F11'.rjust(28), command=self.vmc.set_full_screen)
 
             elif index == 3:
-                self.view_menu.add_checkbutton(label=value, onvalue=1, offvalue=False, variable=self.vmc.line_number_var, accelerator='Alt+L'.rjust(30), command=self.vmc.toggle_linenumber)
+                self.view_menu.add_checkbutton(label=value, onvalue=1, offvalue=False, variable=self.vmc.LineNumberVar, accelerator='Alt+L'.rjust(30), command=self.vmc.ToggleLineNumber)
 
-        for index, value in enumerate(self.help_menu_options):
-            self.help_menu.add_command(label=value.ljust(20), accelerator=self.help_menu_accelerator[index], command=self.help_menu_commands[index])
+        for index, value in enumerate(self.HelpMenuOptions):
+            self.help_menu.add_command(label=value.ljust(20), accelerator=self.HelpMenuAccelerator[index], command=self.HelpMenuCommands[index])
 
-        self.Fmc.wrap_around()
-        self.vmc.toggle_linenumber()
-        self.update_line_column()
-        self.enable_disable_menu()
-        self.update_label_text()
+        self.Fmc.WrapAround()
+        self.vmc.ToggleLineNumber()
+        self.UpdateLineColumn()
+        self.EnableDisableMenu()
+        self.UpdateLabelText()
 
-        self.text_widget.bind('<Button-3>', self.button_3)
-        self.text_widget.bind('<Delete>', self.emc.delete)
-        self.text_widget.bind('<Control-n>', self.fmc.new)
-        self.text_widget.bind('<Control-x>', self.emc.cut)
-        self.text_widget.bind('<Control-o>', self.fmc.open)
-        self.text_widget.bind('<Control-s>', self.fmc.save)
-        self.text_widget.bind('<Control-q>', self.fmc.exit)
-        self.text_widget.bind('<Control-z>', self.emc.undo)
-        self.text_widget.bind('<Control-c>', self.emc.copy)
-        self.text_widget.bind('<BackSpace>', self.backspace)
-        self.text_widget.bind('<Control-v>', self.emc.paste)
-        self.text_widget.bind('<Key>', self.remove_selection)
-        self.text_widget.bind('<F5>', self.emc.get_date_time)
-        self.master.bind('<F12>', self.help_menu_commands[0])
-        self.text_widget.bind('<Control-S>', self.fmc.save_as)
+        self.TextWidget.bind('<Button-3>', self.button_3)
+        self.TextWidget.bind('<Delete>', self.emc.delete)
+        self.TextWidget.bind('<Control-n>', self.fmc.New)
+        self.TextWidget.bind('<Control-x>', self.emc.cut)
+        self.TextWidget.bind('<Control-o>', self.fmc.Open)
+        self.TextWidget.bind('<Control-s>', self.fmc.Save)
+        self.TextWidget.bind('<Control-q>', self.fmc.exit)
+        self.TextWidget.bind('<Control-z>', self.emc.undo)
+        self.TextWidget.bind('<Control-c>', self.emc.copy)
+        self.TextWidget.bind('<BackSpace>', self.backspace)
+        self.TextWidget.bind('<Control-v>', self.emc.paste)
+        self.TextWidget.bind('<Key>', self.RemoveSelection)
+        self.TextWidget.bind('<F5>', self.emc.GetDateTime)
+        self.master.bind('<F12>', self.HelpMenuCommands[0])
+        self.TextWidget.bind('<Control-S>', self.fmc.SaveAs)
         self.master.protocol('WM_DELETE_WINDOW', self.fmc.exit)
-        self.text_widget.bind('<Control-a>', self.emc.select_all)
-        self.text_widget.bind('<Control-N>', self.fmc.new_window)
-        self.text_widget.bind('<Control-plus>', self.vmc.zoom_in)
-        self.text_widget.bind('<MouseWheel>', self.vmc.wheel_zoom)
-        self.text_widget.bind('<Button-1>', self.button_1_command)
-        self.text_widget.bind('<Control-minus>', self.vmc.zoom_out)
-        self.text_widget.bind('<Control-f>', self.show_find_widget)
-        self.text_widget.bind('<Control-g>', self.emc.go_to_widget)
-        self.text_widget.bind('<Control-0>', self.vmc.default_zoom)
-        self.text_widget.bind('<Double-Button-1>', self.double_click)
+        self.TextWidget.bind('<Control-a>', self.emc.SelectAll)
+        self.TextWidget.bind('<Control-N>', self.fmc.NewWindow)
+        self.TextWidget.bind('<Control-plus>', self.vmc.ZoomIn)
+        self.TextWidget.bind('<Control-g>', self.emc.GoToWidget)
+        self.TextWidget.bind('<MouseWheel>', self.vmc.WheelZoom)
+        self.TextWidget.bind('<Button-1>', self.SingleLeftClick)
+        self.TextWidget.bind('<Control-f>', self.ShowFindWidget)
+        self.TextWidget.bind('<Control-minus>', self.vmc.ZoomOut)
+        self.TextWidget.bind('<Control-0>', self.vmc.DefaultZoom)
+        self.TextWidget.bind('<Triple-Button-1>', self.TripleClick)
+        self.TextWidget.bind('<Control-h>', self.ShowReplaceWidget)
         self.master.bind('<F11>', lambda e: self.view_menu.invoke(2))
-        self.text_widget.bind('<Triple-Button-1>', self.triple_click)
         self.master.bind('<Alt-s>', lambda e: self.view_menu.invoke(1))
-        self.text_widget.bind('<Control-h>', self.show_replace_widget)
-        self.text_widget.bind('<Control-e>', self.emc.search_with_google)
+        self.TextWidget.bind('<Control-e>', self.emc.SearchWithGoogle)
+        self.TextWidget.bind('<Double-Button-1>', self.DoubleLeftClick)
+        self.TextWidget.bind('<Alt-Return>', self.ActivateStripWhiteSpace)
         self.master.after(0, lambda: include.initial_position(self.master))
-        self.text_widget.bind('<Alt-l>', lambda e: self.view_menu.invoke(3))
-        self.text_widget.bind('<Alt-Return>', self.activate_strip_whitespace)
-        self.text_widget.bind('<Control-F>', lambda e: self.Fmc.font_selection())
-        self.text_widget.bind('<Control-w>', lambda e: self.format_menu.invoke(0))
-        self.text_widget.bind('<Configure>', lambda e: self.text_widget.configure(scrollregion=self.text_widget.bbox('end')))
+        self.TextWidget.bind('<Alt-l>', lambda e: self.view_menu.invoke(3))
+        self.TextWidget.bind('<Control-F>', lambda e: self.Fmc.FontSelection())
+        self.TextWidget.bind('<Control-w>', lambda e: self.format_menu.invoke(0))
+        self.TextWidget.bind('<Configure>', lambda e: self.TextWidget.configure(scrollregion=self.TextWidget.bbox('end')))
         self.master.mainloop()
 
     def backspace(self, event=None):
         '''When backspace key is pressed'''
 
         self.status_label_var.set('')
-        self.text_widget.config(insertofftime=300, insertontime=600)
+        self.TextWidget.config(insertofftime=300, insertontime=600)
 
-    def update_label_text(self):
+    def UpdateLabelText(self):
         '''Show the number of text selected, number of text copied or cut'''
 
         try:
-            selected_text = self.text_widget.get('sel.first', 'sel.last')
+            selected_text = self.TextWidget.get('sel.first', 'sel.last')
             self.status_label_var.set(f'{len(selected_text)} characters selected')
 
         except TclError:
             pass
 
-        self.master.after(10, self.update_label_text)
+        self.master.after(10, self.UpdateLabelText)
 
-    def button_1_command(self, event=None):
+    def SingleLeftClick(self, event=None):
         '''Remove "found" tag and restore the blinking time to default'''
 
         self.status_label_var.set('')
 
-        if 'triple_click' in self.text_widget.tag_names():
-            self.text_widget.tag_delete('triple_click', '1.0', 'end')
+        if 'triple_click' in self.TextWidget.tag_names():
+            self.TextWidget.tag_delete('triple_click', '1.0', 'end')
 
-        if 'found' in self.text_widget.tag_names():
-            self.text_widget.tag_delete('found', '1.0', 'end')
+        if 'found' in self.TextWidget.tag_names():
+            self.TextWidget.tag_delete('found', '1.0', 'end')
 
-        if self.text_widget['insertofftime'] == 1000000:
-            self.text_widget.config(insertofftime=300, insertontime=600)
+        if self.TextWidget['insertofftime'] == 1000000:
+            self.TextWidget.config(insertofftime=300, insertontime=600)
 
     def button_3(self, event=None):
         '''When user right clicks'''
 
-        right_click.Right_Click(self.master, self.text_widget, self.fmc, self.status_label_var).show_popup(event=event)
+        right_click.RightClick(self.master, self.TextWidget, self.fmc, self.status_label_var).ShowPopUp(event=event)
 
-    def remove_selection(self, event=None):
+    def RemoveSelection(self, event=None):
         '''Remove "found" and "triple_click" tags from the text_widget annd reset the blinking time to default'''
 
         if event.keysym in ['Up', 'Down', 'Right', 'Left']:
-            self.button_1_command()
+            self.SingleLeftClick()
 
-        if self.fmc.is_file_changed():
+        if self.fmc.IsFileChanged():
             self.status_label_var.set('')
 
     def change_title(self, event=None):
@@ -228,28 +228,28 @@ class GPAD:
 
         title = self.master.title()
 
-        if self.fmc.is_file_changed():
+        if self.fmc.IsFileChanged():
             if not title.startswith('*'):
                 self.master.title('*' + title)
 
         else:
             self.master.title(title.lstrip('*'))
 
-    def update_line_column(self, event=None):
+    def UpdateLineColumn(self, event=None):
         '''Insert the line number and column number at the status bar'''
 
-        line, column = tuple(self.text_widget.index(INSERT).split('.'))
-        self.line_column_var.set(f'Ln {line}, Col {int(column) + 1}')
+        line, column = tuple(self.TextWidget.index(INSERT).split('.'))
+        self.LineColumnVar.set(f'Ln {line}, Col {int(column) + 1}')
 
         self.change_title()
-        self.master.after(50, self.update_line_column)
+        self.master.after(50, self.UpdateLineColumn)
 
-    def enable_disable_menu(self):
+    def EnableDisableMenu(self):
         '''Enable or disable some sub-menus in edit-menus'''
 
-        text_from_text_widget = self.text_widget.get('1.0', 'end-1c').strip()
+        text_from_text_widget = self.TextWidget.get('1.0', 'end-1c').strip()
 
-        if self.fmc.is_file_changed():  # Enable 'Undo' option when any change is detected to the text-widget
+        if self.fmc.IsFileChanged():  # Enable 'Undo' option when any change is detected to the text-widget
             if self.edit_menu.entrycget(0, 'state') == 'disabled':
                 self.edit_menu.entryconfig(0, state=NORMAL)
 
@@ -284,11 +284,11 @@ class GPAD:
                 self.edit_menu.entryconfig(4, state=DISABLED)
 
         try:
-            selected_text = self.emc.get_selected_text()  # Get the selected text
+            selected_text = self.emc.GetSelectedText()  # Get the selected text
 
         except TclError:  # If there is no any text selected
             selected_text = None
-            self.text_widget.focus()
+            self.TextWidget.focus()
 
         if selected_text:  # Disabling Copy, Cut, Delete and Search with Google when some text is selected.
             if self.edit_menu.entrycget(2, 'state') == 'disabled':
@@ -304,23 +304,23 @@ class GPAD:
                 self.edit_menu.entryconfig(5, state=DISABLED)
                 self.edit_menu.entryconfig(7, state=DISABLED)
 
-        self.master.after(100, self.enable_disable_menu)
+        self.master.after(100, self.EnableDisableMenu)
 
-    def show_find_widget(self, event=None):
+    def ShowFindWidget(self, event=None):
         '''Command when user clicks find sub-menu in Edit-Menu or when user
            presses Ctrl+F only if the respective sub-menu is activated.'''
 
         if self.edit_menu.entrycget(9, 'state') == 'normal':
-            self.emc.find_widget()
+            self.emc.FindWidget()
 
-    def show_replace_widget(self, event=None):
+    def ShowReplaceWidget(self, event=None):
         '''Command when user clicks replace sub-menu in Edit-Menu or when user
            presses Ctrl+H only if the respective sub-menu is activated.'''
 
         if self.edit_menu.entrycget(11, 'state') == 'normal':
-            self.emc.replace_widget()
+            self.emc.ReplaceWidget()
 
-    def activate_strip_whitespace(self, event=None):
+    def ActivateStripWhiteSpace(self, event=None):
         '''Commands for striping whitespaces from each line when user clicks
            strip-whitespaces sub-menu in Edit-Menu or when user presses
            Alt+Enter if the respective sub-menu is activated'''
@@ -330,29 +330,29 @@ class GPAD:
 
         return 'break'
 
-    def double_click(self, event=None):
+    def DoubleLeftClick(self, event=None):
         '''Make selection up-to the end of the line when user makes left double
            clicks'''
 
-        self.text_widget.tag_delete('triple_click', '1.0', 'end')
-        cursor_pos = self.text_widget.index('insert')
-        line_end = self.text_widget.index(f'{cursor_pos.split(".")[0]}.end')
+        self.TextWidget.tag_delete('triple_click', '1.0', 'end')
+        cursor_pos = self.TextWidget.index('insert')
+        line_end = self.TextWidget.index(f'{cursor_pos.split(".")[0]}.end')
 
         if cursor_pos == line_end:
             return 'break'
 
-        self.text_widget.config(insertofftime=1000000, insertontime=0)
+        self.TextWidget.config(insertofftime=1000000, insertontime=0)
 
-    def triple_click(self, event=None):
+    def TripleClick(self, event=None):
         '''When user triple clicks select all texts within that line'''
 
-        contents = self.text_widget.get('1.0', 'end').strip('\n')
+        contents = self.TextWidget.get('1.0', 'end').strip('\n')
 
         if contents:
-            cursor_pos = self.text_widget.index('insert').split('.')[0]
-            self.text_widget.tag_delete('sel', '1.0', 'end')
-            self.text_widget.tag_add('sel', f'{cursor_pos}.0', f'{cursor_pos}.end')
-            self.text_widget.tag_add('triple_click', f'{cursor_pos}.0', f'{cursor_pos}.end+1c')
+            cursor_pos = self.TextWidget.index('insert').split('.')[0]
+            self.TextWidget.tag_delete('sel', '1.0', 'end')
+            self.TextWidget.tag_add('sel', f'{cursor_pos}.0', f'{cursor_pos}.end')
+            self.TextWidget.tag_add('triple_click', f'{cursor_pos}.0', f'{cursor_pos}.end+1c')
 
             return 'break'
 
