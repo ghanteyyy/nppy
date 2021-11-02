@@ -28,7 +28,7 @@ class Music_Player:
         self.AudioName = None  # Store currently playing song's name
         self.CurrentPlayingIndex = -1  # Index of current playing audio
         self.EOF = False  # Trigger to check if the last songs is about to play
-        self.PlaylistPath = os.path.join(os.path.dirname(__file__), 'playlists.json')
+        self.PlaylistPath = os.path.abspath(os.path.join('.', 'playlists.json'))
         self.RemTimer = None  # Stores an alarm to call change_time function in every 500 ms
         self.PreviousVolume = None  # Store previous value of volumen before muting and unmuting
         self.ScaleTimer = None  # Stores an alarm to call update_scale function in every 1000 ms
@@ -238,7 +238,7 @@ class Music_Player:
 
             if self.PreviousScaleValue != self.AudioSliderVar.get():
                 self.PreviousScaleValue = self.AudioSliderVar.get()
-                self.SkipAudio()
+                self.SkipAudio(event)
 
     def MouseWheel(self, event):
         '''Change Volume or Skip Audio when ScrollWheel button'''
