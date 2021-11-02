@@ -7,6 +7,7 @@ from tkinter import messagebox
 
 class GUI:
     def __init__(self):
+        self.FileName = os.path.abspath(os.path.join('.', 'Remainder.txt'))
         self.master = Tk()
 
         self.width, self.height = 446, 200
@@ -111,7 +112,7 @@ class GUI:
             elif month == 'Month' or month not in self.months:
                 messagebox.showerror('Invalid Month', 'Select Valid Month')
 
-            elif not date or date == 'Date' or not int(date) not in range(1, 13):
+            elif not date or date == 'Date' or int(date) not in range(1, 13):
                 messagebox.showerror('Invalid Date', 'Date must be in between 1-12')
 
             elif not hour or hour == 'Hour' or int(hour) not in range(1, 13):
@@ -124,11 +125,11 @@ class GUI:
                 messagebox.showerror('Invalid period', 'Period must be AM or PM')
 
             else:
-                if not os.path.exists('Remainder.txt'):
-                    with open('Remainder.txt', 'w'):
+                if not os.path.exists(self.FileName):
+                    with open(self.FileName, 'w'):
                         pass
 
-                with open('Remainder.txt', 'a') as f:
+                with open(self.FileName, 'a') as f:
                     write = f'{message} | {month} {date} {hour} {minute} {am_pm}\n'
                     f.write(write)
 
