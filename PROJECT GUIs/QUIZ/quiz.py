@@ -11,7 +11,7 @@ class Quiz:
     def __init__(self):
         self.prev_widget = ''
         self.quiz_numbers = []
-        self.file_name = self.resource_path('quiz.json')
+        self.file_name = os.path.abspath(os.path.join('.', 'quiz.json'))
         self.buttons_attributes = {'fg': 'white', 'activeforeground': 'white', 'cursor': 'hand2', 'relief': RIDGE}
 
         self.master = Tk()

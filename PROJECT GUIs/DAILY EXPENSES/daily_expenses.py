@@ -9,7 +9,7 @@ class Daily_Expenses:
     '''Daily Expenses is built for tracking the expenses you spent in any item.'''
 
     def __init__(self):
-        self.file = 'daily_expenses.txt'
+        self.file = os.path.abspath(os.path.join('.', 'daily_expenses.txt'))
         self.entry_attributes = {'width': 70, 'fg': 'grey', 'highlightbackground': 'blue', 'highlightcolor': 'blue', 'highlightthickness': 2, 'justify': CENTER}
 
         self.master = Tk()

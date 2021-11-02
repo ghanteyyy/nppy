@@ -9,7 +9,7 @@ from tkinter.ttk import Scrollbar
 class SSNI:
     def __init__(self):
         self.after_id = None
-        self.file_name = self.resource_path('video_file.txt')
+        self.file_name = os.path.abspath(os.path.join('.', 'video_file.txt'))
         self.buttons_attributes = {'bg': 'green', 'fg': 'white', 'activebackground': 'green', 'activeforeground': 'white', 'cursor': 'hand2'}
 
         self.master = Tk()

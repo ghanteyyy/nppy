@@ -11,8 +11,8 @@ from tkinter.ttk import Scrollbar
 class Sticky_Notes:
     def __init__(self):
         self.all_tags = {}
-        self.json_filename = self.resource_path('config.json')
-        self.text_filename = self.resource_path('sticky_notes.txt')
+        self.json_filename = os.path.abspath(os.path.join('.', 'config.json'))
+        self.text_filename = os.path.abspath(os.path.join('.', 'sticky_notes.txt'))
 
         self.master = Tk()
         self.master.withdraw()

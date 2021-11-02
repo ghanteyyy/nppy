@@ -11,10 +11,10 @@ class To_Do_List:
         self.master.resizable(0, 0)
         self.master.overrideredirect(True)
         self.master.title('TO-DO LIST')
-        self.file_name = self.resource_path('to_do_list.txt')
         self.master.after(0, self.master.deiconify)
         self.master.wm_attributes("-topmost", 'true')
         self.master.iconbitmap(self.resource_path('icon.ico'))
+        self.file_name = os.path.abspath(os.path.join('.', 'to_do_list.txt'))
 
         self.buttons_attributes = {'bd': 1, 'fg': 'white', 'bg': '#002157', 'relief': GROOVE, 'cursor': 'hand2', 'activeforeground': 'white', 'activebackground': '#002157'}
 

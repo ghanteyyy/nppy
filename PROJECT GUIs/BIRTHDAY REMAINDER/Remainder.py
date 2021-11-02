@@ -10,7 +10,7 @@ class Remainder_Window:
     def __init__(self):
         self.birthdates = {}
         self.todays_date = time.strftime('%m-%d')
-        self.files = [self.resource_path('birthday_remainder.txt'), self.resource_path('seen_birthday.txt')]
+        self.files = [os.path.abspath(os.path.join('.', 'birthday_remainder.txt')), os.path.abspath(os.path.join('.', 'seen_birthday.txt'))]
         self.month_number = {'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'}
 
     def Window(self, name, date):

@@ -27,7 +27,7 @@ class Widgets:
 
 class Tution:
     def __init__(self):
-        self.file_name = self.resource_path('tution.json')
+        self.file_name = os.path.abspath(os.path.join('.', 'tution.json'))
 
         self.master = Tk()
         self.master.title('TUTION')

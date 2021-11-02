@@ -9,7 +9,8 @@ from tkinter import messagebox
 class Saving_Spending:
     def __init__(self):
         self.font1, self.font2 = ('Courier', 13), ('Courier', 30)
-        self.saving_file, self.spent_file = self.resource_path('saving.txt'), self.resource_path('spending.txt')
+        self.saving_file = os.path.abspath(os.path.join('.', 'saving.txt'))
+        self.spent_file = os.path.abspath(os.path.join('.', 'spending.txt'))
         self.label_attributes = {'padx': 20, 'pady': 20, 'bg': 'white', 'font': self.font1, 'takefocus': False}
         self.home_button_attributes = {'height': 3, 'width': 60, 'fg': 'white', 'activeforeground': 'white', 'cursor': 'hand2'}
 
