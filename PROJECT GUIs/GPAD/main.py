@@ -1,21 +1,21 @@
 from tkinter import *
 from tkinter.font import Font
-import include
-import file_menu
-import edit_menu
-import format_menu
-import view_menu
-import about
-import right_click
+import About
+import Include
+import FileMenu
+import EditMenu
+import FormatMenu
+import ViewMenu
+import RightClick
 
 
 class GPAD:
     def __init__(self):
-        self.get_font = include.GetFontDetails()
+        self.get_font = Include.GetFontDetails()
 
         self.master = Tk()
         self.font = Font(family=self.get_font['Font Family'], size=self.get_font['Font Size'])
-        include.ConfigFontStyle(self.get_font['Font Style'], self.font)
+        Include.ConfigFontStyle(self.get_font['Font Style'], self.font)
 
         self.menu = Menu(self.master)
         self.file_menu = Menu(self.menu, tearoff=0)
@@ -70,21 +70,21 @@ class GPAD:
         self.encoding = Label(self.StatusBarFrame, text='UTF-8')
         self.encoding.grid(row=0, column=4, ipadx=10)
 
-        self.fmc = file_menu.File_Menu(self.master, self.TextWidget, self.status_label_var)
+        self.fmc = FileMenu.File_Menu(self.master, self.TextWidget, self.status_label_var)
         self.FileMenuOptions = ['New', 'New Window ', 'Open... ', 'Save', 'SaveAs...', 'Exit']
         self.FileMenuCommands = [self.fmc.New, self.fmc.NewWindow, self.fmc.Open, self.fmc.Save, self.fmc.SaveAs, self.fmc.exit]
         self.FileMenuAccelerator = ['Ctrl+N', 'Ctrl+Shift+N', 'Ctrl+O', 'Ctrl+S', 'Ctrl+Shift+S', 'Ctrl+Q']
 
-        self.emc = edit_menu.Edit_Menu(self.master, self.TextWidget, self.status_label_var)
+        self.emc = EditMenu.Edit_Menu(self.master, self.TextWidget, self.status_label_var)
         self.EditMenuOptions = ['Undo', 'Cut', 'Copy', 'Paste', 'Delete', 'Search with Google', 'Find...', 'Replace...', 'Go To...', 'Select All', 'Time / Date', 'Strip Trailing Whitespace']
         self.EditMenuCommands = [self.emc.undo, self.emc.cut, self.emc.copy, self.emc.paste, self.emc.delete, self.emc.SearchWithGoogle, self.emc.FindWidget, self.emc.ReplaceWidget, self.emc.GoToWidget, self.emc.SelectAll, self.emc.GetDateTime, self.emc.StripWhitespaces]
         self.EditMenuAccelerator = ['Ctrl+Z', 'Ctrl+X', 'Ctrl+C', 'Ctrl+V', 'DEL', 'Ctrl+E', 'Ctrl+F', 'Ctrl+H', 'Ctr+G', 'Ctrl+A', 'F5', 'Alt+Enter']
 
-        self.Fmc = format_menu.Format(self.master, self.TextWidget, self.font)
+        self.Fmc = FormatMenu.Format(self.master, self.TextWidget, self.font)
         self.FormatMenuOptions = ['Word Wrap', 'Font...']
         self.FormatMenuAccelerator = ['Ctrl+W', 'Ctrl+Shift+F']
 
-        self.vmc = view_menu.View(self.master, self.TextWidget, self.TextWidgetFrame, self.CanvasFrame, self.LineCanvas, self.StatusBarFrame, self.ZoomLabel, self.font)
+        self.vmc = ViewMenu.View(self.master, self.TextWidget, self.TextWidgetFrame, self.CanvasFrame, self.LineCanvas, self.StatusBarFrame, self.ZoomLabel, self.font)
         self.ViewMenuOptions = ['Zoom', 'Status Bar', 'FullScreen', 'Show Line Numbers']
         self.ZoomCommands = [self.vmc.ZoomIn, self.vmc.ZoomOut, self.vmc.DefaultZoom]
         self.ViewMenuZoomAccelerator = {'Zoom In': '            Ctrl+Plus', 'Zoom Out': '        Ctrl+Minus', 'Restore Default Zoom': '                 Ctrl+0'}
@@ -170,7 +170,7 @@ class GPAD:
         self.TextWidget.bind('<Control-e>', self.emc.SearchWithGoogle)
         self.TextWidget.bind('<Double-Button-1>', self.DoubleLeftClick)
         self.TextWidget.bind('<Alt-Return>', self.ActivateStripWhiteSpace)
-        self.master.after(0, lambda: include.initial_position(self.master))
+        self.master.after(0, lambda: Include.initial_position(self.master))
         self.TextWidget.bind('<Alt-l>', lambda e: self.view_menu.invoke(3))
         self.TextWidget.bind('<Control-F>', lambda e: self.Fmc.FontSelection())
         self.TextWidget.bind('<Control-w>', lambda e: self.format_menu.invoke(0))
@@ -212,7 +212,7 @@ class GPAD:
     def button_3(self, event=None):
         '''When user right clicks'''
 
-        right_click.RightClick(self.master, self.TextWidget, self.fmc, self.status_label_var).ShowPopUp(event=event)
+        RightClick.RightClick(self.master, self.TextWidget, self.fmc, self.status_label_var).ShowPopUp(event=event)
 
     def RemoveSelection(self, event=None):
         '''Remove "found" and "triple_click" tags from the text_widget annd reset the blinking time to default'''
@@ -359,7 +359,7 @@ class GPAD:
     def about(self, event=None):
         '''When user clicks about sub-menu in Help menu'''
 
-        about.About(self.master)
+        About.About(self.master)
 
 
 if __name__ == '__main__':
