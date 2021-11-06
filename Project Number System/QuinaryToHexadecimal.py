@@ -1,4 +1,4 @@
-def QuinaryToHexadecimal(quinary_number):
+class QuinaryToHexadecimal:
     '''Convert quinary number into hexadecimal number
 
         You can convert quinary number, first by converting quinary number to decimal and then obtained decimal to hexadecimal number
@@ -13,52 +13,41 @@ def QuinaryToHexadecimal(quinary_number):
                                -----
                                  2
 
+                    And our required hexadecimal number is 26'''
 
-                        And our required hexadecimal number is 26
-    '''
+    def IsQuinary(self, quinary_number):
+        while quinary_number > 0:
+            remainder = quinary_number % 10
+            quinary_number //= 10
 
-    decimal = 0
-    hexadecimal = ''
-    reversed_quinary = str(quinary_number)[::-1]
-    hex_value = {'A': '10', 'B': '11', 'C': '12', 'D': '13', 'E': '14', 'F': '15'}
+            if remainder not in range(5):
+                return False
 
-    def is_quinary():
-        count = 0
+        return True
 
-        for quinary in str(quinary_number):
-            if int(quinary) >= 5:
-                count += 1
+    def toHexadecimal(self, quinary_number):
+        if self.IsQuinary(quinary_number):
+            decimal_number = 0
+            hexadecimal_number = ''
+            hex_value = {'10': 'A', '11': 'B', '12': 'C', '13': 'D', '14': 'E', '15': 'F'}
 
-        if count == 0:
-            return True
+            for power, num in enumerate(str(quinary_number)[::-1]):
+                decimal_number += int(num) * 5 ** power
+
+            while decimal_number > 0:
+                remainder = str(decimal_number % 16)
+
+                if remainder in hex_value:
+                    remainder = hex_value[remainder]
+
+                decimal_number //= 16
+                hexadecimal_number += remainder
+
+            return hexadecimal_number[::-1]
 
         else:
-            return False
-
-    if is_quinary():
-        for x in range(len(reversed_quinary)):
-            decimal += int(reversed_quinary[x]) * 5 ** x
-
-        while decimal > 0:
-            hex_num = decimal % 16
-
-            if hex_num in hex_value:
-                hexadecimal += hex_value[hex_num]
-
-            else:
-                hexadecimal += str(hex_num)
-
-            decimal = decimal // 16
-
-        print(hexadecimal[::-1])
-
-    else:
-        print('Invalid quinary number')
+            raise ValueError('Invalid Quinary Number')
 
 
 if __name__ == '__main__':
-    try:
-        QuinaryToHexadecimal(123)
-
-    except (ValueError, NameError):
-        print('Integers was expected')
+    print(QuinaryToHexadecimal().toHexadecimal(123))

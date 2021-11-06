@@ -1,4 +1,4 @@
-def QuinaryToDecimal(quinary_number):
+class QuinaryToDecimal:
     '''Convert quinary number to decimal number
 
         You can convert quinary number to decimal by multiplying each quinary number with base of 5 with power starting from 0 increasing from left to right.
@@ -10,35 +10,28 @@ def QuinaryToDecimal(quinary_number):
 
                     And our required quinary number is 38 '''
 
-    def is_quinary():
-        count = 0
+    def IsQuinary(self, quinary_number):
+        while quinary_number > 0:
+            remainder = quinary_number % 10
+            quinary_number //= 10
 
-        for quinary in str(quinary_number):
-            if int(quinary) >= 5:
-                count += 1
+            if remainder not in range(5):
+                return False
 
-        if count == 0:
-            return True
+        return True
+
+    def toDecimal(self, quinary_number):
+        if self.IsQuinary(quinary_number):
+            decimal_number = 0
+
+            for power, num in enumerate(str(quinary_number)[::-1]):
+                decimal_number += int(num) * 5 ** power
+
+            return decimal_number
 
         else:
-            return False
-
-    if is_quinary():
-        decimal = 0
-        reversed_binary = str(quinary_number)[::-1]
-
-        for index, value in enumerate(reversed_binary):
-            decimal += int(value) * 5 ** index
-
-        print(decimal)
-
-    else:
-        print('Invalid quinary number')
+            return('Invalid Quinary Number')
 
 
 if __name__ == '__main__':
-    try:
-        QuinaryToDecimal(123)
-
-    except (ValueError, NameError):
-        print('Integers was expected')
+    print(QuinaryToDecimal().toDecimal(123))

@@ -1,4 +1,4 @@
-def HexadecimalToOctal(hexadecimal_number):
+class HexadecimalToOctal:
     '''Convert hexadecimal number to octal number
 
         To calculate hexadecimal to octal you need to first convert hexadecimal to decimal and obtained decimal to octal
@@ -10,71 +10,42 @@ def HexadecimalToOctal(hexadecimal_number):
                 Step 2: Convert obtained decimal number to octal number
                                 8 | 291 | 3
                                   ------
-                               8 |  36 | 4
-                                 ------
-                                    4
+                                8 |  36 | 4
+                                  ------
+                                     4
 
-                    And our required octal number is 443 (taken in reverse order)
-    '''
-    octal_number = ''
-    decimal_number = 0
-    hex_value = {'A': '10', 'B': '11', 'C': '12', 'D': '13', 'E': '14', 'F': '15'}
+                    And our required octal number is 443 (taken in reverse order)'''
 
-    hexadecimal_number = str(hexadecimal_number)
+    def IsHexadecimal(self, hexadecimal_number):
+        for num in hexadecimal_number:
+            if num not in '0123456789ABCDEF':
+                return False
 
-    def is_hexadecimal():
-        count = 0
+        return True
 
-        if hexadecimal_number.isalpha() or hexadecimal_number.isalnum():
-            for hexa_decimal in hexadecimal_number:
-                if hexa_decimal.isalpha() and hexa_decimal not in list('ABCDEF'):
-                    count += 1
+    def toOctal(self, hexadecimal_number):
+        hexadecimal_number = str(hexadecimal_number)
+        hex_value = {'A': '10', 'B': '11', 'C': '12', 'D': '13', 'E': '14', 'F': '15'}
 
-        if count == 0:
-            return True
+        if self.IsHexadecimal(hexadecimal_number):
+            octal_number = ''
+            decimal_number = 0
 
-        else:
-            return False
+            for power, num in enumerate(hexadecimal_number[::-1]):
+                if num in hex_value:
+                    num = hex_value[num]
 
-    if is_hexadecimal():
-        if hexadecimal_number.isalpha() or hexadecimal_number.isalnum():
-            split_hexadecimal = list(str(hexadecimal_number))
-
-            for index, split_hexa_decimal in enumerate(split_hexadecimal):
-                if split_hexa_decimal in hex_value:
-                    split_hexadecimal[index] = hex_value[split_hexa_decimal]
-
-            reverse_split_hexadecimal = split_hexadecimal[::-1]
-
-            for x in range(len(reverse_split_hexadecimal)):
-                decimal_number += int(reverse_split_hexadecimal[x]) * 16 ** x
+                decimal_number += int(num) * 16 ** power
 
             while decimal_number > 0:
                 octal_number += str(decimal_number % 8)
-                decimal_number = decimal_number // 8
+                decimal_number //= 8
 
-            print(octal_number[::-1])
+            return octal_number[::-1]
 
         else:
-            reversed_hexadecimal = hexadecimal_number[::-1]
-
-            # Converting to decimal
-            for x in range(len(reversed_hexadecimal)):
-                decimal_number += int(reversed_hexadecimal[x]) * 16 ** x
-
-            while decimal_number > 0:
-                octal_number += str(decimal_number % 8)
-                decimal_number = decimal_number // 8
-
-            print(octal_number[::-1])
-
-    else:
-        print('Invalid hexadecimal number')
+            raise ValueError('Invalid Hexadecimal Number')
 
 
 if __name__ == '__main__':
-    try:
-        HexadecimalToOctal('291')
-
-    except (ValueError, NameError):
-        print('Integers was expected')
+    print(HexadecimalToOctal().toOctal('123'))

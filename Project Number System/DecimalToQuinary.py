@@ -1,32 +1,40 @@
-def DecimalToQuinary(decimal_number):
+class DecimalToQuinary:
     '''Convert decimal number to quinary number
 
         For an instance, lets take decimal_number as 123 then,
 
         To calculate decimal_number to quinary you need to:
-                        5 | 123 | 3    >>> Remainder
+                        5 | 123 | 3
                           ------
-                       5 | 24  | 4    >>> Remainder
-                         ------
-                           4         >>> Remainder
+                        5 | 24  | 4
+                          ------
+                            4
 
-        Required quinary number is 443
-    '''
+        Required quinary number is 443'''
 
-    quinary_number = ''
+    def IsDecimal(self, decimal_number):
+        while decimal_number > 0:
+            remainder = decimal_number % 10
+            decimal_number //= 10
 
-    # Converting into quinary
-    while decimal_number > 0:
-        test_quinary_number = decimal_number % 5
-        quinary_number += str(test_quinary_number)
-        decimal_number = decimal_number // 5
+            if remainder not in range(10):
+                return False
 
-    print(quinary_number[::-1])
+        return True
+
+    def toQuinary(self, decimal_number):
+        if self.IsDecimal(decimal_number):
+            quinary_number = ''
+
+            while decimal_number > 0:
+                quinary_number += str(decimal_number % 5)
+                decimal_number = decimal_number // 5
+
+            return quinary_number[::-1]
+
+        else:
+            raise ValueError('Invalid Decimal Number')
 
 
 if __name__ == '__main__':
-    try:
-        DecimalToQuinary(123)
-
-    except (ValueError, NameError):
-        print('Integers was expected')
+    print(DecimalToQuinary().toQuinary(123))

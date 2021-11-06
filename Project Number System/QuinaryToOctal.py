@@ -1,55 +1,48 @@
-def QuinaryToOctal(quinary_number):
+class QuinaryToOctal:
     '''Convert quinary number to octal number
 
-        You can convert quinary number to octal, first by converting quinary number to decimal and obtained decimal number to quinary number
-            For an instance, lets take binary number be 123
+        You can convert quinary number to octal, first by converting quinary
+        number to decimal and obtained decimal number to quinary number
 
-                Step 1: Convert to deicmal
-                        123 = 1 * 5^2 + 2 * 5^1 + 3 * 5^0
-                            = 38 (Decimal)
+        For an instance, lets take binary number be 123
+            Step 1: Convert to deicmal
+                    123 = 1 * 5^2 + 2 * 5^1 + 3 * 5^0
+                        = 38 (Decimal)
 
-                Step 2: Convert to octal from the obtained decimal
-                                    8 | 38 | 6
-                                      -----
-                                        4
+            Step 2: Convert to octal from the obtained decimal
+                                8 | 38 | 6
+                                  -----
+                                    4
 
-                            And our required octal number is 46 (taken in a reverse way)
-    '''
+                    And our required octal number is 46 (taken in a reverse way)'''
 
-    def is_octal():
-        count = 0
+    def IsQuinary(self, quinary_number):
+        while quinary_number > 0:
+            remainder = quinary_number % 10
+            quinary_number //= 10
 
-        for quinary in str(quinary_number):
-            if int(quinary) >= 5:
-                count += 1
+            if remainder not in range(5):
+                return False
 
-        if count == 0:
-            return True
+        return True
+
+    def toOctal(self, quinary_number):
+        if self.IsQuinary(quinary_number):
+            octal_number = ''
+            decimal_number = 0
+
+            for index, value in enumerate(str(quinary_number)[::-1]):
+                decimal_number += int(value) * 5 ** index
+
+            while decimal_number > 0:
+                octal_number += str(decimal_number % 8)
+                decimal_number = decimal_number // 8
+
+            return octal_number[::-1]
 
         else:
-            return False
-
-    if is_octal():
-        decimal = 0
-        octal_number = ''
-        reversed_quinary = str(quinary_number)[::-1]
-
-        for index, value in enumerate(reversed_quinary):
-            decimal += int(value) * 5 ** index
-
-        while decimal > 0:
-            octal_number += str(decimal % 8)
-            decimal = decimal // 8
-
-        print(octal_number[::-1])
-
-    else:
-        print('Invalid quinary Number')
+            raise ValueError('Invalid Quinary Number')
 
 
 if __name__ == '__main__':
-    try:
-        QuinaryToOctal(123)
-
-    except (ValueError, NameError):
-        print('Integers was expected')
+    print(QuinaryToOctal().toOctal(123))

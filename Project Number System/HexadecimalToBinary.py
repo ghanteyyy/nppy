@@ -1,92 +1,97 @@
-def HexadecimalToBinary(hexadecimal_number):
-    '''Convert hexadecimal number to binary number
+class HexadecimalToBinary:
+    def __init__(self):
+        self.HexValue = {'A': '10', 'B': '11', 'C': '12', 'D': '13', 'E': '14', 'F': '15'}
 
-        To convert hexadecimal to binary, you need to first convert hexadecimal to decimal and obtained decimal to binary
+    def IsHexadecimal(self, hexadecimal_number):
+        for num in hexadecimal_number:
+            if num not in '0123456789ABCDEF':
+                return False
 
-            Step 1: Convert hexadecimal to decimal
-                    123 = 1 * 16^2 + 2 * 16^1 + 3 * 16^0
-                        = 291 (decimal number)
+        return True
 
-            Step 2: Convert the obtained decimal to binary
-                                2 | 291 | 1
-                                  ------
-                               2 | 145 | 1
-                                 ------
-                              2 |  72 | 0
-                                ------
-                             2 |  36 | 0
-                               ------
-                            2 |  18 | 0
-                              ------
-                           2 |  9  | 1
-                             ------
-                          2 |   4 | 0
-                            ------
-                         2 |   2 | 0
+    def toBinary(self, hexadecimal_number):
+        '''Convert hexadecimal number to binary number
+
+            To convert hexadecimal to binary, you need to first convert hexadecimal to decimal and obtained decimal to binary
+                Step 1: Convert hexadecimal to decimal
+                        123 = 1 * 16^2 + 2 * 16^1 + 3 * 16^0
+                            = 291 (decimal number)
+
+                Step 2: Convert the obtained decimal to binary
+                        2 | 291 | 1
+                           ------
+                        2 | 145 | 1
+                           ------
+                        2 |  72 | 0
+                           ------
+                        2 |  36 | 0
+                           ------
+                        2 |  18 | 0
+                           ------
+                        2 |  9  | 1
+                           ------
+                        2 |  4  | 0
+                           ------
+                        2 |  2  | 0
                            ------
                              1
 
-                        Required binary number is 100100011 (taking remainder in reverse order)
-    '''
+                Required binary number is 100100011 (taking remainder in reverse order)'''
 
-    binary_number = ''
-    decimal_number = 0
-    hex_value = {'A': '10', 'B': '11', 'C': '12', 'D': '13', 'E': '14', 'F': '15'}
+        hexadecimal_number = str(hexadecimal_number)
 
-    hexadecimal_number = str(hexadecimal_number)
+        if self.IsHexadecimal(hexadecimal_number):
+            binary_number = ''
+            decimal_number = 0
+            self.HexValue = {'A': '10', 'B': '11', 'C': '12', 'D': '13', 'E': '14', 'F': '15'}
 
-    def is_hexadecimal():
-        count = 0
+            for power, num in enumerate(hexadecimal_number[::-1]):
+                if num in self.HexValue:
+                    num = self.HexValue[num]
 
-        if hexadecimal_number.isalpha() or hexadecimal_number.isalnum():
-            for hexa_decimal in hexadecimal_number:
-                if hexa_decimal.isalpha() and hexa_decimal.upper() not in list('ABCDEF'):
-                    count += 1
-
-        if count == 0:
-            return True
-
-        else:
-            return False
-
-    if is_hexadecimal():
-        if hexadecimal_number.isalpha() or not hexadecimal_number.isdigit():
-            split_hexadecimal = list(str(hexadecimal_number))
-
-            for index, split_hexa_decimal in enumerate(split_hexadecimal):
-                if split_hexa_decimal.upper() in hex_value:
-                    split_hexadecimal[index] = hex_value[split_hexa_decimal.upper()]
-
-            reverse_split_hexadecimal = split_hexadecimal[::-1]
-
-            for index, value in enumerate(reverse_split_hexadecimal):
-                decimal_number += int(reverse_split_hexadecimal[index]) * 16 ** index
+                decimal_number += int(num) * 16 ** power
 
             while decimal_number > 0:
                 binary_number += str(decimal_number % 2)
-                decimal_number = decimal_number // 2
+                decimal_number //= 2
+
+            return binary_number[::-1]
 
         else:
-            reversed_hexadecimal = hexadecimal_number[::-1]
+            raise ValueError('Invalid Hexadecimal Number')
 
-            # Converting to decimal
-            for x in range(len(reversed_hexadecimal)):
-                decimal_number += int(reversed_hexadecimal[x]) * 16 ** x
+    def AlternativeMethod(self, hexadecimal_number):
+        '''1. Loop to each hexadecimal number
+           2. Convert each hexadecimal number to binary
+           3. If obtained binary length is not 4 then reverse
+              it and insert '0's to make its length 4
+           4. If obtained binary length is equal to 4 then
+              reversing it
+           5. Remove leading '0' from the obtained binary'''
 
-            # Converting to binary
-            while decimal_number > 0:
-                binary_number += str(decimal_number % 2)
-                decimal_number = decimal_number // 2
+        binary_number = ''
+        hexadecimal_number = str(hexadecimal_number)
 
-        print(binary_number[::-1])
+        if self.IsHexadecimal(hexadecimal_number):
+            for num in hexadecimal_number:
+                if num in self.HexValue:
+                    num = self.HexValue[num]
 
-    else:
-        print('Invalid hexadecimal number')
+                num = int(num)
+                tempBinary = ''
+
+                while num > 0:
+                    tempBinary += str(num % 2)
+                    num //= 2
+
+                binary_number += tempBinary[::-1].zfill(4)
+
+            return binary_number.lstrip('0')
+
+        else:
+            raise ValueError('Invalid Hexadecimal Number')
 
 
 if __name__ == '__main__':
-    try:
-        HexadecimalToBinary('123')
-
-    except (ValueError, NameError):
-        print('Integers was expected')
+    print(HexadecimalToBinary().toBinary('123'))
+    print(HexadecimalToBinary().AlternativeMethod('123'))

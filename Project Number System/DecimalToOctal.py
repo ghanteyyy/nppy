@@ -1,31 +1,40 @@
-def DecimalToOctal(decimal_number):
+class DecimalToOctal:
     '''Convert decimal number to octal number
 
         To convert decimal to octal you need to divide decimal number by 0:
             For an instance, lets take decimal number as 98
-                            8 | 123 | 3     >>> Remainder
-                              -----
-                           8 |  15 | 7      >>> Remainder
-                             -----
-                               1           >>> Remainder
+                            8 | 123 | 3
+                              ------
+                            8 |  15 | 7
+                              ------
+                                1
 
-            And writing the remainder in reverse way i.e 173
-    '''
+            And writing the remainder in reverse way i.e 173'''
 
-    octal_number = ''
+    def IsDecimal(self, decimal_number):
+        while decimal_number > 0:
+            remainder = decimal_number % 10
+            decimal_number //= 10
 
-    # Converting into octal
-    while decimal_number > 0:
-        temp_octal = decimal_number % 8
-        octal_number += str(temp_octal)
-        decimal_number = decimal_number // 8
+            if remainder not in range(10):
+                return False
 
-    print(octal_number[::-1])
+        return True
+
+    def toOctal(self, decimal_number):
+        if self.IsDecimal(decimal_number):
+            octal_number = ''
+
+            while decimal_number > 0:
+                temp_octal = decimal_number % 8
+                octal_number += str(temp_octal)
+                decimal_number = decimal_number // 8
+
+            return octal_number[::-1]
+
+        else:
+            raise ValueError('Invalid Decimal Number')
 
 
 if __name__ == '__main__':
-    try:
-        DecimalToOctal(123)
-
-    except (ValueError, NameError):
-        print('Integers was expected')
+    print(DecimalToOctal().toOctal(123))
