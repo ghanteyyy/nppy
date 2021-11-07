@@ -338,8 +338,11 @@ class MusicPlayer:
 
             if CurrentIndex != self.CurrentPlayingIndex:
                 self.isPlaying = None
+
+                if self.CurrentPlayingIndex != -1:
+                    self.AudioListBox.itemconfig(self.CurrentPlayingIndex, bg='white', fg='purple')
+
                 self.CurrentPlayingIndex = CurrentIndex
-                self.AudioListBox.itemconfig(self.CurrentPlayingIndex, bg='white', fg='purple')
 
         self.PlayOrPauseAudio()
 
@@ -413,10 +416,10 @@ class MusicPlayer:
             if self.ScaleTimer:
                 self.master.after_cancel(self.ScaleTimer)
 
-            self.AudioSliderVar.set(0)
             self.isPlaying = None
+            self.AudioSliderVar.set(0)
             self.AudioListBox.itemconfig(self.CurrentPlayingIndex, fg='purple', bg='white')
-            self.CurrentPlayingIndex -= 1
+            self.CurrentPlayingIndex = -1
             self.TotalTimeVar.set('--:--')
             self.EscapedTimeVar.set('--:--')
             self.AudioListBox.selection_clear(0, 'end')
