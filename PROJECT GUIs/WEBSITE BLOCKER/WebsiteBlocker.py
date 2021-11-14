@@ -20,6 +20,7 @@ def IsAdmin():
 
 class WebsiteBlocker:
     def __init__(self):
+        self.PreviousText = ''
         self.PreviousEntry = None
         self.LocalHost = '127.0.0.1 '
         self.DefaultAddress = 'https://github.com/ghanteyyy'
@@ -71,22 +72,23 @@ class WebsiteBlocker:
         except AttributeError:
             wid = event.widget
 
-        if self.PreviousEntry and (wid.winfo_parent() == '.' or wid == self.DisplayBlockedSites or (isinstance(wid, str) and str(wid.cget('state')) == 'normal')):
-                self.PreviousEntry.config(state='disabled', cursor='arrow')
-                self.PreviousEntry = None
+        if self.PreviousEntry and self.PreviousEntry != event.widget:
+            self.RenameInsideFile()
 
         if not self.EntryVar.get().strip():  # Inserting default text in Entry Widget if no text is found in it
             self.BlockerWindow.focus()
             self.EntryVar.set(self.DefaultAddress)
             self.style.configure('Ent.TEntry', foreground='grey')
 
+        if self.PreviousEntry:
+            if wid.winfo_parent() != self.PreviousEntry.winfo_parent():
+                self.PreviousEntry.config(state='disabled', cursor='arrow')
+                self.PreviousEntry = None
+
         return 'break'
 
     def FocusIn(self, event=None):
         '''When user clicks to the Entry widget to add new Address'''
-
-        if self.PreviousEntry is not None:
-            self.PreviousEntry.config(state='disabled', cursor='arrow')
 
         if self.EntryVar.get().strip() == self.DefaultAddress:
             self.EntryVar.set('')
@@ -121,7 +123,7 @@ class WebsiteBlocker:
 
             SavedEntry = ttk.Entry(InnerWidget, width=70, cursor='arrow')
             SavedEntry.grid(row=0, column=0, ipady=5)
-            SavedEntry.insert(0, text.strip(self.LocalHost))
+            SavedEntry.insert(0, text.strip(self.LocalHost).strip())
             SavedEntry.config(state='disabled', cursor='arrow')
 
             ButtonsAttr = {'bd': 0, 'cursor': 'hand2', 'bg': '#e4ede9', 'activebackground': '#e4ede9'}
@@ -132,11 +134,16 @@ class WebsiteBlocker:
             DeleteButton.grid(row=0, column=2)
 
             if default is None:
+                if contents[-1].startswith('#'):  # Adding new line if there is no new line at end of file
+                    contents.append('\n')
+
                 if text not in contents:
                     contents.append(text)
                     self.WriteSite(contents)
 
             self.DisplayBlockedSites.window_create(END, window=InnerWidget)
+            self.DisplayBlockedSites.insert('end', '\n')
+
             self.EntryVar.set('')
             self.FocusOut()
 
@@ -152,6 +159,7 @@ class WebsiteBlocker:
         '''When user clicks Rename button'''
 
         if self.PreviousEntry == widget:
+            self.RenameInsideFile()
             self.PreviousEntry = None
             widget.config(state='disabled', cursor='arrow')
             return
@@ -159,6 +167,7 @@ class WebsiteBlocker:
         widget.config(state='normal', cursor='xterm')
         widget.focus()
         widget.selection_range(0, 'end')
+        self.PreviousText = f'{self.LocalHost}{widget.get()}\n'
 
         if self.PreviousEntry is not None:
             self.PreviousEntry.config(state='disabled', cursor='arrow')
@@ -169,11 +178,14 @@ class WebsiteBlocker:
         '''When user clicks Delete button'''
 
         contents = self.ReadContents()
-        site = f'{self.LocalHost}{frame.winfo_children()[0].get()}'
+        site = f'{self.LocalHost}{frame.winfo_children()[0].get()}\n'
 
         if site in contents:
             contents.remove(site)
             self.WriteSite(contents)
+
+        index = self.DisplayBlockedSites.index(frame)
+        self.DisplayBlockedSites.delete(f'{index} linestart', f'{index} lineend+1c')
 
         frame.destroy()
 
@@ -198,6 +210,22 @@ class WebsiteBlocker:
         with open(self.HostFile, 'w') as f:
             for content in contents:
                 f.write(content)
+
+    def RenameInsideFile(self):
+        '''Replace old entry with new entry inside the file'''
+
+        NewText = f'{self.LocalHost}{self.PreviousEntry.get()}\n'
+        contents = self.ReadContents()
+
+        if NewText != self.PreviousText:
+            try:
+                index = contents.index(self.PreviousText)
+                contents[index] = NewText
+
+                self.WriteSite(contents)
+
+            except ValueError:
+                pass
 
     def StartAtCenter(self):
         '''Place window at the center of screen when it opens for the first time'''
