@@ -1,5 +1,6 @@
 import os
 import sys
+import winsound
 from tkinter import *
 import tkinter.ttk as ttk
 from tkinter import messagebox
@@ -10,13 +11,14 @@ class SSNI:
     def __init__(self):
         self.after_id = None
         self.file_name = os.path.abspath(os.path.join('.', 'video_file.txt'))
-        self.buttons_attributes = {'bg': 'green', 'fg': 'white', 'activebackground': 'green', 'activeforeground': 'white', 'cursor': 'hand2'}
+        self.buttons_attributes = {'bd': 0, 'bg': 'green', 'fg': 'white', 'activebackground': 'green', 'activeforeground': 'white', 'cursor': 'hand2'}
 
         self.master = Tk()
         self.master.withdraw()
         self.master.title('SSNI')
         self.master.iconbitmap(self.resource_path('icon.ico'))
 
+        self.BackImage = PhotoImage(file='included_files\\back.png')
         self.first_left_frame = Frame(self.master)
 
         self.video_entry_style = ttk.Style()
@@ -25,17 +27,17 @@ class SSNI:
         self.video_entry.insert(END, 'Video Name')
         self.video_entry.pack(pady=10, padx=10, ipady=3)
 
-        self.add_button = Button(self.first_left_frame, text='ADD', **self.buttons_attributes, command=lambda: self.add_remove_search_command(button_name='ADD'))
-        self.add_button.pack(pady=5, ipady=3, ipadx=80)
+        self.add_button = Button(self.first_left_frame, text='A D D', **self.buttons_attributes, command=lambda: self.add_remove_search_command(button_name='ADD'))
+        self.add_button.pack(pady=5, ipady=3, ipadx=75)
 
-        self.remove_button = Button(self.first_left_frame, text='REMOVE', **self.buttons_attributes, command=lambda: self.add_remove_search_command(button_name='REMOVE'))
-        self.remove_button.pack(pady=5, ipady=3, ipadx=70)
+        self.remove_button = Button(self.first_left_frame, text='R E M O V E', **self.buttons_attributes, command=lambda: self.add_remove_search_command(button_name='REMOVE'))
+        self.remove_button.pack(pady=5, ipady=3, ipadx=60)
 
-        self.search_button = Button(self.first_left_frame, text='SEARCH', **self.buttons_attributes, command=lambda: self.add_remove_search_command(button_name='SEARCH'))
-        self.search_button.pack(pady=5, ipady=3, ipadx=70)
+        self.search_button = Button(self.first_left_frame, text='S E A R C H', **self.buttons_attributes, command=lambda: self.add_remove_search_command(button_name='SEARCH'))
+        self.search_button.pack(pady=5, ipady=3, ipadx=60)
 
-        self.rename_window_button = Button(self.first_left_frame, text='RENAME', **self.buttons_attributes, command=self.rename_window)
-        self.rename_window_button.pack(pady=5, ipady=3, ipadx=69)
+        self.rename_window_button = Button(self.first_left_frame, text='R E N A M E', **self.buttons_attributes, command=self.rename_window)
+        self.rename_window_button.pack(pady=5, ipady=3, ipadx=59)
 
         self.first_left_frame.pack(padx=5, side=LEFT, ipady=2)
 
@@ -70,8 +72,8 @@ class SSNI:
         self.new_name_entry = ttk.Entry(self.rename_window_frame, font=('Courier', 12), width=19, justify='center', style='N.TEntry')
         self.new_name_entry.insert(END, 'New Name')
 
-        self.rename_button = Button(self.rename_window_frame, text='RENAME', bg='green', fg='white', activebackground='green', activeforeground='white', cursor='hand2', command=self.rename_command)
-        self.back_button = Button(self.rename_window_frame, text='BACK', bd=0, fg='blue', font=('Courier', 15, 'bold'), cursor='hand2', command=self.back_command, activeforeground='blue')
+        self.rename_button = Button(self.rename_window_frame, text='R E N A M E', **self.buttons_attributes, command=self.rename_command)
+        self.back_button = Button(self.rename_window_frame, image=self.BackImage, bd=0, cursor='hand2', command=self.back_command)
 
         self.master.bind('<Button-1>', self.key_bindings)
         self.back_button.bind('<Return>', self.back_command)
@@ -110,6 +112,7 @@ class SSNI:
         key.configure(self.widgets[widget][1][key], foreground=color)
 
         if insert:
+            self.master.focus()
             widget.insert(END, self.widgets[widget][0])
 
     def key_bindings(self, event, focus_out=False):
@@ -131,7 +134,7 @@ class SSNI:
                 if not _widget.get().strip():
                     self.config_entry(_widget, 'grey')
 
-        if widget in [self.master, self.rename_window_frame, self.first_left_frame]:
+        if widget in [self.master, self.rename_window_frame, self.first_left_frame, self.scrollbar]:
             self.master.focus()
 
     def rename_window(self):
@@ -143,7 +146,7 @@ class SSNI:
 
         self.old_name_entry.pack(pady=10, padx=10, ipady=3)
         self.new_name_entry.pack(pady=10, padx=10, ipady=3)
-        self.rename_button.pack(pady=15, ipady=3, ipadx=70)
+        self.rename_button.pack(pady=15, ipady=3, ipadx=59)
 
         self.back_button.pack()
 
@@ -224,12 +227,13 @@ class SSNI:
         contents = self.read_file()
         from_entry = self.video_entry.get().strip()
 
-        if not from_entry or from_entry == 'Video Name':
-            messagebox.showerror('Invalid Name', 'No Name given')
+        if from_entry == 'Video Name':
+            winsound.MessageBeep()
 
         elif button_name == 'ADD':
             if from_entry in contents:
                 self.highlight(from_entry, '#e8cb10')
+                self.config_entry(self.video_entry, 'grey')
 
             else:
                 success = True
@@ -238,31 +242,27 @@ class SSNI:
             if from_entry in contents:
                 contents.remove(from_entry)
                 self.highlight(from_entry, 'red')
+                self.config_entry(self.video_entry, 'grey')
                 self.master.after(800, lambda: self.insert_text_area(contents))
 
             else:
-                option = messagebox.askyesno('Add Value?', f'"{from_entry}" not in file. Do you want to add it?')
-
-                if option:
-                    success = True
+                winsound.MessageBeep()
 
         else:
             if from_entry in contents:
                 self.highlight(from_entry, '#3ccbde')
+                self.config_entry(self.video_entry, 'grey')
 
             else:
-                option = messagebox.askyesno('Add Value?', f'"{from_entry}" not in file. Do you want to add it?')
-
-                if option:
-                    success = True
+                winsound.MessageBeep()
 
         if success:
             contents.append(from_entry)
             self.insert_text_area(contents)
             self.highlight(from_entry, 'green')
 
-        self.config_entry(self.video_entry, 'grey')
-        self.master.focus()
+            self.config_entry(self.video_entry, 'grey')
+            self.master.focus()
 
     def rename_command(self, event=None):
         '''Commands when user clicks RENAME button'''
@@ -271,14 +271,8 @@ class SSNI:
         old_name = self.old_name_entry.get().strip()
         new_name = self.new_name_entry.get().strip()
 
-        if old_name in ['', 'Old Name'] or new_name in ['', 'New Name']:
-            messagebox.showerror('Invalid Video Name', 'The input video name is invlaid')
-
-        elif old_name not in contents:
-            messagebox.showerror('Not exists', 'Old Name Not found')
-
-        elif new_name in contents:
-            messagebox.showerror('Already Exists', 'New Name already exists in file. Try another!')
+        if old_name == 'Old Name' or new_name == 'New Name' or old_name not in contents or new_name in contents:
+            winsound.MessageBeep()
 
         else:
             old_name_index = contents.index(old_name)
