@@ -2,14 +2,15 @@ import os
 import sys
 import time
 import json
+import winsound
 from tkinter import *
 from tkinter import font
 import tkinter.ttk as ttk
 from tkinter import filedialog
 from tkinter import messagebox
 import pygame
-from mutagen.mp3 import MP3
 from ttkbootstrap import Style
+from mutagen.mp3 import MP3, HeaderNotFoundError
 
 
 '''To setup ttkbootstrap:
@@ -58,14 +59,22 @@ class MusicPlayer:
         self.Menu.add_cascade(label='File', menu=self.FileMenu)
         self.master.config(menu=self.Menu)
 
-        self.FileMenu.add_command(label='Open', accelerator='Ctrl + O', command=self.OpenFiles)
-        self.FileMenu.add_command(label='Open Playlist', accelerator='Ctrl + P', command=self.GetPlaylist)
-        self.FileMenu.add_command(label='Save Playlist', accelerator='Ctrl + Shift + P', command=self.SavePlaylist)
-        self.FileMenu.add_command(label='Exit', accelerator='Ctrl + Q', command=self.master.destroy)
+        self.FileMenu.add_command(label='Open', accelerator=f'{" " * 10}Ctrl + O', command=self.OpenFiles)
+        self.FileMenu.add_command(label='Open Playlist', accelerator=f'{" " * 10}Ctrl + P', command=self.GetPlaylist)
+        self.FileMenu.add_command(label='Save Playlist', accelerator=f'{" " * 10}Ctrl + S', command=self.SavePlaylist)
+        self.FileMenu.add_command(label='Exit', accelerator=f'{" " * 10}Ctrl + Q', command=self.master.destroy)
+
+        self.AudioListFrame = Frame(self.container)
+        self.AudioListFrame.pack()
 
         self.AudioListBoxVar = Variable()
-        self.AudioListBox = Listbox(self.container, listvariable=self.AudioListBoxVar, activestyle='none', height=10, width=100, bg='#f9f9fa', fg='purple', selectmode=MULTIPLE)
-        self.AudioListBox.pack(fill='x')
+        self.AudioListBox = Listbox(self.AudioListFrame, listvariable=self.AudioListBoxVar, activestyle='none', height=10, width=100, bg='#f9f9fa', fg='purple', selectmode=MULTIPLE)
+        self.AudioListBox.pack(side=LEFT, fill='x')
+
+        self.vsb = Scrollbar(self.AudioListFrame, orient='vertical')
+        self.vsb.pack(side=RIGHT, fill='y')
+        self.AudioListBox.config(yscrollcommand=self.vsb.set)
+        self.vsb.config(command=self.AudioListBox.yview)
 
         self.TotalTimeVar = StringVar()
         self.TotalTimeVar.set('--:--')
@@ -129,7 +138,7 @@ class MusicPlayer:
         self.master.bind('<Control-p>', self.GetPlaylist)
         self.master.bind('<MouseWheel>', self.MouseWheel)
         self.master.bind('<Delete>', self.RemoveFromList)
-        self.master.bind('<Control-P>', self.SavePlaylist)
+        self.master.bind('<Control-s>', self.SavePlaylist)
         self.AudioSlider.bind('<Button-3>', self.SkipAudio)
         self.AudioListBox.bind('<Button-3>', self.RightClick)
         self.AudioListBox.bind('<Button-1>', self.SingleClick)
@@ -151,6 +160,8 @@ class MusicPlayer:
         self.master.bind('<Control-Left>', lambda event: self.SkipAudio(event, 'backward'))
         self.master.bind('<Control-a>', lambda e: self.AudioListBox.selection_set(0, 'end'))
         self.master.bind('<Control-A>', lambda e: self.AudioListBox.selection_set(0, 'end'))
+        self.AudioListBox.bind('<Control-Left>', lambda event: self.SkipAudio(event, 'backward'))
+        self.AudioListBox.bind('<Control-Right>', lambda event: self.SkipAudio(event, 'forward'))
         self.master.bind('<Left>', lambda event, change='decrease': self.ChangeVolume(event, change))
         self.master.bind('<Right>', lambda event, change='increase': self.ChangeVolume(event, change))
         self.AudioListBox.bind('<Left>', lambda event, change='decrease': self.ChangeVolume(event, change))
@@ -265,7 +276,7 @@ class MusicPlayer:
         if self.ClickedAtEmptySpace():
             return 'break'
 
-        if self.AudioListBox.itemcget(self.AudioListBox.nearest(event.y), 'bg') == 'grey':
+        if self.AudioListBox.itemcget(self.AudioListBox.nearest(event.y), 'bg') == '#809cb6':
             self.AudioListBox.select_clear(0, 'end')
             self.SelectIndex = self.AudioListBox.nearest(event.y)
             return 'break'
@@ -294,11 +305,28 @@ class MusicPlayer:
     def OpenFiles(self, event=None, files=None):
         '''Open dialog box to select audio files'''
 
+        ShowErrorMessage = False
+
         if files is None:
             files = filedialog.askopenfilenames(filetypes=self.extensions, initialdir=os.getcwd(), defaultextension=self.extensions)
 
         if files:
-            self.AudioFiles.update({os.path.basename(f): f for f in files})
+            for file in files:
+                try:
+                    pygame.mixer.music.set_volume(0)
+                    MP3(file).info.length
+                    pygame.mixer.music.load(file)
+                    pygame.mixer.music.play()
+                    self.AudioFiles.update({os.path.basename(file): file})
+
+                except (pygame.error, HeaderNotFoundError):
+                    if ShowErrorMessage is False:
+                        ShowErrorMessage = True
+                        messagebox.showinfo('ERR', 'Some audio file(s) are not supported so ignoring them')
+
+                pygame.mixer.music.stop()
+                pygame.mixer.music.set_volume(100)
+
             self.AudioListBoxVar.set(list(self.AudioFiles.keys()))
 
             if self.CurrentPlayingIndex == -1:
@@ -331,18 +359,15 @@ class MusicPlayer:
     def SpaceBind(self, event=None):
         '''When user presses SPACE key'''
 
-        CurrentIndex = self.AudioListBox.curselection()
+        CurrentIndex = self.SelectIndex
 
-        if CurrentIndex:
-            CurrentIndex = CurrentIndex[0]
+        if CurrentIndex != self.CurrentPlayingIndex:
+            self.isPlaying = None
 
-            if CurrentIndex != self.CurrentPlayingIndex:
-                self.isPlaying = None
+            if self.CurrentPlayingIndex != -1:
+                self.AudioListBox.itemconfig(self.CurrentPlayingIndex, bg='white', fg='purple')
 
-                if self.CurrentPlayingIndex != -1:
-                    self.AudioListBox.itemconfig(self.CurrentPlayingIndex, bg='white', fg='purple')
-
-                self.CurrentPlayingIndex = CurrentIndex
+            self.CurrentPlayingIndex = CurrentIndex
 
         self.PlayOrPauseAudio()
 
@@ -351,17 +376,9 @@ class MusicPlayer:
 
         try:
             if self.isPlaying is None:  # When any audio is not played before
-                CurrentSelection = self.AudioListBox.curselection()
-
-                if CurrentSelection:
-                    CurrentSelection = CurrentSelection[0]
-
-                else:
-                    CurrentSelection = 0
-
-                self.CurrentPlayingIndex = self.SelectIndex = CurrentSelection
+                self.CurrentPlayingIndex = self.SelectIndex
                 self.AudioListBox.selection_set(self.CurrentPlayingIndex)
-                self.AudioListBox.itemconfig(self.CurrentPlayingIndex, bg='grey', fg='white')
+                self.AudioListBox.itemconfig(self.CurrentPlayingIndex, bg='#809cb6', fg='white')
                 self.AudioListBox.selection_clear(0, 'end')
                 self.AudioName = self.AudioListBox.get(self.CurrentPlayingIndex)
                 self.CurrentAudioPath = self.AudioFiles[self.AudioName]
@@ -400,10 +417,6 @@ class MusicPlayer:
 
             self.PlayButton.config(image=img)
 
-        except pygame.error:
-            self.isPlaying = None
-            messagebox.showinfo('ERR', 'Audio format not supported')
-
         except TclError:  # when user tries to play audio when no audio was added before
             pass
 
@@ -416,6 +429,7 @@ class MusicPlayer:
             if self.ScaleTimer:
                 self.master.after_cancel(self.ScaleTimer)
 
+            self.SelectIndex = 0
             self.isPlaying = None
             self.AudioSliderVar.set(0)
             self.AudioListBox.itemconfig(self.CurrentPlayingIndex, fg='purple', bg='white')
@@ -440,7 +454,7 @@ class MusicPlayer:
         if self.CurrentPlayingIndex == len(self.AudioFiles) - 1 and self.EOF is False:
             self.EOF = True
 
-        if int(self.CurrentPos) == int(self.TotalTime):  # Checking if audio has complete playing
+        if int(self.CurrentPos) >= int(self.TotalTime):  # Checking if audio has complete playing
             self.master.after_cancel(self.ScaleTimer)
             self.isPlaying = None
 
@@ -513,6 +527,7 @@ class MusicPlayer:
                     self.AudioListBox.itemconfig(self.CurrentPlayingIndex, bg='white', fg='purple')
                     self.CurrentPlayingIndex += 1
 
+                self.SelectIndex = self.CurrentPlayingIndex
                 self.AudioListBox.selection_clear(0, 'end')
                 self.AudioListBox.see(self.CurrentPlayingIndex)
                 self.AudioListBox.selection_set(self.CurrentPlayingIndex)
@@ -552,7 +567,7 @@ class MusicPlayer:
                 messagebox.showinfo('Saved!', 'Playlist Saved !!')
 
         else:
-            messagebox.showinfo('ERR', 'No audio found to save in Playlist')
+            winsound.MessageBeep()
 
     def ShowRemainingTime(self, event=None):
         '''Show remaining time of current playing audio'''
@@ -713,10 +728,11 @@ class MusicPlayer:
                 if CurrentIndex < len(self.AudioFiles) - 1:
                     CurrentIndex += 1
 
+            self.SelectIndex = CurrentIndex
             self.AudioListBox.see(CurrentIndex)
             self.AudioListBox.selection_clear(0, 'end')
 
-            if self.AudioListBox.itemcget(CurrentIndex, 'bg') != 'grey':
+            if self.AudioListBox.itemcget(CurrentIndex, 'bg') != '#809cb6':
                 self.AudioListBox.selection_set(CurrentIndex)
 
     def MultipleSelectionOneByOne(self, event=None):
@@ -730,6 +746,9 @@ class MusicPlayer:
         else:
             self.AudioListBox.selection_set(self.SelectIndex)
             self.AudioListBox.activate(self.SelectIndex)
+
+        if not self.AudioListBox.curselection():
+            self.SelectIndex = self.CurrentPlayingIndex
 
     def shift_multiple_selection(self, event=None):
         '''Select multiple items in list-box holding shift key'''
