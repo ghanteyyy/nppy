@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import json
+import random
 import winsound
 from tkinter import *
 from tkinter import font
@@ -30,6 +31,7 @@ class MusicPlayer:
         self.CurrentPlayingIndex = -1  # Index of current playing audio
         self.EOF = False  # Trigger to check if the last songs is about to play
         self.PlaylistPath = os.path.abspath(os.path.join('.', 'playlists.json'))
+        self.PlayRandom = False  # Track if Random Button has been pressed or not
         self.RemTimer = None  # Stores an alarm to call change_time function in every 500 ms
         self.PreviousVolume = None  # Store previous value of volumen before muting and unmuting
         self.ScaleTimer = None  # Stores an alarm to call update_scale function in every 1000 ms
@@ -44,12 +46,14 @@ class MusicPlayer:
         self.master.title('Music Player')
 
         self.PlayImage = PhotoImage(file=self.ResourcePath('Play.png'))
-        self.StopAudioImage = PhotoImage(file=self.ResourcePath('Stop.png'))
         self.NextImage = PhotoImage(file=self.ResourcePath('Next.png'))
         self.MuteImage = PhotoImage(file=self.ResourcePath('Mute.png'))
         self.PauseImage = PhotoImage(file=self.ResourcePath('Pause.png'))
         self.UnmuteImage = PhotoImage(file=self.ResourcePath('Unmute.png'))
+        self.StopAudioImage = PhotoImage(file=self.ResourcePath('Stop.png'))
         self.PreviousImage = PhotoImage(file=self.ResourcePath('Previous.png'))
+        self.RandomActiveImage = PhotoImage(file=self.ResourcePath('RandomActive.png'))
+        self.RandomDisabledImage = PhotoImage(file=self.ResourcePath('RandomDisabled.png'))
 
         self.container = Frame(self.master)
         self.container.pack()
@@ -103,6 +107,8 @@ class MusicPlayer:
         self.ButtonsAttributes = {'bd': '0', 'bg': 'white', 'activebackground': 'white', 'takefocus': False}
 
         self.ButtonsFrame = Frame(self.BottomFrame)
+        self.ButtonsFrame.pack(side=LEFT)
+
         self.PlayButton = Button(self.ButtonsFrame, image=self.PlayImage, **self.ButtonsAttributes, command=self.PlayOrPauseAudio)
         self.PlayButton.pack(side=LEFT)
         self.PreviousButton = Button(self.ButtonsFrame, image=self.PreviousImage, **self.ButtonsAttributes, command=lambda: self.PreviousNextSong(button_name='prev'))
@@ -111,7 +117,8 @@ class MusicPlayer:
         self.StopAudioButton.pack(side=LEFT)
         self.NextButton = Button(self.ButtonsFrame, image=self.NextImage, **self.ButtonsAttributes, command=self.PreviousNextSong)
         self.NextButton.pack(side=LEFT, padx=2)
-        self.ButtonsFrame.pack(side=LEFT)
+        self.RandomButton = Button(self.ButtonsFrame, image=self.RandomDisabledImage, **self.ButtonsAttributes, command=self.ToggleRandom)
+        self.RandomButton.pack(side=LEFT)
 
         self.VolumeFrame = Frame(self.BottomFrame)
         self.MuteUnmuteButton = Button(self.VolumeFrame, image=self.UnmuteImage, **self.ButtonsAttributes, command=self.MuteUnmuteVolume)
@@ -371,6 +378,17 @@ class MusicPlayer:
 
         self.PlayOrPauseAudio()
 
+    def ToggleRandom(self, event=None):
+        '''When user clicks random button'''
+
+        if self.PlayRandom is False:
+            self.PlayRandom = True
+            self.RandomButton.config(image=self.RandomActiveImage)
+
+        else:
+            self.PlayRandom = False
+            self.RandomButton.config(image=self.RandomDisabledImage)
+
     def PlayOrPauseAudio(self, event=None):
         '''Play or pause audio when play or pause button is pressed'''
 
@@ -451,12 +469,11 @@ class MusicPlayer:
         self.EscapedTimeVar.set(time.strftime('%H:%M:%S', time.gmtime(self.CurrentPos)))
         self.AudioSliderVar.set(int(self.CurrentPos))
 
-        if self.CurrentPlayingIndex == len(self.AudioFiles) - 1 and self.EOF is False:
+        if self.CurrentPlayingIndex == len(self.AudioFiles) - 1 and self.EOF is False and self.PlayRandom is False:
             self.EOF = True
 
         if int(self.CurrentPos) >= int(self.TotalTime):  # Checking if audio has complete playing
             self.master.after_cancel(self.ScaleTimer)
-            self.isPlaying = None
 
             self.AudioSliderVar.set(0)
             self.TotalTimeVar.set('--:--')
@@ -468,7 +485,9 @@ class MusicPlayer:
                 self.ShowRemTime = False
                 self.PlayButton.config(image=self.PlayImage)
 
-                self.master.after_cancel(self.RemTimer)
+                if self.RemTimer:
+                    self.master.after_cancel(self.RemTimer)
+
                 self.AudioListBox.selection_clear(0, 'end')
                 self.AudioListBox.selection_set(0)
 
@@ -510,24 +529,30 @@ class MusicPlayer:
         '''Play previous and present audio present in list-box'''
 
         try:
-            if self.CurrentPlayingIndex > -1:
-                from_list_box = self.AudioListBoxVar.get()
-
-                if button_name == 'prev':  # If previous buttons is clicked
-                    if self.CurrentPlayingIndex == 0:
-                        return
-
+            if self.AudioFiles:
+                if self.PlayRandom:
+                    self.SelectIndex = random.randint(0, len(self.AudioFiles) - 1)
                     self.AudioListBox.itemconfig(self.CurrentPlayingIndex, bg='white', fg='purple')
-                    self.CurrentPlayingIndex -= 1
 
-                else:  # If next button is clicked
-                    if self.CurrentPlayingIndex == len(from_list_box) - 1:
-                        return
+                elif self.CurrentPlayingIndex > -1:
+                    from_list_box = self.AudioListBoxVar.get()
 
-                    self.AudioListBox.itemconfig(self.CurrentPlayingIndex, bg='white', fg='purple')
-                    self.CurrentPlayingIndex += 1
+                    if button_name == 'prev':  # If previous buttons is clicked
+                        if self.CurrentPlayingIndex == 0:
+                            return
 
-                self.SelectIndex = self.CurrentPlayingIndex
+                        self.AudioListBox.itemconfig(self.CurrentPlayingIndex, bg='white', fg='purple')
+                        self.CurrentPlayingIndex -= 1
+
+                    else:  # If next button is clicked
+                        if self.CurrentPlayingIndex == len(from_list_box) - 1:
+                            return
+
+                        self.AudioListBox.itemconfig(self.CurrentPlayingIndex, bg='white', fg='purple')
+                        self.CurrentPlayingIndex += 1
+
+                    self.SelectIndex = self.CurrentPlayingIndex
+
                 self.AudioListBox.selection_clear(0, 'end')
                 self.AudioListBox.see(self.CurrentPlayingIndex)
                 self.AudioListBox.selection_set(self.CurrentPlayingIndex)
