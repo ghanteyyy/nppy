@@ -25,9 +25,10 @@ class MusicPlayer:
         pygame.mixer.init()
 
         self.AudioFiles = dict()
-        self.WindowNotMapped = False
         self.extensions = [('Music Files', '*.mp3')]
+        self.RepeatAudio = None  # Track the state of Repeat Button
         self.AudioName = None  # Store currently playing song's name
+        self.WindowNotMapped = False  # Track if window is minimized
         self.CurrentPlayingIndex = -1  # Index of current playing audio
         self.EOF = False  # Trigger to check if the last songs is about to play
         self.PlaylistPath = os.path.abspath(os.path.join('.', 'playlists.json'))
@@ -52,7 +53,9 @@ class MusicPlayer:
         self.UnmuteImage = PhotoImage(file=self.ResourcePath('Unmute.png'))
         self.StopAudioImage = PhotoImage(file=self.ResourcePath('Stop.png'))
         self.PreviousImage = PhotoImage(file=self.ResourcePath('Previous.png'))
+        self.RepeatAllImage = PhotoImage(file=self.ResourcePath('RepeatAll.png'))
         self.RandomActiveImage = PhotoImage(file=self.ResourcePath('RandomActive.png'))
+        self.RepeatCurrentImage = PhotoImage(file=self.ResourcePath('RepeatCurrent.png'))
         self.RandomDisabledImage = PhotoImage(file=self.ResourcePath('RandomDisabled.png'))
 
         self.container = Frame(self.master)
@@ -63,10 +66,11 @@ class MusicPlayer:
         self.Menu.add_cascade(label='File', menu=self.FileMenu)
         self.master.config(menu=self.Menu)
 
-        self.FileMenu.add_command(label='Open', accelerator=f'{" " * 10}Ctrl + O', command=self.OpenFiles)
-        self.FileMenu.add_command(label='Open Playlist', accelerator=f'{" " * 10}Ctrl + P', command=self.GetPlaylist)
-        self.FileMenu.add_command(label='Save Playlist', accelerator=f'{" " * 10}Ctrl + S', command=self.SavePlaylist)
-        self.FileMenu.add_command(label='Exit', accelerator=f'{" " * 10}Ctrl + Q', command=self.master.destroy)
+        self.EmptySpace = ' ' * 10
+        self.FileMenu.add_command(label='Open', accelerator=f'{self.EmptySpace}Ctrl + O', command=self.OpenFiles)
+        self.FileMenu.add_command(label='Open Playlist', accelerator=f'{self.EmptySpace}Ctrl + P', command=self.GetPlaylist)
+        self.FileMenu.add_command(label='Save Playlist', accelerator=f'{self.EmptySpace}Ctrl + S', command=self.SavePlaylist)
+        self.FileMenu.add_command(label='Exit', accelerator=f'{self.EmptySpace}Ctrl + Q', command=self.master.destroy)
 
         self.AudioListFrame = Frame(self.container)
         self.AudioListFrame.pack()
@@ -111,14 +115,16 @@ class MusicPlayer:
 
         self.PlayButton = Button(self.ButtonsFrame, image=self.PlayImage, **self.ButtonsAttributes, command=self.PlayOrPauseAudio)
         self.PlayButton.pack(side=LEFT)
-        self.PreviousButton = Button(self.ButtonsFrame, image=self.PreviousImage, **self.ButtonsAttributes, command=lambda: self.PreviousNextSong(button_name='prev'))
+        self.PreviousButton = Button(self.ButtonsFrame, image=self.PreviousImage, **self.ButtonsAttributes, command=lambda: self.PreviousNextAudio(button_name='prev'))
         self.PreviousButton.pack(side=LEFT, padx=2, ipady=5)
         self.StopAudioButton = Button(self.ButtonsFrame, image=self.StopAudioImage, **self.ButtonsAttributes, command=self.StopAudio)
         self.StopAudioButton.pack(side=LEFT)
-        self.NextButton = Button(self.ButtonsFrame, image=self.NextImage, **self.ButtonsAttributes, command=self.PreviousNextSong)
+        self.NextButton = Button(self.ButtonsFrame, image=self.NextImage, **self.ButtonsAttributes, command=self.PreviousNextAudio)
         self.NextButton.pack(side=LEFT, padx=2)
+        self.RepeatButton = Button(self.ButtonsFrame, image=self.RepeatAllImage, **self.ButtonsAttributes, command=self.ToggleRepeat)
+        self.RepeatButton.pack(side=LEFT)
         self.RandomButton = Button(self.ButtonsFrame, image=self.RandomDisabledImage, **self.ButtonsAttributes, command=self.ToggleRandom)
-        self.RandomButton.pack(side=LEFT)
+        self.RandomButton.pack(side=LEFT, padx=2)
 
         self.VolumeFrame = Frame(self.BottomFrame)
         self.MuteUnmuteButton = Button(self.VolumeFrame, image=self.UnmuteImage, **self.ButtonsAttributes, command=self.MuteUnmuteVolume)
@@ -134,6 +140,8 @@ class MusicPlayer:
 
         self.master.bind('<s>', self.StopAudio)
         self.master.bind('<S>', self.StopAudio)
+        self.master.bind('<r>', self.ToggleRandom)
+        self.master.bind('<R>', self.ToggleRandom)
         self.master.bind('<space>', self.SpaceBind)
         self.master.bind('<Return>', self.ReturnBind)
         self.master.bind('<m>', self.MuteUnmuteVolume)
@@ -146,6 +154,7 @@ class MusicPlayer:
         self.master.bind('<MouseWheel>', self.MouseWheel)
         self.master.bind('<Delete>', self.RemoveFromList)
         self.master.bind('<Control-s>', self.SavePlaylist)
+        self.master.bind('<Control-r>', self.ToggleRepeat)
         self.AudioSlider.bind('<Button-3>', self.SkipAudio)
         self.AudioListBox.bind('<Button-3>', self.RightClick)
         self.AudioListBox.bind('<Button-1>', self.SingleClick)
@@ -158,10 +167,10 @@ class MusicPlayer:
         self.AudioSlider.bind('<ButtonRelease-1>', self.ClickInMotionReleased)
         self.AudioSlider.bind('<ButtonRelease-3>', self.ClickInMotionReleased)
         self.AudioListBox.bind('<Shift-Button-1>', self.shift_multiple_selection)
-        self.master.bind('<n>', lambda event: self.PreviousNextSong(event, 'next'))
-        self.master.bind('<N>', lambda event: self.PreviousNextSong(event, 'next'))
-        self.master.bind('<p>', lambda event: self.PreviousNextSong(event, 'prev'))
-        self.master.bind('<P>', lambda event: self.PreviousNextSong(event, 'prev'))
+        self.master.bind('<n>', lambda event: self.PreviousNextAudio(event, 'next'))
+        self.master.bind('<N>', lambda event: self.PreviousNextAudio(event, 'next'))
+        self.master.bind('<p>', lambda event: self.PreviousNextAudio(event, 'prev'))
+        self.master.bind('<P>', lambda event: self.PreviousNextAudio(event, 'prev'))
         self.AudioListBox.bind('<Control-Button-1>', self.MultipleSelectionOneByOne)
         self.master.bind('<Control-Right>', lambda event: self.SkipAudio(event, 'forward'))
         self.master.bind('<Control-Left>', lambda event: self.SkipAudio(event, 'backward'))
@@ -249,7 +258,7 @@ class MusicPlayer:
             self.isButtonInMotion = True
 
     def ClickInMotionReleased(self, event=None):
-        '''When user stops dragging left or right'''
+        '''When user stops dragging left or right the AudioSlider'''
 
         if self.isButtonInMotion:
             self.isButtonInMotion = False
@@ -389,51 +398,71 @@ class MusicPlayer:
             self.PlayRandom = False
             self.RandomButton.config(image=self.RandomDisabledImage)
 
+    def ToggleRepeat(self, event=None):
+        '''When user clicks repeat button'''
+
+        if self.RepeatAudio is None:  # Button has not clicked yet
+            self.RepeatAudio = 'LoopAll'
+            self.RepeatButton.config(relief='sunken')
+
+        elif self.RepeatAudio == 'LoopAll':
+            self.RepeatAudio = 'LoopCurrent'
+            self.RepeatButton.config(image=self.RepeatCurrentImage)
+
+        elif self.RepeatAudio == 'LoopCurrent':
+            self.RepeatAudio = None
+            self.RepeatButton.config(image=self.RepeatAllImage, relief='raised')
+
     def PlayOrPauseAudio(self, event=None):
         '''Play or pause audio when play or pause button is pressed'''
 
         try:
-            if self.isPlaying is None:  # When any audio is not played before
-                self.CurrentPlayingIndex = self.SelectIndex
-                self.AudioListBox.selection_set(self.CurrentPlayingIndex)
-                self.AudioListBox.itemconfig(self.CurrentPlayingIndex, bg='#809cb6', fg='white')
-                self.AudioListBox.selection_clear(0, 'end')
-                self.AudioName = self.AudioListBox.get(self.CurrentPlayingIndex)
-                self.CurrentAudioPath = self.AudioFiles[self.AudioName]
+            if self.AudioFiles:
+                if self.isPlaying is None:  # When any audio is not played before
+                    self.CurrentPlayingIndex = self.SelectIndex
+                    self.AudioListBox.selection_set(self.CurrentPlayingIndex)
+                    self.AudioListBox.itemconfig(self.CurrentPlayingIndex, bg='#809cb6', fg='white')
+                    self.AudioListBox.selection_clear(0, 'end')
+                    self.AudioName = self.AudioListBox.get(self.CurrentPlayingIndex)
+                    self.CurrentAudioPath = self.AudioFiles[self.AudioName]
 
-                self.isPlaying = True  # Here, True represents that the music is being played.
-                img = self.PauseImage
-                pygame.mixer.music.load(self.CurrentAudioPath)  # Loading selected file for playing
-                pygame.mixer.music.play()  # Start playing loaded file
+                    self.isPlaying = True  # Here, True represents that the music is being played.
+                    img = self.PauseImage
 
-                self.TotalTime = MP3(self.CurrentAudioPath).info.length  # Getting audio length
-                self.AudioSlider.config(to=int(self.TotalTime))
-                self.AudioSliderVar.set(0)
-                self.AudioListBox.see(self.CurrentPlayingIndex)  # Scrolling to currently playing audio
-                self.TotalTimeVar.set(time.strftime('%H:%M:%S', time.gmtime(self.TotalTime)))
-                self.AudioListBox.selection_clear(0, 'end')
+                    pygame.mixer.music.load(self.CurrentAudioPath)  # Loading selected file for playing
+                    pygame.mixer.music.play()  # Start playing loaded file
 
-                if self.CurrentPlayingIndex != len(self.AudioFiles) - 1:
-                    self.EOF = False  # Here, setting self.EOF to False means last song is not being played yet
+                    self.TotalTime = MP3(self.CurrentAudioPath).info.length  # Getting audio length
+                    self.AudioSlider.config(to=int(self.TotalTime))
+                    self.AudioSliderVar.set(0)
+                    self.AudioListBox.see(self.CurrentPlayingIndex)  # Scrolling to currently playing audio
+                    self.TotalTimeVar.set(time.strftime('%H:%M:%S', time.gmtime(self.TotalTime)))
+                    self.AudioListBox.selection_clear(0, 'end')
 
-                if self.ScaleTimer:
+                    if self.CurrentPlayingIndex != len(self.AudioFiles) - 1:
+                        self.EOF = False  # Here, setting self.EOF to False means last song is not being played yet
+
+                    if self.ScaleTimer:
+                        self.master.after_cancel(self.ScaleTimer)
+
+                    self.UpdateScale()
+
+                elif self.isPlaying is True:  # Pausing audio when another audio is playing
+                    pygame.mixer.music.pause()
+                    img = self.PlayImage
+                    self.isPlaying = False
                     self.master.after_cancel(self.ScaleTimer)
 
-                self.UpdateScale()
+                elif self.isPlaying is False:  # Resume playing audio from where the audio is paused
+                    self.isPlaying = True
+                    img = self.PauseImage
+                    pygame.mixer.music.play(start=self.AudioSliderVar.get())
+                    self.UpdateScale()
 
-            elif self.isPlaying is True:  # Pausing audio when another audio is playing
-                pygame.mixer.music.pause()
-                img = self.PlayImage
-                self.isPlaying = False
-                self.master.after_cancel(self.ScaleTimer)
+                self.PlayButton.config(image=img)
 
-            elif self.isPlaying is False:  # Resume playing audio from where the audio is paused
-                self.isPlaying = True
-                img = self.PauseImage
-                pygame.mixer.music.play(start=self.AudioSliderVar.get())
-                self.UpdateScale()
-
-            self.PlayButton.config(image=img)
+            else:
+                winsound.MessageBeep()
 
         except TclError:  # when user tries to play audio when no audio was added before
             pass
@@ -457,6 +486,9 @@ class MusicPlayer:
             self.AudioListBox.selection_clear(0, 'end')
             self.PlayButton.config(image=self.PlayImage)
 
+        else:
+            winsound.MessageBeep()
+
     def UpdateScale(self, event=None):
         '''Continuously update escaping time and slider values
            until songs comes to end'''
@@ -469,15 +501,19 @@ class MusicPlayer:
         self.EscapedTimeVar.set(time.strftime('%H:%M:%S', time.gmtime(self.CurrentPos)))
         self.AudioSliderVar.set(int(self.CurrentPos))
 
-        if self.CurrentPlayingIndex == len(self.AudioFiles) - 1 and self.EOF is False and self.PlayRandom is False:
-            self.EOF = True
-
         if int(self.CurrentPos) >= int(self.TotalTime):  # Checking if audio has complete playing
             self.master.after_cancel(self.ScaleTimer)
 
             self.AudioSliderVar.set(0)
             self.TotalTimeVar.set('--:--')
             self.EscapedTimeVar.set('--:--')
+
+            if self.CurrentPlayingIndex == len(self.AudioFiles) - 1:
+                if self.RepeatAudio == 'LoopAll' or self.PlayRandom:
+                    self.EOF = False
+
+                else:
+                    self.EOF = True
 
             if self.EOF:
                 self.EOF = False
@@ -493,8 +529,22 @@ class MusicPlayer:
 
                 self.AudioListBox.itemconfig(self.CurrentPlayingIndex, bg='white', fg='purple')
 
+            elif self.RepeatAudio == 'LoopCurrent':
+                self.isPlaying = None
+                self.PlayOrPauseAudio()
+
+            elif self.RepeatAudio == 'LoopAll' and self.CurrentPlayingIndex == len(self.AudioFiles) - 1:
+                if self.PlayRandom is True:
+                    self.PreviousNextAudio(button_name='next')
+
+                else:
+                    self.SelectIndex = 0
+                    self.isPlaying = None
+                    self.AudioListBox.itemconfig(self.CurrentPlayingIndex, bg='white', fg='purple')
+                    self.PlayOrPauseAudio()
+
             else:
-                self.PreviousNextSong(button_name='next')
+                self.PreviousNextAudio(button_name='next')
 
         else:
             self.ScaleTimer = self.master.after(1000, self.UpdateScale)
@@ -509,7 +559,7 @@ class MusicPlayer:
                 SkipAt += 5
 
                 if SkipAt >= self.TotalTime:
-                    self.PreviousNextSong()
+                    self.PreviousNextAudio()
                     return
 
             elif direction == 'backward' or (not(isinstance(event, str)) and event.delta < 0):
@@ -525,7 +575,7 @@ class MusicPlayer:
 
             self.EscapedTimeVar.set(time.strftime('%H:%M:%S', time.gmtime(SkipAt)))
 
-    def PreviousNextSong(self, event=None, button_name=None):
+    def PreviousNextAudio(self, event=None, button_name=None):
         '''Play previous and present audio present in list-box'''
 
         try:
@@ -559,6 +609,9 @@ class MusicPlayer:
                 self.isPlaying = None
                 self.PlayOrPauseAudio()
 
+            else:
+                winsound.MessageBeep()
+
         except TclError:
             pass
 
@@ -581,6 +634,9 @@ class MusicPlayer:
                     files.remove(path)
 
             self.OpenFiles(files=files)
+
+        else:
+            winsound.MessageBeep()
 
     def SavePlaylist(self, event=None):
         '''Save audio path present in list-box'''
