@@ -27,6 +27,7 @@ class MusicPlayer:
         self.AudioFiles = dict()
         self.extensions = [('Music Files', '*.mp3')]
         self.RepeatAudio = None  # Track the state of Repeat Button
+        self.IsMuted = False  # Track if audio has been muted or not
         self.AudioName = None  # Store currently playing song's name
         self.WindowNotMapped = False  # Track if window is minimized
         self.CurrentPlayingIndex = -1  # Index of current playing audio
@@ -34,7 +35,7 @@ class MusicPlayer:
         self.PlaylistPath = os.path.abspath(os.path.join('.', 'playlists.json'))
         self.PlayRandom = False  # Track if Random Button has been pressed or not
         self.RemTimer = None  # Stores an alarm to call change_time function in every 500 ms
-        self.PreviousVolume = None  # Store previous value of volumen before muting and unmuting
+        self.PreviousVolume = 100  # Store previous value of volumen before muting and unmuting
         self.ScaleTimer = None  # Stores an alarm to call update_scale function in every 1000 ms
         self.ShowRemTime = False  # Trigger to check if remaining time has showed in total time button
         self.PreviousScaleValue = 0  # Store previous position of AudioSlider to avoid dragging in same position
@@ -68,7 +69,7 @@ class MusicPlayer:
 
         self.EmptySpace = ' ' * 10
         self.FileMenu.add_command(label='Open', accelerator=f'{self.EmptySpace}Ctrl + O', command=self.OpenFiles)
-        self.FileMenu.add_command(label='Open Playlist', accelerator=f'{self.EmptySpace}Ctrl + P', command=self.GetPlaylist)
+        self.FileMenu.add_command(label='Open Playlist', accelerator=f'{self.EmptySpace}Ctrl + Shift + O', command=self.GetPlaylist)
         self.FileMenu.add_command(label='Save Playlist', accelerator=f'{self.EmptySpace}Ctrl + S', command=self.SavePlaylist)
         self.FileMenu.add_command(label='Exit', accelerator=f'{self.EmptySpace}Ctrl + Q', command=self.master.destroy)
 
@@ -139,25 +140,23 @@ class MusicPlayer:
         self.StopWindowFlicking()
 
         self.master.bind('<s>', self.StopAudio)
-        self.master.bind('<S>', self.StopAudio)
-        self.master.bind('<r>', self.ToggleRandom)
-        self.master.bind('<R>', self.ToggleRandom)
         self.master.bind('<space>', self.SpaceBind)
         self.master.bind('<Return>', self.ReturnBind)
-        self.master.bind('<m>', self.MuteUnmuteVolume)
-        self.master.bind('<M>', self.MuteUnmuteVolume)
         self.master.bind('<Up>', self.UpDownDirection)
         self.master.bind('<Control-o>', self.OpenFiles)
-        self.master.bind('<Control-O>', self.OpenFiles)
+        self.master.bind('<Control-S>', self.StopAudio)
         self.master.bind('<Down>', self.UpDownDirection)
-        self.master.bind('<Control-p>', self.GetPlaylist)
+        self.master.bind('<Control-O>', self.GetPlaylist)
         self.master.bind('<MouseWheel>', self.MouseWheel)
         self.master.bind('<Delete>', self.RemoveFromList)
         self.master.bind('<Control-s>', self.SavePlaylist)
+        self.master.bind('<Control-R>', self.ToggleRandom)
         self.master.bind('<Control-r>', self.ToggleRepeat)
         self.AudioSlider.bind('<Button-3>', self.SkipAudio)
         self.AudioListBox.bind('<Button-3>', self.RightClick)
+        self.master.bind('<Control-P>', self.PlayOrPauseAudio)
         self.AudioListBox.bind('<Button-1>', self.SingleClick)
+        self.master.bind('<Control-m>', self.MuteUnmuteVolume)
         self.AudioSlider.bind('<B1-Motion>', self.ClickInMotion)
         self.AudioSlider.bind('<B3-Motion>', self.ClickInMotion)
         self.AudioListBox.bind('<Double-Button-1>', self.DoubleClick)
@@ -167,15 +166,12 @@ class MusicPlayer:
         self.AudioSlider.bind('<ButtonRelease-1>', self.ClickInMotionReleased)
         self.AudioSlider.bind('<ButtonRelease-3>', self.ClickInMotionReleased)
         self.AudioListBox.bind('<Shift-Button-1>', self.shift_multiple_selection)
-        self.master.bind('<n>', lambda event: self.PreviousNextAudio(event, 'next'))
-        self.master.bind('<N>', lambda event: self.PreviousNextAudio(event, 'next'))
-        self.master.bind('<p>', lambda event: self.PreviousNextAudio(event, 'prev'))
-        self.master.bind('<P>', lambda event: self.PreviousNextAudio(event, 'prev'))
         self.AudioListBox.bind('<Control-Button-1>', self.MultipleSelectionOneByOne)
         self.master.bind('<Control-Right>', lambda event: self.SkipAudio(event, 'forward'))
         self.master.bind('<Control-Left>', lambda event: self.SkipAudio(event, 'backward'))
+        self.master.bind('<Control-n>', lambda event: self.PreviousNextAudio(event, 'next'))
         self.master.bind('<Control-a>', lambda e: self.AudioListBox.selection_set(0, 'end'))
-        self.master.bind('<Control-A>', lambda e: self.AudioListBox.selection_set(0, 'end'))
+        self.master.bind('<Control-p>', lambda event: self.PreviousNextAudio(event, 'prev'))
         self.AudioListBox.bind('<Control-Left>', lambda event: self.SkipAudio(event, 'backward'))
         self.AudioListBox.bind('<Control-Right>', lambda event: self.SkipAudio(event, 'forward'))
         self.master.bind('<Left>', lambda event, change='decrease': self.ChangeVolume(event, change))
@@ -341,7 +337,9 @@ class MusicPlayer:
                         messagebox.showinfo('ERR', 'Some audio file(s) are not supported so ignoring them')
 
                 pygame.mixer.music.stop()
-                pygame.mixer.music.set_volume(100)
+
+            if self.IsMuted is False:
+                pygame.mixer.music.set_volume(self.PreviousVolume / 100)
 
             self.AudioListBoxVar.set(list(self.AudioFiles.keys()))
 
@@ -673,8 +671,9 @@ class MusicPlayer:
     def MuteUnmuteVolume(self, event=None):
         '''Mute and Unmute volume'''
 
-        if self.PreviousVolume is None:  # Volume is not muted before
-            self.PreviousVolume = int(self.VolumeLabelVar.get()[:-1])
+        if self.IsMuted is False:  # Volume is not muted before
+            self.IsMuted = True
+            self.PreviousVolume = self.VolumeSliderVar.get()
             self.MuteUnmuteButton.config(image=self.MuteImage)
             self.VolumeSlider.config(state='disabled')
             self.VolumeLabelVar.set('0%')
@@ -682,12 +681,12 @@ class MusicPlayer:
             self.VolumeSliderVar.set(0)
 
         else:  # Volume is muted before
+            self.IsMuted = False
             self.VolumeSlider.config(state='normal')
             self.VolumeSliderVar.set(self.PreviousVolume)
             pygame.mixer.music.set_volume(self.PreviousVolume / 100)
             self.VolumeLabelVar.set(f'{self.PreviousVolume}%')
             self.MuteUnmuteButton.config(image=self.UnmuteImage)
-            self.PreviousVolume = None
 
     def ChangeVolume(self, event=None, change=None):
         '''Increase or decrease volume when user drags volume bar or
@@ -709,17 +708,13 @@ class MusicPlayer:
                 CurrentVolume = 00
 
         if CurrentVolume == 0:
-            self.PreviousVolume = None
+            self.IsMuted = False
 
         else:
+            self.IsMuted = True
             self.PreviousVolume = CurrentVolume
 
         self.MuteUnmuteVolume()
-
-        self.VolumeSliderVar.set(CurrentVolume)
-        CurrentVolume /= 100
-        pygame.mixer.music.set_volume(CurrentVolume)
-        self.VolumeLabelVar.set(f'{int(CurrentVolume * 100)}%')
 
         return 'break'
 
