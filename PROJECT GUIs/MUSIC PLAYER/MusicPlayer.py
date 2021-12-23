@@ -24,7 +24,10 @@ class MusicPlayer:
     def __init__(self):
         pygame.mixer.init()
 
+        self.PrevSearchChar = ''
         self.AudioFiles = dict()
+        self.SearchLocalIndex = 0
+        self.SearchGlobalIndex = None
         self.extensions = [('Music Files', '*.mp3')]
         self.RepeatAudio = None  # Track the state of Repeat Button
         self.IsMuted = False  # Track if audio has been muted or not
@@ -35,7 +38,7 @@ class MusicPlayer:
         self.PlaylistPath = os.path.abspath(os.path.join('.', 'playlists.json'))
         self.PlayRandom = False  # Track if Random Button has been pressed or not
         self.RemTimer = None  # Stores an alarm to call change_time function in every 500 ms
-        self.PreviousVolume = 100  # Store previous value of volumen before muting and unmuting
+        self.PreviousVolume = 100  # Store previous value of volume before muting and unmuting
         self.ScaleTimer = None  # Stores an alarm to call update_scale function in every 1000 ms
         self.ShowRemTime = False  # Trigger to check if remaining time has showed in total time button
         self.PreviousScaleValue = 0  # Store previous position of AudioSlider to avoid dragging in same position
@@ -139,7 +142,7 @@ class MusicPlayer:
         self.InitialPosition()
         self.StopWindowFlicking()
 
-        self.master.bind('<s>', self.StopAudio)
+        self.master.bind('<Key>', self.SearchAudio)
         self.master.bind('<space>', self.SpaceBind)
         self.master.bind('<Return>', self.ReturnBind)
         self.master.bind('<Up>', self.UpDownDirection)
@@ -288,11 +291,7 @@ class MusicPlayer:
         if self.ClickedAtEmptySpace():
             return 'break'
 
-        if self.AudioListBox.itemcget(self.AudioListBox.nearest(event.y), 'bg') == '#809cb6':
-            self.AudioListBox.select_clear(0, 'end')
-            self.SelectIndex = self.AudioListBox.nearest(event.y)
-            return 'break'
-
+        self.ResetSearchIndex()
         self.AudioListBox.selection_clear(0, 'end')
         self.SelectIndex = self.AudioListBox.nearest(event.y)
 
@@ -337,6 +336,12 @@ class MusicPlayer:
                         messagebox.showinfo('ERR', 'Some audio file(s) are not supported so ignoring them')
 
                 pygame.mixer.music.stop()
+
+            if self.AudioFiles:
+                self.AudioListBox.config(bg='white')
+
+            else:
+                self.AudioListBox.config(bg='#f9f9fa')
 
             if self.IsMuted is False:
                 pygame.mixer.music.set_volume(self.PreviousVolume / 100)
@@ -468,7 +473,7 @@ class MusicPlayer:
     def StopAudio(self, event=None):
         '''Stop playing audio'''
 
-        if self.isPlaying:
+        if self.isPlaying is not None:
             pygame.mixer.music.stop()
 
             if self.ScaleTimer:
@@ -601,6 +606,7 @@ class MusicPlayer:
 
                     self.SelectIndex = self.CurrentPlayingIndex
 
+                self.ResetSearchIndex()
                 self.AudioListBox.selection_clear(0, 'end')
                 self.AudioListBox.see(self.CurrentPlayingIndex)
                 self.AudioListBox.selection_set(self.CurrentPlayingIndex)
@@ -718,6 +724,47 @@ class MusicPlayer:
 
         return 'break'
 
+    def SearchAudio(self, event=None):
+        '''Highlight audio whose name starts with the given character'''
+
+        char = event.char.lower()
+        files = [f for f in self.AudioFiles.keys() if f.lower().startswith(char)]
+
+        if files:
+            if self.SearchGlobalIndex is not None:
+                self.AudioListBox.itemconfig(self.SearchGlobalIndex, bg='white', fg='purple')
+
+            if self.SearchGlobalIndex == self.CurrentPlayingIndex:
+                self.AudioListBox.itemconfig(self.SearchGlobalIndex, bg='#809cb6', fg='white')
+
+            if self.PrevSearchChar == files[0][0].lower():
+                self.SearchLocalIndex += 1
+
+                if self.SearchLocalIndex == len(files):
+                    self.SearchLocalIndex = 0
+
+            else:
+                self.SearchLocalIndex = 0
+                self.PrevSearchChar = char
+
+            self.SearchGlobalIndex = list(self.AudioFiles.keys()).index(files[self.SearchLocalIndex])
+            self.AudioListBox.see(self.SearchGlobalIndex)
+            self.AudioListBox.itemconfig(self.SearchGlobalIndex, bg='#b3b3b3', fg='black')
+
+    def ResetSearchIndex(self):
+        '''Remove searched highlights'''
+
+        if self.SearchGlobalIndex is not None:
+            if self.SearchGlobalIndex == self.CurrentPlayingIndex:
+                self.AudioListBox.itemconfig(self.SearchGlobalIndex, bg='#809cb6', fg='white')
+
+            else:
+                self.AudioListBox.itemconfig(self.SearchGlobalIndex, bg='white', fg='purple')
+
+            self.SearchGlobalIndex = None
+            self.SearchLocalIndex = 0
+            self.PrevSearchChar = ''
+
     def RightClick(self, event=None):
         '''When user right clicks inside list-box'''
 
@@ -776,6 +823,12 @@ class MusicPlayer:
             else:
                 self.AudioListBox.selection_set(CurrentIndex)
 
+            if self.AudioFiles:
+                self.AudioListBox.config(bg='white')
+
+            else:
+                self.AudioListBox.config(bg='#f9f9fa')
+
     def remove_from_playlist(self, event=None):
         '''Remove selected item from the list-box as well from the playlist file'''
 
@@ -786,6 +839,7 @@ class MusicPlayer:
         '''When user presses up or down arrow'''
 
         direc = event.keysym
+        self.ResetSearchIndex()
 
         if self.AudioFiles:
             CurrentIndex = self.AudioListBox.curselection()
