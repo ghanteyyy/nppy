@@ -52,9 +52,13 @@ class MusicPlayer:
 
         self.PlayImage = PhotoImage(file=self.ResourcePath('Play.png'))
         self.NextImage = PhotoImage(file=self.ResourcePath('Next.png'))
-        self.MuteImage = PhotoImage(file=self.ResourcePath('Mute.png'))
+        self.UnmuteImage = PhotoImage(file=self.ResourcePath('Vol4.png'))
         self.PauseImage = PhotoImage(file=self.ResourcePath('Pause.png'))
-        self.UnmuteImage = PhotoImage(file=self.ResourcePath('Unmute.png'))
+        self.VolumeImage1 = PhotoImage(file=self.ResourcePath('Vol1.png'))
+        self.VolumeImage2 = PhotoImage(file=self.ResourcePath('Vol2.png'))
+        self.VolumeImage3 = PhotoImage(file=self.ResourcePath('Vol3.png'))
+        self.VolumeImage4 = PhotoImage(file=self.ResourcePath('Vol4.png'))
+        self.NoVolumeImage = PhotoImage(file=self.ResourcePath('Vol0.png'))
         self.StopAudioImage = PhotoImage(file=self.ResourcePath('Stop.png'))
         self.PreviousImage = PhotoImage(file=self.ResourcePath('Previous.png'))
         self.RepeatAllImage = PhotoImage(file=self.ResourcePath('RepeatAll.png'))
@@ -131,7 +135,7 @@ class MusicPlayer:
         self.RandomButton.pack(side=LEFT, padx=2)
 
         self.VolumeFrame = Frame(self.BottomFrame)
-        self.MuteUnmuteButton = Button(self.VolumeFrame, image=self.UnmuteImage, **self.ButtonsAttributes, command=self.MuteUnmuteVolume)
+        self.MuteUnmuteButton = Button(self.VolumeFrame, image=self.VolumeImage4, **self.ButtonsAttributes, command=self.MuteUnmuteVolume)
         self.MuteUnmuteButton.pack(side=LEFT)
         self.VolumeSlider = ttk.Scale(self.VolumeFrame, from_=0, to=100, variable=self.VolumeSliderVar, style='success.Horizontal.TScale', takefocus=False, command=self.ChangeVolume)
         self.VolumeSlider.pack(side=LEFT)
@@ -575,6 +579,7 @@ class MusicPlayer:
 
             if self.isPlaying:
                 pygame.mixer.music.play(start=SkipAt)
+                self.MuteUnmuteVolume(nochange=True)
 
             self.EscapedTimeVar.set(time.strftime('%H:%M:%S', time.gmtime(SkipAt)))
 
@@ -674,30 +679,50 @@ class MusicPlayer:
         self.TotalTimeVar.set(time.strftime('-%H:%M:%S', gmtime))
         self.RemTimer = self.master.after(500, self.ChangeTime)
 
-    def MuteUnmuteVolume(self, event=None):
-        '''Mute and Unmute volume'''
+    def MuteUnmuteVolume(self, event=None, nochange=False):
+        '''Mute and Unmute volume
 
-        if self.IsMuted is False:  # Volume is not muted before
-            self.IsMuted = True
-            self.PreviousVolume = self.VolumeSliderVar.get()
-            self.MuteUnmuteButton.config(image=self.MuteImage)
+           nochange parameter is to skip indented block of
+           following first if statement to unchange volume
+           when audio is skipped or changed'''
+
+        if nochange is False:
+            if self.IsMuted is False:  # Volume is not muted before
+                self.IsMuted = True
+                self.PreviousVolume = self.VolumeSliderVar.get()
+                self.VolumeLabelVar.set('0%')
+                pygame.mixer.music.set_volume(0)
+                self.VolumeSliderVar.set(0)
+
+            else:  # Volume is muted before
+                self.IsMuted = False
+                self.VolumeSlider.config(state='normal')
+                self.VolumeSliderVar.set(self.PreviousVolume)
+                pygame.mixer.music.set_volume(self.PreviousVolume / 100)
+                self.VolumeLabelVar.set(f'{self.PreviousVolume}%')
+
+        SliderGet = self.VolumeSliderVar.get()
+
+        if SliderGet == 0:
             self.VolumeSlider.config(state='disabled')
-            self.VolumeLabelVar.set('0%')
-            pygame.mixer.music.set_volume(0)
-            self.VolumeSliderVar.set(0)
+            self.MuteUnmuteButton.config(image=self.NoVolumeImage)
 
-        else:  # Volume is muted before
-            self.IsMuted = False
-            self.VolumeSlider.config(state='normal')
-            self.VolumeSliderVar.set(self.PreviousVolume)
-            pygame.mixer.music.set_volume(self.PreviousVolume / 100)
-            self.VolumeLabelVar.set(f'{self.PreviousVolume}%')
-            self.MuteUnmuteButton.config(image=self.UnmuteImage)
+        elif SliderGet <= 25:
+            self.MuteUnmuteButton.config(image=self.VolumeImage1)
+
+        elif SliderGet <= 50:
+            self.MuteUnmuteButton.config(image=self.VolumeImage2)
+
+        elif SliderGet <=75:
+            self.MuteUnmuteButton.config(image=self.VolumeImage3)
+
+        else:
+            self.MuteUnmuteButton.config(image=self.VolumeImage4)
 
     def ChangeVolume(self, event=None, change=None):
         '''Increase or decrease volume when user drags volume bar or
            when user presses right arrow or left arrow
-            Here volume value is between 0-1'''
+                Here volume value is between 0-1'''
 
         CurrentVolume = self.VolumeSliderVar.get()
 
