@@ -45,12 +45,6 @@ class File_Menu:
             f.write(self.GetContents())
             self.PreviousSignature = self.GetSignature(self.GetContents())
             self.set_var(f'Saved to {self.FileName}')
-            return True
-
-        title = self.master.title()
-
-        if title.startswith('*') and not self.IsFileChanged():
-            self.master.title(title[1:])
 
     def New(self, event=None):
         '''When user presses ctrl+n or clicks new option from file menu'''
