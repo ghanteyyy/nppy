@@ -168,9 +168,6 @@ class Tution:
             with open(self.file_name, 'r') as f:
                 contents = json.load(f)
 
-                if not contents:
-                    contents = {}
-
         except FileNotFoundError:
             with open(self.file_name, 'w'):
                 contents = {}
@@ -191,25 +188,14 @@ class Tution:
         '''Calculate next payment date when user adds data for the first time or when user gets monthly payment'''
 
         today = datetime.date.today()
+        today_obj = datetime.datetime.strptime(str(today), '%Y-%m-%d')
         joined_obj = datetime.datetime.strptime(joined_str, '%Y-%b-%d')
 
-        total_days_in_joined_month = calendar.monthrange(joined_obj.year, joined_obj.month)[1]
-        remaining_days_in_joined_month = total_days_in_joined_month - joined_obj.day
+        total_days_in_current_month = calendar.monthrange(today_obj.year, today_obj.month)[1]
+        remaining_days_in_current_month = total_days_in_current_month - today_obj.day
 
-        _to = today.month
-        _from = joined_obj.month
-
-        if _to == _from:
-            _to += 1
-
-        for i in range(_from + 1, _to):
-            if i > 12:
-                remaining_days_in_joined_month += calendar.monthrange(today.year + 1, i - 12)[1]
-
-            else:
-                remaining_days_in_joined_month += calendar.monthrange(today.year, i)[1]
-
-        next_payment = joined_obj + datetime.timedelta(days=remaining_days_in_joined_month + joined_obj.day)
+        remaining_days_in_current_month += joined_obj.day
+        next_payment = today_obj + datetime.timedelta(days=remaining_days_in_current_month)
 
         return f'{next_payment.year}-{calendar.month_abbr[next_payment.month]}-{str(next_payment.day).zfill(2)}'
 
