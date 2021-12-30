@@ -516,7 +516,7 @@ class MusicPlayer:
             self.EscapedTimeVar.set('--:--')
 
             if self.CurrentPlayingIndex == len(self.AudioFiles) - 1:
-                if self.RepeatAudio == 'LoopAll' or self.PlayRandom:
+                if self.RepeatAudio in ['LoopAll', 'LoopCurrent'] or self.PlayRandom:
                     self.EOF = False
 
                 else:
@@ -752,29 +752,38 @@ class MusicPlayer:
     def SearchAudio(self, event=None):
         '''Highlight audio whose name starts with the given character'''
 
-        char = event.char.lower()
-        files = [f for f in self.AudioFiles.keys() if f.lower().startswith(char)]
+        keysym = event.keysym
 
-        if files:
-            if self.SearchGlobalIndex is not None:
-                self.AudioListBox.itemconfig(self.SearchGlobalIndex, bg='white', fg='purple')
+        if keysym == 'Home':
+            self.AudioListBox.see(0)
 
-            if self.SearchGlobalIndex == self.CurrentPlayingIndex:
-                self.AudioListBox.itemconfig(self.SearchGlobalIndex, bg='#809cb6', fg='white')
+        elif keysym == 'End':
+            self.AudioListBox.see(len(self.AudioFiles) - 1)
 
-            if self.PrevSearchChar == files[0][0].lower():
-                self.SearchLocalIndex += 1
+        else:
+            char = event.char.lower()
+            files = [f for f in self.AudioFiles.keys() if f.lower().startswith(char)]
 
-                if self.SearchLocalIndex == len(files):
+            if files:
+                if self.SearchGlobalIndex is not None:
+                    self.AudioListBox.itemconfig(self.SearchGlobalIndex, bg='white', fg='purple')
+
+                if self.SearchGlobalIndex == self.CurrentPlayingIndex:
+                    self.AudioListBox.itemconfig(self.SearchGlobalIndex, bg='#809cb6', fg='white')
+
+                if self.PrevSearchChar == files[0][0].lower():
+                    self.SearchLocalIndex += 1
+
+                    if self.SearchLocalIndex == len(files):
+                        self.SearchLocalIndex = 0
+
+                else:
                     self.SearchLocalIndex = 0
+                    self.PrevSearchChar = char
 
-            else:
-                self.SearchLocalIndex = 0
-                self.PrevSearchChar = char
-
-            self.SearchGlobalIndex = list(self.AudioFiles.keys()).index(files[self.SearchLocalIndex])
-            self.AudioListBox.see(self.SearchGlobalIndex)
-            self.AudioListBox.itemconfig(self.SearchGlobalIndex, bg='#b3b3b3', fg='black')
+                self.SearchGlobalIndex = list(self.AudioFiles.keys()).index(files[self.SearchLocalIndex])
+                self.AudioListBox.see(self.SearchGlobalIndex)
+                self.AudioListBox.itemconfig(self.SearchGlobalIndex, bg='#b3b3b3', fg='black')
 
     def ResetSearchIndex(self):
         '''Remove searched highlights'''
