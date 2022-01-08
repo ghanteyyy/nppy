@@ -35,9 +35,19 @@ class Pattern_Two:
             print(' '.join(self.strings * steps))
             steps -= 1
 
+    def method_three(self):
+        print('\nMethod Three')
+
+        for i in range(self.steps, 0, -1):
+            for j in range(i, 0, -1):
+                print(self.strings, end=' ')
+
+            print('\n', end='')
+
 
 if __name__ == '__main__':
     pattern_two = Pattern_Two()
 
     pattern_two.method_one()
     pattern_two.method_two()
+    pattern_two.method_three()

@@ -13,11 +13,28 @@ class Pattern_Fifteen:
     '''
 
     def __init__(self, steps=10):
-        _range = [str(i) for i in range(1, steps + 1)]
+        self.steps = steps
+
+    def method_one(self):
+        print('\nMethod One')
+
+        _range = [str(i) for i in range(1, self.steps + 1)]
 
         for i in range(1, len(_range)):
             print(' '.join(_range[:i]))
 
+    def method_two(self):
+        print('\nMethod Two')
+
+        for i in range(1, self.steps):
+            for j in range(1, i + 1):
+                print(j, end=' ')
+
+            print()
+
 
 if __name__ == '__main__':
-    Pattern_Fifteen()
+    pattern_fifteen = Pattern_Fifteen()
+
+    pattern_fifteen.method_one()
+    pattern_fifteen.method_two()
