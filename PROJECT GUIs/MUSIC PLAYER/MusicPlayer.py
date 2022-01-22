@@ -166,7 +166,6 @@ class MusicPlayer:
         self.ExitSearchButton = Button(self.SearchFrame, image=self.SearchExitImage, bg='#e5e5e5', bd=0, activebackground='#e5e5e5', cursor='hand2', command=self.DestroyFindWidget)
         self.ExitSearchButton.pack(side=RIGHT)
 
-        self.Tree.bind('<Return>', self.ReturnBind)
         self.Tree.bind("<Button-3>", self.RightClick)
         self.Tree.bind('<Delete>', self.RemoveFromList)
         self.Tree.bind('<space>', self.SpaceBarBindings)
@@ -177,7 +176,6 @@ class MusicPlayer:
         self.SearchEntry.bind('<Up>', self.UpDownSearchItems)
         self.master.bind_all('<Control-O>', self.GetPlaylist)
         self.SearchEntry.bind('<Down>', self.UpDownSearchItems)
-        self.SearchEntry.bind('<Return>', self.PlayOrPauseAudio)
         self.Tree.bind('<Motion>', self.RestrictResizingHeading)
         self.AudioSlider.bind('<B1-Motion>', self.ClickInMotion)
         self.master.bind_all('<Control-f>', self.ShowFindWidget)
@@ -185,6 +183,7 @@ class MusicPlayer:
         self.master.bind_all('<Escape>', self.DestroyFindWidget)
         self.Tree.bind('<Double-Button-1>', self.DoubleLeftClick)
         self.Tree.bind('<Shift-Delete>', self.RemoveFromPlaylist)
+        self.SearchEntry.bind('<Return>', self.SearchEntryReturnBind)
         self.TotalTimeLabel.bind('<Button-1>', self.ShowRemainingTime)
         self.master.bind("<Control-q>", lambda e: self.master.destroy())
         self.AudioSlider.bind('<ButtonRelease-1>', self.ClickInMotionReleased)
@@ -298,22 +297,10 @@ class MusicPlayer:
     def SpaceBarBindings(self, event=None):
         '''When user presses space-bar'''
 
-        selections = self.Tree.selection()
+        if self.master.focus_get() != self.SearchEntry:
+            selections = self.Tree.selection()
 
-        if self.childrens and selections and self.childrens.index(selections[0]) != self.CurrentPlayingIndex:
-            self.isPlaying = None
-
-        self.PlayOrPauseAudio()
-
-    def ReturnBind(self, event=None):
-        '''When user presses Enter key'''
-
-        selections = self.Tree.selection()
-
-        if len(selections) == 1:
-            index = self.childrens.index(selections[0])
-
-            if self.CurrentPlayingIndex != index:
+            if self.childrens and selections and self.childrens.index(selections[0]) != self.CurrentPlayingIndex:
                 self.isPlaying = None
 
             self.PlayOrPauseAudio()
@@ -782,13 +769,13 @@ class MusicPlayer:
             CurrentIndexs = self.Tree.selection()
 
             for iid in CurrentIndexs:
-                if self.childrens.index(iid) == self.CurrentPlayingIndex:
+                if self.childrens.index(iid) == self.CurrentPlayingIndex and self.isPlaying is not None:
                     self.StopAudio()
 
                 song_name = self.Tree.item(iid)['values'][0]
                 self.AudioFiles.pop(song_name)
+                self.Tree.delete(iid)
 
-            self.Tree.delete(CurrentIndexs)
             self.LowerCasedAudioFiles = [f.lower() for f in self.AudioFiles.keys()]
 
             index = self.childrens.index(iid)
@@ -850,26 +837,11 @@ class MusicPlayer:
 
             if value:
                 self.filteredFiles = [f for f in self.LowerCasedAudioFiles if f.startswith(value)]
+                self.SearchLocalIndex = 0
 
-                if self.PrevSearchChar != value or self.SearchLocalIndex == len(self.filteredFiles) - 1:
-                    # If new search is made or searching has reached to end of list
-                    # Setting search to the first value if it reaches to the end of list
-                    self.SearchLocalIndex = 0
-
-                else:
-                    if self.PrevSearchChar == value:
-                        self.SearchLocalIndex += 1
-
-                self.PrevSearchChar = value
                 self.SearchGlobalIndex = self.LowerCasedAudioFiles.index(self.filteredFiles[self.SearchLocalIndex])
-
                 item = self.childrens[self.SearchGlobalIndex]
                 self.Tree.see(item)
-                self.Tree.focus(item)
-                self.Tree.selection_set(item)
-
-            else:
-                self.PrevSearchChar = None
 
         except (IndexError, AttributeError):
             pass
@@ -879,6 +851,9 @@ class MusicPlayer:
 
         try:
             arrow = event.keysym
+
+            if not self.SearchEntryVar.get():
+                self.filteredFiles = []
 
             if arrow == 'Up':
                 if self.SearchLocalIndex == 0:
@@ -890,7 +865,8 @@ class MusicPlayer:
                 if self.SearchLocalIndex == len(self.filteredFiles) - 1:
                     self.SearchLocalIndex = -1
 
-                self.SearchLocalIndex += 1
+                if self.SearchLocalIndex != 0:
+                    self.SearchLocalIndex += 1
 
             self.SearchGlobalIndex = self.LowerCasedAudioFiles.index(self.filteredFiles[self.SearchLocalIndex])
 
@@ -898,10 +874,25 @@ class MusicPlayer:
             self.Tree.see(item)
             self.Tree.focus(item)
             self.Tree.selection_set(item)
+            self.Tree.focus_force()
 
-        except (TypeError, AttributeError):
+        except (TypeError, AttributeError, IndexError):
             # When no audio is opened though user wants to make a search
             winsound.MessageBeep()
+
+    def SearchEntryReturnBind(self, event=None):
+        '''When user hits Enter key when focused to SearchEntry box'''
+
+        if self.SearchGlobalIndex:
+            item = self.childrens[self.SearchGlobalIndex]
+            self.Tree.focus(item)
+            self.Tree.selection_set(item)
+
+            if self.SearchGlobalIndex != self.CurrentPlayingIndex:
+                self.isPlaying = None
+
+            self.PlayOrPauseAudio()
+            self.DestroyFindWidget()
 
     def ResourcePath(self, FileName):
         '''Get absolute path to resource from temporary directory
