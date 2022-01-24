@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter.font import Font
+from tkinter import messagebox
 import About
 import Include
 import FileMenu
@@ -10,10 +11,23 @@ import RightClick
 
 
 class GPAD:
-    def __init__(self):
+    def __init__(self, NewWindow=False):
         self.get_font = Include.GetFontDetails()
 
-        self.master = Tk()
+        if NewWindow:  # When user wants to make a new window
+            self.master = Toplevel()
+
+            if 'Number of Windows' not in self.get_font:  # Tracking the number of Toplevel Windows
+                self.get_font['Number of Windows'] = 1
+
+            else:
+                self.get_font['Number of Windows'] += 1
+
+            Include.SaveFontDetails(self.get_font)
+
+        else:  # When programs starts for the first time
+            self.master = Tk()
+
         self.font = Font(family=self.get_font['Font Family'], size=self.get_font['Font Size'])
         Include.ConfigFontStyle(self.get_font['Font Style'], self.font)
 
@@ -72,7 +86,7 @@ class GPAD:
 
         self.fmc = FileMenu.File_Menu(self.master, self.TextWidget, self.status_label_var)
         self.FileMenuOptions = ['New', 'New Window ', 'Open... ', 'Save', 'SaveAs...', 'Exit']
-        self.FileMenuCommands = [self.fmc.New, self.fmc.NewWindow, self.fmc.Open, self.fmc.Save, self.fmc.SaveAs, self.fmc.exit]
+        self.FileMenuCommands = [self.fmc.New, self.fmc.NewWindow, self.fmc.Open, self.fmc.Save, self.fmc.SaveAs, self.exit]
         self.FileMenuAccelerator = ['Ctrl+N', 'Ctrl+Shift+N', 'Ctrl+O', 'Ctrl+S', 'Ctrl+Shift+S', 'Ctrl+Q']
 
         self.emc = EditMenu.Edit_Menu(self.master, self.TextWidget, self.status_label_var)
@@ -138,13 +152,13 @@ class GPAD:
         self.EnableDisableMenu()
         self.UpdateLabelText()
 
+        self.TextWidget.bind('<Control-q>', self.exit)
         self.TextWidget.bind('<Button-3>', self.button_3)
         self.TextWidget.bind('<Delete>', self.emc.delete)
         self.TextWidget.bind('<Control-n>', self.fmc.New)
         self.TextWidget.bind('<Control-x>', self.emc.cut)
         self.TextWidget.bind('<Control-o>', self.fmc.Open)
         self.TextWidget.bind('<Control-s>', self.fmc.Save)
-        self.TextWidget.bind('<Control-q>', self.fmc.exit)
         self.TextWidget.bind('<Control-z>', self.emc.undo)
         self.TextWidget.bind('<Control-c>', self.emc.copy)
         self.TextWidget.bind('<BackSpace>', self.backspace)
@@ -152,8 +166,9 @@ class GPAD:
         self.TextWidget.bind('<Key>', self.RemoveSelection)
         self.TextWidget.bind('<F5>', self.emc.GetDateTime)
         self.master.bind('<F12>', self.HelpMenuCommands[0])
+        self.master.protocol('WM_DELETE_WINDOW', self.exit)
         self.TextWidget.bind('<Control-S>', self.fmc.SaveAs)
-        self.master.protocol('WM_DELETE_WINDOW', self.fmc.exit)
+        self.TextWidget.bind('<Control-N>', self.fmc.NewWindow)
         self.TextWidget.bind('<Control-a>', self.emc.SelectAll)
         self.TextWidget.bind('<Control-N>', self.fmc.NewWindow)
         self.TextWidget.bind('<Control-plus>', self.vmc.ZoomIn)
@@ -360,6 +375,50 @@ class GPAD:
         '''When user clicks about sub-menu in Help menu'''
 
         About.About(self.master)
+
+    def exit(self, event=None):
+        '''When user wants to exit the program'''
+
+        if self.fmc.IsFileChanged():
+            choice = messagebox.askyesnocancel('GPAD', 'Do you really want to quit without saving?')
+
+            if choice is False:
+                self.fmc.Save()
+
+        else:
+            choice = True
+
+        if choice:
+            exit = True
+            MasterDestroy = False
+            content = Include.GetFontDetails()
+
+            if 'Zoomed' in content:
+                content.pop('Zoomed')
+
+            NumberOfWindows = content['Number of Windows']  # Getting number of Toplevel windows
+
+            if self.master.winfo_class() == 'Tk':  # When user wants to close the root window
+                if NumberOfWindows > 0:  # When some Toplevel windows is opened
+                    exit = False
+                    self.master.withdraw()  # Withdrawing Tk window from the window
+
+            elif self.master.winfo_class() == 'Toplevel':  # When user wants to close the Toplevel window
+                NumberOfWindows -=1
+                content['Number of Windows'] = NumberOfWindows
+
+                if NumberOfWindows == 0:  # If the window is the last Toplevel window
+                    MasterDestroy = True
+
+            content.update({'window_dimension': self.master.geometry()})
+            Include.SaveFontDetails(content)
+
+            if MasterDestroy:  # Ending the mainloop of Tk window if there is no any Toplevel window
+                self.master.master.destroy()
+
+            else:  # When user wants to close the Toplevel window opening another Toplevel window
+                if exit:
+                    self.master.destroy()
 
 
 if __name__ == '__main__':

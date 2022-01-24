@@ -72,7 +72,7 @@ class File_Menu:
     def NewWindow(self, event=None):
         '''When user presses ctrl+shift+n or clicks new_window option from file_menu'''
 
-        main.GPAD()
+        main.GPAD(NewWindow=True)
 
     def Open(self, event=None):
         '''When user presses ctrl+o or clicks open option from file menu'''
@@ -139,25 +139,3 @@ class File_Menu:
             font_details.pop('Zoomed')
 
         Include.save_font_details(font_details)
-
-    def exit(self, event=None):
-        '''When user wants to exit the program'''
-
-        if self.IsFileChanged():
-            choice = messagebox.askyesnocancel('GPAD', 'Do you really want to quit without saving?')
-
-            if choice is False:
-                self.Save()
-
-        else:
-            choice = True
-
-        if choice:
-            content = Include.GetFontDetails()
-
-            if 'Zoomed' in content:
-                content.pop('Zoomed')
-
-            content.update({'window_dimension': self.master.geometry()})
-            Include.SaveFontDetails(content)
-            self.master.destroy()
