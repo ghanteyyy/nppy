@@ -39,7 +39,7 @@ class MusicPlayer:
         self.SearchLocalIndex = None   # Track the search index of filtered items
         self.PlayRandom = False  # Track if Random Button has been pressed or not
         self.RemTimer = None  # Stores an alarm to call change_time function in every 500 ms
-        self.PreviousVolume = 100  # Store previous value of volume before muting and unmuting
+        self.PreviousVolume = 100  # Store previous value of volume before muting and un-muting
         self.ScaleTimer = None  # Stores an alarm to call update_scale function in every 1000 ms
         self.ShowRemTime = False  # Trigger to check if remaining time has showed in total time button
         self.PlaylistPath = self.ResourcePath('playlists.json')  # File where list of audios are saved
@@ -166,13 +166,13 @@ class MusicPlayer:
         self.ExitSearchButton = Button(self.SearchFrame, image=self.SearchExitImage, bg='#e5e5e5', bd=0, activebackground='#e5e5e5', cursor='hand2', command=self.DestroyFindWidget)
         self.ExitSearchButton.pack(side=RIGHT)
 
-        self.Tree.bind("<Button-3>", self.RightClick)
         self.Tree.bind('<Delete>', self.RemoveFromList)
         self.Tree.bind('<space>', self.SpaceBarBindings)
         self.master.bind('<MouseWheel>', self.MouseWheel)
         self.Tree.bind('<Button-1>', self.SingleLeftClick)
         self.AudioSlider.bind('<Button-3>', self.SkipAudio)
         self.master.bind_all('<Control-o>', self.OpenFiles)
+        self.master.bind_all("<Button-3>", self.RightClick)
         self.SearchEntry.bind('<Up>', self.UpDownSearchItems)
         self.master.bind_all('<Control-O>', self.GetPlaylist)
         self.SearchEntry.bind('<Down>', self.UpDownSearchItems)
@@ -181,10 +181,10 @@ class MusicPlayer:
         self.master.bind_all('<Control-f>', self.ShowFindWidget)
         self.AudioSlider.bind('<B3-Motion>', self.ClickInMotion)
         self.master.bind_all('<Escape>', self.DestroyFindWidget)
-        self.Tree.bind('<Double-Button-1>', self.DoubleLeftClick)
         self.Tree.bind('<Shift-Delete>', self.RemoveFromPlaylist)
         self.SearchEntry.bind('<Return>', self.SearchEntryReturnBind)
         self.TotalTimeLabel.bind('<Button-1>', self.ShowRemainingTime)
+        self.master.bind_all('<Double-Button-1>', self.DoubleLeftClick)
         self.master.bind("<Control-q>", lambda e: self.master.destroy())
         self.AudioSlider.bind('<ButtonRelease-1>', self.ClickInMotionReleased)
         self.AudioSlider.bind('<ButtonRelease-3>', self.ClickInMotionReleased)
@@ -205,13 +205,13 @@ class MusicPlayer:
         self.master.mainloop()
 
     def RestrictResizingHeading(self, event):
-        '''Restrict user to resize the colums of Treeview '''
+        '''Restrict user to resize the columns of Treeview '''
 
         if self.Tree.identify_region(event.x, event.y) == "separator":
             return "break"
 
     def StopWindowFlicking(self):
-        '''When window is minimize and maximized continusouly then black
+        '''When window is minimize and maximized continuously then black
            color gets appear on the window for fraction of seconds which
            looks like the window is flickering'''
 
@@ -246,6 +246,8 @@ class MusicPlayer:
         return self.Tree.identify('item', event.x, event.y) == ''
 
     def SingleLeftClick(self, event):
+        '''When user single left click inside Tree widget'''
+
         if self.Tree.identify_region(event.x, event.y) == 'heading':
             # Restrict single left clicking if the cursor is on Treeview's heading
             return
@@ -258,21 +260,35 @@ class MusicPlayer:
             return 'break'
 
     def DoubleLeftClick(self, event=None):
-        '''When user right clicks'''
+        '''When user double clicks anywhere in window'''
 
-        if self.Tree.identify_region(event.x, event.y) == 'heading':
-            # Restrict double clicking if the cursor is on Treeview's heading
-            return
+        x, y = self.master.winfo_pointerxy()
+        widget = self.master.winfo_containing(x, y)
 
-        elif self.ClickedAtEmptySpace(event):
-            # When some files are opened and user double clicks
-            # on the empty spaces then open file_dialog to open additional audio files
-            self.OpenFiles()
+        if widget == self.Tree:
+            if self.Tree.identify_region(event.x, event.y) == 'heading':
+                self.DRY_1()
 
-        else:
-            # Play the selected song when user double clicks on it
-            self.isPlaying = None
-            self.PlayOrPauseAudio()
+            elif self.ClickedAtEmptySpace(event):
+                # When some files are opened and user double clicks
+                # on the empty spaces then open file_dialog to open additional audio files
+                self.OpenFiles()
+
+            else:
+                index = self.childrens.index(self.Tree.selection()[0])
+
+                if index == self.CurrentPlayingIndex:
+                    self.AddRemoveSelection('Add')
+
+                else:
+                    self.isPlaying = None
+
+                self.PlayOrPauseAudio()
+
+        elif widget in [self.EscapedTimeLabel, self.VolumeLabel] or isinstance(widget, Frame):
+            # When user clicks to the empty space or
+            # to the EscapedTimeLabel or VolumeLabel
+            self.DRY_1()
 
     def SeekSingleClick(self, event, widget, function, seek=False):
         '''Hijacking Single Left Click to work like Single Right Click
@@ -669,7 +685,7 @@ class MusicPlayer:
         '''Mute and Unmute volume
 
            nochange parameter is to skip indented block of
-           following first if statement to unchange volume
+           following first if statement to un-change volume
            when audio is skipped or changed'''
 
         if nochange is False:
@@ -707,7 +723,7 @@ class MusicPlayer:
     def ShowRemainingTime(self, event=None):
         '''Show remaining time of current playing audio'''
 
-        if self.isPlaying and self.CurrentPlayingIndex > -1:
+        if self.isPlaying is not None:
             if self.ShowRemTime is False:  # If remaining time has not been shown
                 self.ShowRemTime = True
                 self.ChangeTime()
@@ -727,34 +743,37 @@ class MusicPlayer:
     def RightClick(self, event=None):
         '''When user right clicks inside list-box'''
 
-        if self.Tree.identify_region(event.x, event.y) == 'heading':
-            # Restrict right clicking if cursor is on Treeview's headings
-            return
+        x, y = event.x , event.y  # Cursor position with respect to Tk window
+        _x, _y = self.master.winfo_pointerxy()  # Cursor position with repsect to monitor resolution
 
-        x, y = event.x , event.y
         CurrentSelection = self.Tree.selection()
+        widget = self.master.winfo_containing(_x, _y)
         RightClickMenu = Menu(self.master, tearoff=False)
 
-        if CurrentSelection:
-            if self.ClickedAtEmptySpace(event):
-                RightClickMenu.add_command(label='Open', command=self.OpenFiles)
+        if widget == self.Tree:
+            if CurrentSelection:
+                if self.ClickedAtEmptySpace(event):
+                    RightClickMenu.add_command(label='Open', command=self.OpenFiles)
+
+                else:
+                    if len(self.Tree.selection()) == 1:
+                        self.Tree.event_generate("<Button-1>", x=x, y=y)
+
+                    RightClickMenu.add_command(label='Remove from list', command=self.RemoveFromList)
+                    RightClickMenu.add_command(label='Remove from playlist', command=self.RemoveFromPlaylist)
 
             else:
-                if len(self.Tree.selection()) == 1:
-                    self.Tree.event_generate("<Button-1>", x=x, y=y)
+                if self.Tree.identify_element(x, y) == 'text':
+                    self.Tree.event_generate('<Button-1>', x=x, y=y)
+                    self.Tree.event_generate('<Button-3>', x=x, y=y)
 
-                RightClickMenu.add_command(label='Remove from list', command=self.RemoveFromList)
-                RightClickMenu.add_command(label='Remove from playlist', command=self.RemoveFromPlaylist)
+                elif self.Tree.identify_region(x, y) == 'heading' or self.ClickedAtEmptySpace(event):
+                    RightClickMenu.add_command(label='Open', command=self.OpenFiles)
+                    RightClickMenu.add_command(label='Open Playlist', command=self.GetPlaylist)
 
-        else:
-            if self.Tree.identify_element(x, y) == 'text':
-                # When user right clicks to the current playing audio without left clicking first
-                self.Tree.event_generate('<Button-1>', x=x, y=y)
-                self.Tree.event_generate('<Button-3>', x=x, y=y)
-
-            else:
-                RightClickMenu.add_command(label='Open', command=self.OpenFiles)
-                RightClickMenu.add_command(label='Open Playlist', command=self.GetPlaylist)
+        elif widget in [self.EscapedTimeLabel, self.VolumeLabel] or isinstance(widget, Frame):
+            RightClickMenu.add_command(label='Open', command=self.OpenFiles)
+            RightClickMenu.add_command(label='Open Playlist', command=self.GetPlaylist)
 
         try:
             RightClickMenu.tk_popup(event.x_root, event.y_root)
@@ -766,9 +785,9 @@ class MusicPlayer:
         '''Remove selected item from the list-box'''
 
         try:
-            CurrentIndexs = self.Tree.selection()
+            CurrentIndexes = self.Tree.selection()
 
-            for iid in CurrentIndexs:
+            for iid in CurrentIndexes:
                 if self.childrens.index(iid) == self.CurrentPlayingIndex and self.isPlaying is not None:
                     self.StopAudio()
 
@@ -893,6 +912,16 @@ class MusicPlayer:
 
             self.PlayOrPauseAudio()
             self.DestroyFindWidget()
+
+    def DRY_1(self):
+        '''Some conditions that are used for multiple times. So,
+           to avoid repetition putting them in this method'''
+
+        if self.isPlaying is not None:
+            self.PlayOrPauseAudio()
+
+        elif not self.AudioFiles:
+            self.OpenFiles()
 
     def ResourcePath(self, FileName):
         '''Get absolute path to resource from temporary directory
