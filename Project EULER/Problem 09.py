@@ -7,20 +7,22 @@ There exists exactly one Pythagorean triplet for which a + b + c = 1000.
 Find the product abc.'''
 
 
-found = False
+''' To find pythagorean triplet I have used Euclid formula:
+        a = m ^ 2 - n ^ 2
+        b = 2 * m * n
+        c = m ^ 2 + n ^ 2
+
+            where, m and n are two natural numbers
+                   m is always greater than n'''
 
 
-for m in range(1, 101):
-    for n in range(1, 101):
-        if found is False:
-            # a, b, c are the squares of side of the triangles
-            a = m ** 2 - n ** 2
-            b = 2 * m * n
-            c = m ** 2 + n ** 2
+# When m & n > 22 then value of c alone exceeds
+# 1000 so values of m & n must be below 23
+for m in range(4, 23):
+    for n in range(4, 23):
+        a = m ** 2 - n ** 2
+        b = 2 * m * n
+        c = m ** 2 + n ** 2
 
-            if a + b + c == 1000:
-                print(a * b * c)
-                found = True
-
-            m += 4
-            n += 4
+        if a + b + c == 1000:
+            print(a * b * c)
