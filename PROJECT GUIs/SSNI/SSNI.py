@@ -1,10 +1,9 @@
 import os
 import sys
-import winsound
 from tkinter import *
 import tkinter.ttk as ttk
-from tkinter import messagebox
 from tkinter.ttk import Scrollbar
+import pygame
 
 
 class SSNI:
@@ -16,64 +15,84 @@ class SSNI:
         self.master = Tk()
         self.master.withdraw()
         self.master.title('SSNI')
-        self.master.iconbitmap(self.resource_path('icon.ico'))
 
-        self.BackImage = PhotoImage(file='included_files\\back.png')
-        self.first_left_frame = Frame(self.master)
+        if sys.platform == 'win32':
+            _width = 27
+            buttons_ipady = 5
+            _font = ('Courier', 12)
+            back_active_bg = '#f0f0f0'
+            self.master.iconbitmap(self.resource_path('icon.ico'))
+            self.ErrorAudioFile = self.resource_path('WinErrSound.wav')
+
+        else:
+            _width = 21
+            buttons_ipady = 3
+            _font = ('Hack', 12)
+            back_active_bg = '#d9d9d9'
+            self.ErrorAudioFile = self.resource_path('LinuxErrSound.wav')
+            self.IconImage = PhotoImage(file=self.resource_path('icon.png'))
+            self.master.iconphoto(False, self.IconImage)
+
+        pygame.init()
+        pygame.mixer.music.load(self.ErrorAudioFile)
+
+        self.BackImage = PhotoImage(file='included_files/back.png')
+        self.buttons_attributes = {'bd': 0, 'width': _width, 'bg': 'green', 'fg': 'white',
+                                   'activebackground': 'green', 'activeforeground': 'white',
+                                   'cursor': 'hand2'}
+
+        self.LeftFrame = Frame(self.master)
+        self.LeftFrame.pack(side=LEFT)
+        self.RightFrame = Frame(self.master)
+        self.RightFrame.pack(side=RIGHT)
+
+        self.FirstLeftFrame = Frame(self.LeftFrame)
+        self.FirstLeftFrame.pack(side=LEFT)
 
         self.video_entry_style = ttk.Style()
         self.video_entry_style.configure('VE.TEntry', foreground='grey')
-        self.video_entry = ttk.Entry(self.first_left_frame, font=('Courier', 12), width=19, justify='center', style='VE.TEntry')
+        self.video_entry = ttk.Entry(self.FirstLeftFrame, font=_font, width=19, justify='center', style='VE.TEntry')
         self.video_entry.insert(END, 'Video Name')
         self.video_entry.pack(pady=10, padx=10, ipady=3)
 
-        self.add_button = Button(self.first_left_frame, text='A D D', **self.buttons_attributes, command=lambda: self.add_remove_search_command(button_name='ADD'))
-        self.add_button.pack(pady=5, ipady=3, ipadx=75)
+        self.add_button = Button(self.FirstLeftFrame, text='A D D', **self.buttons_attributes, command=lambda: self.add_remove_search_command(button_name='ADD'))
+        self.add_button.pack(pady=5, ipady=buttons_ipady)
+        self.remove_button = Button(self.FirstLeftFrame, text='R E M O V E', **self.buttons_attributes, command=lambda: self.add_remove_search_command(button_name='REMOVE'))
+        self.remove_button.pack(pady=5, ipady=buttons_ipady)
+        self.search_button = Button(self.FirstLeftFrame, text='S E A R C H', **self.buttons_attributes, command=lambda: self.add_remove_search_command(button_name='SEARCH'))
+        self.search_button.pack(pady=5, ipady=buttons_ipady)
+        self.rename_window_button = Button(self.FirstLeftFrame, text='R E N A M E', **self.buttons_attributes, command=self.ShowRenamingWidgets)
+        self.rename_window_button.pack(pady=5, ipady=buttons_ipady)
 
-        self.remove_button = Button(self.first_left_frame, text='R E M O V E', **self.buttons_attributes, command=lambda: self.add_remove_search_command(button_name='REMOVE'))
-        self.remove_button.pack(pady=5, ipady=3, ipadx=60)
-
-        self.search_button = Button(self.first_left_frame, text='S E A R C H', **self.buttons_attributes, command=lambda: self.add_remove_search_command(button_name='SEARCH'))
-        self.search_button.pack(pady=5, ipady=3, ipadx=60)
-
-        self.rename_window_button = Button(self.first_left_frame, text='R E N A M E', **self.buttons_attributes, command=self.rename_window)
-        self.rename_window_button.pack(pady=5, ipady=3, ipadx=59)
-
-        self.first_left_frame.pack(padx=5, side=LEFT, ipady=2)
-
-        self.text_area_frame = Frame(self.master)
-
-        self.text_area = Text(self.text_area_frame, width=27, height=13, state=DISABLED, cursor='arrow')
-        self.scrollbar = Scrollbar(self.text_area_frame, orient="vertical", command=self.text_area.yview)
+        self.text_area = Text(self.RightFrame, width=27, height=13, state=DISABLED, cursor='arrow')
+        self.scrollbar = Scrollbar(self.RightFrame, orient="vertical", command=self.text_area.yview)
         self.text_area.config(yscrollcommand=self.scrollbar.set)
         self.text_area.pack(side=LEFT, ipady=1)
         self.scrollbar.pack(side=RIGHT, fill='y')
-        self.text_area_frame.pack(pady=5, padx=4, anchor='w')
+        self.RightFrame.pack(pady=5, padx=4, anchor='w')
 
         self.text_area.config(state=NORMAL)
         self.text_area.delete('1.0', END)
-        self.text_area_frame.pack(padx=5, pady=5, side=LEFT)
+        self.RightFrame.pack(padx=5, pady=5, side=LEFT)
 
-        self.rename_window_button.bind('<Return>', lambda e: self.rename_window())
-        self.add_button.bind('<Return>', lambda e: self.add_remove_search_command(button_name='ADD'))
-        self.remove_button.bind('<Return>', lambda e: self.add_remove_search_command(button_name='REMOVE'))
-        self.search_button.bind('<Return>', lambda e: self.add_remove_search_command(button_name='SEARCH'))
-
-        # Rename_window widgets
-        self.rename_window_frame = Frame(self.master)
+        self.SecondLeftFrame = Frame(self.LeftFrame)
 
         self.old_name_entry_style = ttk.Style()
         self.old_name_entry_style.configure('O.TEntry', foreground='grey')
-        self.old_name_entry = ttk.Entry(self.rename_window_frame, font=('Courier', 12), width=19, justify='center', style='O.TEntry')
+        self.old_name_entry = ttk.Entry(self.SecondLeftFrame, font=_font, width=19, justify='center', style='O.TEntry')
         self.old_name_entry.insert(END, 'Old Name')
+        self.old_name_entry.pack(padx=10, ipady=3)
 
         self.new_name_entry_style = ttk.Style()
         self.new_name_entry_style.configure('N.TEntry', foreground='grey')
-        self.new_name_entry = ttk.Entry(self.rename_window_frame, font=('Courier', 12), width=19, justify='center', style='N.TEntry')
+        self.new_name_entry = ttk.Entry(self.SecondLeftFrame, font=_font, width=19, justify='center', style='N.TEntry')
         self.new_name_entry.insert(END, 'New Name')
+        self.new_name_entry.pack(pady=10, padx=10, ipady=3)
 
-        self.rename_button = Button(self.rename_window_frame, text='R E N A M E', **self.buttons_attributes, command=self.rename_command)
-        self.back_button = Button(self.rename_window_frame, image=self.BackImage, bd=0, cursor='hand2', command=self.back_command)
+        self.rename_button = Button(self.SecondLeftFrame, text='R E N A M E', **self.buttons_attributes, command=self.rename_command)
+        self.rename_button.pack(ipady=buttons_ipady)
+        self.back_button = Button(self.SecondLeftFrame, image=self.BackImage, bd=0, cursor='hand2', activebackground=back_active_bg, command=self.back_command)
+        self.back_button.pack(ipady=buttons_ipady)
 
         self.master.bind('<Button-1>', self.key_bindings)
         self.back_button.bind('<Return>', self.back_command)
@@ -97,7 +116,7 @@ class SSNI:
 
         screen_width, screen_height = self.master.winfo_screenwidth() // 2, self.master.winfo_screenheight() // 2
         width, height = self.master.winfo_width(), self.master.winfo_height()
-        self.master.geometry(f'{width}x{height}+{screen_width - width // 2}+{screen_height - height // 2}')
+        self.master.geometry(f'+{screen_width - width // 2}+{screen_height - height // 2}')
 
         self.widgets = {self.video_entry: ('Video Name', {self.video_entry_style: 'VE.TEntry'}), self.old_name_entry: ('Old Name', {self.old_name_entry_style: 'O.TEntry'}),
                         self.new_name_entry: ('New Name', {self.new_name_entry_style: 'N.TEntry'})}
@@ -105,14 +124,13 @@ class SSNI:
         self.master.deiconify()
 
     def config_entry(self, widget, color, insert=True):
-        '''Configure behaviour of entries widget when user clicks in or out of them'''
+        '''Configure behavior of entries widget when user clicks in or out of them'''
 
         widget.delete(0, END)
         key = list(self.widgets[widget][1].keys())[0]
         key.configure(self.widgets[widget][1][key], foreground=color)
 
         if insert:
-            self.master.focus()
             widget.insert(END, self.widgets[widget][0])
 
     def key_bindings(self, event, focus_out=False):
@@ -134,35 +152,20 @@ class SSNI:
                 if not _widget.get().strip():
                     self.config_entry(_widget, 'grey')
 
-        if widget in [self.master, self.rename_window_frame, self.first_left_frame, self.scrollbar]:
+        if widget in [self.master, self.SecondLeftFrame, self.FirstLeftFrame, self.scrollbar]:
             self.master.focus()
 
-    def rename_window(self):
-        '''Rename window when user clicks rename button'''
+    def ShowRenamingWidgets(self, event=None):
+        '''Show the renaming widgets to rename old name with new name'''
 
-        self.master.focus()
-        self.first_left_frame.pack_forget()
-        self.text_area_frame.pack_forget()
-
-        self.old_name_entry.pack(pady=10, padx=10, ipady=3)
-        self.new_name_entry.pack(pady=10, padx=10, ipady=3)
-        self.rename_button.pack(pady=15, ipady=3, ipadx=59)
-
-        self.back_button.pack()
-
-        self.rename_window_frame.pack(padx=5, side=LEFT, ipady=2)
-        self.text_area_frame.pack(pady=5, padx=5, anchor='w')
+        self.FirstLeftFrame.pack_forget()
+        self.SecondLeftFrame.pack(side=LEFT)
 
     def back_command(self, event=None):
-        '''Command when user clicks back button'''
+        '''When user clicks back button'''
 
-        self.text_area_frame.pack_forget()
-        self.rename_window_frame.pack_forget()
-
-        self.first_left_frame.pack(padx=5, side=LEFT, ipady=2)
-        self.text_area_frame.pack(pady=5, padx=5, anchor='w')
-
-        self.back_button.pack_forget()
+        self.SecondLeftFrame.pack_forget()
+        self.FirstLeftFrame.pack(side=LEFT)
 
     def read_file(self):
         '''Getting everything from file'''
@@ -228,7 +231,7 @@ class SSNI:
         from_entry = self.video_entry.get().strip()
 
         if from_entry == 'Video Name':
-            winsound.MessageBeep()
+            pygame.mixer.music.play()
 
         elif button_name == 'ADD':
             if from_entry in contents:
@@ -240,21 +243,23 @@ class SSNI:
 
         elif button_name == 'REMOVE':
             if from_entry in contents:
+                self.master.focus()
                 contents.remove(from_entry)
                 self.highlight(from_entry, 'red')
                 self.config_entry(self.video_entry, 'grey')
                 self.master.after(800, lambda: self.insert_text_area(contents))
 
             else:
-                winsound.MessageBeep()
+                pygame.mixer.music.play()
 
         else:
             if from_entry in contents:
+                self.master.focus()
                 self.highlight(from_entry, '#3ccbde')
                 self.config_entry(self.video_entry, 'grey')
 
             else:
-                winsound.MessageBeep()
+                pygame.mixer.music.play()
 
         if success:
             contents.append(from_entry)
@@ -272,7 +277,7 @@ class SSNI:
         new_name = self.new_name_entry.get().strip()
 
         if old_name == 'Old Name' or new_name == 'New Name' or old_name not in contents or new_name in contents:
-            winsound.MessageBeep()
+            pygame.mixer.music.play()
 
         else:
             old_name_index = contents.index(old_name)
