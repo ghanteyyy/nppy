@@ -5,7 +5,6 @@ pygit2
 pygame
 django
 mutagen
-pywin32
 requests
 pyautogui
 pyperclip
@@ -15,3 +14,4 @@ ttkbootstrap
 opencv-python
 auto-py-to-exe
 beautifulsoup4
+pywin32; sys_platform == 'win32'
