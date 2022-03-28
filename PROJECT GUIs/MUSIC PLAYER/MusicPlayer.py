@@ -15,7 +15,9 @@ from mutagen.mp3 import MP3, HeaderNotFoundError
 '''To setup ttkbootstrap:
         1. Install ttkbootstrap using python -m pip install ttkbootstrap
         2. Create themes using python -m ttkcreator
-        3. Specify your desired color and save the themes'''
+        3. Specify your desired color and save the themes
+        4. If you want to use my theme then copy user.py file to
+                <python-installed-directory>\Lib\site-packages\ttkbootstrap\themes'''
 
 
 class MusicPlayer:
@@ -90,7 +92,7 @@ class MusicPlayer:
 
         self.Columns = ['Title', 'Duration']
 
-        self.style = Style('newtheme', master=self.master)
+        self.style = Style('newtheme')
         self.Tree = ttk.Treeview(self.AudioListFrame, columns=self.Columns, show='headings', style='secondary.Treeview')
         self.Tree.pack(side=LEFT, fill=BOTH)
 
@@ -148,13 +150,14 @@ class MusicPlayer:
         self.SearchButton.pack(side=LEFT)
 
         self.VolumeFrame = Frame(self.BottomFrame)
+        self.VolumeSliderFrame = Frame(self.VolumeFrame)
         self.MuteUnmuteButton = Button(self.VolumeFrame, image=self.VolumeImage4, **self.ButtonsAttributes, command=self.MuteUnmuteVolume)
         self.MuteUnmuteButton.pack(side=LEFT)
-        self.VolumeSlider = ttk.Scale(self.VolumeFrame, from_=0, to=100, variable=self.VolumeSliderVar, style='success.Horizontal.TScale', takefocus=False, command=self.ChangeVolume)
-        self.VolumeSlider.pack(side=LEFT)
-        self.VolumeLabel = Label(self.VolumeFrame, textvariable=self.VolumeLabelVar, width=4, font=font.Font(weight='bold'))
+        self.VolumeSlider = ttk.Scale(self.VolumeSliderFrame, from_=0, to=100, variable=self.VolumeSliderVar, style='success.Horizontal.TScale', command=self.ChangeVolume)
+        self.VolumeSlider.pack(side=LEFT, padx=5)
+        self.VolumeLabel = Label(self.VolumeSliderFrame, textvariable=self.VolumeLabelVar, width=4, font=font.Font(weight='bold'))
         self.VolumeLabel.pack(side=LEFT)
-        self.VolumeFrame.pack(side=RIGHT)
+        self.VolumeFrame.pack(side=LEFT, padx=2)
 
         self.SearchStyle = ttk.Style()
         self.SearchEntryVar = StringVar()
@@ -182,6 +185,8 @@ class MusicPlayer:
         self.AudioSlider.bind('<B3-Motion>', self.ClickInMotion)
         self.master.bind_all('<Escape>', self.DestroyFindWidget)
         self.Tree.bind('<Shift-Delete>', self.RemoveFromPlaylist)
+        self.VolumeFrame.bind('<Enter>', self.ShowVolumeSlider)
+        self.VolumeFrame.bind('<Leave>', self.HideVolumeSlider)
         self.SearchEntry.bind('<Return>', self.SearchEntryReturnBind)
         self.TotalTimeLabel.bind('<Button-1>', self.ShowRemainingTime)
         self.master.bind_all('<Double-Button-1>', self.DoubleLeftClick)
@@ -275,15 +280,18 @@ class MusicPlayer:
                 self.OpenFiles()
 
             else:
-                index = self.childrens.index(self.Tree.selection()[0])
+                selection = self.Tree.selection()
 
-                if index == self.CurrentPlayingIndex:
-                    self.AddRemoveSelection('Add')
+                if selection:
+                    index = self.childrens.index(selection[0])
 
-                else:
-                    self.isPlaying = None
+                    if index == self.CurrentPlayingIndex:
+                        self.AddRemoveSelection('Add')
 
-                self.PlayOrPauseAudio()
+                    else:
+                        self.isPlaying = None
+
+                    self.PlayOrPauseAudio()
 
         elif widget in [self.EscapedTimeLabel, self.VolumeLabel] or isinstance(widget, Frame):
             # When user clicks to the empty space or
@@ -348,6 +356,17 @@ class MusicPlayer:
 
         elif widget == self.AudioSlider:  # Skip audio
             self.SkipAudio(event)
+
+    def ShowVolumeSlider(self, event=None):
+        '''Show the volume slider when user hovers to volume button'''
+
+        self.VolumeSliderFrame.pack(side=LEFT)
+
+    def HideVolumeSlider(self, event=None):
+        '''Hide the volume slider when user hovers away from the
+           volume button'''
+
+        self.VolumeSliderFrame.pack_forget()
 
     def OpenFiles(self, event=None, files=None):
         '''Open dialog box to select audio files'''
@@ -422,9 +441,13 @@ class MusicPlayer:
                 self.Tree.tag_configure(_tag, background='#e5e5e5', foreground='#333333')
 
         else:
-            _tag = self.AudioFiles[self.AudioName][1]
-            self.Tree.tag_configure(_tag, background='green')
-            self.Tree.selection_remove(self.Tree.selection()[0])
+            if self.AudioName is None:
+                self.PlayOrPauseAudio()
+
+            else:
+                _tag = self.AudioFiles[self.AudioName][1]
+                self.Tree.tag_configure(_tag, background='#29465b')
+                self.Tree.selection_remove(self.Tree.selection()[0])
 
     def PlayOrPauseAudio(self, event=None):
         '''Play or pause audio when play or pause button is pressed'''
@@ -655,29 +678,31 @@ class MusicPlayer:
            when user presses right arrow or left arrow
                 Here volume value is between 0-1'''
 
-        if self.master.focus_get() != self.SearchEntry:
-            CurrentVolume = self.VolumeSliderVar.get()
+        if self.master.focus_get() == self.SearchEntry and not event:
+            event.widget.tk_focusNext().focus()
 
-            if change == 'increase' or (not(isinstance(event, str)) and event.delta > 0):
-                CurrentVolume += 5
+        CurrentVolume = self.VolumeSliderVar.get()
 
-                if CurrentVolume >= 100:
-                    CurrentVolume = 100
+        if change == 'increase' or (not(isinstance(event, str)) and event.delta > 0):
+            CurrentVolume += 5
 
-            elif change == 'decrease' or (not(isinstance(event, str)) and event.delta < 0):
-                CurrentVolume -= 5
+            if CurrentVolume >= 100:
+                CurrentVolume = 100
 
-                if CurrentVolume <= 0:
-                    CurrentVolume = 00
+        elif change == 'decrease' or (not(isinstance(event, str)) and event.delta < 0):
+            CurrentVolume -= 5
 
-            if CurrentVolume == 0:
-                self.IsMuted = False
+            if CurrentVolume <= 0:
+                CurrentVolume = 00
 
-            else:
-                self.IsMuted = True
-                self.PreviousVolume = CurrentVolume
+        if CurrentVolume == 0:
+            self.IsMuted = False
 
-            self.MuteUnmuteVolume()
+        else:
+            self.IsMuted = True
+            self.PreviousVolume = CurrentVolume
+
+        self.MuteUnmuteVolume()
 
         return 'break'
 
