@@ -1,12 +1,19 @@
 import os
 import sys
 import json
+import ctypes
+import winreg
 import calendar
 import datetime
+import subprocess
 from tkinter import *
 import tkinter.ttk as ttk
 from tkinter import messagebox
 from tkinter.ttk import Scrollbar
+from configparser import ConfigParser
+from pystray._base import MenuItem as item
+import pystray._win32
+from PIL import Image
 
 
 class Widgets:
@@ -27,9 +34,14 @@ class Widgets:
 
 class Tution:
     def __init__(self):
-        self.file_name = os.path.abspath(os.path.join('.', 'tution.json'))
+        self.configFile = os.path.join(os.environ['USERPROFILE'], r'AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Tution\settings.ini')
+        self.startupFile = os.path.join(os.path.dirname(sys.executable), 'Tution-StartUp.exe')
+        self.file_name = os.path.join(os.path.dirname(self.configFile), 'tution.json')
+        self.DetailsInserted = False
+        self.WindowState = 'normal'
 
         self.master = Tk()
+        self.master.withdraw()
         self.master.title('TUTION')
 
         self.add_details_frame = Frame(self.master, bg='silver')
@@ -87,9 +99,9 @@ class Tution:
         self.left = Widgets(self.container_frame, 'LEFT')
         self.late = Widgets(self.container_frame, 'LATE PAY')
 
-        # Adding scrollbar
         self.text_widgets = [self.student_name.text_widget, self.student_fee.text_widget, self.join_date.text_widget, self.prev_pay.text_widget, self.next_pay.text_widget, self.left.text_widget, self.late.text_widget]
 
+        # Adding scrollbar
         self.scrollbar = Scrollbar(self.late.text_frame, orient="vertical", command=self.multiple_yview)
         self.scrollbar.pack(side=LEFT, fill='y')
 
@@ -103,22 +115,31 @@ class Tution:
 
         self.master.after(0, self.center_window)
         self.master.config(bg='silver')
+
+        self.Minimize()
+        self.master.protocol('WM_DELETE_WINDOW', self.withdraw_window)
         self.master.mainloop()
 
     def center_window(self):
         '''Set position of the window to the center of the screen when user open the program'''
 
-        self.master.withdraw()
         self.master.update()
 
         self.master.resizable(0, 0)
-        self.master.iconbitmap(self.resource_path('icon.ico'))
+        self.master.iconbitmap(resource_path('icon.ico'))
         width, height = self.master.winfo_width(), self.master.winfo_height() + 5
         screenwidth, screenheight = self.master.winfo_screenwidth() // 2, self.master.winfo_screenheight() // 2
         self.master.geometry(f'{width}x{height}+{screenwidth - width // 2}+{screenheight - height // 2}')
 
-        self.insert_at_first()
-        self.master.deiconify()
+        self.AddToStartUp()
+        self.RanAtStartup = self.AlterConfigFile() == 'True'
+
+        if self.RanAtStartup:
+            self.withdraw_window()
+
+        else:
+            self.insert_at_first()
+            self.master.deiconify()
 
     def widgets_bindings(self, event, focus_out=False):
         '''Remove or Add the default text when user clicks in or out of the entry widget'''
@@ -359,25 +380,127 @@ class Tution:
 
         self.master.focus()
         self.write_json(contents)
+        self.DetailsInserted = True
         self.config_text_widget(state=DISABLED)
 
-    def resource_path(self, file_name):
-        '''Get absolute path to resource from temporary directory
+    def quit_window(self):
+        '''Quit window from the system tray'''
 
-        In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+        self.icon.stop()
+        self.master.quit()
+        subprocess.call('taskkill /IM "{sys.executable}" /F', creationflags=0x08000000)
 
-        After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
+    def show_window(self):
+        '''Restore window from the system tray'''
 
-        try:
-            base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
+        self.icon.stop()
 
-        except AttributeError:
-            base_path = os.path.dirname(__file__)
+        if self.DetailsInserted is False:
+            self.master.after(250, self.insert_at_first)
 
-        return os.path.join(base_path, 'included_files', file_name)
+        self.master.after(0, self.master.deiconify)
+
+    def withdraw_window(self):
+        '''Hide window to the system tray'''
+
+        self.master.withdraw()
+
+        image = Image.open(resource_path("icon.ico"))
+        menu = (item('Quit', lambda: self.quit_window()), item('Show', lambda: self.show_window(), default=True))
+        self.icon = pystray.Icon("name", image, "Tution", menu)
+        self.icon.run()
+
+    def Minimize(self):
+        '''Hide window to the system tray when user clicks the minimize button'''
+
+        state = self.master.state()
+
+        if (state, self.WindowState) == ('iconic', 'normal'):
+            self.WindowState = 'iconic'
+            self.withdraw_window()
+
+        elif (state, self.WindowState) == ('normal', 'iconic'):
+            self.WindowState = 'normal'
+
+        self.master.after(250, self.Minimize)
+
+    def AlterConfigFile(self):
+        '''Read and Write the config file'''
+
+        config = ConfigParser()
+        config.read(self.configFile)
+
+        dirpath = os.path.dirname(self.configFile)
+
+        if not os.path.exists(dirpath):
+            os.mkdir(dirpath)
+
+        if 'STATUS' in config:
+            status = config['STATUS']['Startup']
+
+        else:
+            status = False
+
+        config['STATUS'] = {'Startup': False}
+        config['PATH'] = {'EXE PATH': sys.executable}
+
+        with open(self.configFile, 'w') as file:
+            config.write(file)
+
+        return status
+
+    def AddToStartUp(self):
+        '''Adding Tution-Startup.exe to startup'''
+
+        if os.path.exists(self.startupFile):
+            if os.path.exists(self.startupFile):
+                areg = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
+
+                try:
+                    akey = winreg.OpenKey(areg, f'SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\Tution-StartUp', 0, winreg.KEY_WRITE)
+                    areg.Close()
+                    akey.Close()
+
+                except WindowsError:
+                    key = winreg.OpenKey(areg, r'SOFTWARE\Microsoft\Windows\CurrentVersion\Run', 0, winreg.KEY_SET_VALUE)
+                    winreg.SetValueEx(key, 'Tution-StartUp', 0, winreg.REG_SZ, self.startupFile)
+
+                    areg.Close()
+                    key.Close()
+
+
+def resource_path(file_name):
+    '''Get absolute path to resource from temporary directory
+
+    In development:
+        Gets path of files that are used in this script like icons, images or file of any extension from current directory
+
+    After compiling to .exe with pyinstaller and using --add-data flag:
+        Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
+
+    try:
+        base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
+
+    except AttributeError:
+        base_path = os.path.dirname(__file__)
+
+    return os.path.join(base_path, 'included_files', file_name)
 
 
 if __name__ == '__main__':
-    Tution()
+    handle = ctypes.windll.user32.FindWindowW(None, "Tution")
+
+    if handle:  # When the program is already running
+        root = Tk()
+        root.withdraw()
+        root.iconbitmap(resource_path('icon.ico'))
+        res = messagebox.showinfo("ERR", "Already running ...")
+
+        if res == 'ok':
+            root.quit()
+            root.destroy()
+
+        root.mainloop()
+
+    else:
+        Tution()
