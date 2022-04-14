@@ -194,13 +194,15 @@ class MusicPlayer:
         self.AudioSlider.bind('<ButtonRelease-1>', self.ClickInMotionReleased)
         self.AudioSlider.bind('<ButtonRelease-3>', self.ClickInMotionReleased)
         self.master.bind("<Control-s>", lambda event: self.SavePlaylist(event, True))
-        self.master.bind_all('<Home>', lambda event: self.Tree.see(self.childrens[0]))
         self.Tree.bind('<Control-a>', lambda e: self.Tree.selection_set(self.childrens))
         self.master.bind_all('<Control-Left>', lambda event: self.SkipAudio(event, 'backward'))
         self.master.bind_all('<Control-Right>', lambda event: self.SkipAudio(event, 'forward'))
+        self.master.bind_all('<Home>', lambda event, _dir="Top": self.ScrollTopDown(event, _dir))
+        self.master.bind_all('<End>', lambda event, _dir="Down": self.ScrollTopDown(event, _dir))
         self.master.bind_all('<Left>', lambda event, change='decrease': self.ChangeVolume(event, change))
         self.master.bind_all('<Right>', lambda event, change='increase': self.ChangeVolume(event, change))
-        self.master.bind_all('<End>', lambda event: self.Tree.see(self.childrens[len(self.AudioFiles) - 1]))
+        self.master.bind_all('<Control-n>', lambda event: self.PreviousNextAudio(event, button_name='Next'))
+        self.master.bind_all('<Control-p>', lambda event: self.PreviousNextAudio(event, button_name='Prev'))
         self.AudioSlider.bind('<Button-1>', lambda event: self.SeekSingleClick(event, self.AudioSlider, self.SkipAudio))
         self.VolumeSlider.bind('<Button-1>', lambda event: self.SeekSingleClick(event, self.VolumeSlider, self.ChangeVolume, True))
 
@@ -412,6 +414,8 @@ class MusicPlayer:
             if len(self.AudioFiles) == 1:  # Play audio if user opens only 1 audio file
                 self.PlayOrPauseAudio()
 
+            self.TotalAudioFiles = len(self.AudioFiles) - 1
+
         return 'break'
 
     def GetPlaylist(self, event=None):
@@ -430,6 +434,23 @@ class MusicPlayer:
             self.OpenFiles(files=files)
 
         else:
+            winsound.MessageBeep()
+
+    def ScrollTopDown(self, event=None, _dir=None):
+        '''Scroll to the top when "HOME" key is pressed
+           or to the bottom when "END" key is pressed'''
+
+        try:
+            if _dir == "Top":
+                index = self.childrens[0]
+
+            else:
+                index = self.childrens[self.TotalAudioFiles]
+
+            self.Tree.see(index)
+            self.Tree.selection_set(index)
+
+        except (IndexError, AttributeError):
             winsound.MessageBeep()
 
     def AddRemoveSelection(self, status):
@@ -574,7 +595,7 @@ class MusicPlayer:
             self.TotalTimeVar.set('--:--')
             self.EscapedTimeVar.set('--:--')
 
-            if self.CurrentPlayingIndex == len(self.AudioFiles) - 1:
+            if self.CurrentPlayingIndex == self.TotalAudioFiles:
                 if self.RepeatAudio in ['LoopAll', 'LoopCurrent'] or self.PlayRandom:
                     self.EOF = False
 
@@ -596,7 +617,7 @@ class MusicPlayer:
                 self.Tree.selection_set(self.childrens[self.CurrentPlayingIndex])
                 self.PlayOrPauseAudio()
 
-            elif self.RepeatAudio == 'LoopAll' and self.CurrentPlayingIndex == len(self.AudioFiles) - 1:
+            elif self.RepeatAudio == 'LoopAll' and self.CurrentPlayingIndex == self.TotalAudioFiles:
                 if self.PlayRandom is True:
                     self.PreviousNextAudio(button_name='next')
 
@@ -620,16 +641,22 @@ class MusicPlayer:
             if self.AudioFiles:
                 if self.PlayRandom:
                     self.PrevID = ''
-                    self.CurrentPlayingIndex = random.randint(0, len(self.AudioFiles) - 1)
+                    self.CurrentPlayingIndex = random.randint(0, self.TotalAudioFiles)
 
                 elif button_name == 'Prev':
-                    if self.CurrentPlayingIndex == 0:
+                    if self.RepeatAudio == 'LoopCurrent' and self.CurrentPlayingIndex == 0:
+                        self.CurrentPlayingIndex = self.TotalAudioFiles + 1
+
+                    elif self.CurrentPlayingIndex == 0:
                         return
 
                     self.CurrentPlayingIndex -= 1
 
                 else:
-                    if self.CurrentPlayingIndex >= len(self.AudioFiles) - 1:
+                    if self.RepeatAudio == 'LoopCurrent' and self.CurrentPlayingIndex == self.TotalAudioFiles:
+                        self.CurrentPlayingIndex = 0
+
+                    elif self.CurrentPlayingIndex >= self.TotalAudioFiles:
                         return
 
                     self.CurrentPlayingIndex += 1
@@ -826,6 +853,7 @@ class MusicPlayer:
             self.childrens = self.Tree.get_children()
             self.Tree.focus(self.childrens[index])
             self.Tree.selection_set(self.childrens[index])
+            self.TotalAudioFiles = len(self.AudioFiles) - 1
 
         except (IndexError, TclError):
             pass
