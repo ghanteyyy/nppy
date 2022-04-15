@@ -4,6 +4,7 @@ import time
 import json
 import random
 import winsound
+import datetime
 from tkinter import *
 import tkinter.ttk as ttk
 from tkinter import font, filedialog, messagebox
@@ -37,6 +38,7 @@ class MusicPlayer:
         self.CurrentPlayingIndex = 0  # Index of current playing audio
         self.IsFindWidgetShown = False  # Track if FindWidget is shown
         self.SearchGlobalIndex = None  # Track the index of Search Value
+        self.TotalAudioDuration = 0  # Store total time of inserted audio
         self.EOF = False  # Trigger to check if the last songs is about to play
         self.SearchLocalIndex = None   # Track the search index of filtered items
         self.PlayRandom = False  # Track if Random Button has been pressed or not
@@ -53,7 +55,9 @@ class MusicPlayer:
         self.master.withdraw()
         self.master.title('Music Player')
         self.master.iconbitmap(self.ResourcePath('icon.ico'))
+        self.ButtonsAttributes = {'bd': '0', 'bg': 'white', 'activebackground': 'white', 'takefocus': False}
 
+        self.InfoImage = PhotoImage(file=self.ResourcePath('info.png'))
         self.PlayImage = PhotoImage(file=self.ResourcePath('Play.png'))
         self.NextImage = PhotoImage(file=self.ResourcePath('Next.png'))
         self.UnmuteImage = PhotoImage(file=self.ResourcePath('Vol4.png'))
@@ -129,7 +133,6 @@ class MusicPlayer:
 
         self.BottomFrame = Frame(self.container)
         self.BottomFrame.pack(side=BOTTOM, fill='x')
-        self.ButtonsAttributes = {'bd': '0', 'bg': 'white', 'activebackground': 'white', 'takefocus': False}
 
         self.ButtonsFrame = Frame(self.BottomFrame)
         self.ButtonsFrame.pack(side=LEFT)
@@ -159,6 +162,11 @@ class MusicPlayer:
         self.VolumeLabel.pack(side=LEFT)
         self.VolumeFrame.pack(side=LEFT, padx=2)
 
+        self.InfoFrame = Frame(self.BottomFrame)
+        self.InfoFrame.pack(side=RIGHT)
+        self.InfoButton = Button(self.InfoFrame, image=self.InfoImage, **self.ButtonsAttributes, command=self.ShowInfo)
+        self.InfoButton.pack(padx=2)
+
         self.SearchStyle = ttk.Style()
         self.SearchEntryVar = StringVar()
         self.SearchEntryVar.trace("w", self.SearchAudio)
@@ -172,6 +180,7 @@ class MusicPlayer:
         self.Tree.bind('<Delete>', self.RemoveFromList)
         self.Tree.bind('<space>', self.SpaceBarBindings)
         self.master.bind('<MouseWheel>', self.MouseWheel)
+        self.master.bind_all('<Control-i>', self.ShowInfo)
         self.Tree.bind('<Button-1>', self.SingleLeftClick)
         self.AudioSlider.bind('<Button-3>', self.SkipAudio)
         self.master.bind_all('<Control-o>', self.OpenFiles)
@@ -179,14 +188,14 @@ class MusicPlayer:
         self.SearchEntry.bind('<Up>', self.UpDownSearchItems)
         self.master.bind_all('<Control-O>', self.GetPlaylist)
         self.SearchEntry.bind('<Down>', self.UpDownSearchItems)
+        self.VolumeFrame.bind('<Enter>', self.ShowVolumeSlider)
+        self.VolumeFrame.bind('<Leave>', self.HideVolumeSlider)
         self.Tree.bind('<Motion>', self.RestrictResizingHeading)
         self.AudioSlider.bind('<B1-Motion>', self.ClickInMotion)
         self.master.bind_all('<Control-f>', self.ShowFindWidget)
         self.AudioSlider.bind('<B3-Motion>', self.ClickInMotion)
         self.master.bind_all('<Escape>', self.DestroyFindWidget)
         self.Tree.bind('<Shift-Delete>', self.RemoveFromPlaylist)
-        self.VolumeFrame.bind('<Enter>', self.ShowVolumeSlider)
-        self.VolumeFrame.bind('<Leave>', self.HideVolumeSlider)
         self.SearchEntry.bind('<Return>', self.SearchEntryReturnBind)
         self.TotalTimeLabel.bind('<Button-1>', self.ShowRemainingTime)
         self.master.bind_all('<Double-Button-1>', self.DoubleLeftClick)
@@ -384,7 +393,9 @@ class MusicPlayer:
                     pygame.mixer.music.set_volume(0)
                     pygame.mixer.music.load(file)
                     pygame.mixer.music.play()
+
                     length = MP3(file).info.length
+                    self.TotalAudioDuration += length
 
                     basename = os.path.basename(file)
                     _time = time.strftime('%H:%M:%S', time.gmtime(length)).lstrip('00').strip(':')
@@ -521,6 +532,9 @@ class MusicPlayer:
                     self.ScaleTimer = self.master.after(250, self.UpdateScale)
 
                 self.PlayButton.config(image=_image)
+
+            else:
+                winsound.MessageBeep()
 
         except (TclError, UnboundLocalError):
             pass
@@ -669,6 +683,9 @@ class MusicPlayer:
                 self.Tree.focus(item)
                 self.Tree.selection_set(item)
                 self.PlayOrPauseAudio()
+
+            else:
+                winsound.MessageBeep()
 
         except TclError:
             pass
@@ -844,7 +861,9 @@ class MusicPlayer:
                     self.StopAudio()
 
                 song_name = self.Tree.item(iid)['values'][0]
-                self.AudioFiles.pop(song_name)
+                pop_item = self.AudioFiles.pop(song_name)
+                self.TotalAudioDuration -= MP3(pop_item[0]).info.length
+
                 self.Tree.delete(iid)
 
             self.LowerCasedAudioFiles = [f.lower() for f in self.AudioFiles.keys()]
@@ -883,14 +902,18 @@ class MusicPlayer:
     def ShowFindWidget(self, event=None):
         '''Show Find widget if not already shown'''
 
-        if self.IsFindWidgetShown is False:
-            self.IsFindWidgetShown = True
-            self.SearchEntry.focus()
-            self.SearchButton.pack_forget()
-            self.SearchFrame.pack(side=LEFT)
+        if self.AudioFiles:
+            if self.IsFindWidgetShown is False:
+                self.IsFindWidgetShown = True
+                self.SearchEntry.focus()
+                self.SearchButton.pack_forget()
+                self.SearchFrame.pack(side=LEFT)
+
+            else:
+                self.SearchEntry.focus()
 
         else:
-            self.SearchEntry.focus()
+            winsound.MessageBeep()
 
     def DestroyFindWidget(self, event=None):
         '''Destroy Find widget when pressed ESC or X button'''
@@ -975,6 +998,24 @@ class MusicPlayer:
 
         elif not self.AudioFiles:
             self.OpenFiles()
+
+    def ShowInfo(self, event=None):
+        '''Show basic audio information'''
+
+        try:
+            TotalFiles = len(self.AudioFiles)
+
+            if TotalFiles >= 0:
+                TotalTime = str(datetime.timedelta(seconds=int(self.TotalAudioDuration))).zfill(8).replace(':', ' : ')
+                details = f"Total Audio: {TotalFiles}\nTotal Time: {TotalTime}"
+
+            else:
+                details = "Nothing to show"
+
+        except AttributeError:
+            details = "Nothing to show"
+
+        messagebox.showinfo("Details", details)
 
     def ResourcePath(self, FileName):
         '''Get absolute path to resource from temporary directory
