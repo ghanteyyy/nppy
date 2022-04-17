@@ -39,6 +39,7 @@ class MusicPlayer:
         self.IsFindWidgetShown = False  # Track if FindWidget is shown
         self.SearchGlobalIndex = None  # Track the index of Search Value
         self.TotalAudioDuration = 0  # Store total time of inserted audio
+        self.IsLeftClicked = False  # Track if left click has been pressed
         self.EOF = False  # Trigger to check if the last songs is about to play
         self.SearchLocalIndex = None   # Track the search index of filtered items
         self.PlayRandom = False  # Track if Random Button has been pressed or not
@@ -196,6 +197,7 @@ class MusicPlayer:
         self.AudioSlider.bind('<B3-Motion>', self.ClickInMotion)
         self.master.bind_all('<Escape>', self.DestroyFindWidget)
         self.Tree.bind('<Shift-Delete>', self.RemoveFromPlaylist)
+        self.VolumeSlider.bind('<Button-3>', self.VolumeRightClick)
         self.SearchEntry.bind('<Return>', self.SearchEntryReturnBind)
         self.TotalTimeLabel.bind('<Button-1>', self.ShowRemainingTime)
         self.master.bind_all('<Double-Button-1>', self.DoubleLeftClick)
@@ -324,6 +326,7 @@ class MusicPlayer:
                 # regions of and [12 ,13, 14, 15] are the bottom regions of ttk.Scale.
                 # When user clicks to these regions must be ignored.
 
+                self.IsLeftClicked = True
                 widget.event_generate('<Button-3>', x=event.x, y=event.y)
                 function(event)
 
@@ -693,7 +696,11 @@ class MusicPlayer:
     def SkipAudio(self, event=None, direction=None):
         '''Skip song as the user moves the slider'''
 
+        if self.IsLeftClicked is False and event.num == 3:
+            return 'break'
+
         if self.isPlaying:
+            self.IsLeftClicked = False
             SkipAt = self.AudioSliderVar.get()
 
             if direction == 'forward' or (not(isinstance(event, str)) and event.delta > 0):
@@ -725,6 +732,7 @@ class MusicPlayer:
         if self.master.focus_get() == self.SearchEntry and not event:
             event.widget.tk_focusNext().focus()
 
+        self.IsLeftClicked = False
         CurrentVolume = self.VolumeSliderVar.get()
 
         if change == 'increase' or (not(isinstance(event, str)) and event.delta > 0):
@@ -849,6 +857,12 @@ class MusicPlayer:
 
         finally:
             RightClickMenu.grab_release()
+
+    def VolumeRightClick(self, event=None):
+        '''When user right clicks in the volume slider'''
+
+        if self.IsLeftClicked is False and event.num == 3:
+            return 'break'
 
     def RemoveFromList(self, event=None):
         '''Remove selected item from the list-box'''
