@@ -828,6 +828,8 @@ class MusicPlayer:
         RightClickMenu = Menu(self.master, tearoff=False)
 
         if widget == self.Tree:
+            region = self.Tree.identify_region(x, y)
+
             if CurrentSelection:
                 if self.ClickedAtEmptySpace(event):
                     RightClickMenu.add_command(label='Open', command=self.OpenFiles)
@@ -844,9 +846,13 @@ class MusicPlayer:
                     self.Tree.event_generate('<Button-1>', x=x, y=y)
                     self.Tree.event_generate('<Button-3>', x=x, y=y)
 
-                elif self.Tree.identify_region(x, y) == 'heading' or self.ClickedAtEmptySpace(event):
+                elif region == 'heading' or self.ClickedAtEmptySpace(event):
                     RightClickMenu.add_command(label='Open', command=self.OpenFiles)
                     RightClickMenu.add_command(label='Open Playlist', command=self.GetPlaylist)
+
+            if self.Tree.selection() and region != 'heading':
+                RightClickMenu.add_command(label='Remove Permanently (Caution!)', command=self.RemovePermanently)
+                RightClickMenu.entryconfig(3, activeforeground='red')
 
         elif widget in [self.EscapedTimeLabel, self.VolumeLabel] or isinstance(widget, Frame):
             RightClickMenu.add_command(label='Open', command=self.OpenFiles)
@@ -896,6 +902,22 @@ class MusicPlayer:
 
         self.RemoveFromList()
         self.SavePlaylist()
+
+    def RemovePermanently(self):
+        '''Delete the selected files entirely from the device'''
+
+        selections = self.Tree.selection()
+        confirm = messagebox.askyesno('Really?', 'This action will permanently delete your selected file(s). You cannot undo this action.\n\nDo you still want to continue?')
+
+        if confirm:
+            for selection in selections:
+                file = self.Tree.item(selection)['values'][0]
+
+                if file in self.AudioFiles:
+                    file_path = self.AudioFiles[file][0]
+                    os.remove(file_path)
+
+            self.RemoveFromPlaylist()
 
     def SavePlaylist(self, event=None, show_message=False):
         '''Save audio path present in list-box'''
