@@ -392,27 +392,33 @@ class MusicPlayer:
 
         if files:
             for file in files:
-                try:
-                    pygame.mixer.music.set_volume(0)
-                    pygame.mixer.music.load(file)
-                    pygame.mixer.music.play()
+                basename = os.path.basename(file)
 
-                    length = MP3(file).info.length
-                    self.TotalAudioDuration += length
+                if basename not in self.AudioFiles:
+                    try:
+                        pygame.mixer.music.set_volume(0)
+                        pygame.mixer.music.load(file)
+                        pygame.mixer.music.play()
 
-                    basename = os.path.basename(file)
-                    _time = time.strftime('%H:%M:%S', time.gmtime(length)).lstrip('00').strip(':')
+                        length = MP3(file).info.length
+                        self.TotalAudioDuration += length
 
-                    self.Tree.insert('', END, values=(basename, _time), tag=self.TagCount)
-                    self.AudioFiles.update({basename: (file, self.TagCount)})
-                    self.TagCount += 1
+                        self.AudioFiles.update({basename: (file, self.TagCount)})
+                        self.TagCount += 1
 
-                except (pygame.error, HeaderNotFoundError):
-                    if ShowErrorMessage is False:
-                        ShowErrorMessage = True
-                        messagebox.showinfo('ERR', 'Some audio file(s) are not supported so ignoring them')
+                    except (pygame.error, HeaderNotFoundError):
+                        if ShowErrorMessage is False:
+                            ShowErrorMessage = True
+                            messagebox.showinfo('ERR', 'Some audio file(s) are not supported so ignoring them')
 
-                pygame.mixer.music.stop()
+                    pygame.mixer.music.stop()
+
+            self.Tree.delete(*self.Tree.get_children())
+
+            for key, value in self.AudioFiles.items():
+                length = MP3(value[0]).info.length
+                _time = time.strftime('%H:%M:%S', time.gmtime(length)).lstrip('00').strip(':')
+                self.Tree.insert('', END, values=(key, _time), tag=value[1])
 
             self.childrens = self.Tree.get_children()
             self.LowerCasedAudioFiles = [f.lower() for f in self.AudioFiles.keys()]
@@ -431,6 +437,35 @@ class MusicPlayer:
             self.TotalAudioFiles = len(self.AudioFiles) - 1
 
         return 'break'
+
+    def SortAudio(self):
+        '''Sort audio list in Treeview alphabetically'''
+
+        selected_text = ''
+        sel = self.Tree.selection()
+
+        if sel:
+            selected_text = self.Tree.item(sel[-1])['values'][0]
+
+        self.Tree.delete(*self.Tree.get_children())
+        self.AudioFiles = dict(sorted(self.AudioFiles.items(), key=lambda item: item[0].lower()))
+
+        for key, value in self.AudioFiles.items():
+            length = MP3(value[0]).info.length
+            _time = time.strftime('%H:%M:%S', time.gmtime(length)).lstrip('00').strip(':')
+            self.Tree.insert('', END, values=(key, _time), tag=value[1])
+
+        child = None
+        self.childrens = self.Tree.get_children()
+
+        for children in self.childrens:
+            if self.Tree.item(children)['values'][0] == selected_text:
+                child = children
+                break
+
+        if child:
+            self.Tree.selection_set(child)
+            self.Tree.see(child)
 
     def GetPlaylist(self, event=None):
         '''Get audio path stored in a file'''
@@ -851,6 +886,7 @@ class MusicPlayer:
                     RightClickMenu.add_command(label='Open Playlist', command=self.GetPlaylist)
 
             if self.Tree.selection() and region != 'heading':
+                RightClickMenu.add_command(label='Sort (Alphabetically)', command=self.SortAudio)
                 RightClickMenu.add_command(label='Remove Permanently (Caution!)', command=self.RemovePermanently)
                 RightClickMenu.entryconfig(3, activeforeground='red')
 
@@ -884,8 +920,7 @@ class MusicPlayer:
                 pop_item = self.AudioFiles.pop(song_name)
                 self.TotalAudioDuration -= MP3(pop_item[0]).info.length
 
-                self.Tree.delete(iid)
-
+            self.Tree.delete(*CurrentIndexes)
             self.LowerCasedAudioFiles = [f.lower() for f in self.AudioFiles.keys()]
 
             index = self.childrens.index(iid)
