@@ -385,12 +385,25 @@ class MusicPlayer:
     def OpenFiles(self, event=None, files=None):
         '''Open dialog box to select audio files'''
 
+        audio_name = ''
         ShowErrorMessage = False
+
+        if self.isPlaying:
+            audio_name = self.AudioName
+
+        else:
+            if self.Tree.selection():
+                audio_name = self.Tree.item(self.Tree.focus())['values'][0]
 
         if files is None:
             files = filedialog.askopenfilenames(filetypes=self.extensions, initialdir=os.getcwd(), defaultextension=self.extensions)
 
         if files:
+            if self.ScaleTimer:
+                # Stopping updating audio-slider and position of current playing audio
+                # to resume audio when finishing adding the new audio to the TreeView
+                self.master.after_cancel(self.ScaleTimer)
+
             for file in files:
                 basename = os.path.basename(file)
 
@@ -413,9 +426,9 @@ class MusicPlayer:
 
                     pygame.mixer.music.stop()
 
-            self.Tree.delete(*self.Tree.get_children())
+            self.Tree.delete(*self.Tree.get_children())  # Emptying TreeView contents
 
-            for key, value in self.AudioFiles.items():
+            for key, value in self.AudioFiles.items():  # Inserting data to TreeView
                 length = MP3(value[0]).info.length
                 _time = time.strftime('%H:%M:%S', time.gmtime(length)).lstrip('00').strip(':')
                 self.Tree.insert('', END, values=(key, _time), tag=value[1])
@@ -423,16 +436,28 @@ class MusicPlayer:
             self.childrens = self.Tree.get_children()
             self.LowerCasedAudioFiles = [f.lower() for f in self.AudioFiles.keys()]
 
-            if self.IsMuted is False:
+            if self.IsMuted is False:  # Setting volume as the previously set by the user
                 pygame.mixer.music.set_volume(self.PreviousVolume / 100)
 
-            if self.isPlaying is None and not self.Tree.selection():
-                self.Tree.focus_force()
-                self.Tree.focus(self.childrens[0])
-                self.Tree.selection_set(self.childrens[0])
+            if audio_name:
+                selIndex = self.childrens[list(self.AudioFiles.keys()).index(audio_name)]
 
-            if len(self.AudioFiles) == 1:  # Play audio if user opens only 1 audio file
+            else:
+                selIndex = self.childrens[0]
+
+            # Selecting audio and scrolling to the that selected audio
+            self.Tree.focus_force()
+            self.Tree.see(selIndex)
+            self.Tree.focus(selIndex)
+            self.Tree.selection_set(selIndex)
+
+            if len(self.AudioFiles) == 1:  # Play audio if user opens only one audio file
                 self.PlayOrPauseAudio()
+
+            if self.isPlaying:  # Resuming audio after finishing opening audios
+                pygame.mixer.music.load(self.AudioFiles[self.AudioName][0])
+                pygame.mixer.music.play(start=self.CurrentPos)
+                self.UpdateScale()
 
             self.TotalAudioFiles = len(self.AudioFiles) - 1
 
