@@ -1,4 +1,5 @@
 import os
+import io
 import sys
 import time
 import json
@@ -9,7 +10,9 @@ from tkinter import *
 import tkinter.ttk as ttk
 from tkinter import font, filedialog, messagebox
 import pygame
+import stagger
 from ttkbootstrap import Style
+from PIL import Image, ImageTk
 from mutagen.mp3 import MP3, HeaderNotFoundError
 
 
@@ -40,6 +43,7 @@ class MusicPlayer:
         self.SearchGlobalIndex = None  # Track the index of Search Value
         self.TotalAudioDuration = 0  # Store total time of inserted audio
         self.IsLeftClicked = False  # Track if left click has been pressed
+        self.IsAlbumPictureShown = False  # Track if album picture is shown
         self.EOF = False  # Trigger to check if the last songs is about to play
         self.SearchLocalIndex = None   # Track the search index of filtered items
         self.PlayRandom = False  # Track if Random Button has been pressed or not
@@ -58,6 +62,8 @@ class MusicPlayer:
         self.master.iconbitmap(self.ResourcePath('icon.ico'))
         self.ButtonsAttributes = {'bd': '0', 'bg': 'white', 'activebackground': 'white', 'takefocus': False}
 
+        self.AlbumArtImage = self.ResourcePath('albumart.png')
+        self.ArtImage = PhotoImage(file=self.ResourcePath('art.png'))
         self.InfoImage = PhotoImage(file=self.ResourcePath('info.png'))
         self.PlayImage = PhotoImage(file=self.ResourcePath('Play.png'))
         self.NextImage = PhotoImage(file=self.ResourcePath('Next.png'))
@@ -141,17 +147,19 @@ class MusicPlayer:
         self.PlayButton = Button(self.ButtonsFrame, image=self.PlayImage, **self.ButtonsAttributes, command=self.PlayOrPauseAudio)
         self.PlayButton.pack(side=LEFT)
         self.PreviousButton = Button(self.ButtonsFrame, image=self.PreviousImage, **self.ButtonsAttributes, command=lambda: self.PreviousNextAudio(button_name='Prev'))
-        self.PreviousButton.pack(side=LEFT, padx=2, ipady=5)
+        self.PreviousButton.pack(side=LEFT, padx=2)
         self.StopAudioButton = Button(self.ButtonsFrame, image=self.StopAudioImage, **self.ButtonsAttributes, command=self.StopAudio)
         self.StopAudioButton.pack(side=LEFT)
         self.NextButton = Button(self.ButtonsFrame, image=self.NextImage, **self.ButtonsAttributes, command=lambda: self.PreviousNextAudio(button_name='Next', event=Event))
         self.NextButton.pack(side=LEFT, padx=2)
+        self.ArtButton = Button(self.ButtonsFrame, image=self.ArtImage, **self.ButtonsAttributes, command=self.ShowAlbumPicture)
+        self.ArtButton.pack(side=LEFT)
         self.RepeatButton = Button(self.ButtonsFrame, image=self.RepeatAllImage, **self.ButtonsAttributes, command=self.ToggleRepeat)
-        self.RepeatButton.pack(side=LEFT)
+        self.RepeatButton.pack(side=LEFT, padx=2)
         self.RandomButton = Button(self.ButtonsFrame, image=self.RandomDisabledImage, **self.ButtonsAttributes, command=self.ToggleRandom)
-        self.RandomButton.pack(side=LEFT, padx=2)
+        self.RandomButton.pack(side=LEFT)
         self.SearchButton = Button(self.ButtonsFrame, image=self.SearchImage, **self.ButtonsAttributes, command=self.ShowFindWidget)
-        self.SearchButton.pack(side=LEFT)
+        self.SearchButton.pack(side=LEFT, padx=2)
 
         self.VolumeFrame = Frame(self.BottomFrame)
         self.VolumeSliderFrame = Frame(self.VolumeFrame)
@@ -396,7 +404,7 @@ class MusicPlayer:
                 audio_name = self.Tree.item(self.Tree.focus())['values'][0]
 
         if files is None:
-            files = filedialog.askopenfilenames(filetypes=self.extensions, initialdir=os.getcwd(), defaultextension=self.extensions)
+            files = filedialog.askopenfilenames(filetypes=self.extensions, defaultextension=self.extensions)
 
         if files:
             if self.ScaleTimer:
@@ -426,40 +434,41 @@ class MusicPlayer:
 
                     pygame.mixer.music.stop()
 
-            self.Tree.delete(*self.Tree.get_children())  # Emptying TreeView contents
+            if self.AudioFiles:
+                self.Tree.delete(*self.Tree.get_children())  # Emptying TreeView contents
 
-            for key, value in self.AudioFiles.items():  # Inserting data to TreeView
-                length = MP3(value[0]).info.length
-                _time = time.strftime('%H:%M:%S', time.gmtime(length)).lstrip('00').strip(':')
-                self.Tree.insert('', END, values=(key, _time), tag=value[1])
+                for key, value in self.AudioFiles.items():  # Inserting data to TreeView
+                    length = MP3(value[0]).info.length
+                    _time = time.strftime('%H:%M:%S', time.gmtime(length)).lstrip('00').strip(':')
+                    self.Tree.insert('', END, values=(key, _time), tag=value[1])
 
-            self.childrens = self.Tree.get_children()
-            self.LowerCasedAudioFiles = [f.lower() for f in self.AudioFiles.keys()]
+                self.childrens = self.Tree.get_children()
+                self.LowerCasedAudioFiles = [f.lower() for f in self.AudioFiles.keys()]
 
-            if self.IsMuted is False:  # Setting volume as the previously set by the user
-                pygame.mixer.music.set_volume(self.PreviousVolume / 100)
+                if self.IsMuted is False:  # Setting volume as the previously set by the user
+                    pygame.mixer.music.set_volume(self.PreviousVolume / 100)
 
-            if audio_name:
-                selIndex = self.childrens[list(self.AudioFiles.keys()).index(audio_name)]
+                if audio_name:
+                    selIndex = self.childrens[list(self.AudioFiles.keys()).index(audio_name)]
 
-            else:
-                selIndex = self.childrens[0]
+                else:
+                    selIndex = self.childrens[0]
 
-            # Selecting audio and scrolling to the that selected audio
-            self.Tree.focus_force()
-            self.Tree.see(selIndex)
-            self.Tree.focus(selIndex)
-            self.Tree.selection_set(selIndex)
+                # Selecting audio and scrolling to the that selected audio
+                self.Tree.focus_force()
+                self.Tree.see(selIndex)
+                self.Tree.focus(selIndex)
+                self.Tree.selection_set(selIndex)
 
-            if len(self.AudioFiles) == 1:  # Play audio if user opens only one audio file
-                self.PlayOrPauseAudio()
+                if len(self.AudioFiles) == 1:  # Play audio if user opens only one audio file
+                    self.PlayOrPauseAudio()
 
-            if self.isPlaying:  # Resuming audio after finishing opening audios
-                pygame.mixer.music.load(self.AudioFiles[self.AudioName][0])
-                pygame.mixer.music.play(start=self.CurrentPos)
-                self.UpdateScale()
+                elif self.isPlaying:  # Resuming audio after finishing opening audios
+                    pygame.mixer.music.load(self.AudioFiles[self.AudioName][0])
+                    pygame.mixer.music.play(start=self.CurrentPos)
+                    self.UpdateScale()
 
-            self.TotalAudioFiles = len(self.AudioFiles) - 1
+                self.TotalAudioFiles = len(self.AudioFiles) - 1
 
         return 'break'
 
@@ -746,6 +755,9 @@ class MusicPlayer:
                 self.Tree.focus(item)
                 self.Tree.selection_set(item)
                 self.PlayOrPauseAudio()
+
+                if self.IsAlbumPictureShown:
+                    self.ShowAlbumPicture(force_show=True)
 
             else:
                 winsound.MessageBeep()
@@ -1112,6 +1124,53 @@ class MusicPlayer:
             details = "Nothing to show"
 
         messagebox.showinfo("Details", details)
+
+    def ShowAlbumPicture(self, force_show=False):
+        '''Show Album Picture instead of TreeView when clicked to art button
+
+           When user plays next or previous audio then force_show when True
+           changes the album picture when the previous album picture is shown
+           already'''
+
+        if self.IsAlbumPictureShown is False or force_show is True:
+            image = ''
+            self.IsAlbumPictureShown = True
+
+            if self.isPlaying is not None:   # When audio is being played or is paused
+                audioPath = self.AudioFiles[self.AudioName][0]  # Getting the current playing or paused audio_path
+
+                try:
+                    mp3 = stagger.read_tag(audioPath)
+                    by_data = mp3[stagger.id3.APIC][0].data   # Getting the image from the audio file
+                    image = io.BytesIO(by_data)  # Storing the image to memory
+                    size = (300, 300)
+
+                except (stagger.errors.NoTagError, KeyError):
+                    pass
+
+            if not image:
+                # When audio do not have any audio_image then setting the default music image
+                size = (175, 175)
+                image = self.AlbumArtImage
+
+            im = Image.open(image)
+            im.thumbnail(size, Image.Resampling.LANCZOS)
+            image = ImageTk.PhotoImage(im)
+
+            if force_show is False:
+                self.Tree.pack_forget()
+                self.AlbumPictureFrame = Frame(self.AudioListFrame)
+                self.AlbumPictureFrame.pack()
+                self.AlbumPictureLabel = Label(self.AlbumPictureFrame, width=self.Tree.winfo_width(), height=self.Tree.winfo_reqheight() - 4)
+                self.AlbumPictureLabel.pack(side=BOTTOM)
+
+            self.AlbumPictureLabel.config(image=image)
+            self.AlbumPictureLabel.image = image
+
+        else:
+            self.IsAlbumPictureShown = False
+            self.AlbumPictureFrame.pack_forget()
+            self.Tree.pack()
 
     def ResourcePath(self, FileName):
         '''Get absolute path to resource from temporary directory
