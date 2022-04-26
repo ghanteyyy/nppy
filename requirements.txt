@@ -5,6 +5,7 @@ pygit2
 pygame
 django
 mutagen
+stagger
 requests
 pyautogui
 pyperclip
