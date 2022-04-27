@@ -181,7 +181,7 @@ class MusicPlayer:
         self.SearchEntryVar.trace("w", self.SearchAudio)
         self.SearchFrame = Frame(self.ButtonsFrame, bg='#e5e5e5')
         self.SearchStyle.configure('Search.TEntry')
-        self.SearchEntry = ttk.Entry(self.SearchFrame, width=26, style='Search.TEntry', textvariable=self.SearchEntryVar)
+        self.SearchEntry = ttk.Entry(self.SearchFrame, width=16, style='Search.TEntry', textvariable=self.SearchEntryVar)
         self.SearchEntry.pack(side=LEFT)
         self.ExitSearchButton = Button(self.SearchFrame, image=self.SearchExitImage, bg='#e5e5e5', bd=0, activebackground='#e5e5e5', cursor='hand2', command=self.DestroyFindWidget)
         self.ExitSearchButton.pack(side=RIGHT)
@@ -631,6 +631,8 @@ class MusicPlayer:
             self.Tree.selection_set(self.childrens[0])
             self.PlayButton.config(image=self.PlayImage)
 
+            self.ShowAlbumPicture(force_show=True)
+
         else:
             winsound.MessageBeep()
 
@@ -909,6 +911,7 @@ class MusicPlayer:
                 else:
                     if len(self.Tree.selection()) == 1:
                         self.Tree.event_generate("<Button-1>", x=x, y=y)
+                        RightClickMenu.add_command(label='Set Album Art', command=self.SetAlbumArt)
 
                     RightClickMenu.add_command(label='Remove from list', command=self.RemoveFromList)
                     RightClickMenu.add_command(label='Remove from playlist', command=self.RemoveFromPlaylist)
@@ -1171,6 +1174,56 @@ class MusicPlayer:
             self.IsAlbumPictureShown = False
             self.AlbumPictureFrame.pack_forget()
             self.Tree.pack()
+
+    def SetAlbumArt(self, event=None):
+        '''Add image to album art of a selected audio'''
+
+        try:
+            image_path = filedialog.askopenfilenames(filetypes=[('Images', '.jpg .png .jpeg')])
+            path_length = len(image_path)
+
+            if path_length == 1:
+                if self.isPlaying is not None:
+                    # Quiting pygame to stop playing audio because stagger module needs
+                    # the selected audio must not be used by any other applications/modules
+                    pygame.mixer.music.stop()
+                    pygame.quit()
+                    self.master.after_cancel(self.ScaleTimer)
+
+                image_path = image_path[0]
+
+                # Getting the selected value
+                sel = self.Tree.selection()[0]
+                item = self.Tree.item(sel)['values'][0]
+                audio_path = self.AudioFiles[item][0]
+
+                # Saving image to audio as album art
+                mp3 = stagger.read_tag(audio_path)
+                mp3.picture = image_path
+                mp3.write()
+
+                if self.isPlaying is not None:
+                    # When audio is being played or paused then resuming it
+                    pygame.mixer.init()
+                    pygame.mixer.music.load(self.AudioFiles[self.AudioName][0])
+                    pygame.mixer.music.play(start=self.CurrentPos)
+
+                    if self.isPlaying is False:
+                        # If audio was paused before then restoring it state as paused
+                        pygame.mixer.music.pause()
+
+                    else:
+                        # If audio was being played then resuming from the previous position
+                        # Also restoring the previous volume value
+                        pygame.mixer.music.set_volume(self.PreviousVolume / 100)
+                        self.UpdateScale()
+
+            elif path_length > 1:  # When user opens more than one images
+                messagebox.showerror('ERR', 'Only one image file was expected')
+
+        except stagger.errors.NoTagError:
+            # Some audios do not support stagger module
+            messagebox.showerror('ERR', 'Cannot add album art to the selected audio')
 
     def ResourcePath(self, FileName):
         '''Get absolute path to resource from temporary directory
