@@ -4,6 +4,7 @@ from tkinter import *
 import tkinter.ttk as ttk
 from tkinter.ttk import Scrollbar
 import pygame
+import pyperclip
 
 
 class SSNI:
@@ -96,6 +97,7 @@ class SSNI:
 
         self.master.bind('<Button-1>', self.key_bindings)
         self.back_button.bind('<Return>', self.back_command)
+        self.video_entry.bind('<Button-3>', self.RightClick)
         self.video_entry.bind('<FocusIn>', self.key_bindings)
         self.old_name_entry.bind('<FocusIn>', self.key_bindings)
         self.new_name_entry.bind('<FocusIn>', self.key_bindings)
@@ -304,6 +306,67 @@ class SSNI:
             self.after_id = None
 
         self.after_id = self.master.after(800, lambda: self.text_area.tag_delete('highlight'))
+
+    def copy_cut(self, cut=False):
+        '''Command for copying and cutting selected text of entry widget'''
+
+        if self.video_entry.selection_present():
+            text = self.video_entry.get()
+            pyperclip.copy(text)  # Copying selected text to clipboard
+
+            if cut:
+                # When user clicks to the cut option of right-click
+                # menu then deleting the text inside of the selection
+
+                self.video_entry.delete('sel.first', 'sel.last')
+
+    def paste(self):
+        '''Command for pasting text from system clipboard to the position
+           of cursor in entry widget'''
+
+        clipboard = pyperclip.paste()
+
+        if self.video_entry.select_present():
+            self.video_entry.delete('sel.first', 'sel.last')  # Removing the selected text of entry widget
+
+        cur_pos = self.video_entry.index(INSERT)
+        self.video_entry.insert(cur_pos, clipboard)
+
+    def RightClick(self, event=None):
+        '''When user right clicks inside list-box'''
+
+        RightClickMenu = Menu(self.master, tearoff=False)
+
+        RightClickMenu.add_command(label='Copy', command=self.copy_cut)
+        RightClickMenu.add_command(label='Cut', command=lambda: self.copy_cut(cut=True))
+        RightClickMenu.add_command(label='Paste', command=self.paste)
+
+        if not pyperclip.paste():
+            # When there is no text in clipboard then
+            # disabling paste options in right-click menu
+
+            RightClickMenu.entryconfig(2, state='disabled')
+
+        if self.video_entry.select_present() is False:
+            # When there is no selection in entry widget then
+            # disabling copy and cut options in right-click menu
+
+            RightClickMenu.entryconfig(0, state='disabled')
+            RightClickMenu.entryconfig(1, state='disabled')
+
+            if self.master.focus_get() != self.video_entry:
+                # When the cursor is over the entry widget and
+                # user right clicks to entry widget then generating
+                # left click event to set focus to entry widget
+                # before showing pop-up menu
+
+                self.video_entry.event_generate('<Button-1>')
+
+        try:
+            RightClickMenu.tk_popup(event.x_root, event.y_root)
+
+        finally:
+            RightClickMenu.grab_release()
 
     def resource_path(self, file_name):
         '''Get absolute path to resource from temporary directory
