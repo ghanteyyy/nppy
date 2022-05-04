@@ -37,7 +37,7 @@ class SSNI:
         pygame.init()
         pygame.mixer.music.load(self.ErrorAudioFile)
 
-        self.BackImage = PhotoImage(file='included_files/back.png')
+        self.BackImage = PhotoImage(file=self.resource_path('back.png'))
         self.buttons_attributes = {'bd': 0, 'width': _width, 'bg': 'green', 'fg': 'white',
                                    'activebackground': 'green', 'activeforeground': 'white',
                                    'cursor': 'hand2'}
@@ -45,7 +45,7 @@ class SSNI:
         self.LeftFrame = Frame(self.master)
         self.LeftFrame.pack(side=LEFT)
         self.RightFrame = Frame(self.master)
-        self.RightFrame.pack(side=RIGHT)
+        self.RightFrame.pack(side=RIGHT, pady=5, anchor='w')
 
         self.FirstLeftFrame = Frame(self.LeftFrame)
         self.FirstLeftFrame.pack(side=LEFT)
@@ -65,16 +65,12 @@ class SSNI:
         self.rename_window_button = Button(self.FirstLeftFrame, text='R E N A M E', **self.buttons_attributes, command=self.ShowRenamingWidgets)
         self.rename_window_button.pack(pady=5, ipady=buttons_ipady)
 
-        self.text_area = Text(self.RightFrame, width=27, height=13, state=DISABLED, cursor='arrow')
-        self.scrollbar = Scrollbar(self.RightFrame, orient="vertical", command=self.text_area.yview)
-        self.text_area.config(yscrollcommand=self.scrollbar.set)
-        self.text_area.pack(side=LEFT, ipady=1)
+        self.ListBoxVariable = Variable()
+        self.ListBox = Listbox(self.RightFrame, width=36, height=13, activestyle='none', listvariable=self.ListBoxVariable)
+        self.scrollbar = Scrollbar(self.RightFrame, orient="vertical", command=self.ListBox.yview)
+        self.ListBox.config(yscrollcommand=self.scrollbar.set)
+        self.ListBox.pack(side=LEFT, ipady=1)
         self.scrollbar.pack(side=RIGHT, fill='y')
-        self.RightFrame.pack(pady=5, padx=4, anchor='w')
-
-        self.text_area.config(state=NORMAL)
-        self.text_area.delete('1.0', END)
-        self.RightFrame.pack(padx=5, pady=5, side=LEFT)
 
         self.SecondLeftFrame = Frame(self.LeftFrame)
 
@@ -95,6 +91,8 @@ class SSNI:
         self.back_button = Button(self.SecondLeftFrame, image=self.BackImage, bd=0, cursor='hand2', activebackground=back_active_bg, command=self.back_command)
         self.back_button.pack(ipady=buttons_ipady)
 
+        self.master.bind('<F5>', self.InsertToListBox)
+        self.ListBox.bind('<Button-3>', self.RightClick)
         self.master.bind('<Button-1>', self.key_bindings)
         self.back_button.bind('<Return>', self.back_command)
         self.video_entry.bind('<Button-3>', self.RightClick)
@@ -102,12 +100,11 @@ class SSNI:
         self.old_name_entry.bind('<FocusIn>', self.key_bindings)
         self.new_name_entry.bind('<FocusIn>', self.key_bindings)
         self.rename_button.bind('<Return>', self.rename_command)
+        self.master.bind_class('Button', '<FocusIn>', lambda event, focus_out=True: self.key_bindings(event, focus_out))
 
         self.master.after(0, self.center_window)
-        self.master.after(0, self.insert_text_area)
+        self.master.after(0, self.InsertToListBox)
 
-        self.master.bind('<F5>', lambda e: self.insert_text_area())
-        self.master.bind_class('Button', '<FocusIn>', lambda event, focus_out=True: self.key_bindings(event, focus_out))
         self.master.mainloop()
 
     def center_window(self):
@@ -125,7 +122,7 @@ class SSNI:
 
         self.master.deiconify()
 
-    def config_entry(self, widget, color, insert=True):
+    def config_entry(self, widget, color='grey', insert=True):
         '''Configure behavior of entries widget when user clicks in or out of them'''
 
         widget.delete(0, END)
@@ -134,6 +131,7 @@ class SSNI:
 
         if insert:
             widget.insert(END, self.widgets[widget][0])
+            self.master.focus()
 
     def key_bindings(self, event, focus_out=False):
         '''When user clicks in and out of the entry boxes'''
@@ -153,6 +151,9 @@ class SSNI:
             for _widget in self.widgets:
                 if not _widget.get().strip():
                     self.config_entry(_widget, 'grey')
+
+        if widget not in [self.ListBox, self.scrollbar]:  # Remove selection of Listbox when user clicks to other widget
+            self.ListBox.selection_clear(0, END)
 
         if widget in [self.master, self.SecondLeftFrame, self.FirstLeftFrame, self.scrollbar]:
             self.master.focus()
@@ -181,56 +182,54 @@ class SSNI:
     def write_to_file(self, contents):
         '''Writting new or renamed data to the file'''
 
-        contents.sort(key=len)
-
         with open(self.file_name, 'w') as f:
             for content in contents:
                 f.write(f'{content}\n')
 
-        return contents
-
-    def insert_text_area(self, contents=None):
+    def InsertToListBox(self, event=None, contents=None, remove=False):
         '''Insert contents of file in Text widget'''
 
-        if contents is not None:
-            contents = self.write_to_file(contents)
-
-        else:
+        if contents is None:
             contents = self.read_file()
 
-        self.text_area.config(state=NORMAL)
-
         if contents:
-            self.text_area.delete('1.0', END)
-            self.text_area.config(fg='black')
+            contents.sort(key=len)
 
-            for index, content in enumerate(contents):
-                if index == 0:
-                    self.text_area.insert(END, content)
+            if self.ListBoxVariable.get() and self.ListBoxVariable.get()[0] == 'No data yet':
+                self.ListBox.itemconfig(0, foreground='black')
 
-                else:
-                    self.text_area.insert(END, '\n' + content)
+            if remove is False:
+                self.ListBoxVariable.set(contents)
+
+            else:
+                # When user removes any value then the deleted value
+                # gets selected by red color first and then after 800ms
+                # the value in the ListBox gets deleted. When doing so
+                # the ListBox scrolls back to the top(its default behavior).
+                # To avoid this default scrolling remove parameter removes
+                # the respective value without scrolling to the top.
+
+                index = self.ListBox.get(0, END).index(remove)
+                self.ListBox.delete(index)
+
+            self.write_to_file(contents)
 
         else:
-            self.text_area.delete('1.0', END)
-            self.text_area.config(fg='grey')
-            self.text_area.insert('1.0', 'No data yet.')
+            # When there is no value in text files
 
-        self.text_area.config(state=DISABLED)
+            self.ListBoxVariable.set(['No data yet'])
+            self.ListBox.itemconfig(0, foreground='grey')
 
-        try:
-            self.text_area.yview(self.line)
-            self.line = None
-
-        except (AttributeError, TclError):
-            pass
-
-    def add_remove_search_command(self, button_name):
+    def add_remove_search_command(self, button_name, from_listbox=None):
         '''Commands when user clicks either ADD, REMOVE or SEARCH buttons'''
 
-        success = False
         contents = self.read_file()
-        from_entry = self.video_entry.get().strip()
+
+        if from_listbox is None:
+            from_entry = self.video_entry.get().strip()
+
+        else:
+            from_entry = self.ListBox.selection_get()
 
         if from_entry == 'Video Name':
             pygame.mixer.music.play()
@@ -238,38 +237,32 @@ class SSNI:
         elif button_name == 'ADD':
             if from_entry in contents:
                 self.highlight(from_entry, '#e8cb10')
-                self.config_entry(self.video_entry, 'grey')
 
             else:
-                success = True
+                contents.append(from_entry)
+
+                self.InsertToListBox(contents=contents)
+                self.highlight(from_entry, 'green')
 
         elif button_name == 'REMOVE':
             if from_entry in contents:
-                self.master.focus()
+                self.ListBox.selection_clear(0, END)
                 contents.remove(from_entry)
+
                 self.highlight(from_entry, 'red')
-                self.config_entry(self.video_entry, 'grey')
-                self.master.after(800, lambda: self.insert_text_area(contents))
+                self.master.after(800, lambda: self.InsertToListBox(contents=contents, remove=from_entry))
 
             else:
                 pygame.mixer.music.play()
 
-        else:
+        elif button_name == 'SEARCH':
             if from_entry in contents:
-                self.master.focus()
                 self.highlight(from_entry, '#3ccbde')
-                self.config_entry(self.video_entry, 'grey')
 
             else:
                 pygame.mixer.music.play()
 
-        if success:
-            contents.append(from_entry)
-            self.insert_text_area(contents)
-            self.highlight(from_entry, 'green')
-
-            self.config_entry(self.video_entry, 'grey')
-            self.master.focus()
+        self.config_entry(self.video_entry)
 
     def rename_command(self, event=None):
         '''Commands when user clicks RENAME button'''
@@ -285,7 +278,7 @@ class SSNI:
             old_name_index = contents.index(old_name)
             contents[old_name_index] = new_name
 
-            self.insert_text_area(contents)
+            self.InsertToListBox(contents)
 
             for widget in [self.old_name_entry, self.new_name_entry]:
                 self.config_entry(widget, 'grey')
@@ -296,29 +289,33 @@ class SSNI:
     def highlight(self, value, color):
         '''Fill color when value is added, removed and searched'''
 
-        self.line = self.text_area.search(value, '1.0', 'end')
-        self.text_area.tag_add('highlight', self.line, f'{self.line.split(".")[0]}.end+1c')
-        self.text_area.tag_config('highlight', background=color, foreground='white')
-        self.text_area.yview(self.line)
+        index = self.ListBox.get(0, END).index(value)
+        self.ListBox.see(index)
+
+        self.ListBox.itemconfig(index, background=color, foreground='white')
 
         if self.after_id:
             self.master.after_cancel(self.after_id)
             self.after_id = None
 
-        self.after_id = self.master.after(800, lambda: self.text_area.tag_delete('highlight'))
+        self.after_id = self.master.after(800, lambda: self.ListBox.itemconfig(index, background='white', foreground='black'))
 
-    def copy_cut(self, cut=False):
+    def copy_cut(self, cut=False, from_listbox=False):
         '''Command for copying and cutting selected text of entry widget'''
 
         if self.video_entry.selection_present():
             text = self.video_entry.get()
-            pyperclip.copy(text)  # Copying selected text to clipboard
 
             if cut:
                 # When user clicks to the cut option of right-click
                 # menu then deleting the text inside of the selection
 
                 self.video_entry.delete('sel.first', 'sel.last')
+
+        elif from_listbox is True:
+            text = self.ListBox.selection_get()
+
+        pyperclip.copy(text)  # Copying selected text to clipboard
 
     def paste(self):
         '''Command for pasting text from system clipboard to the position
@@ -335,32 +332,56 @@ class SSNI:
     def RightClick(self, event=None):
         '''When user right clicks inside list-box'''
 
+        x, y = self.master.winfo_pointerxy()
+        widget = self.master.winfo_containing(x, y)
         RightClickMenu = Menu(self.master, tearoff=False)
 
-        RightClickMenu.add_command(label='Copy', command=self.copy_cut)
-        RightClickMenu.add_command(label='Cut', command=lambda: self.copy_cut(cut=True))
-        RightClickMenu.add_command(label='Paste', command=self.paste)
+        if widget == self.video_entry:
+            RightClickMenu.add_command(label='Copy', command=self.copy_cut)
+            RightClickMenu.add_command(label='Cut', command=lambda: self.copy_cut(cut=True))
+            RightClickMenu.add_command(label='Paste', command=self.paste)
 
-        if not pyperclip.paste():
-            # When there is no text in clipboard then
-            # disabling paste options in right-click menu
+            if not pyperclip.paste():
+                # When there is no text in clipboard then
+                # disabling paste options in right-click menu
 
-            RightClickMenu.entryconfig(2, state='disabled')
+                RightClickMenu.entryconfig(2, state='disabled')
 
-        if self.video_entry.select_present() is False:
-            # When there is no selection in entry widget then
-            # disabling copy and cut options in right-click menu
+            if self.video_entry.select_present() is False:
+                # When there is no selection in entry widget then
+                # disabling copy and cut options in right-click menu
 
-            RightClickMenu.entryconfig(0, state='disabled')
-            RightClickMenu.entryconfig(1, state='disabled')
+                RightClickMenu.entryconfig(0, state='disabled')
+                RightClickMenu.entryconfig(1, state='disabled')
 
-            if self.master.focus_get() != self.video_entry:
-                # When the cursor is over the entry widget and
-                # user right clicks to entry widget then generating
-                # left click event to set focus to entry widget
-                # before showing pop-up menu
+                if self.master.focus_get() != self.video_entry:
+                    # When the cursor is over the entry widget and
+                    # user right clicks to entry widget then generating
+                    # left click event to set focus to entry widget
+                    # before showing pop-up menu
 
-                self.video_entry.event_generate('<Button-1>')
+                    self.video_entry.event_generate('<Button-1>')
+
+        elif widget == self.ListBox:
+            _y = event.y
+            nearset = self.ListBox.nearest(_y)  # Getting index nearest to the cursor
+            bbox = self.ListBox.bbox(nearset)   # Getting the x, y, width and height of value of the obtained nearest index
+            from_listbox = self.ListBoxVariable.get()
+
+            if (from_listbox and from_listbox[0] == 'No data yet') or (nearset == 0 and _y > bbox[-1]):  # When there is no data in Listbox
+                RightClickMenu.add_command(label='Load from file', command=self.InsertToListBox)
+
+            else:
+                self.ListBox.event_generate('<Button-1>')
+
+                # Removing previous selection
+                self.ListBox.select_clear(0, END)
+
+                # Selecting the obtained nearest index
+                self.ListBox.selection_set(nearset)
+
+                RightClickMenu.add_command(label='Copy', command=lambda: self.copy_cut(from_listbox=True))
+                RightClickMenu.add_command(label='Remove', command=lambda: self.add_remove_search_command('REMOVE', from_listbox=True))
 
         try:
             RightClickMenu.tk_popup(event.x_root, event.y_root)
