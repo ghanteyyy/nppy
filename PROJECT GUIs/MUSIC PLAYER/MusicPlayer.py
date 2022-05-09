@@ -285,6 +285,16 @@ class MusicPlayer:
             self.OpenFiles()
             return 'break'
 
+    def FormatEscapedTime(self, _time):
+        '''Remove 00 from the hour part if found'''
+
+        _time = _time.split(':')
+
+        if _time[0] == '00':
+            _time = ':'.join(_time[1:])
+
+            return _time
+
     def DoubleLeftClick(self, event=None):
         '''When user double clicks anywhere in window'''
 
@@ -439,7 +449,10 @@ class MusicPlayer:
 
                 for key, value in self.AudioFiles.items():  # Inserting data to TreeView
                     length = MP3(value[0]).info.length
-                    _time = time.strftime('%H:%M:%S', time.gmtime(length)).lstrip('00').strip(':')
+
+                    _time = time.strftime('%H:%M:%S', time.gmtime(length))
+                    _time = self.FormatEscapedTime(_time)
+
                     self.Tree.insert('', END, values=(key, _time), tag=value[1])
 
                 self.childrens = self.Tree.get_children()
@@ -486,7 +499,10 @@ class MusicPlayer:
 
         for key, value in self.AudioFiles.items():
             length = MP3(value[0]).info.length
-            _time = time.strftime('%H:%M:%S', time.gmtime(length)).lstrip('00').strip(':')
+
+            _time = time.strftime('%H:%M:%S', time.gmtime(length))
+            _time = self.FormatEscapedTime(_time)
+
             self.Tree.insert('', END, values=(key, _time), tag=value[1])
 
         child = None
@@ -577,7 +593,10 @@ class MusicPlayer:
                             self.TotalTime = MP3(self.CurrentAudioPath).info.length
                             self.AudioSlider.config(to=int(self.TotalTime))
                             self.Tree.tag_configure(self.AudioFiles[self.AudioName][1], foreground='silver')
-                            _time = time.strftime('%H:%M:%S', time.gmtime(self.TotalTime)).lstrip('00').lstrip(':')
+
+                            _time = time.strftime('%H:%M:%S', time.gmtime(self.TotalTime))
+                            _time = self.FormatEscapedTime(_time)
+
                             self.TotalTimeVar.set(_time)
                             self.EscapedTimeVar.set('00:00')
                             self.AudioSliderVar.set(0)
@@ -673,7 +692,10 @@ class MusicPlayer:
             # becomes more than the previous AudioSlider position
             self.CurrentPos = self.AudioSliderVar.get() + 1
 
-        self.EscapedTimeVar.set(time.strftime('%H:%M:%S', time.gmtime(self.CurrentPos)))
+        _time = time.strftime('%H:%M:%S', time.gmtime(self.CurrentPos))
+        _time = self.FormatEscapedTime(_time)
+
+        self.EscapedTimeVar.set(_time)
         self.AudioSliderVar.set(int(self.CurrentPos))
 
         if int(self.CurrentPos) >= int(self.TotalTime):  # Checking if audio has complete playing
@@ -796,7 +818,10 @@ class MusicPlayer:
                 pygame.mixer.music.play(start=SkipAt)
                 self.MuteUnmuteVolume(nochange=True)
 
-            self.EscapedTimeVar.set(time.strftime('%H:%M:%S', time.gmtime(SkipAt)))
+            _time = time.strftime('%H:%M:%S', time.gmtime(SkipAt))
+            _time = self.FormatEscapedTime(_time)
+
+            self.EscapedTimeVar.set(_time)
 
     def ChangeVolume(self, event=None, change=None):
         '''Increase or decrease volume when user drags volume bar or
@@ -882,13 +907,21 @@ class MusicPlayer:
             else:  # Remaining time has already been show
                 self.ShowRemTime = False
                 self.master.after_cancel(self.RemTimer)
-                self.TotalTimeVar.set(time.strftime('%H:%M:%S', time.gmtime(self.TotalTime)))
+
+                _time = time.strftime('%H:%M:%S', time.gmtime(self.TotalTime))
+                _time = self.FormatEscapedTime(_time)
+
+                self.TotalTimeVar.set(_time)
 
     def ChangeTime(self):
         '''Calculate remaining time of currently playing song'''
 
         gmtime = time.gmtime(self.TotalTime - self.CurrentPos)
-        self.TotalTimeVar.set(time.strftime('-%H:%M:%S', gmtime))
+
+        _time = time.strftime('%H:%M:%S', gmtime)
+        _time = self.FormatEscapedTime(_time)
+
+        self.TotalTimeVar.set(f'-{_time}')
         self.RemTimer = self.master.after(500, self.ChangeTime)
 
     def RightClick(self, event=None):
