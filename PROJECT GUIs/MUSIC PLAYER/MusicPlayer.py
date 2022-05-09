@@ -927,8 +927,7 @@ class MusicPlayer:
 
             if self.Tree.selection() and region != 'heading':
                 RightClickMenu.add_command(label='Sort (Alphabetically)', command=self.SortAudio)
-                RightClickMenu.add_command(label='Remove Permanently (Caution!)', command=self.RemovePermanently)
-                RightClickMenu.entryconfig(3, activeforeground='red')
+                RightClickMenu.add_command(label='Remove Permanently (Caution!)', activeforeground='red', command=self.RemovePermanently)
 
         elif widget in [self.EscapedTimeLabel, self.VolumeLabel] or isinstance(widget, Frame):
             RightClickMenu.add_command(label='Open', command=self.OpenFiles)
