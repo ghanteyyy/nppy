@@ -1199,8 +1199,15 @@ class MusicPlayer:
                 self.AlbumPictureLabel = Label(self.AlbumPictureFrame, width=self.Tree.winfo_width(), height=self.Tree.winfo_reqheight() - 4)
                 self.AlbumPictureLabel.pack(side=BOTTOM)
 
-            self.AlbumPictureLabel.config(image=image)
-            self.AlbumPictureLabel.image = image
+            try:
+                self.AlbumPictureLabel.config(image=image)
+                self.AlbumPictureLabel.image = image
+
+            except AttributeError:
+                # When user stops the audio without showing the album picture then the
+                # self.AlbumPictureLabel does not exists as it has never been created
+                # before which triggers AttributeError then ignoring this error
+                pass
 
         else:
             self.IsAlbumPictureShown = False
