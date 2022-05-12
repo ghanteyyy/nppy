@@ -129,7 +129,7 @@ class MusicPlayer:
         self.TotalTimeLabel.pack(side=RIGHT)
         self.TimeFrame.pack(fill='x')
 
-        self.AudioSliderVar = IntVar()
+        self.AudioSliderVar = DoubleVar()
         self.AudioSlider = ttk.Scale(self.container, from_=0, to=100, style='info.Horizontal.TScale', variable=self.AudioSliderVar)
         self.AudioSlider.pack(fill='x')
 
@@ -613,13 +613,17 @@ class MusicPlayer:
                 elif self.isPlaying is True:  # Audio is being played
                     self.isPlaying = False
                     _image = self.PlayImage
+
                     pygame.mixer.music.pause()
                     self.master.after_cancel(self.ScaleTimer)
 
                 elif self.isPlaying is False:  # Audio is paused
                     self.isPlaying = True
                     _image = self.PauseImage
-                    pygame.mixer.music.play(start=self.AudioSliderVar.get())
+
+                    pygame.mixer.music.set_pos(self.AudioSliderVar.get())
+                    pygame.mixer.music.unpause()
+
                     self.ScaleTimer = self.master.after(250, self.UpdateScale)
 
                 self.PlayButton.config(image=_image)
@@ -811,8 +815,6 @@ class MusicPlayer:
 
                 if SkipAt <= 0:
                     SkipAt = 0
-
-            self.AudioSliderVar.set(SkipAt)
 
             if self.isPlaying:
                 pygame.mixer.music.play(start=SkipAt)
