@@ -187,8 +187,9 @@ class MusicPlayer:
         self.ExitSearchButton.pack(side=RIGHT)
 
         self.Tree.bind('<Delete>', self.RemoveFromList)
-        self.Tree.bind('<space>', self.SpaceBarBindings)
+        self.master.bind('<0>', self.RewindCurrentAudio)
         self.master.bind('<MouseWheel>', self.MouseWheel)
+        self.master.bind('<space>', self.SpaceBarBindings)
         self.master.bind_all('<Control-i>', self.ShowInfo)
         self.Tree.bind('<Button-1>', self.SingleLeftClick)
         self.AudioSlider.bind('<Button-3>', self.SkipAudio)
@@ -823,6 +824,7 @@ class MusicPlayer:
             _time = time.strftime('%H:%M:%S', time.gmtime(SkipAt))
             _time = self.FormatEscapedTime(_time)
 
+            self.AudioSliderVar.set(SkipAt)
             self.EscapedTimeVar.set(_time)
 
     def ChangeVolume(self, event=None, change=None):
@@ -1265,6 +1267,38 @@ class MusicPlayer:
         except stagger.errors.NoTagError:
             # Some audios do not support stagger module
             messagebox.showerror('ERR', 'Cannot add album art to the selected audio')
+
+    def RewindCurrentAudio(self, event=None):
+        '''Rewind the playing audio from the start when user presses 0 '''
+
+        if isinstance(event.widget, ttk.Entry):
+            # Don't re-wind the audio when the
+            # focus is in the search Entry widget
+            return
+
+        _child = None
+        playing = self.isPlaying
+
+        for child in self.Tree.get_children():  # Getting child of playing audio
+            value = self.Tree.item(child)['values'][0]
+
+            if value == self.AudioName:
+                _child = child
+                break
+
+        if self.isPlaying is not None:  # When audio is either playing or is paused
+            self.StopAudio()
+
+            self.Tree.selection_set(_child)
+            self.PlayOrPauseAudio()  # Playing the audio from the start
+
+            if playing is False:
+                # When the audio was previously paused
+                # then maintaining the same state
+                self.isPlaying = True
+                self.PlayOrPauseAudio()
+
+            self.master.focus_set()
 
     def ResourcePath(self, FileName):
         '''Get absolute path to resource from temporary directory
