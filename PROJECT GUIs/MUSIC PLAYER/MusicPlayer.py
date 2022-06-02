@@ -435,7 +435,15 @@ class MusicPlayer:
                         length = MP3(file).info.length
                         self.TotalAudioDuration += length
 
-                        self.AudioFiles.update({basename: (file, self.TagCount)})
+                        if isinstance(files, dict):
+                            sub = files[file]['Subtitle']
+
+                        else:
+                            sub = ''
+
+                        self.AudioFiles.update({basename: {'path': file,
+                                                           'TagCount': self.TagCount,
+                                                           'Subtitle': sub}})
                         self.TagCount += 1
 
                     except (pygame.error, HeaderNotFoundError):
@@ -449,12 +457,14 @@ class MusicPlayer:
                 self.Tree.delete(*self.Tree.get_children())  # Emptying TreeView contents
 
                 for key, value in self.AudioFiles.items():  # Inserting data to TreeView
-                    length = MP3(value[0]).info.length
+                    path = self.AudioFiles[key]['path']
+                    tag = self.AudioFiles[key]['TagCount']
+                    length = MP3(path).info.length
 
                     _time = time.strftime('%H:%M:%S', time.gmtime(length))
                     _time = self.FormatEscapedTime(_time)
 
-                    self.Tree.insert('', END, values=(key, _time), tag=value[1])
+                    self.Tree.insert('', END, values=(key, _time), tag=tag)
 
                 self.childrens = self.Tree.get_children()
                 self.LowerCasedAudioFiles = [f.lower() for f in self.AudioFiles.keys()]
@@ -496,15 +506,15 @@ class MusicPlayer:
             selected_text = self.Tree.item(sel[-1])['values'][0]
 
         self.Tree.delete(*self.Tree.get_children())
-        self.AudioFiles = dict(sorted(self.AudioFiles.items(), key=lambda item: item[0].lower()))
+        self.AudioFiles = dict(sorted(self.AudioFiles.items(), key=lambda item: os.path.basename(item[0]).lower()))
 
         for key, value in self.AudioFiles.items():
-            length = MP3(value[0]).info.length
+            length = MP3(self.AudioFiles[key]['path']).info.length
 
             _time = time.strftime('%H:%M:%S', time.gmtime(length))
             _time = self.FormatEscapedTime(_time)
 
-            self.Tree.insert('', END, values=(key, _time), tag=value[1])
+            self.Tree.insert('', END, values=(key, _time), tag=self.AudioFiles[key]['TagCount'])
 
         child = None
         self.childrens = self.Tree.get_children()
@@ -530,7 +540,7 @@ class MusicPlayer:
             messagebox.showerror('ERR', 'Either playlists file is corrupt or does not exist')
 
         if contents:
-            files = [f for f in contents['playlists'].values() if os.path.exists(f)]  # Removing audios that does not exists
+            files = {k: {'Subtitle': v['Subtitle']} for k, v in contents.items() if os.path.exists(k)}  # Removing audios that does not exists
             self.OpenFiles(files=files)
 
         else:
@@ -556,9 +566,11 @@ class MusicPlayer:
     def AddRemoveSelection(self, status):
         '''Add or Remove selection when audio changes'''
 
+        if self.AudioName:
+            _tag = self.AudioFiles[self.AudioName]['TagCount']
+
         if status == 'Remove':
             if self.AudioName:  # Removing the previous selection if another audio has been played before
-                _tag = self.AudioFiles[self.AudioName][1]
                 self.Tree.tag_configure(_tag, background='#e5e5e5', foreground='#333333')
 
         else:
@@ -566,7 +578,6 @@ class MusicPlayer:
                 self.PlayOrPauseAudio()
 
             else:
-                _tag = self.AudioFiles[self.AudioName][1]
                 self.Tree.tag_configure(_tag, background='#29465b')
                 self.Tree.selection_remove(self.Tree.selection()[0])
 
@@ -589,11 +600,11 @@ class MusicPlayer:
                             _image = self.PauseImage
 
                             self.AudioName = self.Tree.item(cursel)['values'][0]
-                            self.CurrentAudioPath = self.AudioFiles[self.AudioName][0]
+                            self.CurrentAudioPath = self.AudioFiles[self.AudioName]['path']
 
                             self.TotalTime = MP3(self.CurrentAudioPath).info.length
                             self.AudioSlider.config(to=int(self.TotalTime))
-                            self.Tree.tag_configure(self.AudioFiles[self.AudioName][1], foreground='silver')
+                            self.Tree.tag_configure(self.AudioFiles[self.AudioName]['TagCount'], foreground='silver')
 
                             _time = time.strftime('%H:%M:%S', time.gmtime(self.TotalTime))
                             _time = self.FormatEscapedTime(_time)
@@ -932,7 +943,7 @@ class MusicPlayer:
         '''When user right clicks inside list-box'''
 
         x, y = event.x , event.y  # Cursor position with respect to Tk window
-        _x, _y = self.master.winfo_pointerxy()  # Cursor position with repsect to monitor resolution
+        _x, _y = self.master.winfo_pointerxy()  # Cursor position with respect to monitor resolution
 
         CurrentSelection = self.Tree.selection()
         widget = self.master.winfo_containing(_x, _y)
@@ -1034,11 +1045,11 @@ class MusicPlayer:
         '''Save audio path present in list-box'''
 
         if self.AudioFiles:
-            newAudioFiles = {k: v[0] for k, v in self.AudioFiles.items()}  # Saving Audios path without tagCount
+            newAudioFiles = {v['path']: {'Subtitle': v['Subtitle']} for _, v in self.AudioFiles.items()}  # Saving Audios path without tagCount
 
             with open(self.PlaylistPath, 'w') as f:
-                contents = {'playlists': newAudioFiles}
-                json.dump(contents, f, indent=4)
+                # contents = {'playlists': newAudioFiles}
+                json.dump(newAudioFiles, f, indent=4)
 
                 if show_message:
                     messagebox.showinfo('Saved!', 'Playlist Saved !!')
@@ -1176,7 +1187,7 @@ class MusicPlayer:
             self.IsAlbumPictureShown = True
 
             if self.isPlaying is not None:   # When audio is being played or is paused
-                audioPath = self.AudioFiles[self.AudioName][0]  # Getting the current playing or paused audio_path
+                audioPath = self.AudioFiles[self.AudioName]['path']  # Getting the current playing or paused audio_path
 
                 try:
                     mp3 = stagger.read_tag(audioPath)
@@ -1227,7 +1238,7 @@ class MusicPlayer:
 
             if path_length == 1:
                 if self.isPlaying is not None:
-                    # Quiting pygame to stop playing audio because stagger module needs
+                    # Quitting pygame to stop playing audio because stagger module needs
                     # the selected audio must not be used by any other applications/modules
                     pygame.mixer.music.stop()
                     pygame.quit()
