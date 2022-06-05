@@ -1,13 +1,15 @@
 import os
+import re
 import io
 import sys
 import time
 import json
+import bisect
 import random
-import winsound
 import datetime
 from tkinter import *
 import tkinter.ttk as ttk
+from tkinter.font import Font
 from tkinter import font, filedialog, messagebox
 import pygame
 import stagger
@@ -30,8 +32,10 @@ class MusicPlayer:
 
         self.PrevID = ''
         self.TagCount = 0
+        self.TrackLine = 0
         self.childrens = []
         self.AudioFiles = dict()
+        self.IsLyricsAdded = None
         self.extensions = [('Music Files', '*.mp3')]
         self.PrevSearchChar = None  # Store previous search string
         self.RepeatAudio = None  # Track the state of Repeat Button
@@ -56,6 +60,14 @@ class MusicPlayer:
         self.isButtonInMotion = False  # Trigger to check if audio_slider is in motion. True for the audio_slider is being dragged
         self.isPlaying = None  # Trigger to check if the song is playing. None for has not started playing yet, True for playing and False for pause
 
+        if sys.platform == 'win32':
+            self.ErrorFile = self.ResourcePath('WinErrSound.wav')
+
+        else:
+            self.ErrorFile = self.ResourcePath('LinuxErrSound.wav')
+
+        self.PlayError = pygame.mixer.Sound(self.ErrorFile)
+
         self.master = Tk()
         self.master.withdraw()
         self.master.title('Music Player')
@@ -67,6 +79,7 @@ class MusicPlayer:
         self.InfoImage = PhotoImage(file=self.ResourcePath('info.png'))
         self.PlayImage = PhotoImage(file=self.ResourcePath('Play.png'))
         self.NextImage = PhotoImage(file=self.ResourcePath('Next.png'))
+        self.LrcImage = PhotoImage(file=self.ResourcePath('Lyrics.png'))
         self.UnmuteImage = PhotoImage(file=self.ResourcePath('Vol4.png'))
         self.PauseImage = PhotoImage(file=self.ResourcePath('Pause.png'))
         self.VolumeImage1 = PhotoImage(file=self.ResourcePath('Vol1.png'))
@@ -104,11 +117,13 @@ class MusicPlayer:
         self.Columns = ['Title', 'Duration']
 
         self.style = Style('newtheme')
-        self.Tree = ttk.Treeview(self.AudioListFrame, columns=self.Columns, show='headings', style='secondary.Treeview')
+        self.TreeFrame = Frame(self.AudioListFrame)
+        self.Tree = ttk.Treeview(self.TreeFrame, columns=self.Columns, show='headings', style='secondary.Treeview')
         self.Tree.pack(side=LEFT, fill=BOTH)
+        self.TreeFrame.pack()
 
         # Attaching scrollbar to TreeView
-        self.scrollbar = Scrollbar(self.AudioListFrame, orient="vertical", command=self.Tree.yview)
+        self.scrollbar = Scrollbar(self.TreeFrame, orient="vertical", command=self.Tree.yview)
         self.Tree.config(yscrollcommand=self.scrollbar.set)
         self.scrollbar.pack(side=RIGHT, fill='y')
 
@@ -154,12 +169,14 @@ class MusicPlayer:
         self.NextButton.pack(side=LEFT, padx=2)
         self.ArtButton = Button(self.ButtonsFrame, image=self.ArtImage, **self.ButtonsAttributes, command=self.ShowAlbumPicture)
         self.ArtButton.pack(side=LEFT)
+        self.LrcButton = Button(self.ButtonsFrame, image=self.LrcImage, **self.ButtonsAttributes, command=self.ShowLyricsCommand)
+        self.LrcButton.pack(side=LEFT, padx=2)
         self.RepeatButton = Button(self.ButtonsFrame, image=self.RepeatAllImage, **self.ButtonsAttributes, command=self.ToggleRepeat)
-        self.RepeatButton.pack(side=LEFT, padx=2)
+        self.RepeatButton.pack(side=LEFT)
         self.RandomButton = Button(self.ButtonsFrame, image=self.RandomDisabledImage, **self.ButtonsAttributes, command=self.ToggleRandom)
-        self.RandomButton.pack(side=LEFT)
+        self.RandomButton.pack(side=LEFT, padx=2)
         self.SearchButton = Button(self.ButtonsFrame, image=self.SearchImage, **self.ButtonsAttributes, command=self.ShowFindWidget)
-        self.SearchButton.pack(side=LEFT, padx=2)
+        self.SearchButton.pack(side=LEFT)
 
         self.VolumeFrame = Frame(self.BottomFrame)
         self.VolumeSliderFrame = Frame(self.VolumeFrame)
@@ -185,6 +202,11 @@ class MusicPlayer:
         self.SearchEntry.pack(side=LEFT)
         self.ExitSearchButton = Button(self.SearchFrame, image=self.SearchExitImage, bg='#e5e5e5', bd=0, activebackground='#e5e5e5', cursor='hand2', command=self.DestroyFindWidget)
         self.ExitSearchButton.pack(side=RIGHT)
+
+        self.LyricsFrame = Frame(self.AudioListFrame, bg='white', width=621, height=183)
+        self.LyricsFrame.pack_propagate(0)
+        self.LyricsBox = Text(self.LyricsFrame, cursor='arrow', width=1, height=1, autostyle=False, font=Font(size=15), bg='#e5e5e5', fg='#a1a9b5', wrap='word')
+        self.LyricsBox.pack(side=LEFT, fill=BOTH, expand=TRUE)
 
         self.Tree.bind('<Delete>', self.RemoveFromList)
         self.master.bind('<0>', self.RewindCurrentAudio)
@@ -436,14 +458,14 @@ class MusicPlayer:
                         self.TotalAudioDuration += length
 
                         if isinstance(files, dict):
-                            sub = files[file]['Subtitle']
+                            lrc = files[file]['Lyrics']
 
                         else:
-                            sub = ''
+                            lrc = ''
 
                         self.AudioFiles.update({basename: {'path': file,
                                                            'TagCount': self.TagCount,
-                                                           'Subtitle': sub}})
+                                                           'Lyrics': lrc}})
                         self.TagCount += 1
 
                     except (pygame.error, HeaderNotFoundError):
@@ -540,11 +562,11 @@ class MusicPlayer:
             messagebox.showerror('ERR', 'Either playlists file is corrupt or does not exist')
 
         if contents:
-            files = {k: {'Subtitle': v['Subtitle']} for k, v in contents.items() if os.path.exists(k)}  # Removing audios that does not exists
+            files = {k: {'Lyrics': v['Lyrics']} for k, v in contents.items() if os.path.exists(k)}  # Removing audios that does not exists
             self.OpenFiles(files=files)
 
         else:
-            winsound.MessageBeep()
+            self.PlayError.play()
 
     def ScrollTopDown(self, event=None, _dir=None):
         '''Scroll to the top when "HOME" key is pressed
@@ -561,7 +583,7 @@ class MusicPlayer:
             self.Tree.selection_set(index)
 
         except (IndexError, AttributeError):
-            winsound.MessageBeep()
+            self.PlayError.play()
 
     def AddRemoveSelection(self, status):
         '''Add or Remove selection when audio changes'''
@@ -614,6 +636,14 @@ class MusicPlayer:
                             self.AudioSliderVar.set(0)
 
                             self.AddRemoveSelection('Add')
+                            lrc_path = self.AudioFiles[self.AudioName]['Lyrics']
+
+                            if lrc_path:
+                                # Insert lyrics text to display lyrics
+                                # of respective audios if exists
+                                self.IsLyricsAdded = False
+                                self.InsertLyricsText(lrc_path=lrc_path)
+
                             pygame.mixer.music.load(self.CurrentAudioPath)  # Loading selected file for playing
                             pygame.mixer.music.play()  # Start playing loaded file
 
@@ -641,7 +671,7 @@ class MusicPlayer:
                 self.PlayButton.config(image=_image)
 
             else:
-                winsound.MessageBeep()
+                self.PlayError.play()
 
         except (TclError, UnboundLocalError):
             pass
@@ -669,7 +699,7 @@ class MusicPlayer:
             self.ShowAlbumPicture(force_show=True)
 
         else:
-            winsound.MessageBeep()
+            self.PlayError.play()
 
     def ToggleRepeat(self, event=None):
         '''When user clicks repeat button'''
@@ -702,6 +732,7 @@ class MusicPlayer:
            until songs comes to end'''
 
         self.CurrentPos = pygame.mixer.music.get_pos() / 1000
+        self.ShowSubtitle()
 
         if self.AudioSliderVar.get() > int(self.CurrentPos):
             # When user skips audio and the position of AudioSlider
@@ -800,7 +831,7 @@ class MusicPlayer:
                     self.ShowAlbumPicture(force_show=True)
 
             else:
-                winsound.MessageBeep()
+                self.PlayError.play()
 
         except TclError:
             pass
@@ -959,6 +990,7 @@ class MusicPlayer:
                 else:
                     if len(self.Tree.selection()) == 1:
                         self.Tree.event_generate("<Button-1>", x=x, y=y)
+                        RightClickMenu.add_command(label='Add Lyrics', command=self.InsertLyrics)
                         RightClickMenu.add_command(label='Set Album Art', command=self.SetAlbumArt)
 
                     RightClickMenu.add_command(label='Remove from list', command=self.RemoveFromList)
@@ -1045,7 +1077,7 @@ class MusicPlayer:
         '''Save audio path present in list-box'''
 
         if self.AudioFiles:
-            newAudioFiles = {v['path']: {'Subtitle': v['Subtitle']} for _, v in self.AudioFiles.items()}  # Saving Audios path without tagCount
+            newAudioFiles = {v['path']: {'Lyrics': v['Lyrics']} for _, v in self.AudioFiles.items()}  # Saving Audios path without tagCount
 
             with open(self.PlaylistPath, 'w') as f:
                 # contents = {'playlists': newAudioFiles}
@@ -1055,7 +1087,7 @@ class MusicPlayer:
                     messagebox.showinfo('Saved!', 'Playlist Saved !!')
 
         else:
-            winsound.MessageBeep()
+            self.PlayError.play()
 
     def ShowFindWidget(self, event=None):
         '''Show Find widget if not already shown'''
@@ -1071,7 +1103,7 @@ class MusicPlayer:
                 self.SearchEntry.focus()
 
         else:
-            winsound.MessageBeep()
+            self.PlayError.play()
 
     def DestroyFindWidget(self, event=None):
         '''Destroy Find widget when pressed ESC or X button'''
@@ -1131,7 +1163,7 @@ class MusicPlayer:
 
         except (TypeError, AttributeError, IndexError):
             # When no audio is opened though user wants to make a search
-            winsound.MessageBeep()
+            self.PlayError.play()
 
     def SearchEntryReturnBind(self, event=None):
         '''When user hits Enter key when focused to SearchEntry box'''
@@ -1182,6 +1214,10 @@ class MusicPlayer:
            changes the album picture when the previous album picture is shown
            already'''
 
+        if self.IsLyricsAdded:
+            self.IsLyricsAdded = False
+            self.LyricsFrame.pack_forget()
+
         if self.IsAlbumPictureShown is False or force_show is True:
             image = ''
             self.IsAlbumPictureShown = True
@@ -1208,10 +1244,10 @@ class MusicPlayer:
             image = ImageTk.PhotoImage(im)
 
             if force_show is False:
-                self.Tree.pack_forget()
+                self.TreeFrame.pack_forget()
                 self.AlbumPictureFrame = Frame(self.AudioListFrame)
                 self.AlbumPictureFrame.pack()
-                self.AlbumPictureLabel = Label(self.AlbumPictureFrame, width=self.Tree.winfo_width(), height=self.Tree.winfo_reqheight() - 4)
+                self.AlbumPictureLabel = Label(self.AlbumPictureFrame, width=self.Tree.winfo_width() + 12, height=self.Tree.winfo_reqheight() - 4)
                 self.AlbumPictureLabel.pack(side=BOTTOM)
 
             try:
@@ -1227,7 +1263,7 @@ class MusicPlayer:
         else:
             self.IsAlbumPictureShown = False
             self.AlbumPictureFrame.pack_forget()
-            self.Tree.pack()
+            self.TreeFrame.pack()
 
     def SetAlbumArt(self, event=None):
         '''Add image to album art of a selected audio'''
@@ -1310,6 +1346,163 @@ class MusicPlayer:
                 self.PlayOrPauseAudio()
 
             self.master.focus_set()
+
+    def ReadLyricsFile(self, lrc_path):
+        '''Extracting lyrics from either lrc, srt or vtt file'''
+
+        details = dict()
+
+        with open(lrc_path) as f:
+            lines = f.readlines()
+
+        for index, line in enumerate(lines):
+            # Extracting lyrics from .lrc file
+            time_pattern = re.compile(r'\[.*?\]')
+            _time = re.search(time_pattern, line)
+
+            if _time:
+                text = line[_time.end(0):].strip().strip('\n')
+                _time = _time.group()[1:-1]
+
+                if text:
+                    _time = self.GetTotalSeconds(_time)
+                    details[_time] = text
+
+            else:  # Extracting lyrics from .srt or vtt file
+                time_pattern = re.compile(r'\d+:\d+:\d+[\.,]\d+')
+                _time = re.search(time_pattern, line)
+
+                if _time:
+                    _time = _time.group().replace(',', '.')
+                    _time = self.GetTotalSeconds(_time)
+                    details[_time] = lines[index + 1]
+
+        return details
+
+    def ShowSubtitle(self):
+        '''Update Lyrics as the position of the audio'''
+
+        if self.IsLyricsAdded:
+            _time = datetime.timedelta(seconds=self.AudioSliderVar.get()).total_seconds() + 1
+
+            closest = self.take_closest(list(self.LyricsDetails.keys()), _time)
+            index = list(self.LyricsDetails.keys()).index(closest) + 1
+
+            lineinfo = self.LyricsBox.dlineinfo(f'{self.TrackLine}.0')
+            diff = lineinfo[1] - 23
+
+            if diff > 0:
+                self.LyricsBox.yview_scroll(lineinfo[1] - 23, 'pixels' )
+
+            if 'config' in self.LyricsBox.tag_names():
+                self.LyricsBox.tag_delete('config', f'{self.TrackLine}.0 linestart', f'{self.TrackLine}.0 lineend')
+
+            self.TrackLine = index
+            self.LyricsBox.tag_add('config', f'{self.TrackLine}.0 linestart', f'{self.TrackLine}.0 lineend')
+            self.LyricsBox.tag_configure('config', font=Font(size=20, weight='bold'), foreground='black')
+
+            self.LyricsBox.see(f'{self.TrackLine}.0')
+
+    def ShowLyricsCommand(self, event=None):
+        '''When user clicks lyrics button'''
+
+        if self.AudioFiles:
+            filetypes = [('Lyrics', '*.lrc *srt *vtt')]
+
+            if self.IsLyricsAdded is None:  # If lyrics is not added before
+                lrc_path = filedialog.askopenfilename(filetypes=filetypes, defaultextension=filetypes)
+
+                if os.path.exists(lrc_path):  # Add only if the given path exists
+                    self.InsertLyricsText(lrc_path)
+                    self.IsLyricsAdded = False
+
+            elif self.IsLyricsAdded is True:
+                # When lyrics has been added before but user presses the
+                # lyrics button then destroying(hiding) the lyrics texts
+                self.IsLyricsAdded = False
+                self.LyricsFrame.pack_forget()
+                self.TreeFrame.pack()
+
+            elif self.IsLyricsAdded is False:
+                # When lyrics has been added but was destroyed by pressing
+                # the lyrics button and again showing the same lyrics texts
+                # when user wants it back
+                self.TreeFrame.pack_forget()
+
+                if self.IsAlbumPictureShown:
+                    self.IsAlbumPictureShown = False
+                    self.AlbumPictureFrame.pack_forget()
+
+                self.IsLyricsAdded = True
+                self.LyricsFrame.pack()
+
+        else:
+            self.ErrorChannel.play()
+
+    def GetTotalSeconds(self, _time):
+        '''Convert string time into total seconds'''
+
+        split = _time.split(':')
+        format = ['%H', '%M', '%S.%f']
+
+        if len(split) <= 2:
+            formatter = ':'.join(format[1:])
+
+        else:
+            formatter = ':'.join(format)
+
+        obj = datetime.datetime.strptime(_time, formatter)
+        _time = obj.hour * 3600 + obj.minute * 60 + obj.second + obj.microsecond / 1000000
+        _time = datetime.timedelta(seconds=_time).total_seconds()
+
+        return _time
+
+    def take_closest(self, myList, myNumber):
+        """ Assumes myList is sorted. Returns closest value to myNumber.
+            If two numbers are equally close, return the smallest number."""
+
+        pos = bisect.bisect_left(myList, myNumber)
+
+        if pos == 0:
+            return myList[0]
+
+        if pos == len(myList):
+            return myList[-1]
+
+        before = myList[pos - 1]
+        after = myList[pos]
+
+        if after - myNumber < myNumber - before:
+            return after
+
+        else:
+            return before
+
+    def InsertLyrics(self, event=None, lrc_path=None):
+        '''Save lyrics to the corresponding audio'''
+
+        filetypes = [('Lyrics', '*.lrc *srt *vtt')]
+
+        if lrc_path is None:
+            lrc_path = filedialog.askopenfilename(filetypes=filetypes, defaultextension=filetypes)
+
+        if lrc_path:
+            values = self.AudioFiles[self.AudioName]
+            values['Lyrics'] = lrc_path
+
+            self.AudioFiles[self.AudioName] = values
+            self.SavePlaylist()
+
+    def InsertLyricsText(self, lrc_path):
+        '''Add text to lyrics text box'''
+
+        self.LyricsDetails = self.ReadLyricsFile(lrc_path)
+        self.LyricsBox.tag_configure("center", justify='center')
+
+        for value in self.LyricsDetails.values():
+            self.LyricsBox.insert(END, value.strip('\n') + '\n')
+
+        self.LyricsBox.tag_add("center", "1.0", "end")
 
     def ResourcePath(self, FileName):
         '''Get absolute path to resource from temporary directory
