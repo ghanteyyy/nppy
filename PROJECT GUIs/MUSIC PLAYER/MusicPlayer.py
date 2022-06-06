@@ -34,8 +34,11 @@ class MusicPlayer:
         self.TagCount = 0
         self.TrackLine = 0
         self.childrens = []
+        self.RotateAngle = 10
         self.AudioFiles = dict()
         self.IsLyricsAdded = None
+        self.IsDefaultImage = None
+        self.RotateImageTimer = None
         self.extensions = [('Music Files', '*.mp3')]
         self.PrevSearchChar = None  # Store previous search string
         self.RepeatAudio = None  # Track the state of Repeat Button
@@ -619,6 +622,7 @@ class MusicPlayer:
                         if self.PrevID != cursel:  # Play Audio only if current playing audio is different than selected audio
                             self.PrevID = cursel
                             self.isPlaying = True
+                            self.RotateAngle = 10
                             _image = self.PauseImage
 
                             self.AudioName = self.Tree.item(cursel)['values'][0]
@@ -644,11 +648,16 @@ class MusicPlayer:
                                 self.IsLyricsAdded = False
                                 self.InsertLyricsText(lrc_path=lrc_path)
 
+                            self.StopImageRotation()
                             pygame.mixer.music.load(self.CurrentAudioPath)  # Loading selected file for playing
                             pygame.mixer.music.play()  # Start playing loaded file
 
                             if self.ScaleTimer:
                                 self.master.after_cancel(self.ScaleTimer)
+
+                            if self.IsDefaultImage:
+                                # When user clicks Art button first and then clicks play button later
+                                self.rotate_image()
 
                             self.ScaleTimer = self.master.after(250, self.UpdateScale)
 
@@ -656,6 +665,7 @@ class MusicPlayer:
                     self.isPlaying = False
                     _image = self.PlayImage
 
+                    self.StopImageRotation()
                     pygame.mixer.music.pause()
                     self.master.after_cancel(self.ScaleTimer)
 
@@ -665,6 +675,10 @@ class MusicPlayer:
 
                     pygame.mixer.music.set_pos(self.AudioSliderVar.get())
                     pygame.mixer.music.unpause()
+
+                    if self.IsDefaultImage and self.RotateImageTimer is None:
+                        # When user resumes audio while the animation is not shown yet
+                        self.rotate_image()
 
                     self.ScaleTimer = self.master.after(250, self.UpdateScale)
 
@@ -697,6 +711,7 @@ class MusicPlayer:
             self.PlayButton.config(image=self.PlayImage)
 
             self.ShowAlbumPicture(force_show=True)
+            self.StopImageRotation()
 
         else:
             self.PlayError.play()
@@ -1214,6 +1229,9 @@ class MusicPlayer:
            changes the album picture when the previous album picture is shown
            already'''
 
+        self.StopImageRotation()
+        self.IsDefaultImage = True
+
         if self.IsLyricsAdded:
             self.IsLyricsAdded = False
             self.LyricsFrame.pack_forget()
@@ -1234,7 +1252,10 @@ class MusicPlayer:
                 except (stagger.errors.NoTagError, KeyError):
                     pass
 
-            if not image:
+            if image:
+                self.IsDefaultImage = False
+
+            else:
                 # When audio do not have any audio_image then setting the default music image
                 size = (175, 175)
                 image = self.AlbumArtImage
@@ -1253,6 +1274,10 @@ class MusicPlayer:
             try:
                 self.AlbumPictureLabel.config(image=image)
                 self.AlbumPictureLabel.image = image
+
+                if self.IsDefaultImage:
+                    # Start animation only if there is no audio-image in audio
+                    self.rotate_image()
 
             except AttributeError:
                 # When user stops the audio without showing the album picture then the
@@ -1503,6 +1528,35 @@ class MusicPlayer:
             self.LyricsBox.insert(END, value.strip('\n') + '\n')
 
         self.LyricsBox.tag_add("center", "1.0", "end")
+
+    def rotate_image(self):
+        '''Rotating image continuously like an animation'''
+
+        size = (175, 175)
+
+        if self.RotateAngle > 360:
+            self.RotateAngle = 10
+
+        if self.isPlaying is True:
+            image = Image.open(self.AlbumArtImage)
+            image_rot = image.rotate(-self.RotateAngle)
+
+            image_rot.thumbnail(size, Image.Resampling.LANCZOS)
+            photo_image = ImageTk.PhotoImage(image_rot)
+
+            self.AlbumPictureLabel.config(image=photo_image)
+            self.AlbumPictureLabel.image = photo_image
+
+            self.RotateAngle += 10
+
+        self.RotateImageTimer = self.master.after(10, self.rotate_image)
+
+    def StopImageRotation(self):
+        '''Cancel image rotation event'''
+
+        if self.RotateImageTimer is not None:
+            self.master.after_cancel(self.RotateImageTimer)
+            self.RotateImageTimer = None
 
     def ResourcePath(self, FileName):
         '''Get absolute path to resource from temporary directory
