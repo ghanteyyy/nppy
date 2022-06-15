@@ -59,10 +59,10 @@ class Calculator:
 
                 elif txt in self.trigonometric_functions:
                     txt += '('
-                    button.config(command=lambda txt=txt: self.keyaction(values=txt))
+                    button.config(command=lambda txt=txt: self.key_action(values=txt))
 
                 else:
-                    button.config(command=lambda txt=txt: self.keyaction(values=txt))
+                    button.config(command=lambda txt=txt: self.key_action(values=txt))
 
             self.track += 7
 
@@ -81,7 +81,7 @@ class Calculator:
 
         self.initial_position()
 
-        self.master.bind('<Key>', self.keyaction)
+        self.master.bind('<Key>', self.key_action)
         self.master.minsize(self.width, self.height)
         self.master.bind('<Return>', lambda e: self.equals_to())
         self.master.bind('<BackSpace>', lambda e: self.del_command())
@@ -126,7 +126,8 @@ class Calculator:
             self.master.geometry(f'{self.width}x{self.height}+{pos_x}+3')
 
     def ac_command(self):
-        '''Remove everything from entry_box and insert '0' when ac_button or 'a' key is pressed'''
+        '''Remove everything from entry_box and insert '0' when ac button or 'a'
+           key is pressed'''
 
         self.var.set('')
         self.var.set('0')
@@ -135,9 +136,10 @@ class Calculator:
     def insert_zero(self):
         '''Insert zero when there is no value in entry box.
 
-           This is especially written because when user turn on or off the numlock then "0" gets removed
-           from the entry box. So, this function reinserts removed "0" to the entry box even if user
-           turn on or off the numlock only if there is no any value in entry box.'''
+           This is especially written because when user turn on or off the num lock
+           then "0" gets removed from the entry box. So, this function reinserts
+           removed "0" to the entry box even if user turn on or off the num lock
+           only if there is no any value in entry box.'''
 
         get = self.var.get()
 
@@ -239,22 +241,22 @@ class Calculator:
         except OverflowError:
             self.var.set('OverflowError')
 
-    def keyaction(self, event=None, values=None):
+    def key_action(self, event=None, values=None):
         ''' Edge Case:
-                1. When only numbers(0-9) are inputed:
+                1. When only numbers(0-9) are inputted:
                     i. If initial_value in entry_box is '0' then remove that initial '0' and insert the input value.
-                    ii. Insert '*' and value when number is inputed after adding '%'
-                    iii. If initial_vaule in entry_box is not '0' then append the input_value with the value in entry_box
+                    ii. Insert '*' and value when number is inputted after adding '%'
+                    iii. If initial_value in entry_box is not '0' then append the input_value with the value in entry_box
 
-                2. When only operators(+-*/) are inputed:
-                    i.Insert '.0' when any operator is inputed after '.'
+                2. When only operators(+-*/) are inputted:
+                    i.Insert '.0' when any operator is inputted after '.'
                     ii. Insert user_input operator in entry_box if last value in entry_box has no any operator.
                     iii. If last value in entry_box and user_input is operator then replace entry_box operator with user_input operator.
 
-                3. When decimal_point(.) is inputed:
+                3. When decimal_point(.) is inputted:
                     i. Insert '.' when not insert previously.
-                    ii. Insert '0.' when '.' is inputed after any operator or '('
-                    iii. Don't repeat decimal unless any other operator is inputed
+                    ii. Insert '0.' when '.' is inputted after any operator or '('
+                    iii. Don't repeat decimal unless any other operator is inputted
 
                 4. When percentage('%') is inserted:
                     i. Insert '%' only if the last value in entry_box is not in '+-/*%.'
