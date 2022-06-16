@@ -13,6 +13,7 @@ matplotlib
 pyinstaller
 ttkbootstrap
 opencv-python
+customtkinter
 auto-py-to-exe
 beautifulsoup4
 pywin32; sys_platform == 'win32'
