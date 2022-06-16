@@ -13,6 +13,7 @@ from tkinter.font import Font
 from tkinter import font, filedialog, messagebox
 import pygame
 import stagger
+import customtkinter
 from ttkbootstrap import Style
 from PIL import Image, ImageTk
 from mutagen.mp3 import MP3, HeaderNotFoundError
@@ -49,7 +50,6 @@ class MusicPlayer:
         self.IsFindWidgetShown = False  # Track if FindWidget is shown
         self.SearchGlobalIndex = None  # Track the index of Search Value
         self.TotalAudioDuration = 0  # Store total time of inserted audio
-        self.IsLeftClicked = False  # Track if left click has been pressed
         self.IsAlbumPictureShown = False  # Track if album picture is shown
         self.EOF = False  # Trigger to check if the last songs is about to play
         self.SearchLocalIndex = None   # Track the search index of filtered items
@@ -60,7 +60,6 @@ class MusicPlayer:
         self.ShowRemTime = False  # Trigger to check if remaining time has showed in total time button
         self.PlaylistPath = self.ResourcePath('playlists.json')  # File where list of audios are saved
         self.PreviousScaleValue = 0  # Store previous position of AudioSlider to avoid dragging in same position
-        self.isButtonInMotion = False  # Trigger to check if audio_slider is in motion. True for the audio_slider is being dragged
         self.isPlaying = None  # Trigger to check if the song is playing. None for has not started playing yet, True for playing and False for pause
 
         if sys.platform == 'win32':
@@ -148,7 +147,7 @@ class MusicPlayer:
         self.TimeFrame.pack(fill='x')
 
         self.AudioSliderVar = DoubleVar()
-        self.AudioSlider = ttk.Scale(self.container, from_=0, to=100, style='info.Horizontal.TScale', variable=self.AudioSliderVar)
+        self.AudioSlider = customtkinter.CTkSlider(self.container, from_=0, to=100, variable=self.AudioSliderVar, command=self.SkipAudio)
         self.AudioSlider.pack(fill='x')
 
         self.VolumeSliderVar = IntVar()
@@ -185,9 +184,9 @@ class MusicPlayer:
         self.VolumeSliderFrame = Frame(self.VolumeFrame)
         self.MuteUnmuteButton = Button(self.VolumeFrame, image=self.VolumeImage4, **self.ButtonsAttributes, command=self.MuteUnmuteVolume)
         self.MuteUnmuteButton.pack(side=LEFT)
-        self.VolumeSlider = ttk.Scale(self.VolumeSliderFrame, from_=0, to=100, variable=self.VolumeSliderVar, style='success.Horizontal.TScale', command=self.ChangeVolume)
-        self.VolumeSlider.pack(side=LEFT, padx=5)
-        self.VolumeLabel = Label(self.VolumeSliderFrame, textvariable=self.VolumeLabelVar, width=4, font=font.Font(weight='bold'))
+        self.VolumeSlider = customtkinter.CTkSlider(self.VolumeSliderFrame, width=80, from_=0, to=100, variable=self.VolumeSliderVar, command=self.ChangeVolume)
+        self.VolumeSlider.pack(side=LEFT, padx=2)
+        self.VolumeLabel = Label(self.VolumeSliderFrame, textvariable=self.VolumeLabelVar, width=4, font=font.Font(size=10, weight='bold'))
         self.VolumeLabel.pack(side=LEFT)
         self.VolumeFrame.pack(side=LEFT, padx=2)
 
@@ -226,18 +225,13 @@ class MusicPlayer:
         self.VolumeFrame.bind('<Enter>', self.ShowVolumeSlider)
         self.VolumeFrame.bind('<Leave>', self.HideVolumeSlider)
         self.Tree.bind('<Motion>', self.RestrictResizingHeading)
-        self.AudioSlider.bind('<B1-Motion>', self.ClickInMotion)
         self.master.bind_all('<Control-f>', self.ShowFindWidget)
-        self.AudioSlider.bind('<B3-Motion>', self.ClickInMotion)
         self.master.bind_all('<Escape>', self.DestroyFindWidget)
         self.Tree.bind('<Shift-Delete>', self.RemoveFromPlaylist)
-        self.VolumeSlider.bind('<Button-3>', self.VolumeRightClick)
         self.SearchEntry.bind('<Return>', self.SearchEntryReturnBind)
         self.TotalTimeLabel.bind('<Button-1>', self.ShowRemainingTime)
         self.master.bind_all('<Double-Button-1>', self.DoubleLeftClick)
         self.master.bind("<Control-q>", lambda e: self.master.destroy())
-        self.AudioSlider.bind('<ButtonRelease-1>', self.ClickInMotionReleased)
-        self.AudioSlider.bind('<ButtonRelease-3>', self.ClickInMotionReleased)
         self.master.bind("<Control-s>", lambda event: self.SavePlaylist(event, True))
         self.Tree.bind('<Control-a>', lambda e: self.Tree.selection_set(self.childrens))
         self.master.bind_all('<Control-Left>', lambda event: self.SkipAudio(event, 'backward'))
@@ -248,8 +242,6 @@ class MusicPlayer:
         self.master.bind_all('<Right>', lambda event, change='increase': self.ChangeVolume(event, change))
         self.master.bind_all('<Control-n>', lambda event: self.PreviousNextAudio(event, button_name='Next'))
         self.master.bind_all('<Control-p>', lambda event: self.PreviousNextAudio(event, button_name='Prev'))
-        self.AudioSlider.bind('<Button-1>', lambda event: self.SeekSingleClick(event, self.AudioSlider, self.SkipAudio))
-        self.VolumeSlider.bind('<Button-1>', lambda event: self.SeekSingleClick(event, self.VolumeSlider, self.ChangeVolume, True))
 
         self.InitialPosition()
         self.StopWindowFlicking()
@@ -355,27 +347,6 @@ class MusicPlayer:
             # to the EscapedTimeLabel or VolumeLabel
             self.DRY_1()
 
-    def SeekSingleClick(self, event, widget, function, seek=False):
-        '''Hijacking Single Left Click to work like Single Right Click
-           to change the value of Scale to the position it is clicked
-
-           Setting seek parameter to True activates audio_slider but
-           not seek_scale when there is no audio in audio_list'''
-
-        if self.AudioFiles or seek:
-            if event.y not in [0, 1, 2, 3, 4, 12, 13, 14, 15]:
-                # I have noticed that we can click on some regions outside of ttk.Scale
-                # making audio repeating at the same position. Those regions in event.y
-                # are [0, 1, 2, 3, 4, 12, 13, 14, 15] where [0, 1, 2, 3, 4] are the top
-                # regions of and [12 ,13, 14, 15] are the bottom regions of ttk.Scale.
-                # When user clicks to these regions must be ignored.
-
-                self.IsLeftClicked = True
-                widget.event_generate('<Button-3>', x=event.x, y=event.y)
-                function(event)
-
-        return 'break'
-
     def SpaceBarBindings(self, event=None):
         '''When user presses space-bar'''
 
@@ -386,22 +357,6 @@ class MusicPlayer:
                 self.isPlaying = None
 
             self.PlayOrPauseAudio()
-
-    def ClickInMotion(self, event=None):
-        '''When user holds left button and starts to drag left or right'''
-
-        if self.isButtonInMotion is False:
-            self.isButtonInMotion = True
-
-    def ClickInMotionReleased(self, event=None):
-        '''When user stops dragging left or right the AudioSlider'''
-
-        if self.isButtonInMotion:
-            self.isButtonInMotion = False
-
-            if self.PreviousScaleValue != self.AudioSliderVar.get():
-                self.PreviousScaleValue = self.AudioSliderVar.get()
-                self.SkipAudio(event)
 
     def MouseWheel(self, event):
         '''Change Volume or Skip Audio when ScrollWheel button'''
@@ -854,21 +809,17 @@ class MusicPlayer:
     def SkipAudio(self, event=None, direction=None):
         '''Skip song as the user moves the slider'''
 
-        if self.IsLeftClicked is False and event.num == 3:
-            return 'break'
-
         if self.isPlaying:
-            self.IsLeftClicked = False
             SkipAt = self.AudioSliderVar.get()
 
-            if direction == 'forward' or (not(isinstance(event, str)) and event.delta > 0):
+            if direction == 'forward':
                 SkipAt += 5
 
                 if SkipAt >= self.TotalTime:
                     self.PreviousNextAudio()
                     return
 
-            elif direction == 'backward' or (not(isinstance(event, str)) and event.delta < 0):
+            elif direction == 'backward':
                 SkipAt -= 5
 
                 if SkipAt <= 0:
@@ -890,18 +841,17 @@ class MusicPlayer:
                 Here volume value is between 0-1'''
 
         if self.master.focus_get() == self.SearchEntry and not event:
-            event.widget.tk_focusNext().focus()
+            self.master.tk_focusNext().focus()
 
-        self.IsLeftClicked = False
         CurrentVolume = self.VolumeSliderVar.get()
 
-        if change == 'increase' or (not(isinstance(event, str)) and event.delta > 0):
+        if change == 'increase':
             CurrentVolume += 5
 
             if CurrentVolume >= 100:
                 CurrentVolume = 100
 
-        elif change == 'decrease' or (not(isinstance(event, str)) and event.delta < 0):
+        elif change == 'decrease':
             CurrentVolume -= 5
 
             if CurrentVolume <= 0:
@@ -1033,12 +983,6 @@ class MusicPlayer:
 
         finally:
             RightClickMenu.grab_release()
-
-    def VolumeRightClick(self, event=None):
-        '''When user right clicks in the volume slider'''
-
-        if self.IsLeftClicked is False and event.num == 3:
-            return 'break'
 
     def RemoveFromList(self, event=None):
         '''Remove selected item from the list-box'''
