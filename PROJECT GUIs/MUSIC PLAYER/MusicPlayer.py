@@ -46,7 +46,7 @@ class MusicPlayer:
         self.IsMuted = False  # Track if audio has been muted or not
         self.AudioName = None  # Store currently playing song's name
         self.WindowNotMapped = False  # Track if window is minimized
-        self.CurrentPlayingIndex = 0  # Index of current playing audio
+        self.CurrentPlayingIndex = None  # Index of current playing audio
         self.IsFindWidgetShown = False  # Track if FindWidget is shown
         self.SearchGlobalIndex = None  # Track the index of Search Value
         self.TotalAudioDuration = 0  # Store total time of inserted audio
@@ -665,7 +665,11 @@ class MusicPlayer:
             self.Tree.selection_set(self.childrens[0])
             self.PlayButton.config(image=self.PlayImage)
 
-            self.ShowAlbumPicture(force_show=True)
+            if self.IsAlbumPictureShown:
+                self.IsAlbumPictureShown = False
+                self.AlbumPictureFrame.pack_forget()
+                self.TreeFrame.pack()
+
             self.StopImageRotation()
 
         else:
@@ -996,10 +1000,14 @@ class MusicPlayer:
 
                 song_name = self.Tree.item(iid)['values'][0]
                 pop_item = self.AudioFiles.pop(song_name)
-                self.TotalAudioDuration -= MP3(pop_item[0]).info.length
+                self.TotalAudioDuration -= MP3(pop_item['path']).info.length
 
             self.Tree.delete(*CurrentIndexes)
             self.LowerCasedAudioFiles = [f.lower() for f in self.AudioFiles.keys()]
+
+            self.isPlaying = None
+            self.AudioName = None
+            self.CurrentPlayingIndex = None
 
             index = self.childrens.index(iid)
             self.childrens = self.Tree.get_children()
