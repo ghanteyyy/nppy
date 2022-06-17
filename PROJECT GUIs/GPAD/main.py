@@ -230,7 +230,7 @@ class GPAD:
         RightClick.RightClick(self.master, self.TextWidget, self.fmc, self.status_label_var).ShowPopUp(event=event)
 
     def RemoveSelection(self, event=None):
-        '''Remove "found" and "triple_click" tags from the text_widget annd reset the blinking time to default'''
+        '''Remove "found" and "triple_click" tags from the text_widget and reset the blinking time to default'''
 
         if event.keysym in ['Up', 'Down', 'Right', 'Left']:
             self.SingleLeftClick()

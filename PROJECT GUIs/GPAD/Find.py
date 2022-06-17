@@ -176,7 +176,7 @@ class Find:
                     self.FindIndex = self.WordIndexes.index(found_tag_index)
 
             except TclError:  # If found tag is not in text_widget
-                if direction == wrap_around == 1 and self.FindIndex == -1:  # When 'Up' and 'Wrap Around' checkbuttons are selected and the cursor is at the very beginning
+                if direction == wrap_around == 1 and self.FindIndex == -1:  # When 'Up' and 'Wrap Around' check-buttons are selected and the cursor is at the very beginning
                     self.FindIndex = len(self.WordIndexes)
 
             self.changed = True

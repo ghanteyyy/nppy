@@ -12,7 +12,7 @@ class Zoom:
     def ZoomIn(self, event=None):
         '''Increase font_size by 1 upto 50 times from default_size'''
 
-        if self.ZoomCount != 500:  # 500% is the maximum perecentage to zoom-in
+        if self.ZoomCount != 500:  # 500% is the maximum percentage to zoom-in
             self.Zoomed += 1
             font_size = self.font['size'] + 1
             self.font.configure(size=font_size)
@@ -77,16 +77,16 @@ class LineNumber:
         i = self.TextWidget.index("@0,0")
 
         while True:
-            dline = self.TextWidget.dlineinfo(i)
+            d_line = self.TextWidget.dlineinfo(i)
 
-            if dline is None:
+            if d_line is None:
                 break
 
-            y = dline[1]
-            linenum = str(i).split(".")[0]
+            y = d_line[1]
+            line_num = str(i).split(".")[0]
 
             font = (self.font['family'], self.font['size'])
-            self.LineCanvas.create_text(2, y, anchor="nw", text=linenum, font=font)
+            self.LineCanvas.create_text(2, y, anchor="nw", text=line_num, font=font)
             i = self.TextWidget.index("%s+1line" % i)
 
         self.master.after(100, self.redraw)
@@ -107,13 +107,13 @@ class View:
         self.FullScreenVar = BooleanVar(value=False)
         self.LineNumberVar = BooleanVar(value=False)
 
-    def ZoomIn(self, evet=None):
+    def ZoomIn(self, event=None):
         self.Zoom.ZoomIn()
 
-    def ZoomOut(self, evet=None):
+    def ZoomOut(self, event=None):
         self.Zoom.ZoomOut()
 
-    def DefaultZoom(self, evet=None):
+    def DefaultZoom(self, event=None):
         self.Zoom.DefaultZoom()
 
     def WheelZoom(self, event=None):

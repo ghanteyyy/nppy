@@ -106,7 +106,7 @@ class Edit_Menu:
 
         return 'break'
 
-    def delete(self, evet=None):
+    def delete(self, event=None):
         '''Remove selected character or single character after the cursor'''
 
         if 'TripleClick' in self.TextWidget.tag_names():  # Delete text that is inside 'triple click' tag
@@ -122,7 +122,7 @@ class Edit_Menu:
                     self.TextWidget.delete('found.first', 'found.last')
                     self.TextWidget.tag_delete('found')
 
-                else:  # Remove one character infront of the cursor
+                else:  # Remove one character in-front of the cursor
                     insert_index = self.TextWidget.index('insert')
                     self.TextWidget.delete(insert_index, f'{insert_index}+1c')
 

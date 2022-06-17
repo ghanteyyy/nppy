@@ -41,9 +41,9 @@ class RightClick:
     def OpenFileLocation(self, event=None):
         '''Open the location of file and select it'''
 
-        FILEBROWSER_PATH = os.path.join(os.getenv('WINDIR'), 'explorer.exe')
+        FILE_BROWSER_PATH = os.path.join(os.getenv('WINDIR'), 'explorer.exe')
         path = os.path.normpath(self.FileName)
-        self.master.after(0, lambda: subprocess.run([FILEBROWSER_PATH, '/select,', path]))
+        self.master.after(0, lambda: subprocess.run([FILE_BROWSER_PATH, '/select,', path]))
 
     def TakeScreenshot(self, event=None):
         '''Take screenshot of the entire window'''

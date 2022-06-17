@@ -111,7 +111,7 @@ class Widgets:
         return 'break'
 
     def KeyReleased(self, event=None):
-        '''When the pressed keys are relased'''
+        '''When the pressed keys are released'''
 
         key = event.keysym
 

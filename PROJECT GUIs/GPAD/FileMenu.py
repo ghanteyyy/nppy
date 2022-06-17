@@ -32,7 +32,7 @@ class File_Menu:
         return hashlib.md5(bytes(self.GetContents(), encoding='utf-8')).digest()
 
     def IsFileChanged(self):
-        '''Check if the signature of the the previous content in text_widet is
+        '''Check if the signature of the the previous content in text_widget is
            not the same of the current content in text_widget.'''
 
         return self.GetSignature(self.GetContents()) != self.PreviousSignature
