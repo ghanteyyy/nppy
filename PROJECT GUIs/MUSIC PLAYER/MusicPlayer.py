@@ -476,7 +476,7 @@ class MusicPlayer:
 
         return 'break'
 
-    def SortAudio(self):
+    def SortAudio(self, by):
         '''Sort audio list in Treeview alphabetically'''
 
         selected_text = ''
@@ -486,7 +486,12 @@ class MusicPlayer:
             selected_text = self.Tree.item(sel[-1])['values'][0]
 
         self.Tree.delete(*self.Tree.get_children())
-        self.AudioFiles = dict(sorted(self.AudioFiles.items(), key=lambda item: os.path.basename(item[0]).lower()))
+
+        if by == 'name':
+            self.AudioFiles = dict(sorted(self.AudioFiles.items(), key=lambda item: os.path.basename(item[0]).lower()))
+
+        elif by == 'date':
+            self.AudioFiles = dict(sorted(self.AudioFiles.items(), key=lambda item: os.path.getctime(item[1]['path'])))
 
         for key, value in self.AudioFiles.items():
             length = MP3(self.AudioFiles[key]['path']).info.length
@@ -975,7 +980,11 @@ class MusicPlayer:
                     RightClickMenu.add_command(label='Open Playlist', command=self.GetPlaylist)
 
             if self.Tree.selection() and region != 'heading':
-                RightClickMenu.add_command(label='Sort (Alphabetically)', command=self.SortAudio)
+                sub_menu = Menu(RightClickMenu, tearoff=0)
+                sub_menu.add_command(label='By name', command=lambda: self.SortAudio('name'))
+                sub_menu.add_command(label='By date', command=lambda: self.SortAudio('date'))
+
+                RightClickMenu.add_cascade(label='Sort', menu=sub_menu)
                 RightClickMenu.add_command(label='Remove Permanently (Caution!)', activeforeground='red', command=self.RemovePermanently)
 
         elif widget in [self.EscapedTimeLabel, self.VolumeLabel] or isinstance(widget, Frame):
@@ -983,7 +992,7 @@ class MusicPlayer:
             RightClickMenu.add_command(label='Open Playlist', command=self.GetPlaylist)
 
         try:
-            RightClickMenu.tk_popup(event.x_root, event.y_root)
+            RightClickMenu.post(event.x_root, event.y_root)
 
         finally:
             RightClickMenu.grab_release()
@@ -1456,7 +1465,7 @@ class MusicPlayer:
             return before
 
     def InsertLyrics(self, event=None, lrc_path=None):
-        '''Save lyrics to the corresponding audio'''
+        '''Save lyrics with the corresponding audio'''
 
         filetypes = [('Lyrics', '*.lrc *srt *vtt')]
 
@@ -1504,7 +1513,7 @@ class MusicPlayer:
         self.RotateImageTimer = self.master.after(10, self.rotate_image)
 
     def StopImageRotation(self):
-        '''Cancel image rotation event'''
+        '''Cancel image rotation animation'''
 
         if self.RotateImageTimer is not None:
             self.master.after_cancel(self.RotateImageTimer)
