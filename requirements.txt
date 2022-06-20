@@ -1,6 +1,8 @@
 tkcap
 numpy
 flask
+qrcode
+pillow
 pygit2
 pygame
 django
