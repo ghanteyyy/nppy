@@ -1,25 +1,28 @@
 import os
 import io
 import sys
+import subprocess
 from tkinter import *
 import tkinter.ttk as ttk
 from tkinter.font import Font
 from tkinter import filedialog
 from tkinter import messagebox
 import qrcode
+import win32clipboard
 from PIL import Image, ImageTk
 
 
 class QRCODE_GENERATOR:
     def __init__(self):
-        self.DEFAULT_TEXT = 'QR Text Here ...'
+        self.bg_color = '#F6F6F6'
+        self.DEFAULT_TEXT = 'QR Text'
         self.QR_DEFAULT_TEXT = 'https://github.com/ghanteyyy'
         self.ClearedDefault = False  # Track if user have inserted data
 
         self.master = Tk()
         self.master.withdraw()
-        self.master.config(bg='white')
-        self.master.title('QR CODE GENERATOR')
+        self.master.config(bg=self.bg_color)
+        self.master.title('QRCODE GENERATOR')
 
         self.IconImage = PhotoImage(file=self.ResourcePath('icon.png'))
         self.master.iconphoto(None, self.IconImage)
@@ -31,13 +34,13 @@ class QRCODE_GENERATOR:
         self.message_box_var.set(self.DEFAULT_TEXT)
         self.message_box_var.trace('w', self.trace_var)
 
-        self.message_box = ttk.Entry(self.master, width=60, textvariable=self.message_box_var, style='MB.TEntry', justify='center')
-        self.message_box.pack(padx=5, ipady=5, pady=8)
+        self.message_box = ttk.Entry(self.master, width=48, textvariable=self.message_box_var, style='MB.TEntry', justify='center')
+        self.message_box.pack(padx=20, ipady=5, pady=8)
 
         self.qr_label = Label(self.master, bd=0)
         self.qr_label.pack()
 
-        self.info_label = Label(self.master, bd=0, fg='black', bg='white', text='Ctrl + S or Right Click to save', font=Font(size=8))
+        self.info_label = Label(self.master, bd=0, fg='black', bg=self.bg_color, text='Ctrl + S or Right Click at QRCODE to save\nCtrl + C to copy', font=Font(size=8), justify='left')
         self.info_label.pack(side=BOTTOM, ipady=5)
 
         self.make_QR(self.QR_DEFAULT_TEXT)
@@ -45,9 +48,10 @@ class QRCODE_GENERATOR:
 
         self.master.bind('<Button-1>', self.focus_here)
         self.message_box.bind('<FocusIn>', self.focus_in)
+        self.qr_label.bind('<Button-3>', self.RightClick)
         self.message_box.bind('<FocusOut>', self.focus_out)
         self.master.bind_all('<Control-s>', self.SaveImage)
-        self.master.bind_all('<Button-3>', self.RightClick)
+        self.master.bind_all('<Control-c>', self.CopyImage)
 
         self.master.mainloop()
 
@@ -125,6 +129,27 @@ class QRCODE_GENERATOR:
 
         if path:  # Save image only when user have given valid location
             self.img.save(path)
+
+    def CopyImage(self, event=None):
+        '''Copy image to clipboard'''
+
+        memory = io.BytesIO()
+        self.img.convert('RGB').save(memory, format='BMP')
+
+        if sys.platform == 'win32':
+            data = memory.getvalue()[14:]
+
+            win32clipboard.OpenClipboard()
+            win32clipboard.EmptyClipboard()
+            win32clipboard.SetClipboardData(win32clipboard.CF_DIB, data)
+            win32clipboard.CloseClipboard()
+
+        else:
+            # I do not have a linux machine so I have no idea if the
+            # following code works in linux. Hope it works for linux
+            output = subprocess.Popen(("xclip", "-selection", "clipboard", "-t", "image/png", "-i"), stdin=subprocess.PIPE)
+            output.stdin.write(memory.getvalue())  # write image to stdin
+            output.stdin.close()
 
     def RightClick(self, event=None):
         '''When user right clicks to QR image'''
