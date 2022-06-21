@@ -1,4 +1,4 @@
-# QR-CODE Generator
+# QRCODE Generator
 
 Generate QR-code in real time.
 
