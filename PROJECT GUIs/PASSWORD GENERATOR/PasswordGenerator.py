@@ -10,6 +10,9 @@ from tkinter import messagebox
 
 class PasswordGenerator:
     def __init__(self):
+        self.ClearedDefault = False
+        self.DEFAULT_TEXT = 'Number of Character'
+
         self.master = Tk()
         self.master.withdraw()
         self.master.resizable(0, 0)
@@ -27,7 +30,7 @@ class PasswordGenerator:
         self.number_box_style = ttk.Style()
         self.number_box_style.configure('N.TEntry', foreground='grey', font=('Calibri', 12))
         self.number_box = ttk.Entry(self.master, width=35, textvariable=self.number_box_var, style='N.TEntry', justify='center')
-        self.number_box_var.set('Number of Character')
+        self.number_box_var.set(self.DEFAULT_TEXT)
         self.number_box.pack(pady=5, ipady=3)
 
         self.check_box_frame = Frame(self.master)
@@ -51,39 +54,59 @@ class PasswordGenerator:
         self.password_label = Label(self.master, font=('Calibri', 20))
         self.copy_button = Button(self.master, text='Copy', width=6, bd=0, bg='Green', fg='white', activeforeground='white', activebackground='Green', font=('Calibri', 12), relief=FLAT, cursor='hand2', command=self.copy_to_clipboard)
 
-        self.master.bind('<Button-1>', self.bind_keys)
-        self.number_box.bind('<FocusIn>', self.bind_keys)
+        self.master.bind('<Button-1>', self.focus_here)
+        self.number_box.bind('<FocusIn>', self.focus_in)
+        self.number_box.bind('<FocusOut>', self.focus_out)
+        self.number_box.bind('<KeyPress>', self.KeyPressed)
         self.number_box.bind('<Return>', self.generate_button)
         self.master.bind('<Control-c>', self.copy_to_clipboard)
         self.master.bind('<Control-C>', self.copy_to_clipboard)
         self.generate_password_button.bind('<Return>', self.generate_button)
-        self.number_box.bind('<FocusOut>', lambda event, focus_out=True: self.bind_keys(event, focus_out))
 
         self.master.after(0, self.master.deiconify)
         self.master.mainloop()
 
-    def bind_keys(self, event, focus_out=False):
-        '''Commands when user clicks in and out of the entry widget'''
+    def focus_here(self, event=None):
+        '''Focus to the clicked widget'''
+
+        event.widget.focus_force()
+
+    def focus_in(self, event=None):
+        '''Remove default text when user clicks to entry widget'''
 
         get = self.number_box_var.get().strip()
 
-        if event.widget == self.number_box and not focus_out:
-            if get == 'Number of Character':
-                self.number_box_var.set('')
-                self.number_box_style.configure('N.TEntry', foreground='black', font=('Calibri', 12))
+        if self.ClearedDefault is False and get == self.DEFAULT_TEXT:
+            self.number_box_var.set('')
+            self.ClearedDefault = True
 
-        elif focus_out or event.widget != self.number_box:
-            if not get:
-                self.number_box_var.set('Number of Character')
-                self.number_box_style.configure('N.TEntry', foreground='grey', font=('Calibri', 12))
+    def focus_out(self, event=None):
+        '''Remove focus from Entry widget when already
+           focused and still user presses TAB key'''
 
-        if event.widget != self.number_box:
-            self.master.focus()
+        get = self.number_box_var.get().strip()
+
+        if not get:
+            self.ClearedDefault = False
+            self.number_box_var.set(self.DEFAULT_TEXT)
+
+    def KeyPressed(self, event=None):
+        '''Inserting user pressed key only if the key is digit only'''
+
+        num = event.keysym
+
+        if num.isdigit():
+            text = self.number_box_var.get() + num
+            self.number_box_var.set(text)
+
+            self.number_box.icursor(END)
+
+        return 'break'
 
     def generate_password(self, string_combination, lengths):
         '''Generating random generated password'''
 
-        return ''.join([random.choice(string_combination) for _ in range(lengths)])
+        return ''.join([random.SystemRandom().choice(string_combination) for _ in range(lengths)])
 
     def copy_to_clipboard(self, event=None):
         '''Copy Generated Password to the clipboard'''
@@ -103,6 +126,11 @@ class PasswordGenerator:
 
         try:
             get_var = [var.get() for var in self.vars]
+
+            if not any(get_var):
+                get_var[-1] = 1
+                self.all_var.set(1)
+
             lengths = int(self.number_box_var.get().strip())
             string_combo = [string.ascii_uppercase, string.ascii_lowercase, string.digits, string.punctuation, string.printable[:94]]
 
@@ -117,9 +145,6 @@ class PasswordGenerator:
 
         except ValueError:
             messagebox.showerror('Invalid Number', 'Input Valid Number')
-
-        except IndexError:
-            messagebox.showerror('No Option', 'No option selected')
 
     def resource_path(self, file_name):
         '''Get absolute path to resource from temporary directory
