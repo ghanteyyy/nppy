@@ -42,6 +42,7 @@ class TestTypingSpeed:
 
         self.typing_area.bind('<F5>', self.redo)
         self.typing_area.bind('<space>', self.next_word)
+        self.show_words.bind('<Button-1>', self.keep_focus)
         self.typing_area.bind('<BackSpace>', self.backspace)
         self.typing_area.bind('<KeyPress>', self.key_pressed)
         self.show_words.bind('<Enter>', self.forbid_default_bindings)
@@ -52,7 +53,15 @@ class TestTypingSpeed:
         self.typing_area.bind('<Control-BackSpace>', self.control_backspace)
         self.show_words.bind('<Double-Button-1>', self.forbid_default_bindings)
 
+        self.typing_area.focus_force()
         self.master.mainloop()
+
+    def keep_focus(self, event=None):
+        '''Keep focus to entry widget even if
+           user clicks to displayed words'''
+
+        self.typing_area.focus_force()
+        return 'break'
 
     def default_values(self):
         self.TotalTime = 60
