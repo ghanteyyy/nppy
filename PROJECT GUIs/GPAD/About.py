@@ -6,7 +6,7 @@ import Search
 
 class About:
     def __init__(self, master):
-        self.BuildNumber = '2.4.0'
+        self.BuildNumber = '2.4.1'
 
         self.master = master
         self.AuthorAddress = 'http://github.com/ghanteyyy'
@@ -45,8 +45,10 @@ class About:
         self.LinkLabel.grid(row=0, column=1)
         self.ShowLinkFrame.pack(side=LEFT)
 
-        self.OkFrame = Frame(self.AboutWindow)
-        self.OkButton = ttk.Button(self.OkFrame, text='Ok', command=self.AboutWindow.destroy)
+        self.OkStyle = ttk.Style()
+        self.OkStyle.configure('btn.TButton', background='white')
+        self.OkFrame = Frame(self.AboutWindow, bg='white')
+        self.OkButton = ttk.Button(self.OkFrame, text='Ok', style='btn.TButton', command=self.AboutWindow.destroy)
         self.OkButton.grid(row=0, column=0)
         self.OkFrame.pack(side=RIGHT)
 
