@@ -224,7 +224,7 @@ class QRCODE_GENERATOR:
         except AttributeError:
             base_path = os.path.dirname(__file__)
 
-        return os.path.join(base_path, 'included_files', FileName)
+        return os.path.join(base_path, 'assets', FileName)
 
 
 if __name__ == '__main__':

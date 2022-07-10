@@ -175,7 +175,7 @@ class DailyExpenses:
         except AttributeError:
             base_path = os.path.dirname(__file__)
 
-        return os.path.join(base_path, 'included_files', file_name)
+        return os.path.join(base_path, 'assets', file_name)
 
 
 if __name__ == '__main__':
