@@ -2,7 +2,7 @@ class OctalToDecimal:
     '''Convert octal number to decimal number
 
         To convert octal to decimal you need to:
-            Multipy each number by base 8 with its own power increase from left to right(first power is 0)
+            Multiply each number by base 8 with its own power increase from left to right(first power is 0)
                 123 = 1 * 8^2 + 2 * 8^1 + 3 * 8^0
                     =  83 '''
 

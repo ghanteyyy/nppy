@@ -11,8 +11,8 @@ class MainWindow:
         self.master = Tk()
 
         self.width, self.height = 446, 200
-        self.screen_width, self.screen_heigth = self.master.winfo_screenwidth() // 2, self.master.winfo_screenheight() // 2
-        self.master.geometry(f'446x200+{self.screen_width - self.width // 2}+{self.screen_heigth - self.height // 2}')
+        self.screen_width, self.screen_height = self.master.winfo_screenwidth() // 2, self.master.winfo_screenheight() // 2
+        self.master.geometry(f'446x200+{self.screen_width - self.width // 2}+{self.screen_height - self.height // 2}')
 
         self.title_label = Label(self.master, text='REMIND ME!', fg='#cfb0be', bg='#6200ff', font=('ISOCP', 40, 'bold'))
         self.title_label.pack()
@@ -63,8 +63,8 @@ class MainWindow:
         self.master.update()
 
         width, height = self.master.winfo_width(), self.master.winfo_height() - 5
-        screen_width, screen_heigth = self.master.winfo_screenwidth() // 2, self.master.winfo_screenheight() // 2
-        self.master.geometry(f'{width}x{height}+{screen_width - width // 2}+{screen_heigth - height // 2}')
+        screen_width, screen_height = self.master.winfo_screenwidth() // 2, self.master.winfo_screenheight() // 2
+        self.master.geometry(f'{width}x{height}+{screen_width - width // 2}+{screen_height - height // 2}')
 
         self.master.resizable(0, 0)
         self.master.title('REMIND ME !')
@@ -74,7 +74,7 @@ class MainWindow:
         self.master.deiconify()
 
     def key_bindings(self, event):
-        '''Action when user clicks inside entry widget or oustide of the entry widget'''
+        '''Action when user clicks inside entry widget or outside of the entry widget'''
 
         get_from_entry = self.entry_box.get().strip()
 

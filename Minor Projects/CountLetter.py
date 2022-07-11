@@ -17,7 +17,7 @@ class CountLetter:
             else:
                 dic[string] = 1      # Else assigning its count to 1.
 
-        keys = [key for key in dic.keys()]   # Ssorting keys of dic alphabetically so that we can print keys and values in order.
+        keys = [key for key in dic.keys()]   # Sorting keys of dic alphabetically so that we can print keys and values in order.
         keys.sort()
 
         for key in keys:
@@ -28,7 +28,7 @@ class CountLetter:
 
         dic = collections.Counter(self.strings)
 
-        keys = [key for key in dic.keys()]  # Ssorting keys of dic alphabetically so that we can print keys and values in order.
+        keys = [key for key in dic.keys()]  # Sorting keys of dic alphabetically so that we can print keys and values in order.
         keys.sort()
 
         for key in keys:

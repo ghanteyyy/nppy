@@ -282,7 +282,7 @@ class Saving_Spending:
         add_frame.pack(ipadx=900, ipady=500)
 
     def read_details(self, file_name):
-        '''Retrive data from the given file_name'''
+        '''Retrieve data from the given file_name'''
 
         try:
             with open(file_name, 'r') as f:

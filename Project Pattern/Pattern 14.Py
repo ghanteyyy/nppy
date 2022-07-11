@@ -1,5 +1,5 @@
-class Pattern_Forteen:
-    '''Pattern forteen
+class Pattern_Fourteen:
+    '''Pattern fourteen
 
         K
          A
@@ -55,9 +55,9 @@ class Pattern_Forteen:
 
 
 if __name__ == '__main__':
-    pattern_forteen = Pattern_Forteen()
+    pattern_fourteen = Pattern_Fourteen()
 
-    pattern_forteen.method_one()
-    pattern_forteen.method_two()
-    pattern_forteen.method_three()
-    pattern_forteen.method_four()
+    pattern_fourteen.method_one()
+    pattern_fourteen.method_two()
+    pattern_fourteen.method_three()
+    pattern_fourteen.method_four()

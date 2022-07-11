@@ -2,7 +2,7 @@ class BinaryToDecimal:
     '''Convert binary number to decimal number
 
         To convert binary to decimal you need to:
-            Multipy each number by base 2 with its own power increase from left to right(first power is 0)
+            Multiply each number by base 2 with its own power increase from left to right(first power is 0)
                 1111011 = 1 * 2^6 + 1 * 2^5 + 1 * 2^4 + 1 * 2^3 + 0 * 2^2 + 1 * 2^1 + 1 * 2^0
                        = 123
 

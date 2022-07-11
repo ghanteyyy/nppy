@@ -2,7 +2,7 @@ class HexadecimalToDecimal:
     '''Convert hexadecimal number to decimal number
 
         To convert hexadecimal to decimal you need to:
-            Multipy each number by base 16 with its own power increase from left to right(first power is 0)
+            Multiply each number by base 16 with its own power increase from left to right(first power is 0)
                 123 = 1 * 16^2 + 2 * 16^1 + 3 * 16^0
                     = 291 '''
 

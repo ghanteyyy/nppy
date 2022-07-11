@@ -1,7 +1,7 @@
 class AddSeriesOfNumbers:
     '''Add given integer entered in series
 
-        If user inputs 123456789 then the scripts adds all the integerbers.
+        If user inputs 123456789 then the scripts adds all the integers.
               = 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9
               = 45    '''
 
@@ -33,7 +33,7 @@ class AddSeriesOfNumbers:
         return f'Sum of {self.integer} = {sums}'
 
     def method_three(self):
-        '''Using list comphrension'''
+        '''Using list comprehension'''
 
         sums = sum([int(integer) for integer in self.integer])
 

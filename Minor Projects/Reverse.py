@@ -40,9 +40,9 @@ class Reverse:
     def method_five(self):
         '''Using in-place algorithm
 
-           Defination:
+           Definition:
                 In-place means that the algorithm does not use extra space for
-                manipulating the input but may require a small though nonconstant
+                manipulating the input but may require a small though non-constant
                 extra space for its operation.'''
 
         strings = list(self.strings)
@@ -53,7 +53,7 @@ class Reverse:
         return ''.join(strings)
 
     def method_six(self):
-        '''List Comphrension of method one'''
+        '''List Comprehension of method one'''
 
         reverse = [self.strings[i] for i in range(self.length, -1, -1)]
 

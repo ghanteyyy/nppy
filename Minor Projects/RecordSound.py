@@ -3,7 +3,7 @@ import sounddevice
 
 
 class Record_Sound:
-    def __init__(self, name='Reocrd.wav', rate=40000, duration=60):
+    def __init__(self, name='Record.wav', rate=40000, duration=60):
         self.name = name           # .wav (extension)
         self.rate = rate           # Hertz
         self.duration = duration   # Seconds

@@ -118,7 +118,7 @@ class is_at_startup:
         self.program_basename = os.path.basename(self.program_path)
 
     def is_path_valid(self):
-        '''Check if the given program path aactually exists'''
+        '''Check if the given program path actually exists'''
 
         if os.path.exists(self.program_path):
             return True

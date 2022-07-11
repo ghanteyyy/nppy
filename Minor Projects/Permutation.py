@@ -2,7 +2,7 @@ import math
 
 
 class Permutation:
-    '''Formula to calulate permutation.
+    '''Formula to calculate permutation.
            P(n,r) = n! / (n-r)!   ; n > r
 
                 where, n = total number of arrangements
@@ -18,7 +18,7 @@ class Permutation:
 
         return math.factorial(num)
 
-    def get_permutaion(self):
+    def get_permutation(self):
         '''Calculating permutation of the given number and difference'''
 
         if self.difference > self.number:
@@ -32,4 +32,4 @@ class Permutation:
 
 if __name__ == '__main__':
     permutation = Permutation(18, 6)
-    print(permutation.get_permutaion())
+    print(permutation.get_permutation())

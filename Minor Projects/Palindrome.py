@@ -1,7 +1,7 @@
 class Palindrome:
     '''Checks if your given string is palindrome or not
 
-        Palindrome is a string / number which is same as reversing the orginal string / number
+        Palindrome is a string / number which is same as reversing the original string / number
     '''
 
     def __init__(self, string):
@@ -27,5 +27,5 @@ class Palindrome:
 
 
 if __name__ == '__main__':
-    palin = Palindrome('mom')
-    palin.is_palindrome()
+    palindrome = Palindrome('mom')
+    palindrome.is_palindrome()

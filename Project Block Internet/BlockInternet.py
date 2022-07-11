@@ -34,7 +34,7 @@ class BlockInternet:
             return [line.strip('\n') for line in f.readlines() if line.strip('\n')]
 
     def write_file(self, contents):
-        '''Writing site with localhost in the hostfile'''
+        '''Writing site with localhost in the host-file'''
 
         is_newline = False
 

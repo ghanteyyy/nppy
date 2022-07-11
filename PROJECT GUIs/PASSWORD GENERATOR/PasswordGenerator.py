@@ -42,7 +42,7 @@ class PasswordGenerator:
         self.check_box_style = ttk.Style()
         self.check_box_style.configure('C.TCheckbutton', font=('Calibri', 12))
 
-        for index, value in enumerate(self.check_box_items):  # Creating Checkbuttons as per name in "self.check_box_items" and variables as per in self.vars
+        for index, value in enumerate(self.check_box_items):  # Creating Check-buttons as per name in "self.check_box_items" and variables as per in self.vars
             self.check_box = ttk.Checkbutton(self.check_box_frame, text=value, variable=self.vars[index], cursor='hand2', style='C.TCheckbutton')
             self.check_box.grid(row=index, column=0, sticky='w')
 

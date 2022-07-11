@@ -56,7 +56,7 @@ class BinaryToHexadecimal:
                         Then, len(binary_number) // 4 + 1 = 2 + 1 = 4
                         So, range = (0, 1, 2, 3)'''
 
-                sliced_binary = binary_number[:4]  # Storing three value from binary_number in each itreation
+                sliced_binary = binary_number[:4]  # Storing three value from binary_number in each iteration
                 binary_number = binary_number[4:]  # Overwriting binary_number variable excluding value stored in sliced_binary using slicing
 
                 if len(sliced_binary) == 4:  # Checking if the length of value stored in sliced_binary variable

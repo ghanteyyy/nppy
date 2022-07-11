@@ -31,7 +31,7 @@ with open('p042_words.txt', 'r') as f:
         for cont in content[1:-1]:  # Adding corresponding alphabetical position
             temp_num += uppercase.index(cont) + 1
 
-        if is_triangle_coded_num(temp_num):  # Checking if the added value is tirangle coded number
+        if is_triangle_coded_num(temp_num):  # Checking if the added value is triangle coded number
             total_triangle_coded_nums += 1
 
 print(total_triangle_coded_nums)

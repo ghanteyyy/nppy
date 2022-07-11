@@ -5,7 +5,7 @@ class QuinaryToOctal:
         number to decimal and obtained decimal number to quinary number
 
         For an instance, lets take binary number be 123
-            Step 1: Convert to deicmal
+            Step 1: Convert to decimal
                     123 = 1 * 5^2 + 2 * 5^1 + 3 * 5^0
                         = 38 (Decimal)
 

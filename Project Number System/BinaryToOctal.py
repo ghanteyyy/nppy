@@ -20,7 +20,7 @@ class BinaryToOctal:
                 Step 1: Split each three value from backward like
                         1           111            011
 
-                Step 2: Here, we have all splited value having length 3 except one i.e 1 so adding extra two '0's in the front of 1
+                Step 2: Here, we have all splitted value having length 3 except one i.e 1 so adding extra two '0's in the front of 1
                         001 to make its length 3
 
                         Then finally we have,
@@ -54,7 +54,7 @@ class BinaryToOctal:
                         Then, len(binary_number) // 3 + 1 = 2 + 1 = 3
                         So, range = (0, 1, 2)'''
 
-                sliced_binary = binary_number[:3]  # Storing three value from binary_number in each itreation
+                sliced_binary = binary_number[:3]  # Storing three value from binary_number in each iteration
                 binary_number = binary_number[3:]  # Overwriting binary_number variable excluding value stored in sliced_binary using slicing
 
                 if len(sliced_binary) == 3:  # Checking if the length of value stored in sliced_binary variable

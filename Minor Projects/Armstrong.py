@@ -22,7 +22,7 @@ class Armstrong():
             return f'{self.integer} is not armstrong\n'
 
     def method_two(self):
-        '''Using list comphrension'''
+        '''Using list comprehension'''
 
         sum_of_cube = sum([int(x) ** 3 for x in str(self.integer)])
 

@@ -121,7 +121,7 @@ class StickyNotes:
         return 'break'
 
     def save_formatting(self, event=None):
-        '''Saves text styles like bold, italic, underline or overstrike as well as sarting_index and ending_index of that style in config.json'''
+        '''Saves text styles like bold, italic, underline or overstrike as well as starting_index and ending_index of that style in config.json'''
 
         self.text_widget.tag_remove('sel', '1.0', 'end')  # Removing all selected area from the text widget.
         self.text_widget.mark_set('insert', END)  # Moving cursor to the end of the text widget.
@@ -184,7 +184,7 @@ class StickyNotes:
             pass
 
     def on_exit(self, event=None):
-        '''Saves text in sticky_notes.txt, styling and indexes in config.json before destorying the window'''
+        '''Saves text in sticky_notes.txt, styling and indexes in config.json before destroying the window'''
 
         contents = self.text_widget.get('1.0', END).strip('\n')
 

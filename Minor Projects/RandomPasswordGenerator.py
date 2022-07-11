@@ -33,14 +33,14 @@ class RandomPasswordGenerator:
         return password
 
     def method_three(self):
-        '''Using List Comphrension at method_one'''
+        '''Using List Comprehension at method_one'''
 
         password = [self.strings[random.randint(0, self.len_strings)] for _ in range(self.length)]
 
         return ''.join(password)
 
     def method_four(self):
-        '''Using List Comphrension at method_two'''
+        '''Using List Comprehension at method_two'''
 
         password = [random.choice(self.strings) for _ in range(self.length)]
 

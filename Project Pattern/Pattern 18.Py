@@ -1,4 +1,4 @@
-class Pattern_Eightteen:
+class Pattern_Eighteen:
     ''' Pattern eighteen
 
         9 8 7 6 5 4 3 2 1
@@ -34,7 +34,7 @@ class Pattern_Eightteen:
 
 
 if __name__ == '__main__':
-    pattern_eightteen = Pattern_Eightteen()
+    pattern_eighteen = Pattern_Eighteen()
 
-    pattern_eightteen.method_one()
-    pattern_eightteen.method_two()
+    pattern_eighteen.method_one()
+    pattern_eighteen.method_two()

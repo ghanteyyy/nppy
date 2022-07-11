@@ -17,7 +17,7 @@ class RemovingVowels:
         return words_removed_vowels
 
     def method_two(self):
-        '''Using list comphrension'''
+        '''Using list comprehension'''
 
         words_removed_vowels = [string for string in self.strings if string not in self.vowels]
 

@@ -7,13 +7,13 @@ class Solution(object):
         """
 
         index = 0
-        haylength = len(haystack)
+        hay_length = len(haystack)
         needleLength = len(needle)
 
         if needleLength == 0:
             return 0
 
-        while index <= haylength:
+        while index <= hay_length:
             if haystack[index: index + needleLength] == needle:
                 return index
 

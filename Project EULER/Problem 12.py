@@ -27,7 +27,7 @@ def get_triangular_number(num):
     return (num * (num + 1)) // 2
 
 
-def get_hundered_factors():
+def get_five_hundred_factors():
     num = 1
 
     while True:
@@ -41,4 +41,4 @@ def get_hundered_factors():
 
 
 if __name__ == '__main__':
-    print(get_hundered_factors())
+    print(get_five_hundred_factors())

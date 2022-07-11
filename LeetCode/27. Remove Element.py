@@ -8,17 +8,17 @@ class Solution(object):
 
         for i in range(len(nums) - 1):
             if nums[i] == val:
-                findex = i + 1
+                f_index = i + 1
 
                 while True:
-                    if nums[i] != nums[findex]:
-                        nums[i], nums[findex] = nums[findex], nums[i]
+                    if nums[i] != nums[f_index]:
+                        nums[i], nums[f_index] = nums[f_index], nums[i]
                         break
 
-                    if findex >= len(nums) - 1:
+                    if f_index >= len(nums) - 1:
                         break
 
-                    findex += 1
+                    f_index += 1
 
         for j in range(len(nums) - 1, -1, -1):
             if nums[j] != val:

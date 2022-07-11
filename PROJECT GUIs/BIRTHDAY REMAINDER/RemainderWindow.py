@@ -8,7 +8,7 @@ import tkinter.ttk as ttk
 
 class RemainderWindow:
     def __init__(self):
-        self.birthdates = {}
+        self.birth_dates = {}
         self.todays_date = time.strftime('%m-%d')
         self.files = [os.path.abspath(os.path.join('.', 'birthday_remainder.txt')), os.path.abspath(os.path.join('.', 'seen_birthday.txt'))]
         self.month_number = {'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'}
@@ -43,7 +43,7 @@ class RemainderWindow:
         self.master.mainloop()
 
     def read_file(self, filename):
-        '''Storing name and birthdates from the given name of file in a dictionary'''
+        '''Storing name and birth dates from the given name of file in a dictionary'''
 
         dic = {}
 
@@ -60,19 +60,19 @@ class RemainderWindow:
         '''Getting name and date of those whose birthday is today'''
 
         try:
-            all_birthdates = self.read_file(self.files[0])
+            all_birth_dates = self.read_file(self.files[0])
 
             if os.path.exists(self.files[1]):
-                today_birthdates = self.read_file(self.files[1])
+                today_birth_dates = self.read_file(self.files[1])
 
-                for name, date in all_birthdates.items():
-                    if name not in today_birthdates and date == self.todays_date:  # If birthdates from 'birthday_remainder.txt' is same as todays_date and name is not in 'seen_birthday.txt'
-                        self.birthdates.update({name: date})
+                for name, date in all_birth_dates.items():
+                    if name not in today_birth_dates and date == self.todays_date:  # If birth dates from 'birthday_remainder.txt' is same as todays_date and name is not in 'seen_birthday.txt'
+                        self.birth_dates.update({name: date})
 
             else:
-                for name, date in all_birthdates.items():
+                for name, date in all_birth_dates.items():
                     if date == self.todays_date:
-                        self.birthdates.update({name: date})
+                        self.birth_dates.update({name: date})
 
         except FileNotFoundError:
             return
@@ -82,12 +82,12 @@ class RemainderWindow:
 
            When close button is clicked with selecting the check_button that means
            don't show remainder of that name again. So this function saves those
-           names to seen_birthday.txt and excludes the stored birthdates next time
+           names to seen_birthday.txt and excludes the stored birth dates next time
            when this script runs'''
 
         if self.var.get() == 1:
             with open(self.files[1], 'a') as tf:
-                tf.write(f'{name.ljust(30)}:{self.birthdates[name].rjust(10)}\n')
+                tf.write(f'{name.ljust(30)}:{self.birth_dates[name].rjust(10)}\n')
 
         self.master.destroy()
 
@@ -109,8 +109,8 @@ class RemainderWindow:
         self.remove_file()
         self.get_today_birthdays()
 
-        if self.birthdates:
-            for name, date in self.birthdates.items():
+        if self.birth_dates:
+            for name, date in self.birth_dates.items():
                 winsound.PlaySound(self.resource_path('tone.wav'), winsound.SND_LOOP + winsound.SND_ASYNC)
                 self.Window(name, date)
 

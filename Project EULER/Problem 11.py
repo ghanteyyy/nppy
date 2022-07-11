@@ -113,15 +113,15 @@ def check_diagonal_from_left():
 
 def check_diagonal_from_right():
     test, index = 0, 0
-    ind, indu = 0, 20
+    start_index, end_index = 0, 20
 
     reversed_grid = []
     another_diagonal = []
 
     for i in range(20):
-        reversed_grid.extend(given_grid[ind: indu][::-1])
-        ind += 20
-        indu += 20
+        reversed_grid.extend(given_grid[start_index: end_index][::-1])
+        start_index += 20
+        end_index += 20
 
     while index <= 420:
         try:

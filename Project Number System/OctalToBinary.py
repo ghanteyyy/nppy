@@ -74,12 +74,12 @@ class OctalToBinary:
                     Here,
                         6    = 110
 
-                        2    = 10   (Here lenght of the remainder is less than 3 so add extra one 0 at its front)
+                        2    = 10   (Here length of the remainder is less than 3 so add extra one 0 at its front)
                              = 010  (After adding extra one 0)
 
                         4    = 100
 
-                        2    = 10   (Here lenght of the remainder is less than 3 so add extra one 0 at its front)
+                        2    = 10   (Here length of the remainder is less than 3 so add extra one 0 at its front)
                              = 010  (After adding extra one 0)
 
                     Now, combine all obtained binary number we get,

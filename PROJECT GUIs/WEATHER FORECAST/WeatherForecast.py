@@ -131,7 +131,7 @@ class WeatherForecast:
             messagebox.showerror('ERR', 'No Internet Connection')
 
     def show_weather_details(self, event=None):
-        '''Get weather details and dispaly them to the user'''
+        '''Get weather details and display them to the user'''
 
         location = self.entry_var.get().strip().title()
         link = f"https://api.openweathermap.org/data/2.5/weather?q={location.replace(' ', '%20')}&appid={self.api_key}"

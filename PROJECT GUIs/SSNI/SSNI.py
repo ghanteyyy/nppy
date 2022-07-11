@@ -180,7 +180,7 @@ class SSNI:
         return []
 
     def write_to_file(self, contents):
-        '''Writting new or renamed data to the file'''
+        '''Writing new or renamed data to the file'''
 
         with open(self.file_name, 'w') as f:
             for content in contents:
@@ -364,11 +364,11 @@ class SSNI:
 
         elif widget == self.ListBox:
             _y = event.y
-            nearset = self.ListBox.nearest(_y)  # Getting index nearest to the cursor
-            bbox = self.ListBox.bbox(nearset)   # Getting the x, y, width and height of value of the obtained nearest index
+            nearest = self.ListBox.nearest(_y)  # Getting index nearest to the cursor
+            bbox = self.ListBox.bbox(nearest)   # Getting the x, y, width and height of value of the obtained nearest index
             from_listbox = self.ListBoxVariable.get()
 
-            if (from_listbox and from_listbox[0] == 'No data yet') or (nearset == 0 and _y > bbox[-1]):  # When there is no data in Listbox
+            if (from_listbox and from_listbox[0] == 'No data yet') or (nearest == 0 and _y > bbox[-1]):  # When there is no data in Listbox
                 RightClickMenu.add_command(label='Load from file', command=self.InsertToListBox)
 
             else:
@@ -378,7 +378,7 @@ class SSNI:
                 self.ListBox.select_clear(0, END)
 
                 # Selecting the obtained nearest index
-                self.ListBox.selection_set(nearset)
+                self.ListBox.selection_set(nearest)
 
                 RightClickMenu.add_command(label='Copy', command=lambda: self.copy_cut(from_listbox=True))
                 RightClickMenu.add_command(label='Remove', command=lambda: self.add_remove_search_command('REMOVE', from_listbox=True))

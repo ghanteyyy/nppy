@@ -44,7 +44,7 @@ class CleanDesktop:
         return [f for f in common_files if self.is_valid_file(f)]
 
     def rename_common_files(self):
-        '''Renme files or directories if they
+        '''Rename files or directories if they
            exists in desktop and cleanup directories'''
 
         common_files = self.get_common_files_or_directories()
