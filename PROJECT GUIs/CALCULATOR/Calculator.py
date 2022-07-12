@@ -134,12 +134,14 @@ class Calculator:
         self.decimal_placeable = True
 
     def insert_zero(self):
-        '''Insert zero when there is no value in entry box.
+        '''
+        Insert zero when there is no value in entry box.
 
-           This is especially written because when user turn on or off the num lock
-           then "0" gets removed from the entry box. So, this function reinserts
-           removed "0" to the entry box even if user turn on or off the num lock
-           only if there is no any value in entry box.'''
+        This is especially written because when user turn on or off the num lock
+        then "0" gets removed from the entry box. So, this function reinserts
+        removed "0" to the entry box even if user turn on or off the num lock
+        only if there is no any value in entry box.
+        '''
 
         get = self.var.get()
 
@@ -200,11 +202,16 @@ class Calculator:
             self.var.set('0')
 
     def equals_to(self, event=None):
-        ''' When '=' button or enter key is presses:
-                i. Make Calculation if two or more operators are in entry_box except '%'
-                ii. Make calculation only if the last_value in entry_box has no any operators
-                iii. Replace '%' with '/100', '^' with '**'.
-                iv. Make calculation if only trigonometric functions are found without any operators'''
+        '''
+        When '=' button or enter key is presses:
+            i. Make Calculation if two or more operators are in entry_box except '%'
+            ii. Make calculation only if the last_value in entry_box has no any operators
+            iii. Replace '%' with '/100', '^' with '**'.
+            iv. Make calculation if only trigonometric functions are found without any operators
+            v.  Store the current value of entry_box in PrevAns if user does not provide any operator
+                but still clicks equals to button
+            vi. Do not do calculation if the number of  '(' and ')' are not equal.
+        '''
 
         try:
             entry_get = to_calculate = self.var.get()
@@ -215,7 +222,7 @@ class Calculator:
             for k, v in replace.items():     # iii.
                 to_calculate = to_calculate.replace(k, v)
 
-            if entry_get.count('(') != entry_get.count(')'):  # Edge Case 9(vii)
+            if entry_get.count('(') != entry_get.count(')'):  # vi
                 messagebox.showerror('Invalid Brackets', 'Brackets are not inserted in order')
                 return
 
@@ -232,6 +239,9 @@ class Calculator:
                 if '.' in calculated:
                     self.decimal_placeable = False    # Making '.' unacceptable if the answer has '.' in it
 
+            else:  # v
+                self.prev_ans = entry_get
+
         except ZeroDivisionError:
             self.var.set(self.zero_division_error)
 
@@ -242,52 +252,56 @@ class Calculator:
             self.var.set('OverflowError')
 
     def key_action(self, event=None, values=None):
-        ''' Edge Case:
-                1. When only numbers(0-9) are inputted:
-                    i. If initial_value in entry_box is '0' then remove that initial '0' and insert the input value.
-                    ii. Insert '*' and value when number is inputted after adding '%'
-                    iii. If initial_value in entry_box is not '0' then append the input_value with the value in entry_box
+        '''
+        Edge Cases:
+            1. When only numbers(0-9) are inputted:
+                i. If initial_value in entry_box is '0' then remove that initial '0' and insert the input value.
+                ii. Insert '*' and value when number is inputted after adding '%'
+                iii. If initial_value in entry_box is not '0' then append the input_value with the value in entry_box
 
-                2. When only operators(+-*/) are inputted:
-                    i.Insert '.0' when any operator is inputted after '.'
-                    ii. Insert user_input operator in entry_box if last value in entry_box has no any operator.
-                    iii. If last value in entry_box and user_input is operator then replace entry_box operator with user_input operator.
+            2. When only operators(+-*/) are inputted:
+                i.Insert '.0' when any operator is inputted after '.'
+                ii. Insert user_input operator in entry_box if last value in entry_box has no any operator.
+                iii. If last value in entry_box and user_input is operator then replace entry_box operator with user_input operator.
 
-                3. When decimal_point(.) is inputted:
-                    i. Insert '.' when not insert previously.
-                    ii. Insert '0.' when '.' is inputted after any operator or '('
-                    iii. Don't repeat decimal unless any other operator is inputted
+            3. When decimal_point(.) is inputted:
+                i. Insert '.' when not insert previously.
+                ii. Insert '0.' when '.' is inputted after any operator or '('
+                iii. Don't repeat decimal unless any other operator is inputted
 
-                4. When percentage('%') is inserted:
-                    i. Insert '%' only if the last value in entry_box is not in '+-/*%.'
+            4. When percentage('%') is inserted:
+                i. Insert '%' only if the last value in entry_box is not in '+-/*%.'
 
-                5. When trigonometric function is pressed:
-                    i. If initial_value in entry_box is '0' then remove that initial '0' and insert trigonometric_functions.
-                    ii. Insert trigonometric functions only if the last value in entry_get is operator, '('.
-                    iii. Remove trigonometric function if 'del' button or 'backspace' key is pressed.
+            5. When trigonometric function is pressed:
+                i. If initial_value in entry_box is '0' then remove that initial '0' and insert trigonometric_functions.
+                ii. Insert trigonometric functions only if the last value in entry_get is operator, '('.
+                iii. Remove trigonometric function if 'del' button or 'backspace' key is pressed.
 
-                6. When 'n!' button is pressed:
-                    i. If initial_value in entry_box is '0' then remove that initial '0' and insert 'factorial('.
-                    ii. Insert 'factorial(' only if there is only operator at the end.
+            6. When 'n!' button is pressed:
+                i. If initial_value in entry_box is '0' then remove that initial '0' and insert 'factorial('.
+                ii. Insert 'factorial(' only if there is only operator at the end.
 
-                7. When 'π' button is pressed:
-                    i. If initial_value in entry_box is '0' then remove that initial '0' and insert 'π'.
-                    ii. Insert 'π' only if there is only operator or '(' at the end.
+            7. When 'π' button is pressed:
+                i. If initial_value in entry_box is '0' then remove that initial '0' and insert 'π'.
+                ii. Insert 'π' only if there is only operator or '(' at the end.
 
-                8. When 'Prev Ans' button is pressed:
-                    i. If initial_value in entry_box is '0' then remove that initial '0' and insert previous_answer.
-                    ii. If there is no initial_value then insert the previous_answer only if the last value in entry_box is in operator and ( .
-                    iii. Don't insert 'prev_ans' if 'prev_ans' have decimal and decimal_placeable is False or last_value in entry_get is in  ), % or last_value is numbers.
-                    iv. If last_value in entry_get is '-' and 'prev_ans' also have '-' then put wrap the 'prev_ans' with '()'
+            8. When 'Prev Ans' button is pressed:
+                i. If initial_value in entry_box is '0' then remove that initial '0' and insert previous_answer.
+                ii. If there is no initial_value then insert the previous_answer if the last value in entry_box
+                    is in operator and ( .
+                iii. Don't insert 'prev_ans' if 'prev_ans' have decimal and decimal_placeable(i.e current value
+                        in entry widget also have decimal) is False.
+                iv. If last_value in entry_get is '-' and 'prev_ans' also have '-' then wrap the 'prev_ans' inside '()'
+                v. If the last value in entry widget ends with number or with  )% then insert *(multiplication sign)
+                    followed by the PrevAns
 
-                9. When '(' or ')' button is pressed:
-                    i.  If initial_value in entry_box is '0' then remove that and insert '('.
-                    ii. Don't insert ')' if the initial value in entry_box is '0'.
-                    iii. Don't insert ')' if the initial value is '('.
-                    iv. Don't insert '(' if last_value is in numbers, ')%'.
-                    v. Don't insert ')' if number of '(' is 0.
-                    vi. Don't insert ')' if the number of '(' and ')' are equal.
-                    vii. Do not do calculation if the number of  '(' and ')' are equal.'''
+            9. When '(' or ')' button is pressed:
+                i.  If initial_value in entry_box is '0' then remove that and insert '('.
+                ii. Don't insert ')' if the initial value is '('.
+                iii. Insert '*(' if last_value is in numbers, ')%'.
+                iv. Don't insert ')' if number of '(' is 0.
+                v. Don't insert ')' if the number of '(' and ')' are equal.
+        '''
 
         try:
             valid = list(self.digits + self.operators) + [x + '(' for x in self.trigonometric_functions] + ['(', ')', '%', '.', 'π', 'x^y', 'n!']
@@ -453,8 +467,11 @@ class Calculator:
         elif entry_get[-1] in self.operators + '(':  # Edge Case 8(ii)
             set_var = entry_get + self.prev_ans
 
-        elif '.' in self.prev_ans and self.decimal_placeable is False or entry_get[-1] in '%)' + self.digits:  # Edge Case 8(iii)
+        elif '.' in self.prev_ans and self.decimal_placeable is False:  # Edge Case 8(iii)
             return
+
+        elif entry_get[-1].isdigit() or entry_get[-1] in '%)':  # Edge Case 8(v)
+            set_var = entry_get + '*' + self.prev_ans
 
         return set_var
 
@@ -464,20 +481,19 @@ class Calculator:
         start_bracket = entry_get.count('(')
         end_bracket = entry_get.count(')')
 
-        if len(entry_get) == 1 and entry_get[0] == '0':  # Edge Case 9(i)
-            if char != ')':  # Edge Case 9(ii)
-                set_var = char
+        if len(entry_get) == 1 and entry_get[0] == '0' and char == '(':  # Edge Case 9(i)
+            set_var = char
 
-        elif entry_get[-1] == '(' and char == ')':  # Edge Case 9(iii)
+        elif entry_get[-1] == '(' and char == ')':  # Edge Case 9(ii)
             return
 
-        elif entry_get[-1] in self.digits + ')%' and char == '(':  # Edge Case 9(iv)
+        elif entry_get[-1] in self.digits + ')%' and char == '(':  # Edge Case 9(iii)
+            set_var = entry_get + '*('
+
+        elif start_bracket == 0 and char == ')':  # Edge Case 9(iv)
             return
 
-        elif start_bracket == 0 and char == ')':  # Edge Case 9(v)
-            return
-
-        elif start_bracket == end_bracket and char == ')':  # Edge Case 9(vi)
+        elif start_bracket == end_bracket and char == ')':  # Edge Case 9(v)
             return
 
         else:
@@ -498,13 +514,15 @@ class Calculator:
         messagebox.showinfo('Key Bindings', values)
 
     def resource_path(self, file_name):
-        '''Get absolute path to resource from temporary directory
+        '''
+        Get absolute path to resource from temporary directory
 
         In development:
             Gets path of files that are used in this script like icons, images or file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
+            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory
+        '''
 
         try:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
