@@ -10,6 +10,7 @@ from tkinter import messagebox
 
 class PasswordGenerator:
     def __init__(self):
+        self.PrevKeySym = []
         self.ClearedDefault = False
         self.DEFAULT_TEXT = 'Number of Character'
 
@@ -59,10 +60,12 @@ class PasswordGenerator:
         self.number_box.bind('<FocusOut>', self.focus_out)
         self.number_box.bind('<KeyPress>', self.KeyPressed)
         self.number_box.bind('<Return>', self.generate_button)
+        self.number_box.bind('<KeyRelease>', self.KeyReleased)
         self.master.bind('<Control-c>', self.copy_to_clipboard)
         self.master.bind('<Control-C>', self.copy_to_clipboard)
         self.generate_password_button.bind('<Return>', self.generate_button)
 
+        self.VarTrace()
         self.master.after(0, self.master.deiconify)
         self.master.mainloop()
 
@@ -79,29 +82,58 @@ class PasswordGenerator:
         if self.ClearedDefault is False and get == self.DEFAULT_TEXT:
             self.number_box_var.set('')
             self.ClearedDefault = True
+            self.number_box_style.configure('N.TEntry', foreground='black')
 
     def focus_out(self, event=None):
-        '''Remove focus from Entry widget when already
-           focused and still user presses TAB key'''
+        '''
+        Remove focus from Entry widget when already
+        focused and still user presses TAB key
+        '''
 
         get = self.number_box_var.get().strip()
 
         if not get:
             self.ClearedDefault = False
             self.number_box_var.set(self.DEFAULT_TEXT)
+            self.number_box_style.configure('N.TEntry', foreground='grey')
+
+    def VarTrace(self):
+        '''
+        Continuously check if the last value in number_box_var
+        is not digit. If found TRUE then set this var without
+        that non-digit value
+        '''
+
+        var_get = self.number_box_var.get()
+
+        if var_get and self.ClearedDefault is True and var_get[-1].isdigit() is False:
+            if self.number_box.selection_present():
+                self.number_box_var.set(var_get[:-1])
+                self.number_box.event_generate('<Control-a>')
+
+            else:
+                self.number_box_var.set(var_get[:-1])
+
+        self.master.after(1, self.VarTrace)
 
     def KeyPressed(self, event=None):
-        '''Inserting user pressed key only if the key is digit only'''
+        '''When user presses any key in keyboard'''
 
         num = event.keysym
 
-        if num.isdigit():
-            text = self.number_box_var.get() + num
-            self.number_box_var.set(text)
+        if num.startswith('Control') or num.startswith('Shift') or num.startswith('Alt'):
+            self.PrevKeySym.append(num)
 
-            self.number_box.icursor(END)
+        if self.number_box.selection_present() and not self.PrevKeySym and num.isdigit() is False:
+            return 'break'
 
-        return 'break'
+    def KeyReleased(self, event=None):
+        '''When user releases any pressed key in keyboard'''
+
+        num = event.keysym
+
+        if num in self.PrevKeySym:
+            self.PrevKeySym.remove(num)
 
     def generate_password(self, string_combination, lengths):
         '''Generating random generated password'''
@@ -115,45 +147,60 @@ class PasswordGenerator:
 
         if text:
             pyperclip.copy(text)
-            self.copy_button['text'] = 'Copied!'
-            self.master.after(1000, lambda: self.copy_button.config(text='Copy'))
+            self.copy_button.config(text='Copied!')
+
+            self.master.after(1000, self.ForgetCopyWidget)
 
         else:
             messagebox.showerror('ERROR', 'Not yet generated password')
 
+    def ForgetCopyWidget(self):
+        '''Delete copy_button widget from the screen after 1000ms'''
+
+        self.copy_button.config(text='Copy')
+        self.copy_button.pack_forget()
+
     def generate_button(self, event=None):
         '''Command when user clicks generate button'''
 
-        try:
-            get_var = [var.get() for var in self.vars]
+        get_var = [var.get() for var in self.vars]
+        num_get = self.number_box_var.get().strip()
 
-            if not any(get_var):
-                get_var[-1] = 1
-                self.all_var.set(1)
+        # Set the value of entry-widget to 8 if its value
+        # is same as the value in self.DEFAULT_TEXT
+        if num_get == self.DEFAULT_TEXT:
+            num_get = '8'
+            self.number_box_var.set('8')
+            self.number_box_style.configure('N.TEntry', foreground='black')
 
-            lengths = int(self.number_box_var.get().strip())
-            string_combo = [string.ascii_uppercase, string.ascii_lowercase, string.digits, string.punctuation, string.printable[:94]]
+        # Selecting the last check-buttons
+        # if user have not selected one
+        if not any(get_var):
+            get_var[-1] = 1
+            self.all_var.set(1)
 
-            string_combination = ''.join({string_combo[index] for index, value in enumerate(get_var) if value == 1})
-            password = self.generate_password(string_combination, lengths)
+        lengths = int(num_get)
+        string_combo = [string.ascii_uppercase, string.ascii_lowercase, string.digits, string.punctuation, string.printable[:94]]
 
-            self.password_label.config(text=password)
-            self.password_label.pack()
+        string_combination = ''.join({string_combo[index] for index, value in enumerate(get_var) if value == 1})
+        password = self.generate_password(string_combination, lengths)
 
-            self.master.geometry(f'{self.width}x{self.height + 15}')
-            self.copy_button.pack(side=RIGHT)
+        self.password_label.config(text=password)
+        self.password_label.pack()
 
-        except ValueError:
-            messagebox.showerror('Invalid Number', 'Input Valid Number')
+        self.master.geometry(f'{self.width}x{self.height + 15}')
+        self.copy_button.pack(side=RIGHT)
 
     def resource_path(self, file_name):
-        '''Get absolute path to resource from temporary directory
+        '''
+        Get absolute path to resource from temporary directory
 
         In development:
             Gets path of files that are used in this script like icons, images or file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
+            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory
+        '''
 
         try:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
