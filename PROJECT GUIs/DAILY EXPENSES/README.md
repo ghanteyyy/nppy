@@ -2,4 +2,4 @@
 
 Track your product and price with the buying date
 
-<img src="included_files/1.jpg">
+<img src="assets/1.jpg">

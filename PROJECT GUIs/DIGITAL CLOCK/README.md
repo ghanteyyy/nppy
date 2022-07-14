@@ -2,4 +2,4 @@
 
 Display current date and current
 
-<img src="included_files/1.jpg">
+<img src="assets/1.jpg">

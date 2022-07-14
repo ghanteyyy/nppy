@@ -2,4 +2,4 @@
 
 Generate Random Password as per given length of password and the combination
 
-<img src="included_files/1.png">
+<img src="assets/1.png">

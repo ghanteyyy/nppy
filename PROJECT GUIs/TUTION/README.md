@@ -1,6 +1,6 @@
 # TUTION
 
-<img src="included_files/1.png">
+<img src="assets/1.png">
 
 **A python script that lets you:**
 
