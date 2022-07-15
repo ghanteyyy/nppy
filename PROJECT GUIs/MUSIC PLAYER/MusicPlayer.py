@@ -19,12 +19,14 @@ from PIL import Image, ImageTk
 from mutagen.mp3 import MP3, HeaderNotFoundError
 
 
-'''To setup ttkbootstrap:
-        1. Install ttkbootstrap using python -m pip install ttkbootstrap
-        2. Create themes using python -m ttkcreator
-        3. Specify your desired color and save the themes
-        4. If you want to use my theme then copy user.py file to
-                <python-installed-directory>\Lib\site-packages\ttkbootstrap\themes'''
+'''
+To setup ttkbootstrap:
+    1. Install ttkbootstrap using python -m pip install ttkbootstrap
+    2. Create themes using python -m ttkcreator
+    3. Specify your desired color and save the themes
+    4. If you want to use my theme then copy user.py file to
+            <python-installed-directory>\Lib\site-packages\ttkbootstrap\themes
+'''
 
 
 class MusicPlayer:
@@ -32,33 +34,33 @@ class MusicPlayer:
         pygame.mixer.init()
 
         self.PrevID = ''
-        self.TagCount = 0
         self.TrackLine = 0
-        self.childrens = []
-        self.RotateAngle = 10
-        self.AudioFiles = dict()
-        self.IsLyricsAdded = None
-        self.IsDefaultImage = None
-        self.RotateImageTimer = None
-        self.extensions = [('Music Files', '*.mp3')]
+        self.RotateImageAngle = 10
         self.PrevSearchChar = None  # Store previous search string
         self.RepeatAudio = None  # Track the state of Repeat Button
         self.IsMuted = False  # Track if audio has been muted or not
         self.AudioName = None  # Store currently playing song's name
+        self.IsLyricsAdded = None  # Tracks if user has added lyrics
         self.WindowNotMapped = False  # Track if window is minimized
-        self.CurrentPlayingIndex = None  # Index of current playing audio
         self.IsFindWidgetShown = False  # Track if FindWidget is shown
         self.SearchGlobalIndex = None  # Track the index of Search Value
         self.TotalAudioDuration = 0  # Store total time of inserted audio
+        self.CurrentPlayingIndex = None  # Index of current playing audio
         self.IsAlbumPictureShown = False  # Track if album picture is shown
+        self.childrens = []  # Stores children belonging to item of TreeView
+        self.RotateImageTimer = None  # Store after timer label to rotate image
         self.EOF = False  # Trigger to check if the last songs is about to play
         self.SearchLocalIndex = None   # Track the search index of filtered items
         self.PlayRandom = False  # Track if Random Button has been pressed or not
+        self.extensions = [('Music Files', '*.mp3')]  # Extensions for audio files
+        self.AudioFiles = dict()  # Stores audio path that is currently opened by user
+        self.IsDefaultImage = None  # Tracks if the current playing audio has album art
         self.RemTimer = None  # Stores an alarm to call change_time function in every 500 ms
         self.PreviousVolume = 100  # Store previous value of volume before muting and un-muting
         self.ScaleTimer = None  # Stores an alarm to call update_scale function in every 1000 ms
         self.ShowRemTime = False  # Trigger to check if remaining time has showed in total time button
         self.PlaylistPath = self.ResourcePath('playlists.json')  # File where list of audios are saved
+        self.TagCount = 0  # Increase by 1 each time when user adds new audio for unique tags in TreeView
         self.PreviousScaleValue = 0  # Store previous position of AudioSlider to avoid dragging in same position
         self.isPlaying = None  # Trigger to check if the song is playing. None for has not started playing yet, True for playing and False for pause
 
@@ -255,9 +257,11 @@ class MusicPlayer:
             return "break"
 
     def StopWindowFlicking(self):
-        '''When window is minimize and maximized continuously then black
-           color gets appear on the window for fraction of seconds which
-           looks like the window is flickering'''
+        '''
+        When window is minimize and maximized continuously then black
+        color gets appear on the window for fraction of seconds which
+        looks like the window is flickering
+        '''
 
         if self.master.winfo_ismapped() == 0:  # When window is minimized
             self.container.pack_forget()
@@ -532,8 +536,10 @@ class MusicPlayer:
             self.PlayError.play()
 
     def ScrollTopDown(self, event=None, _dir=None):
-        '''Scroll to the top when "HOME" key is pressed
-           or to the bottom when "END" key is pressed'''
+        '''
+        Scroll to the top when "HOME" key is pressed
+        or to the bottom when "END" key is pressed
+        '''
 
         try:
             if _dir == "Top":
@@ -582,7 +588,7 @@ class MusicPlayer:
                         if self.PrevID != cursel:  # Play Audio only if current playing audio is different than selected audio
                             self.PrevID = cursel
                             self.isPlaying = True
-                            self.RotateAngle = 10
+                            self.RotateImageAngle = 10
                             _image = self.PauseImage
 
                             self.AudioName = self.Tree.item(cursel)['values'][0]
@@ -607,6 +613,12 @@ class MusicPlayer:
                                 # of respective audios if exists
                                 self.IsLyricsAdded = False
                                 self.InsertLyricsText(lrc_path=lrc_path)
+
+                            else:
+                                if self.IsLyricsAdded is not False:
+                                    self.IsLyricsAdded = None
+                                    self.LyricsFrame.pack_forget()
+                                    self.TreeFrame.pack()
 
                             self.StopImageRotation()
                             pygame.mixer.music.load(self.CurrentAudioPath)  # Loading selected file for playing
@@ -673,6 +685,11 @@ class MusicPlayer:
             if self.IsAlbumPictureShown:
                 self.IsAlbumPictureShown = False
                 self.AlbumPictureFrame.pack_forget()
+                self.TreeFrame.pack()
+
+            if self.IsLyricsAdded is not None:
+                self.IsLyricsAdded = None
+                self.LyricsFrame.pack_forget()
                 self.TreeFrame.pack()
 
             self.StopImageRotation()
@@ -845,9 +862,11 @@ class MusicPlayer:
             self.EscapedTimeVar.set(_time)
 
     def ChangeVolume(self, event=None, change=None):
-        '''Increase or decrease volume when user drags volume bar or
-           when user presses right arrow or left arrow
-                Here volume value is between 0-1'''
+        '''
+        Increase or decrease volume when user drags volume bar or
+        when user presses right arrow or left arrow
+            Here volume value is between 0-1
+        '''
 
         if self.master.focus_get() == self.SearchEntry and not event:
             self.master.tk_focusNext().focus()
@@ -878,11 +897,13 @@ class MusicPlayer:
         return 'break'
 
     def MuteUnmuteVolume(self, event=None, nochange=False):
-        '''Mute and Unmute volume
+        '''
+        Mute and Unmute volume
 
-           nochange parameter is to skip indented block of
-           following first if statement to un-change volume
-           when audio is skipped or changed'''
+        nochange parameter is to skip indented block of
+        following first if statement to un-change volume
+        when audio is skipped or changed
+        '''
 
         if nochange is False:
             if self.IsMuted is False:  # Volume is not muted before
@@ -1184,11 +1205,13 @@ class MusicPlayer:
         messagebox.showinfo("Details", details)
 
     def ShowAlbumPicture(self, force_show=False):
-        '''Show Album Picture instead of TreeView when clicked to art button
+        '''
+        Show Album Picture instead of TreeView when clicked to art button
 
-           When user plays next or previous audio then force_show when True
-           changes the album picture when the previous album picture is shown
-           already'''
+        When user plays next or previous audio then force_show when True
+        changes the album picture when the previous album picture is shown
+        already
+        '''
 
         self.StopImageRotation()
         self.IsDefaultImage = True
@@ -1400,6 +1423,8 @@ class MusicPlayer:
 
                 if os.path.exists(lrc_path):  # Add only if the given path exists
                     self.InsertLyricsText(lrc_path)
+                    self.ShowSubtitle()
+
                     self.IsLyricsAdded = False
 
             elif self.IsLyricsAdded is True:
@@ -1423,7 +1448,7 @@ class MusicPlayer:
                 self.LyricsFrame.pack()
 
         else:
-            self.ErrorChannel.play()
+            self.PlayError.play()
 
     def GetTotalSeconds(self, _time):
         '''Convert string time into total seconds'''
@@ -1444,8 +1469,10 @@ class MusicPlayer:
         return _time
 
     def take_closest(self, myList, myNumber):
-        """ Assumes myList is sorted. Returns closest value to myNumber.
-            If two numbers are equally close, return the smallest number."""
+        '''
+        Assumes myList is sorted. Returns closest value to myNumber.
+        If two numbers are equally close, return the smallest number.
+        '''
 
         pos = bisect.bisect_left(myList, myNumber)
 
@@ -1495,12 +1522,12 @@ class MusicPlayer:
 
         size = (175, 175)
 
-        if self.RotateAngle > 360:
-            self.RotateAngle = 10
+        if self.RotateImageAngle > 360:
+            self.RotateImageAngle = 10
 
         if self.isPlaying is True:
             image = Image.open(self.AlbumArtImage)
-            image_rot = image.rotate(-self.RotateAngle)
+            image_rot = image.rotate(-self.RotateImageAngle)
 
             image_rot.thumbnail(size, Image.Resampling.LANCZOS)
             photo_image = ImageTk.PhotoImage(image_rot)
@@ -1508,7 +1535,7 @@ class MusicPlayer:
             self.AlbumPictureLabel.config(image=photo_image)
             self.AlbumPictureLabel.image = photo_image
 
-            self.RotateAngle += 10
+            self.RotateImageAngle += 10
 
         self.RotateImageTimer = self.master.after(10, self.rotate_image)
 
@@ -1520,13 +1547,15 @@ class MusicPlayer:
             self.RotateImageTimer = None
 
     def ResourcePath(self, FileName):
-        '''Get absolute path to resource from temporary directory
+        '''
+        Get absolute path to resource from temporary directory
 
         In development:
             Gets path of files that are used in this script like icons, images or file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
+            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory
+        '''
 
         try:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
