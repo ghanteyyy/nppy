@@ -9,7 +9,7 @@ class NumberSystemConversion:
     def __init__(self, display_answer):
         self.display_answer = display_answer
         self.hex_to_num = {'A': 10, 'B': 11, 'C': 12, 'D': 13, 'E': 14, 'F': 15}
-        self.num_to_hex = {10: 'A', 11: 'B', 12: 'C', 13: 'D', 14: 'E', 15: 'F'}
+        self.num_to_hex = {v: k for k, v in self.hex_to_num.items()}
 
     def is_valid_number_system(self, nums, check, name):
         '''Check if the given number is valid with resect to the number system from converting'''
@@ -25,10 +25,12 @@ class NumberSystemConversion:
         return False
 
     def binary_to_decimal(self, binary_number):
-        '''Convert binary number to decimal number
+        '''
+        Convert binary number to decimal number
 
-            1111011 = 1 * 2^6 + 1 * 2^5 + 1 * 2^4 + 1 * 2^3 + 0 * 2^2 + 1 * 2^1 + 1 * 2^0
-                    = 123 '''
+        1111011 = 1 * 2^6 + 1 * 2^5 + 1 * 2^4 + 1 * 2^3 + 0 * 2^2 + 1 * 2^1 + 1 * 2^0
+                = 123
+        '''
 
         if self.is_valid_number_system(binary_number, '01', 'Binary'):
             decimal_num = 0
@@ -42,11 +44,13 @@ class NumberSystemConversion:
             return str(decimal_num)
 
     def binary_to_octal(self, binary_number):
-        '''Convert binary number to octal number
+        '''
+        Convert binary number to octal number
 
-           To convert binary to octal you need to:
-                1. Convert binary number to decimal number via "self.binary_to_decimal" function
-                2. Convert obtained decimal number from step 1 to octal via "decimal_to_octal" function '''
+        To convert binary to octal you need to:
+            1. Convert binary number to decimal number via "self.binary_to_decimal" function
+            2. Convert obtained decimal number from step 1 to octal via "decimal_to_octal" function
+        '''
 
         if self.is_valid_number_system(binary_number, '01', 'Binary'):
             decimal_num = self.binary_to_decimal(binary_number)
@@ -55,11 +59,13 @@ class NumberSystemConversion:
             return str(octal_num)
 
     def binary_to_hexadecimal(self, binary_number):
-        '''Convert binary number to hexadecimal number
+        '''
+        Convert binary number to hexadecimal number
 
-           To convert binary to hexadecimal you need to:
-                1. Convert binary number to decimal number via "self.binary_to_decimal" function
-                2. Convert obtained decimal number obtained from step 1 to hexadecimal via "decimal_to_hexadecimal" function '''
+        To convert binary to hexadecimal you need to:
+            1. Convert binary number to decimal number via "self.binary_to_decimal" function
+            2. Convert obtained decimal number obtained from step 1 to hexadecimal via "decimal_to_hexadecimal" function
+        '''
 
         if self.is_valid_number_system(binary_number, '01', 'Binary'):
             decimal_num = self.binary_to_decimal(binary_number)
@@ -68,11 +74,13 @@ class NumberSystemConversion:
             return str(decimal_to_hexadecimal)
 
     def binary_to_quinary(self, binary_number):
-        '''Convert binary number to quinary number
+        '''
+        Convert binary number to quinary number
 
-           To convert binary to quinary you need to:
-                1. Convert binary number to decimal number via "self.binary_to_decimal" function
-                2. Convert obtained decimal number obtained from step 1 to quinary via "decimal_to_quinary" function '''
+        To convert binary to quinary you need to:
+            1. Convert binary number to decimal number via "self.binary_to_decimal" function
+            2. Convert obtained decimal number obtained from step 1 to quinary via "decimal_to_quinary" function
+        '''
 
         if self.is_valid_number_system(binary_number, '01', 'Binary'):
             decimal_num = self.binary_to_decimal(binary_number)
@@ -81,23 +89,25 @@ class NumberSystemConversion:
             return str(quinary_num)
 
     def decimal_to_binary(self, decimal_number):
-        '''Convert decimal number to binary number
+        '''
+        Convert decimal number to binary number
 
-                    2 | 123 | 1   >>> Remainder
-                        ------
-                   2 | 61  | 1    >>> Remainder
-                     ------
-                  2 | 30  | 0     >>> Remainder
-                    -----
-                 2 | 15  | 1     >>> Remainder
-                    -----
-                2 |  7  | 1      >>> Remainder
-                  ------
-               2 |  3  | 1       >>> Remainder
-                 ------
-                   1
+                2 | 123 | 1     >>> Remainder
+                  -------
+                2 | 61  | 1     >>> Remainder
+                  -------
+                2 | 30  | 0     >>> Remainder
+                  -------
+                2 | 15  | 1     >>> Remainder
+                  -------
+                2 |  7  | 1     >>> Remainder
+                  -------
+                2 |  3  | 1     >>> Remainder
+                  -------
+                     1
 
-            And writing the remainder in reverse way i.e 1111011 '''
+                And writing the remainder in reverse way i.e 1111011
+        '''
 
         if self.is_valid_number_system(decimal_number, '0123456789', 'Decimal'):
             decimal_num = int(decimal_number)
@@ -111,15 +121,17 @@ class NumberSystemConversion:
             return str(binary_num[::-1])
 
     def decimal_to_octal(self, decimal_number):
-        '''Convert decimal number to octal number
+        '''
+        Convert decimal number to octal number
 
                 8 | 123 | 3     >>> Remainder
-                  -----
-               8 |  15 | 7      >>> Remainder
-                 -----
-                   1           >>> Remainder
+                  -------
+                8 |  15 | 7     >>> Remainder
+                  -------
+                     1          >>> Remainder
 
-            And writing the remainder in reverse way i.e 173 '''
+                 And writing the remainder in reverse way i.e 173
+        '''
 
         if self.is_valid_number_system(decimal_number, '0123456789', 'Decimal'):
             decimal_num = int(decimal_number)
@@ -133,13 +145,15 @@ class NumberSystemConversion:
             return str(octal_num[::-1])
 
     def decimal_to_hexadecimal(self, decimal_number):
-        '''Convert decimal number to hexadecimal number
+        '''
+        Convert decimal number to hexadecimal number
 
                 16| 123 | 11 (B)   >>> Remainder
-                  ------
+                  -------
                     7              >>> Remainder
 
-            And writing the remainder in reverse way i.e 7B '''
+                And writing the remainder in reverse way i.e 7B
+        '''
 
         if self.is_valid_number_system(decimal_number, '0123456789', 'Decimal'):
             decimal_num = int(decimal_number)
@@ -159,16 +173,18 @@ class NumberSystemConversion:
             return str(hexadecimal_num[::-1])
 
     def decimal_to_quinary(self, decimal_number):
-        '''Convert decimal number to quinary number
+        '''
+        Convert decimal number to quinary number
 
             To calculate decimal_number to quinary you need to:
-                5 | 123 | 3    >>> Remainder
-                  ------
-               5 | 24  | 4    >>> Remainder
-                 ------
-                   4         >>> Remainder
+                    5 | 123 | 3    >>> Remainder
+                      -------
+                    5 | 24  | 4    >>> Remainder
+                      -------
+                        4          >>> Remainder
 
-            And writing the remainder in reverse way i.e 443 '''
+                    And writing the remainder in reverse way i.e 443
+        '''
 
         if self.is_valid_number_system(decimal_number, '0123456789', 'Decimal'):
             decimal_num = int(decimal_number)
@@ -182,11 +198,13 @@ class NumberSystemConversion:
             return str(quinary_num[::-1])
 
     def octal_to_binary(self, octal_number):
-        '''Convert octal number system to binary number system
+        '''
+        Convert octal number system to binary number system
 
-           To convert octal to binary you need to:
-                1. Convert octal number to decimal number via "self.octal_to_decimal" function
-                2. Convert obtained decimal number obtained from step 1 to binary via "decimal_to_binary" function '''
+        To convert octal to binary you need to:
+            1. Convert octal number to decimal number via "self.octal_to_decimal" function
+            2. Convert obtained decimal number obtained from step 1 to binary via "decimal_to_binary" function
+        '''
 
         if self.is_valid_number_system(octal_number, '01234567', 'Octal'):
             octal_to_decimal = self.octal_to_decimal(octal_number)
@@ -195,10 +213,12 @@ class NumberSystemConversion:
             return binary_num
 
     def octal_to_decimal(self, octal_number):
-        '''Convert octal number to decimal number
+        '''
+        Convert octal number to decimal number
 
             173 = 1 * 8^2 + 7 * 8^1 + 3 * 8^0
-                = 123 '''
+                = 123
+        '''
 
         if self.is_valid_number_system(octal_number, '01234567', 'Octal'):
             decimal_num = 0
@@ -212,11 +232,13 @@ class NumberSystemConversion:
             return str(decimal_num)
 
     def octal_to_hexadecimal(self, octal_number):
-        '''Convert octal number to hexadecimal number
+        '''
+        Convert octal number to hexadecimal number
 
-           To convert octal to hexadecimal you need to:
-                1. Convert octal number to decimal number via "self.octal_to_decimal" function
-                2. Convert obtained decimal number obtained from step 1 to hexadecimal via "decimal_to_hexadecimal" function '''
+        To convert octal to hexadecimal you need to:
+            1. Convert octal number to decimal number via "self.octal_to_decimal" function
+            2. Convert obtained decimal number obtained from step 1 to hexadecimal via "decimal_to_hexadecimal" function
+        '''
 
         if self.is_valid_number_system(octal_number, '01234567', 'Octal'):
             decimal_num = self.octal_to_decimal(octal_number)
@@ -225,11 +247,13 @@ class NumberSystemConversion:
             return str(hexadecimal_num)
 
     def octal_to_quinary(self, octal_number):
-        '''Convert octal number to quinary number
+        '''
+        Convert octal number to quinary number
 
-           To convert octal to quinary you need to:
-                1. Convert octal number to decimal number via "self.octal_to_decimal" function
-                2. Convert obtained decimal number obtained from step 1 to quinary via "decimal_to_quinary" function '''
+        To convert octal to quinary you need to:
+            1. Convert octal number to decimal number via "self.octal_to_decimal" function
+            2. Convert obtained decimal number obtained from step 1 to quinary via "decimal_to_quinary" function
+        '''
 
         if self.is_valid_number_system(octal_number, '01234567', 'Octal'):
             decimal_num = self.octal_to_decimal(octal_number)
@@ -238,11 +262,13 @@ class NumberSystemConversion:
             return str(quinary_num)
 
     def hexadecimal_to_binary(self, hexadecimal_number):
-        '''Convert hexadecimal number to binary number
+        '''
+        Convert hexadecimal number to binary number
 
            To convert hexadecimal to binary you need to:
                 1. Convert hexadecimal number to decimal number via "self.hexadecimal_to_decimal" function
-                2. Convert obtained decimal number obtained from step 1 to binary via "decimal_to_binary" function '''
+                2. Convert obtained decimal number obtained from step 1 to binary via "decimal_to_binary" function
+        '''
 
         if self.is_valid_number_system(hexadecimal_number, '0123456789ABCDEF', 'Hexadecimal'):
             decimal_num = self.hexadecimal_to_decimal(hexadecimal_number)
@@ -251,10 +277,12 @@ class NumberSystemConversion:
             return str(binary_num)
 
     def hexadecimal_to_decimal(self, hexadecimal_number):
-        '''Convert hexadecimal number to decimal number
+        '''
+        Convert hexadecimal number to decimal number
 
             7B = 7 * 16^2 + 11 * 16^0       here B == 11
-               = 123 '''
+               = 123
+        '''
 
         if self.is_valid_number_system(hexadecimal_number, '0123456789ABCDEF', 'Hexadecimal'):
             decimal_num = 0
@@ -273,11 +301,13 @@ class NumberSystemConversion:
             return str(decimal_num)
 
     def hexadecimal_to_octal(self, hexadecimal_number):
-        '''Convert hexadecimal number to octal number
+        '''
+        Convert hexadecimal number to octal number
 
-           To convert hexadecimal to octal you need to:
-                1. Convert hexadecimal number to decimal number via "self.hexadecimal_to_decimal" function
-                2. Convert obtained decimal number obtained from step 1 to octal via "decimal_to_octal" function '''
+        To convert hexadecimal to octal you need to:
+            1. Convert hexadecimal number to decimal number via "self.hexadecimal_to_decimal" function
+            2. Convert obtained decimal number obtained from step 1 to octal via "decimal_to_octal" function
+        '''
 
         if self.is_valid_number_system(hexadecimal_number, '0123456789ABCDEF', 'Hexadecimal'):
             decimal_num = self.hexadecimal_to_decimal(hexadecimal_number)
@@ -286,11 +316,13 @@ class NumberSystemConversion:
             return str(octal_num)
 
     def hexadecimal_to_quinary(self, hexadecimal_number):
-        '''Convert hexadecimal number to quinary number
+        '''
+        Convert hexadecimal number to quinary number
 
-           To convert hexadecimal to quinary you need to:
-                1. Convert hexadecimal number to decimal number via "self.hexadecimal_to_decimal" function
-                2. Convert obtained decimal number obtained from step 1 to quinary via "decimal_to_quinary" function '''
+        To convert hexadecimal to quinary you need to:
+            1. Convert hexadecimal number to decimal number via "self.hexadecimal_to_decimal" function
+            2. Convert obtained decimal number obtained from step 1 to quinary via "decimal_to_quinary" function
+        '''
 
         if self.is_valid_number_system(hexadecimal_number, '0123456789ABCDEF', 'Hexadecimal'):
             decimal_num = self.hexadecimal_to_decimal(hexadecimal_number)
@@ -299,11 +331,13 @@ class NumberSystemConversion:
             return str(quinary_num)
 
     def quinary_to_binary(self, quinary_number):
-        '''Convert quinary number to binary number
+        '''
+        Convert quinary number to binary number
 
-           To convert quinary to binary you need to:
-                1. Convert quinary number to decimal number via "self.quinary_to_decimal" function
-                2. Convert obtained decimal number obtained from step 1 to binary via "decimal_to_binary" function '''
+        To convert quinary to binary you need to:
+            1. Convert quinary number to decimal number via "self.quinary_to_decimal" function
+            2. Convert obtained decimal number obtained from step 1 to binary via "decimal_to_binary" function
+        '''
 
         if self.is_valid_number_system(quinary_number, '01234', 'Quinary'):
             decimal_num = self.quinary_to_decimal(quinary_number)
@@ -312,10 +346,12 @@ class NumberSystemConversion:
             return str(binary_num)
 
     def quinary_to_decimal(self, quinary_number):
-        '''Convert quinary number to decimal number
+        '''
+        Convert quinary number to decimal number
 
             443 = 4 * 5^2 + 4 * 5^1 + 3 * 5^0
-                = 123 '''
+                = 123
+        '''
 
         if self.is_valid_number_system(quinary_number, '01234', 'Quinary'):
             decimal_num = 0
@@ -329,11 +365,13 @@ class NumberSystemConversion:
             return str(decimal_num)
 
     def quinary_to_octal(self, quinary_number):
-        '''Convert quinary number to octal number
+        '''
+        Convert quinary number to octal number
 
-           To convert quinary to octal you need to:
-                1. Convert quinary number to decimal number via "self.quinary_to_decimal" function
-                2. Convert obtained decimal number obtained from step 1 to octal via "decimal_to_octal" function '''
+        To convert quinary to octal you need to:
+            1. Convert quinary number to decimal number via "self.quinary_to_decimal" function
+            2. Convert obtained decimal number obtained from step 1 to octal via "decimal_to_octal" function
+        '''
 
         if self.is_valid_number_system(quinary_number, '01234', 'Quinary'):
             decimal_num = self.quinary_to_decimal(quinary_number)
@@ -342,11 +380,13 @@ class NumberSystemConversion:
         return str(octal_num)
 
     def quinary_to_hexadecimal(self, quinary_number):
-        '''Convert quinary number into hexadecimal number
+        '''
+        Convert quinary number into hexadecimal number
 
-           To convert quinary to hexadecimal you need to:
-                1. Convert quinary number to decimal number via "self.quinary_to_decimal" function
-                2. Convert obtained decimal number obtained from step 1 to hexadecimal via "decimal_to_hexadecimal" function '''
+        To convert quinary to hexadecimal you need to:
+            1. Convert quinary number to decimal number via "self.quinary_to_decimal" function
+            2. Convert obtained decimal number obtained from step 1 to hexadecimal via "decimal_to_hexadecimal" function
+        '''
 
         if self.is_valid_number_system(quinary_number, '01234', 'Quinary'):
             decimal_num = self.quinary_to_decimal(quinary_number)
@@ -502,13 +542,15 @@ class GUI:
             self.text_area.config(state=DISABLED)
 
     def resource_path(self, file_name):
-        '''Get absolute path to resource from temporary directory
+        '''
+        Get absolute path to resource from temporary directory
 
         In development:
             Gets path of files that are used in this script like icons, images or file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
+            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory
+        '''
 
         try:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
