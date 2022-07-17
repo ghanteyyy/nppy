@@ -595,7 +595,7 @@ class MusicPlayer:
                             self.CurrentAudioPath = self.AudioFiles[self.AudioName]['path']
 
                             self.TotalTime = MP3(self.CurrentAudioPath).info.length
-                            self.AudioSlider.config(to=int(self.TotalTime))
+                            self.AudioSlider.configure(to=int(self.TotalTime))
                             self.Tree.tag_configure(self.AudioFiles[self.AudioName]['TagCount'], foreground='silver')
 
                             _time = time.strftime('%H:%M:%S', time.gmtime(self.TotalTime))
