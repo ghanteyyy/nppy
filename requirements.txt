@@ -8,6 +8,8 @@ pygame
 django
 mutagen
 stagger
+fastapi
+uvicorn
 requests
 pyautogui
 pyperclip
