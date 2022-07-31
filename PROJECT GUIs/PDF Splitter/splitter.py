@@ -55,11 +55,21 @@ class SplitPDF:
                     if is_duplicate_message_shown is False:
                         continue
 
-                # Saving new pdf
-                with open(full_path, 'wb') as fp:
-                    pdfWriter.write(fp)
-                    self.output_text_area.insert('end', page_labels + ' > Created.\n', 'center')
-                    self.output_text_area.see('end')
+                try:
+                    # Saving new pdf
+                    with open(full_path, 'wb') as fp:
+                        pdfWriter.write(fp)
+                        self.output_text_area.insert('end', page_labels + ' > Created.\n', 'center')
+                        self.output_text_area.see('end')
+
+                except PermissionError:
+                    self.output_frame.pack_forget()
+
+                    path = os.path.dirname(self.root_path)
+                    messagebox.showerror('ERR', f'{path} does not have the required permission to perform file operations')
+
+                    return
+
 
         self.output_text_area.insert('end', '\nCompleted.', 'center')
         self.output_text_area.see('end')
