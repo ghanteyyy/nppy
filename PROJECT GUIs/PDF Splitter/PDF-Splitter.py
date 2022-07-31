@@ -261,13 +261,14 @@ class PDFSplitter:
         Get pdf path when user clicks to browse button
         '''
 
-        extension = [('pdf', '*pdf')]
+        self.master.update()
+        extension = [('PDF', '*.pdf')]
 
         if style_name == 'Original':  # When user clicks first Browse button
             path = filedialog.askopenfilename(defaultextension=extension, filetypes=extension)
 
         else:  # When user clicks second Browse button
-            path = filedialog.askdirectory(title='Select a directory')
+            path = filedialog.asksaveasfilename(title='Save', filetypes=extension, defaultextension=extension)
 
         if path:
             entry.Entry.IsDefault = False
@@ -285,6 +286,7 @@ class PDFSplitter:
         entries_widgets = self.GetEntryWidgets()
         prefix = self.Prefix_Entry.var.get().strip()
         save_to_path = self.OutputPathEntry.Entry.var.get().strip()
+        save_to_path_dir = os.path.dirname(save_to_path)
         original_path = self.OriginalSourceEntry.Entry.var.get().strip()
 
         for entry in entries_widgets:
@@ -301,11 +303,11 @@ class PDFSplitter:
         elif self.OutputPathEntry.Entry.IsDefault:
             messagebox.showerror('ERR', 'Path to store splitted pdf(s) not provided')
 
-        elif not os.path.exists(original_path):
+        elif os.path.exists(original_path) is False:
             messagebox.showerror('ERR', 'Original PDF path not exists')
 
-        elif not os.path.exists(save_to_path):
-            messagebox.showerror('ERR', 'To Saved PDF path not exists')
+        elif os.path.exists(save_to_path_dir) is False:
+            messagebox.showerror('ERR', 'Destination PDF path not exists')
 
         elif self.Prefix_Entry.IsDefault:
             messagebox.showerror('ERR', 'Prefix name was expected')
