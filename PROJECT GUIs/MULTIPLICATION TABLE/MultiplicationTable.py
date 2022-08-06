@@ -7,56 +7,99 @@ from tkinter import messagebox
 import pyperclip
 
 
+class _Entry:
+    def __init__(self, master, default_text, style_name, generate_func):
+        self.master = master
+        self.isDefault = True
+        self.var = StringVar()
+        self.style_name = style_name
+        self.default_text = default_text
+        self.generate_func = generate_func
+
+        self.Style = ttk.Style()
+        self.var.set(self.default_text)
+        self.Style.configure(self.style_name, foreground='grey')
+
+        self.Entry = ttk.Entry(self.master, textvariable=self.var, justify='center', style=self.style_name)
+
+        self.Entry.bind('<FocusIn>', self.FocusIn)
+        self.Entry.bind('<FocusOut>', self.FocusOut)
+        self.Entry.bind('<KeyPress>', self.KeyPressed)
+        self.Entry.bind('<Return>', self.generate_func)
+
+    def FocusIn(self, event=None):
+        '''When user set focus to respective entry widget'''
+
+        if self.isDefault:
+            self.var.set('')
+            self.isDefault = False
+            self.Style.configure(self.style_name, foreground='black')
+
+    def FocusOut(self, event=None):
+        '''When user set focus out of respective entry widget'''
+
+        if self.isDefault is False and not self.var.get().strip():
+            self.isDefault = True
+            self.var.set(self.default_text)
+            self.Style.configure(self.style_name, foreground='grey')
+
+    def KeyPressed(self, event=None):
+        '''
+        When user presses any character from the keyboard and if that
+        character is not a digit then forcing tkinter not to insert
+        that character
+        '''
+
+        char = event.keysym
+
+        if char.isdigit() is False and char not in ['BackSpace', 'Delete', 'Left', 'Right', 'Tab']:
+            return 'break'
+
+
 class MultiplicationTable:
     def __init__(self):
+        self.is_table_shown = False
+
         self.master = Tk()
         self.master.withdraw()
         self.master.title('Multiplication Table')
 
-        self.num_var = StringVar()
-        self.num_var.set('Number')
-        self.upto_var = StringVar()
-        self.upto_var.set('Upto')
-
-        self.num_style = ttk.Style()
-        self.num_style.configure('N.TEntry', foreground='grey')
-        self.upto_style = ttk.Style()
-        self.upto_style.configure('U.TEntry', foreground='grey')
+        self.Style = ttk.Style()
+        self.Style.theme_use('clam')
+        self.Style.map('TEntry', lightcolor=[('focus', 'blue')])
 
         self.entry_frame = Frame(self.master)
-        self.entry_frame.grid(row=0, column=0, sticky='NSEW')
+        self.entry_frame.pack(pady=5)
 
-        self.num_entry = ttk.Entry(self.entry_frame, width=40, textvariable=self.num_var, justify='center', style='N.TEntry')
-        self.num_entry.grid(row=0, column=0, ipady=3, padx=5, sticky='NSEW')
+        self.num_entry = _Entry(self.entry_frame, 'Number', 'N.TEntry', self.generate_table)
+        self.num_entry.Entry.pack(side=LEFT, ipady=3, padx=(5, 0))
 
-        self.upto_entry = ttk.Entry(self.entry_frame, width=10, textvariable=self.upto_var, justify='center', style='U.TEntry')
-        self.upto_entry.grid(row=0, column=1, ipady=3, padx=5, sticky='NSEW')
+        self.upto_entry = _Entry(self.entry_frame, 'Upto', 'U.TEntry', self.generate_table)
+        self.upto_entry.Entry.pack(side=LEFT, ipady=3, padx=(5, 0))
+
+        self.generate_button = Button(self.entry_frame, width=10, text='GENERATE', bg='#5e72b5', activebackground='#5e72b5', fg='white', activeforeground='white', bd='0', cursor='hand2', command=self.generate_table)
+        self.generate_button.pack(ipady=2, padx=(3, 2))
 
         self.table_frame = Frame(self.master)
-        self.table_frame.grid(row=1, column=0, sticky='NSEW')
 
         self.table_text = Text(self.table_frame, width=40, height=10, cursor='arrow', state='disabled')
-        self.table_text.grid(row=1, column=0, padx=5, pady=5, sticky='NSEW')
+        self.table_text.pack(side=LEFT, pady=(0, 5))
 
         self.vsb = Scrollbar(self.table_frame, orient='vertical', command=self.table_text.yview)
-        self.vsb.grid(row=1, column=1, sticky='NS')
+        self.vsb.pack(side=LEFT, fill='y')
         self.table_text.configure(yscrollcommand=self.vsb.set)
 
-        self.show_table = Button(self.master, width=40, text='SHOW TABLE', bg='#5e72b5', activebackground='#5e72b5', fg='white', activeforeground='white', bd='0', cursor='hand2', command=self.generate_table)
-        self.show_table.grid(row=2, column=0, ipady=3, padx=5, sticky='NSEW')
-
-        self.copy_button = Button(self.master, width=40, text='COPY', bg='green', activebackground='green', fg='white', activeforeground='white', bd='0', cursor='hand2', command=self.copy_to_clipboard)
-        self.copy_button.grid(row=3, column=0, ipady=3, padx=5, pady=5, sticky='NSEW')
-
-        self.master.bind('<Button-1>', self.master_binding)
-        self.num_entry.bind('<FocusIn>', self.entry_binding)
-        self.upto_entry.bind('<FocusIn>', self.entry_binding)
-        self.num_entry.bind('<Return>', self.generate_table)
-        self.upto_entry.bind('<Return>', self.generate_table)
-        self.show_table.bind('<FocusIn>', self.master_binding)
+        self.copy_button = Button(self.master, width=47, text='COPY', bg='green', activebackground='green', fg='white', activeforeground='white', bd='0', cursor='hand2', command=self.copy_to_clipboard)
 
         self.initial_position()
+
+        self.master.bind('<Button-1>', self.focus_everywhere)
         self.master.mainloop()
+
+    def focus_everywhere(self, event=None):
+        '''Focus to respective widgets where clicked'''
+
+        event.widget.focus()
 
     def initial_position(self):
         '''Position window to the center of screen when the program opens'''
@@ -74,57 +117,14 @@ class MultiplicationTable:
         pos_y = screen_height // 2 - height // 2
 
         self.master.resizable(0, 0)
-        self.master.geometry(f'{width}x{height}+{pos_x}+{pos_y}')
+        self.master.geometry(f'+{pos_x}+{pos_y}')
         self.master.deiconify()
-
-    def master_binding(self, event=None, widget=None):
-        '''When user clicks anywhere outside of entry boxes and buttons'''
-
-        if widget is None:
-            widget = event.widget
-
-        if widget not in [self.num_entry, self.upto_entry]:
-            if not self.num_var.get().strip():
-                self.num_var.set('Number')
-                self.num_style.configure('N.TEntry', foreground='grey')
-
-            if not self.upto_var.get().strip():
-                self.upto_var.set('Upto')
-                self.upto_style.configure('U.TEntry', foreground='grey')
-
-            self.master.focus()
-
-    def entry_binding(self, event=None):
-        '''When focus changes in or out of the entry widget'''
-
-        widget = event.widget
-
-        if widget == self.num_entry:
-            if not self.upto_var.get().strip():
-                self.upto_var.set('Upto')
-                self.upto_style.configure('U.TEntry', foreground='grey')
-
-            if self.num_var.get().strip() == 'Number':
-                self.num_var.set('')
-                self.num_style.configure('N.TEntry', foreground='black')
-
-        elif widget == self.upto_entry:
-            if not self.num_var.get().strip():
-                self.num_var.set('Number')
-                self.num_style.configure('N.TEntry', foreground='grey')
-
-            if self.upto_var.get().strip() == 'Upto':
-                self.upto_var.set('')
-                self.upto_style.configure('U.TEntry', foreground='black')
-
-        else:
-            self.master_binding(widget=self.master)
 
     def generate_table(self, event=None):
         '''Insert multiplication table in text_widget '''
 
-        num = self.num_var.get().strip()
-        upto = self.upto_var.get().strip()
+        num = self.num_entry.var.get().strip()
+        upto = self.upto_entry.var.get().strip()
 
         try:
             num = int(num)
@@ -145,6 +145,9 @@ class MultiplicationTable:
                 self.table_text.insert('end', table)
 
             self.table_text.config(state='disabled')
+            self.table_frame.pack()
+
+            self.copy_button.pack(pady=(0, 5), ipady=5)
 
         except ValueError:
             messagebox.showinfo('ERR', 'Number must be integer')
@@ -160,13 +163,15 @@ class MultiplicationTable:
             self.master.after(1000, lambda: self.copy_button.config(text='Copy'))
 
     def resource_path(self, file_name):
-        '''Get absolute path to resource from temporary directory
+        '''
+        Get absolute path to resource from temporary directory
 
         In development:
             Gets path of files that are used in this script like icons, images or file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
+            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory
+        '''
 
         try:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
