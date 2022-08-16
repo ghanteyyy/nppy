@@ -1,7 +1,6 @@
 import os
 import sys
 import json
-import ctypes
 import winreg
 import calendar
 import datetime
@@ -9,31 +8,66 @@ import subprocess
 from tkinter import *
 import tkinter.ttk as ttk
 from tkinter import messagebox
-from tkinter.ttk import Scrollbar
 from configparser import ConfigParser
 from pystray._base import MenuItem as item
+import psutil
 import pystray._win32
 from PIL import Image
+from dateutil.relativedelta import relativedelta
 
 
-class Widgets:
-    '''Create label and text_widgets for displaying corresponding values'''
+class _Entry:
+    def __init__(self, frame, entry_style, default_text, width=30, trace=False):
+        self.frame = frame
+        self.trace = trace
+        self.entry_style = entry_style
 
-    def __init__(self, container_frame, text, width=13):
-        self.label_text_frame = Frame(container_frame, bg='silver')
-        self.label = Label(self.label_text_frame, text=text, bg='silver', font=('Courier', 12))
-        self.label.pack()
+        self.IsDefault = True
+        self.DEFAULT_TEXT = default_text
 
-        self.text_frame = Frame(self.label_text_frame, bg='silver')
-        self.text_widget = Text(self.text_frame, width=width, height=10, cursor='arrow')
-        self.text_widget.pack(side=LEFT)
-        self.text_frame.pack()
+        self.var = StringVar()
+        self.var.set(self.DEFAULT_TEXT)
 
-        self.label_text_frame.pack(side=LEFT)
+        self.EntryStyle = ttk.Style()
+        self.EntryStyle.configure(self.entry_style, foreground='grey')
+        self.Entry = ttk.Entry(self.frame, width=width, textvariable=self.var, justify='center', style=self.entry_style)
+
+        self.Entry.bind("<FocusIn>", self.focus_in)
+        self.Entry.bind("<FocusOut>", self.focus_out)
+        self.Entry.bind('<KeyPress>', self.KeyPressed)
+
+    def focus_in(self, event=None):
+        '''
+        Remove temporary placeholder's text when user clicks to respective entry widget
+        '''
+
+        if self.IsDefault:
+            self.var.set('')
+            self.IsDefault = False
+            self.EntryStyle.configure(self.entry_style, foreground='black')
+
+    def focus_out(self, event=None):
+        '''
+        Remove temporary placeholder's text when user clicks out of respective entry widget
+        '''
+
+        if self.IsDefault is False and not self.var.get().strip():
+            self.IsDefault = True
+            self.var.set(self.DEFAULT_TEXT)
+            self.EntryStyle.configure(self.entry_style, foreground='grey')
+
+    def KeyPressed(self, event=None):
+        if self.trace:
+            char = event.keysym
+
+            if char.isdigit() is False and char not in ['BackSpace', 'Delete', 'Right', 'Left']:
+                return 'break'
 
 
 class Tution:
     def __init__(self):
+        self.tag = 0
+        self.IsAddedFirstTime = False
         self.configFile = os.path.join(os.environ['USERPROFILE'], r'AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Tution\settings.ini')
         self.startupFile = os.path.join(os.path.dirname(sys.executable), 'Tution-StartUp.exe')
         self.file_name = os.path.join(os.path.dirname(self.configFile), 'tution.json')
@@ -46,19 +80,11 @@ class Tution:
 
         self.add_details_frame = Frame(self.master, bg='silver')
 
-        self.entry_name_var = StringVar()
-        self.entry_name_style = ttk.Style()
-        self.entry_name_style.configure('EntryName.TEntry', foreground='grey')
-        self.entry_name = ttk.Entry(self.add_details_frame, width=50, justify=CENTER, style='EntryName.TEntry', textvariable=self.entry_name_var)
-        self.entry_name.insert(END, 'Name of Student')
-        self.entry_name.pack(ipady=4, pady=5)
+        self.entry_name = _Entry(self.add_details_frame, 'EntryName.TEntry', 'Name of Student', 50)
+        self.entry_name.Entry.pack(ipady=4, pady=5)
 
-        self.entry_fee_var = StringVar()
-        self.entry_fee_style = ttk.Style()
-        self.entry_fee_style.configure('EntryFee.TEntry', foreground='grey')
-        self.entry_fee = ttk.Entry(self.add_details_frame, width=50, justify=CENTER, style='EntryFee.TEntry', textvariable=self.entry_fee_var)
-        self.entry_fee.insert(END, 'Fee')
-        self.entry_fee.pack(ipady=4)
+        self.entry_fee = _Entry(self.add_details_frame, 'EntryFee.TEntry', 'Fee', 50, True)
+        self.entry_fee.Entry.pack(ipady=4)
 
         self.months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
         self.date_frame = Frame(self.add_details_frame, bg='silver')
@@ -73,50 +99,44 @@ class Tution:
         self.submit_button = ttk.Button(self.date_frame, text='Submit', cursor='hand2', command=self.submit_button_command)
         self.submit_button.pack(ipadx=10)
 
-        self.style = ttk.Style()
-        self.style.configure('EntryFee.TRadiobutton', background='silver', foreground='black')
-        self.radio_var = IntVar()
-        self.radio_buttonframe = Frame(self.add_details_frame, bg='silver')
-        self.add_radiobutton = ttk.Radiobutton(self.radio_buttonframe, text='ADD', value=1, variable=self.radio_var, cursor='hand2', style='EntryFee.TRadiobutton')
-        self.add_radiobutton.pack(side=LEFT)
-
-        self.remove_radiobutton = ttk.Radiobutton(self.radio_buttonframe, text='REMOVE', value=2, variable=self.radio_var, cursor='hand2', style='EntryFee.TRadiobutton')
-        self.remove_radiobutton.pack(side=LEFT)
-
         self.date_frame.pack(pady=10)
-        self.radio_buttonframe.pack()
         self.add_details_frame.pack(pady=10)
 
-        self.container_frame = Frame(self.master, bg='silver')
-        self.container_frame.pack(padx=3)
+        self.TreeFrame = Frame(self.master, bg='silver')
+        self.TreeFrame.pack(padx=3)
 
-        # Creating text-widgets and labels
-        self.student_name = Widgets(self.container_frame, 'NAME', 18)
-        self.student_fee = Widgets(self.container_frame, 'FEE', 10)
-        self.join_date = Widgets(self.container_frame, 'JOINED')
-        self.prev_pay = Widgets(self.container_frame, 'PREV PAY')
-        self.next_pay = Widgets(self.container_frame, 'NEXT PAY')
-        self.left = Widgets(self.container_frame, 'LEFT')
-        self.late = Widgets(self.container_frame, 'LATE PAY')
+        self.Columns = ['NAME', 'FEE', 'JOINED', 'PREV DATE', 'NEXT PAY', 'LEFT', 'LATE PAY']
+        self.Tree = ttk.Treeview(self.TreeFrame, show='headings', columns=self.Columns)
+        self.Tree.pack(side=LEFT)
 
-        self.text_widgets = [self.student_name.text_widget, self.student_fee.text_widget, self.join_date.text_widget, self.prev_pay.text_widget, self.next_pay.text_widget, self.left.text_widget, self.late.text_widget]
+        self.Tree.heading('NAME', text='NAME')
+        self.Tree.column('NAME')
+        self.Tree.heading('FEE', text='FEE')
+        self.Tree.column('FEE', width=80, anchor='center')
+        self.Tree.heading('JOINED', text='JOINED')
+        self.Tree.column('JOINED', width=130, anchor='center')
+        self.Tree.heading('PREV DATE', text='PREV DATE')
+        self.Tree.column('PREV DATE', width=130, anchor='center')
+        self.Tree.heading('NEXT PAY', text='NEXT PAY')
+        self.Tree.column('NEXT PAY', width=130, anchor='center')
+        self.Tree.heading('LEFT', text='LEFT')
+        self.Tree.column('LEFT', width=80, anchor='center')
+        self.Tree.heading('LATE PAY', text='LATE PAY')
+        self.Tree.column('LATE PAY', width=80, anchor='center')
 
-        # Adding scrollbar
-        self.scrollbar = Scrollbar(self.late.text_frame, orient="vertical", command=self.multiple_yview)
-        self.scrollbar.pack(side=LEFT, fill='y')
-
-        for widgets in self.text_widgets:  # Setting scrollbar for all text_widgets
-            widgets.config(yscrollcommand=self.scrollbar.set)
-
-        self.master.bind('<Button-1>', self.widgets_bindings)
-        self.entry_name.bind('<FocusIn>', self.widgets_bindings)
-        self.entry_fee.bind('<FocusIn>', self.widgets_bindings)
-        self.entry_fee.bind('<FocusOut>', lambda event, focus_out=True: self.widgets_bindings(event, focus_out))
+        self.scrollbar = ttk.Scrollbar(self.TreeFrame, orient="vertical", command=self.Tree.yview)
+        self.Tree.config(yscrollcommand=self.scrollbar.set)
+        self.scrollbar.pack(side=RIGHT, fill='y')
 
         self.master.after(0, self.center_window)
         self.master.config(bg='silver')
 
         self.Minimize()
+
+        self.Tree.bind('<Control-a>', self.SelectAll)
+        self.Tree.bind('<Button-3>', self.RightClick)
+        self.master.bind('<Button-1>', self.focus_anywhere)
+        self.Tree.bind('<Motion>', self.RestrictResizingHeading)
         self.master.protocol('WM_DELETE_WINDOW', self.withdraw_window)
         self.master.mainloop()
 
@@ -141,46 +161,52 @@ class Tution:
             self.insert_at_first()
             self.master.deiconify()
 
-    def widgets_bindings(self, event, focus_out=False):
-        '''Remove or Add the default text when user clicks in or out of the entry widget'''
+    def focus_anywhere(self, event=None):
+        '''
+        Focus to the click widget. Also remove the selection(s) if made
+        in ttk.Treeview
+        '''
 
-        name = self.entry_name_var.get().strip()
-        fee = self.entry_fee_var.get().strip()
+        widget = event.widget
+        selections = self.Tree.selection()
 
-        if event.widget == self.entry_name or focus_out:
-            if name == 'Name of Student' and not focus_out:
-                self.entry_name_style.configure('EntryName.TEntry', foreground='black')
-                self.entry_name_var.set('')
+        if self.ClickedAtEmptySpace(event) or isinstance(widget, ttk.Treeview) is False:
+            if selections:
+                self.Tree.selection_remove(selections)
 
-            if not fee:
-                self.entry_fee_var.set('Fee')
-                self.entry_fee_style.configure('EntryFee.TEntry', foreground='grey')
+        widget.focus()
 
-        elif event.widget == self.entry_fee:
-            if fee == 'Fee':
-                self.entry_fee_var.set('')
-                self.entry_fee_style.configure('EntryFee.TEntry', foreground='black')
+    def ClickedAtEmptySpace(self, event=None):
+        '''Check if user has clicked in empty space'''
 
-            if not name:
-                self.entry_name_var.set('Name of Student')
-                self.entry_name_style.configure('EntryName.TEntry', foreground='grey')
+        return self.Tree.identify('item', event.x, event.y) == ''
 
-        elif event.widget not in [self.entry_name, self.entry_fee]:
-            if not name:
-                self.entry_name_var.set('Name of Student')
-                self.entry_name_style.configure('EntryName.TEntry', foreground='grey')
+    def RestrictResizingHeading(self, event):
+        '''Restrict user to resize the columns of Treeview '''
 
-            if not fee:
-                self.entry_fee_var.set('Fee')
-                self.entry_fee_style.configure('EntryFee.TEntry', foreground='grey')
+        if self.Tree.identify_region(event.x, event.y) == "separator":
+            return "break"
 
-            self.master.focus()
+    def SelectAll(self, event=None):
+        '''Select all values of ttk.Treeview when user presses control-A'''
 
-    def multiple_yview(self, *args):
-        '''Creating commands of y-view for  all the TEXT widget'''
+        childrens = self.Tree.get_children()
+        self.Tree.selection_add(childrens)
 
-        for widgets in self.text_widgets:
-            widgets.yview(*args)
+    def RightClick(self, event=None):
+        '''When user right clicks inside list-box'''
+
+        CurrentSelections = self.Tree.selection()
+        RightClickMenu = Menu(self.master, tearoff=False)
+
+        if CurrentSelections:
+            RightClickMenu.add_command(label='Delete', command=self.delete_details)
+
+        try:
+            RightClickMenu.post(event.x_root, event.y_root)
+
+        finally:
+            RightClickMenu.grab_release()
 
     def read_json(self):
         '''Reading data from the .json file.'''
@@ -194,7 +220,6 @@ class Tution:
                 contents = {}
 
         except json.decoder.JSONDecodeError:
-            messagebox.showerror('JSON Error', 'You json file is either empty or corrupted so we could not load the data')
             contents = {}
 
         return contents
@@ -209,66 +234,55 @@ class Tution:
         '''Calculate next payment date when user adds data for the first time or when user gets monthly payment'''
 
         today = datetime.date.today()
-        today_obj = datetime.datetime.strptime(str(today), '%Y-%m-%d')
         joined_obj = datetime.datetime.strptime(joined_str, '%Y-%b-%d')
+        joined_obj = datetime.date(joined_obj.year, joined_obj.month, joined_obj.day)
 
-        total_days_in_current_month = calendar.monthrange(today_obj.year, today_obj.month)[1]
-        remaining_days_in_current_month = total_days_in_current_month - today_obj.day
+        difference = relativedelta(today, joined_obj)
+        diff_days = abs(today.day - joined_obj.day)
 
-        remaining_days_in_current_month += joined_obj.day
-        next_payment = today_obj + datetime.timedelta(days=remaining_days_in_current_month)
+        if difference.months == 0:
+            diff_days = difference.days
 
-        return f'{next_payment.year}-{calendar.month_abbr[next_payment.month]}-{str(next_payment.day).zfill(2)}'
+        elif joined_obj > today:
+            today = joined_obj
+            diff_days = 0
 
-    def add_command(self, name, fee, month, day, var):
-        '''When user selects REMOVE check-button and clicks SUBMIT button'''
+        next_payment = today - relativedelta(days=diff_days) + relativedelta(months=1)
+        return next_payment.strftime('%Y-%b-%d')
 
-        joined_str = f'{datetime.date.today().year}-{month}-{str(day).zfill(2)}'
-        next_pay = self.get_next_payment_date(joined_str)
+    def delete_details(self):
+        '''When user selects items in treeview and clicks delete menu'''
 
-        head = self.read_json()
-
-        if name in head:
-            messagebox.showerror('Exists', f'{name} is already in the file')
-
-        else:
-            tails = {name: {'fee': fee, 'joined': joined_str, 'prev_pay': [], 'late_pay': {}, 'next_pay': next_pay}}
-
-            head.update(tails)
-            return head
-
-    def remove_command(self, name):
-        '''When user selects ADD check-button and clicks SUBMIT button'''
-
+        is_error_shown = False
         contents = self.read_json()
+        selections = self.Tree.selection()
 
-        try:
-            contents.pop(name)
+        for selection in selections:
+            value = self.Tree.item(selection)['values'][0]
 
-            return contents
+            try:
+                contents.pop(value)
 
-        except KeyError:
-            messagebox.showerror('Invalid Value', f'{name.upper()} not found in the file')
+            except KeyError:
+                if is_error_shown is False:
+                    is_error_shown = True
+                    messagebox.showerror('ERR', f'Some values are not found in the file. Ignoring them.')
+
+        self.write_json(contents)
+        self.insert_at_first()
 
     def submit_button_command(self):
         '''When user clicks SUBMIT button '''
 
-        var = self.radio_var.get()
-        fee = self.entry_fee_var.get().strip()
-        name = self.entry_name_var.get().strip()
+        fee = self.entry_fee.var.get().strip()
+        name = self.entry_name.var.get().strip()
         day = self.day_combobox.get().strip()
         month = self.month_combobox.get().strip()
 
         if name in ['Name of Student', '']:
             messagebox.showerror('Invalid Name', 'Name of Student is invalid.')
 
-        elif var not in [1, 2]:
-            messagebox.showerror('Invalid button', 'You must select either ADD or REMOVE as per your intentions.')
-
-        elif var == 2:
-            contents = self.remove_command(name)
-
-        elif not fee.isdigit():
+        elif fee.isdigit() is False:
             messagebox.showerror('Invalid Fee', 'Fee is expected in numbers.')
 
         elif month not in self.months:
@@ -277,49 +291,38 @@ class Tution:
         elif not day.isdigit() or int(day) > 32:
             messagebox.showerror('Invalid Day', 'Day is expected between 1-32.')
 
-        elif var == 1:
-            contents = self.add_command(name, fee, month, day, var)
+        else:
+            joined_str = f'{datetime.date.today().year}-{month}-{str(day).zfill(2)}'
+            next_pay = self.get_next_payment_date(joined_str)
 
-        try:
-            if contents:
-                self.write_json(contents)
+            head = self.read_json()
+
+            if name in head:
+                messagebox.showerror('Exists', f'{name} is already in the file')
+
+            else:
+                tails = {name: {'fee': fee, 'joined': joined_str, 'prev_pay': [], 'late_pay': {}, 'next_pay': next_pay}}
+                head.update(tails)
+
+                self.write_json(head)
+                self.IsAddedFirstTime = True
 
                 self.reset()
                 self.insert_at_first()
 
-        except UnboundLocalError:
-            pass
-
     def reset(self):
         '''Reset entries buttons and radio-button to initial state'''
-
-        self.entry_fee_style.configure('EntryFee.TEntry', foreground='silver')
-        self.entry_name_style.configure('EntryName.TEntry', foreground='silver')
-
-        for widget, text in {self.entry_name: 'Name of Student', self.entry_fee: 'Fee'}.items():
-            widget.delete(0, END)
-            widget.insert(END, text)
 
         self.day_combobox.set('Day')
         self.month_combobox.set('Month')
 
-        self.radio_var.set(0)
         self.master.focus()
-
-    def config_text_widget(self, state, clear=False):
-        '''Enabling TEXT widgets to insert data and Disabling them after all data has been inserted'''
-
-        for widget in self.text_widgets:
-            widget.config(state=state, cursor='arrow')
-
-            if clear:
-                widget.delete('1.0', END)
 
     def insert_at_first(self):
         '''Inserts data from .json file to the TEXT widgets and also calculated the next payment date as well as the number of date left for the payment'''
 
         contents = self.read_json()
-        self.config_text_widget(state=NORMAL, clear=True)
+        self.Tree.delete(*self.Tree.get_children())
 
         for key, value in contents.items():
             name = key
@@ -341,9 +344,13 @@ class Tution:
                 prev_pay = 'Not Yet'
 
             if left <= 0:  # When its the day to get pay
-                late_pay = (today - next_pay_obj).days
+                if self.IsAddedFirstTime:
+                    late_pay = '0'
 
-                if messagebox.askyesno('Got Payment?', f'Did you get paid from {name}?'):
+                else:
+                    late_pay = (today - next_pay_obj).days
+
+                if self.IsAddedFirstTime is False and messagebox.askyesno('Got Payment?', f'Did you get paid from {name}?'):
                     prev_pay = f'{today.year}-{calendar.month_abbr[today.month]}-{str(today.day).zfill(2)}'
                     contents[name]['prev_pay'].append(prev_pay)
 
@@ -371,17 +378,14 @@ class Tution:
                 else:  # If there is not last payment in the file
                     late_pay = '0 days'
 
-            # Creating dictionary of text_widgets and its corresponding values for insertion
-            values = [name, fee, joined, prev_pay, next_pay, f'{left} days', late_pay]
-            _dict = {widget: values[index] for index, widget in enumerate(self.text_widgets)}
+            values = (name, fee, joined, prev_pay, next_pay, f'{left} days', late_pay)
+            self.Tree.insert('', END, values=values, tag=self.tag)
 
-            for widget, text in _dict.items():
-                widget.insert(END, f'{text}\n')
+            self.tag += 1
 
         self.master.focus()
         self.write_json(contents)
         self.DetailsInserted = True
-        self.config_text_widget(state=DISABLED)
 
     def quit_window(self):
         '''Quit window from the system tray'''
@@ -488,11 +492,12 @@ def resource_path(file_name):
 
 
 if __name__ == '__main__':
-    handle = ctypes.windll.user32.FindWindowW(None, "Tution")
+    handle = 'Tution.exe' in (p.name() for p in psutil.process_iter())
 
     if handle:  # When the program is already running
         root = Tk()
         root.withdraw()
+        root.attributes('-topmost', True)
         root.iconbitmap(resource_path('icon.ico'))
         res = messagebox.showinfo("ERR", "Already running ...")
 
