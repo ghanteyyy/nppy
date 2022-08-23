@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import winreg
+import ctypes
 import calendar
 import datetime
 import subprocess
@@ -10,7 +11,6 @@ import tkinter.ttk as ttk
 from tkinter import messagebox
 from configparser import ConfigParser
 from pystray._base import MenuItem as item
-import psutil
 import pystray._win32
 from PIL import Image
 from dateutil.relativedelta import relativedelta
@@ -38,7 +38,8 @@ class _Entry:
 
     def focus_in(self, event=None):
         '''
-        Remove temporary placeholder's text when user clicks to respective entry widget
+        Remove temporary placeholder's text when
+        user clicks to respective entry widget
         '''
 
         if self.IsDefault:
@@ -48,7 +49,8 @@ class _Entry:
 
     def focus_out(self, event=None):
         '''
-        Remove temporary placeholder's text when user clicks out of respective entry widget
+        Remove temporary placeholder's text when
+        user clicks out of respective entry widget
         '''
 
         if self.IsDefault is False and not self.var.get().strip():
@@ -64,19 +66,19 @@ class _Entry:
                 return 'break'
 
 
-class Tution:
+class Tuition:
     def __init__(self):
         self.tag = 0
         self.IsAddedFirstTime = False
-        self.configFile = os.path.join(os.environ['USERPROFILE'], r'AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Tution\settings.ini')
-        self.startupFile = os.path.join(os.path.dirname(sys.executable), 'Tution-StartUp.exe')
-        self.file_name = os.path.join(os.path.dirname(self.configFile), 'tution.json')
+        self.configFile = os.path.join(os.environ['USERPROFILE'], r'AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Tuition\settings.ini')
+        self.startupFile = os.path.join(os.path.dirname(sys.executable), 'Tuition-StartUp.exe')
+        self.file_name = os.path.join(os.path.dirname(self.configFile), 'tuition.json')
         self.DetailsInserted = False
         self.WindowState = 'normal'
 
         self.master = Tk()
         self.master.withdraw()
-        self.master.title('TUTION')
+        self.master.title('TUITION')
 
         self.add_details_frame = Frame(self.master, bg='silver')
 
@@ -89,11 +91,9 @@ class Tution:
         self.months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
         self.date_frame = Frame(self.add_details_frame, bg='silver')
         self.month_combobox = ttk.Combobox(self.date_frame, values=self.months, width=8, height=12)
-        self.month_combobox.set('Month')
         self.month_combobox.pack(side=LEFT, padx=5)
 
-        self.day_combobox = ttk.Combobox(self.date_frame, values=list(range(1, 33)), width=5, height=12)
-        self.day_combobox.set('Day')
+        self.day_combobox = ttk.Combobox(self.date_frame, width=5, height=12)
         self.day_combobox.pack(side=LEFT, padx=5)
 
         self.submit_button = ttk.Button(self.date_frame, text='Submit', cursor='hand2', command=self.submit_button_command)
@@ -132,16 +132,46 @@ class Tution:
         self.master.config(bg='silver')
 
         self.Minimize()
+        self.SetDefaultDates()
 
         self.Tree.bind('<Control-a>', self.SelectAll)
         self.Tree.bind('<Button-3>', self.RightClick)
         self.master.bind('<Button-1>', self.focus_anywhere)
         self.Tree.bind('<Motion>', self.RestrictResizingHeading)
+        self.day_combobox.bind('<KeyPress>', self.ComboKeyPressed)
         self.master.protocol('WM_DELETE_WINDOW', self.withdraw_window)
+        self.month_combobox.bind('<<ComboboxSelected>>', self.SetMonthRange)
+        self.month_combobox.bind('<KeyPress>', lambda event=Event, _bool=True: self.ComboKeyPressed(event, _bool))
+
         self.master.mainloop()
 
+    def ComboKeyPressed(self, event=None, _bool=False):
+        '''
+        When user types in Month Combobox then:
+            i. Restricting user to input digit.
+            ii. Restricting user to input more than three letters
+
+        When user types in Day Combobox then:
+            i. Restricting user to input letters
+        '''
+
+        char = event.keysym
+
+        if char not in ['BackSpace', 'Delete', 'Left', 'Right']:
+            if _bool is True:
+                month_combo_get = self.month_combobox.get().strip() + event.char
+
+                if len(month_combo_get) > 3:
+                    return 'break'
+
+            if char.isdigit() is _bool:
+                return 'break'
+
     def center_window(self):
-        '''Set position of the window to the center of the screen when user open the program'''
+        '''
+        Set position of the window to the center
+        of the screen when user open the program
+        '''
 
         self.master.update()
 
@@ -163,8 +193,8 @@ class Tution:
 
     def focus_anywhere(self, event=None):
         '''
-        Focus to the click widget. Also remove the selection(s) if made
-        in ttk.Treeview
+        Focus to the click widget. Also remove the
+        selection(s) if made in ttk.Treeview
         '''
 
         widget = event.widget
@@ -231,7 +261,10 @@ class Tution:
             json.dump(contents, f, indent=4)
 
     def get_next_payment_date(self, joined_str, opt=False):
-        '''Calculate next payment date when user adds data for the first time or when user gets monthly payment'''
+        '''
+        Calculate next payment date when user adds data for
+        the first time or when user gets monthly payment
+        '''
 
         today = datetime.date.today()
         joined_obj = datetime.datetime.strptime(joined_str, '%Y-%b-%d')
@@ -311,7 +344,9 @@ class Tution:
                 self.insert_at_first()
 
     def reset(self):
-        '''Reset entries buttons and radio-button to initial state'''
+        '''
+        Reset entries buttons and radio-button to initial state
+        '''
 
         self.day_combobox.set('Day')
         self.month_combobox.set('Month')
@@ -319,7 +354,10 @@ class Tution:
         self.master.focus()
 
     def insert_at_first(self):
-        '''Inserts data from .json file to the TEXT widgets and also calculated the next payment date as well as the number of date left for the payment'''
+        '''
+        Inserts data from .json file to the TEXT widgets and also calculated
+        the next payment date as well as the number of date left for the payment
+        '''
 
         contents = self.read_json()
         self.Tree.delete(*self.Tree.get_children())
@@ -387,6 +425,46 @@ class Tution:
         self.write_json(contents)
         self.DetailsInserted = True
 
+    def SetDefaultDates(self):
+        '''
+        Set month and day combobox to current month
+        and day when program loads for the first time
+        '''
+
+        today = datetime.datetime.today()
+        self.month_combobox.set(today.strftime('%b'))
+        self.day_combobox.set(today.strftime('%d'))
+
+        self.SetMonthRange()
+
+    def SetMonthRange(self, event=None):
+        '''
+        Set day range to respective month
+        selected month name from month-combobox
+        '''
+
+        day_range = self.day_combobox.get().strip()
+        month_name = self.month_combobox.get().strip().capitalize()
+
+        today = datetime.date.today()
+
+        if day_range.isdigit() is False:
+            messagebox.showerror('ERR', 'Day must be number. Setting to DEFAULT value 1')
+            return
+
+        elif month_name not in self.months:
+            messagebox.showerror('ERR', 'Invalid Month name. Setting to DEFAULT month JAN')
+            return
+
+        month_index = list(calendar.month_abbr).index(month_name)
+        month_range = calendar.monthrange(today.year, month_index)[1]
+
+        if int(day_range) > month_range:
+            messagebox.showerror('ERR', 'Day range is beyond the actual range. Setting to DEFAULT value 1')
+
+        else:
+            self.day_combobox.config(values=list(range(1, month_range + 1)))
+
     def quit_window(self):
         '''Quit window from the system tray'''
 
@@ -411,7 +489,7 @@ class Tution:
 
         image = Image.open(resource_path("icon.ico"))
         menu = (item('Quit', lambda: self.quit_window()), item('Show', lambda: self.show_window(), default=True))
-        self.icon = pystray.Icon("name", image, "Tution", menu)
+        self.icon = pystray.Icon("name", image, "Tuition", menu)
         self.icon.run()
 
     def Minimize(self):
@@ -454,33 +532,35 @@ class Tution:
         return status
 
     def AddToStartUp(self):
-        '''Adding Tution-Startup.exe to startup'''
+        '''Adding Tuition-Startup.exe to startup'''
 
         if os.path.exists(self.startupFile):
             if os.path.exists(self.startupFile):
                 areg = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
 
                 try:
-                    akey = winreg.OpenKey(areg, f'SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\Tution-StartUp', 0, winreg.KEY_WRITE)
+                    akey = winreg.OpenKey(areg, f'SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\Tuition-StartUp', 0, winreg.KEY_WRITE)
                     areg.Close()
                     akey.Close()
 
                 except WindowsError:
                     key = winreg.OpenKey(areg, r'SOFTWARE\Microsoft\Windows\CurrentVersion\Run', 0, winreg.KEY_SET_VALUE)
-                    winreg.SetValueEx(key, 'Tution-StartUp', 0, winreg.REG_SZ, self.startupFile)
+                    winreg.SetValueEx(key, 'Tuition-StartUp', 0, winreg.REG_SZ, self.startupFile)
 
                     areg.Close()
                     key.Close()
 
 
 def resource_path(file_name):
-    '''Get absolute path to resource from temporary directory
+    '''
+    Get absolute path to resource from temporary directory
 
     In development:
         Gets path of files that are used in this script like icons, images or file of any extension from current directory
 
     After compiling to .exe with pyinstaller and using --add-data flag:
-        Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
+        Gets path of files that are used in this script like icons, images or file of any extension from temporary directory
+    '''
 
     try:
         base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
@@ -492,7 +572,7 @@ def resource_path(file_name):
 
 
 if __name__ == '__main__':
-    handle = 'Tution.exe' in (p.name() for p in psutil.process_iter())
+    handle = ctypes.windll.user32.FindWindowW(None, "Tuition")
 
     if handle:  # When the program is already running
         root = Tk()
@@ -508,4 +588,4 @@ if __name__ == '__main__':
         root.mainloop()
 
     else:
-        Tution()
+        Tuition()
