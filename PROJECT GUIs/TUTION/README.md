@@ -1,4 +1,4 @@
-# TUTION
+# TUITION
 
 <img src="assets/1.png">
 
