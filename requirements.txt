@@ -5,8 +5,10 @@ qrcode
 pillow
 pygit2
 pygame
+PyPDF2
 django
 mutagen
+pystray
 stagger
 fastapi
 uvicorn
@@ -15,9 +17,11 @@ pyautogui
 pyperclip
 matplotlib
 pyinstaller
+pytesseract
 ttkbootstrap
 opencv-python
 customtkinter
 auto-py-to-exe
 beautifulsoup4
+python-dateutil
 pywin32; sys_platform == 'win32'
