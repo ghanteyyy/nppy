@@ -69,12 +69,15 @@ class _Entry:
 class Tuition:
     def __init__(self):
         self.tag = 0
+        self.WindowState = 'normal'
+        self.DetailsInserted = False
+        self.DetailsInserted = False
         self.IsAddedFirstTime = False
+
         self.configFile = os.path.join(os.environ['USERPROFILE'], r'AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Tuition\settings.ini')
         self.startupFile = os.path.join(os.path.dirname(sys.executable), 'Tuition-StartUp.exe')
+        self.startupFile = os.path.join(os.path.dirname(sys.executable), 'Tuition-StartUp.exe')
         self.file_name = os.path.join(os.path.dirname(self.configFile), 'tuition.json')
-        self.DetailsInserted = False
-        self.WindowState = 'normal'
 
         self.master = Tk()
         self.master.withdraw()
@@ -88,7 +91,7 @@ class Tuition:
         self.entry_fee = _Entry(self.add_details_frame, 'EntryFee.TEntry', 'Fee', 50, True)
         self.entry_fee.Entry.pack(ipady=4)
 
-        self.months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        self.months = list(calendar.month_abbr)[1:]
         self.date_frame = Frame(self.add_details_frame, bg='silver')
         self.month_combobox = ttk.Combobox(self.date_frame, values=self.months, width=8, height=12)
         self.month_combobox.pack(side=LEFT, padx=5)
@@ -260,7 +263,7 @@ class Tuition:
         with open(self.file_name, 'w') as f:
             json.dump(contents, f, indent=4)
 
-    def get_next_payment_date(self, joined_str, opt=False):
+    def get_next_payment_date(self, joined_str):
         '''
         Calculate next payment date when user adds data for
         the first time or when user gets monthly payment
@@ -362,6 +365,8 @@ class Tuition:
         contents = self.read_json()
         self.Tree.delete(*self.Tree.get_children())
 
+        self.master.attributes('-topmost', True)
+
         for key, value in contents.items():
             name = key
             fee = value['fee']
@@ -424,6 +429,8 @@ class Tuition:
         self.master.focus()
         self.write_json(contents)
         self.DetailsInserted = True
+
+        self.master.attributes('-topmost', False)
 
     def SetDefaultDates(self):
         '''
