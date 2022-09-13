@@ -2,9 +2,56 @@ import os
 import sys
 from tkinter import *
 import tkinter.ttk as ttk
-from tkinter.ttk import Scrollbar
+from tkinter.ttk import Scrollbar, Style
 import pygame
 import pyperclip
+
+
+class _Entry:
+    def __init__(self, frame, font, style_name, default_text):
+        self.font = font
+        self.frame = frame
+        self.IsDefault = True
+        self.style_name = style_name
+        self.default_text = default_text
+
+        self.var = StringVar()
+        self.var.set(self.default_text)
+
+        self.Style = ttk.Style()
+        self.Style.configure(self.style_name, foreground='grey')
+
+        self.Entry = ttk.Entry(self.frame, textvariable=self.var, font=self.font, width=19, justify='center', style=self.style_name)
+
+        self.Entry.bind('<FocusIn>', self.FocusIn)
+        self.Entry.bind('<FocusOut>', self.FocusOut)
+
+    def FocusIn(self, event=None):
+        '''When ttk.Entry gets focus either by click to it or by pressing TAB key'''
+
+        if self.IsDefault and self.var.get().strip() == self.default_text:
+            self.IsDefault = False
+            self.var.set('')
+            self.Style.configure(self.style_name, foreground='black')
+
+    def FocusOut(self, event=None):
+        '''When ttk.Entry gets focus out either by click to another widget or by pressing TAB key'''
+
+        if self.IsDefault is False and not self.var.get().strip():
+            self.IsDefault = True
+            self.var.set(self.default_text)
+            self.Style.configure(self.style_name, foreground='grey')
+
+    def SetToDefault(self):
+        '''
+        Set the default values to respective ttk.Entry when
+        user finish adding, deleting or renaming values
+        '''
+
+        self.IsDefault = True
+
+        self.var.set(self.default_text)
+        self.Style.configure(self.style_name, foreground='grey')
 
 
 class SSNI:
@@ -50,11 +97,8 @@ class SSNI:
         self.FirstLeftFrame = Frame(self.LeftFrame)
         self.FirstLeftFrame.pack(side=LEFT)
 
-        self.video_entry_style = ttk.Style()
-        self.video_entry_style.configure('VE.TEntry', foreground='grey')
-        self.video_entry = ttk.Entry(self.FirstLeftFrame, font=_font, width=19, justify='center', style='VE.TEntry')
-        self.video_entry.insert(END, 'Video Name')
-        self.video_entry.pack(pady=10, padx=10, ipady=3)
+        self.video_entry = _Entry(self.FirstLeftFrame, _font, 'VE.TEntry', 'Video Name')
+        self.video_entry.Entry.pack(pady=10, padx=10, ipady=3)
 
         self.add_button = Button(self.FirstLeftFrame, text='A D D', **self.buttons_attributes, command=lambda: self.add_remove_search_command(button_name='ADD'))
         self.add_button.pack(pady=5, ipady=buttons_ipady)
@@ -74,17 +118,11 @@ class SSNI:
 
         self.SecondLeftFrame = Frame(self.LeftFrame)
 
-        self.old_name_entry_style = ttk.Style()
-        self.old_name_entry_style.configure('O.TEntry', foreground='grey')
-        self.old_name_entry = ttk.Entry(self.SecondLeftFrame, font=_font, width=19, justify='center', style='O.TEntry')
-        self.old_name_entry.insert(END, 'Old Name')
-        self.old_name_entry.pack(padx=10, ipady=3)
+        self.old_name_entry = _Entry(self.SecondLeftFrame,  _font, 'O.TEntry', 'Old Name')
+        self.old_name_entry.Entry.pack(padx=10, ipady=3)
 
-        self.new_name_entry_style = ttk.Style()
-        self.new_name_entry_style.configure('N.TEntry', foreground='grey')
-        self.new_name_entry = ttk.Entry(self.SecondLeftFrame, font=_font, width=19, justify='center', style='N.TEntry')
-        self.new_name_entry.insert(END, 'New Name')
-        self.new_name_entry.pack(pady=10, padx=10, ipady=3)
+        self.new_name_entry = _Entry(self.SecondLeftFrame,  _font, 'N.TEntry', 'New Name')
+        self.new_name_entry.Entry.pack(pady=10, padx=10, ipady=3)
 
         self.rename_button = Button(self.SecondLeftFrame, text='R E N A M E', **self.buttons_attributes, command=self.rename_command)
         self.rename_button.pack(ipady=buttons_ipady)
@@ -95,11 +133,8 @@ class SSNI:
         self.ListBox.bind('<Button-3>', self.RightClick)
         self.master.bind('<Button-1>', self.key_bindings)
         self.back_button.bind('<Return>', self.back_command)
-        self.video_entry.bind('<Button-3>', self.RightClick)
-        self.video_entry.bind('<FocusIn>', self.key_bindings)
-        self.old_name_entry.bind('<FocusIn>', self.key_bindings)
-        self.new_name_entry.bind('<FocusIn>', self.key_bindings)
         self.rename_button.bind('<Return>', self.rename_command)
+        self.video_entry.Entry.bind('<Button-3>', self.RightClick)
         self.master.bind_class('Button', '<FocusIn>', lambda event, focus_out=True: self.key_bindings(event, focus_out))
 
         self.master.after(0, self.center_window)
@@ -117,46 +152,12 @@ class SSNI:
         width, height = self.master.winfo_width(), self.master.winfo_height()
         self.master.geometry(f'+{screen_width - width // 2}+{screen_height - height // 2}')
 
-        self.widgets = {self.video_entry: ('Video Name', {self.video_entry_style: 'VE.TEntry'}), self.old_name_entry: ('Old Name', {self.old_name_entry_style: 'O.TEntry'}),
-                        self.new_name_entry: ('New Name', {self.new_name_entry_style: 'N.TEntry'})}
-
         self.master.deiconify()
-
-    def config_entry(self, widget, color='grey', insert=True):
-        '''Configure behavior of entries widget when user clicks in or out of them'''
-
-        widget.delete(0, END)
-        key = list(self.widgets[widget][1].keys())[0]
-        key.configure(self.widgets[widget][1][key], foreground=color)
-
-        if insert:
-            widget.insert(END, self.widgets[widget][0])
-            self.master.focus()
 
     def key_bindings(self, event, focus_out=False):
         '''When user clicks in and out of the entry boxes'''
 
-        widget = event.widget
-
-        if widget in self.widgets and widget.get().strip() == self.widgets[widget][0]:
-            self.config_entry(widget, 'black', False)
-
-            if widget == self.new_name_entry and not self.old_name_entry.get().strip():
-                self.config_entry(self.old_name_entry, 'grey')
-
-            if widget == self.old_name_entry and not self.new_name_entry.get().strip():
-                self.config_entry(self.new_name_entry, 'grey')
-
-        elif widget not in self.widgets or focus_out:
-            for _widget in self.widgets:
-                if not _widget.get().strip():
-                    self.config_entry(_widget, 'grey')
-
-        if widget not in [self.ListBox, self.scrollbar]:  # Remove selection of Listbox when user clicks to other widget
-            self.ListBox.selection_clear(0, END)
-
-        if widget in [self.master, self.SecondLeftFrame, self.FirstLeftFrame, self.scrollbar]:
-            self.master.focus()
+        event.widget.focus()
 
     def ShowRenamingWidgets(self, event=None):
         '''Show the renaming widgets to rename old name with new name'''
@@ -226,7 +227,7 @@ class SSNI:
         contents = self.read_file()
 
         if from_listbox is None:
-            from_entry = self.video_entry.get().strip()
+            from_entry = self.video_entry.var.get().strip()
 
         else:
             from_entry = self.ListBox.selection_get()
@@ -262,14 +263,14 @@ class SSNI:
             else:
                 pygame.mixer.music.play()
 
-        self.config_entry(self.video_entry)
+        self.video_entry.SetToDefault()
 
     def rename_command(self, event=None):
         '''Commands when user clicks RENAME button'''
 
         contents = self.read_file()
-        old_name = self.old_name_entry.get().strip()
-        new_name = self.new_name_entry.get().strip()
+        old_name = self.old_name_entry.var.get().strip()
+        new_name = self.new_name_entry.var.get().strip()
 
         if old_name == 'Old Name' or new_name == 'New Name' or old_name not in contents or new_name in contents:
             pygame.mixer.music.play()
@@ -278,10 +279,10 @@ class SSNI:
             old_name_index = contents.index(old_name)
             contents[old_name_index] = new_name
 
-            self.InsertToListBox(contents)
+            self.InsertToListBox(contents=contents)
 
             for widget in [self.old_name_entry, self.new_name_entry]:
-                self.config_entry(widget, 'grey')
+                widget.SetToDefault()
 
             self.master.focus()
             self.highlight(new_name, '#45bf7c')
@@ -303,14 +304,14 @@ class SSNI:
     def copy_cut(self, cut=False, from_listbox=False):
         '''Command for copying and cutting selected text of entry widget'''
 
-        if self.video_entry.selection_present():
-            text = self.video_entry.get()
+        if self.video_entry.Entry.selection_present():
+            text = self.video_entry.var.get()
 
             if cut:
                 # When user clicks to the cut option of right-click
                 # menu then deleting the text inside of the selection
 
-                self.video_entry.delete('sel.first', 'sel.last')
+                self.video_entry.Entry.delete('sel.first', 'sel.last')
 
         elif from_listbox is True:
             text = self.ListBox.selection_get()
@@ -323,11 +324,11 @@ class SSNI:
 
         clipboard = pyperclip.paste()
 
-        if self.video_entry.select_present():
-            self.video_entry.delete('sel.first', 'sel.last')  # Removing the selected text of entry widget
+        if self.video_entry.Entry.select_present():
+            self.video_entry.Entry.delete('sel.first', 'sel.last')  # Removing the selected text of entry widget
 
-        cur_pos = self.video_entry.index(INSERT)
-        self.video_entry.insert(cur_pos, clipboard)
+        cur_pos = self.video_entry.Entry.index(INSERT)
+        self.video_entry.Entry.insert(cur_pos, clipboard)
 
     def RightClick(self, event=None):
         '''When user right clicks inside list-box'''
@@ -336,7 +337,7 @@ class SSNI:
         widget = self.master.winfo_containing(x, y)
         RightClickMenu = Menu(self.master, tearoff=False)
 
-        if widget == self.video_entry:
+        if widget == self.video_entry.Entry:
             RightClickMenu.add_command(label='Copy', command=self.copy_cut)
             RightClickMenu.add_command(label='Cut', command=lambda: self.copy_cut(cut=True))
             RightClickMenu.add_command(label='Paste', command=self.paste)
@@ -347,20 +348,20 @@ class SSNI:
 
                 RightClickMenu.entryconfig(2, state='disabled')
 
-            if self.video_entry.select_present() is False:
+            if widget.select_present() is False:
                 # When there is no selection in entry widget then
                 # disabling copy and cut options in right-click menu
 
                 RightClickMenu.entryconfig(0, state='disabled')
                 RightClickMenu.entryconfig(1, state='disabled')
 
-                if self.master.focus_get() != self.video_entry:
+                if self.master.focus_get() != widget:
                     # When the cursor is over the entry widget and
                     # user right clicks to entry widget then generating
                     # left click event to set focus to entry widget
                     # before showing pop-up menu
 
-                    self.video_entry.event_generate('<Button-1>')
+                    widget.event_generate('<Button-1>')
 
         elif widget == self.ListBox:
             _y = event.y
