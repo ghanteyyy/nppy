@@ -69,13 +69,11 @@ class _Entry:
 class Tuition:
     def __init__(self):
         self.tag = 0
+        self.UpdateTimer = None
         self.WindowState = 'normal'
-        self.DetailsInserted = False
-        self.DetailsInserted = False
         self.IsAddedFirstTime = False
 
         self.configFile = os.path.join(os.environ['USERPROFILE'], r'AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Tuition\settings.ini')
-        self.startupFile = os.path.join(os.path.dirname(sys.executable), 'Tuition-StartUp.exe')
         self.startupFile = os.path.join(os.path.dirname(sys.executable), 'Tuition-StartUp.exe')
         self.file_name = os.path.join(os.path.dirname(self.configFile), 'tuition.json')
 
@@ -193,6 +191,8 @@ class Tuition:
         else:
             self.insert_at_first()
             self.master.deiconify()
+
+        self.UpdateListBox()
 
     def focus_anywhere(self, event=None):
         '''
@@ -362,6 +362,8 @@ class Tuition:
         the next payment date as well as the number of date left for the payment
         '''
 
+        self.tag = 0
+
         contents = self.read_json()
         self.Tree.delete(*self.Tree.get_children())
 
@@ -397,7 +399,7 @@ class Tuition:
                     prev_pay = f'{today.year}-{calendar.month_abbr[today.month]}-{str(today.day).zfill(2)}'
                     contents[name]['prev_pay'].append(prev_pay)
 
-                    next_pay = self.get_next_payment_date(joined, opt=True)
+                    next_pay = self.get_next_payment_date(joined)
                     next_pay_obj = datetime.datetime.strptime(next_pay, '%Y-%b-%d')
                     next_pay_obj = datetime.date(year=next_pay_obj.year, month=next_pay_obj.month, day=next_pay_obj.day)
                     left = (next_pay_obj - today).days
@@ -428,7 +430,6 @@ class Tuition:
 
         self.master.focus()
         self.write_json(contents)
-        self.DetailsInserted = True
 
         self.master.attributes('-topmost', False)
 
@@ -472,6 +473,36 @@ class Tuition:
         else:
             self.day_combobox.config(values=list(range(1, month_range + 1)))
 
+    def UpdateListBox(self):
+        '''
+        When the program keeps running and at 12:00 am the value of
+        left days decreases by 1. So, updating this left days value.
+        '''
+
+        if self.master.state() == 'normal':
+            children = self.Tree.get_children()
+
+            for child in children:
+                item = self.Tree.item(child)
+
+                values = item['values']
+                prev_left = int(values[-2].split()[0])
+
+                today = datetime.date.today()
+                next_pay = datetime.datetime.strptime(values[4], '%Y-%b-%d')
+                next_pay_obj = datetime.date(year=next_pay.year, month=next_pay.month, day=next_pay.day)
+
+                actual_left = (next_pay_obj - today).days
+
+                if actual_left < 0:
+                    actual_left = 0
+
+                if prev_left != actual_left:
+                    values[-2] = f'{actual_left} days'
+                    self.Tree.item(child, values=values, tags=item['tags'][0])
+
+        self.UpdateTimer = self.master.after(10, self.UpdateListBox)
+
     def quit_window(self):
         '''Quit window from the system tray'''
 
@@ -484,15 +515,15 @@ class Tuition:
 
         self.icon.stop()
 
-        if self.DetailsInserted is False:
-            self.master.after(250, self.insert_at_first)
-
+        self.master.after(250, self.insert_at_first)
         self.master.after(0, self.master.deiconify)
+        self.master.after(250, self.UpdateListBox)
 
     def withdraw_window(self):
         '''Hide window to the system tray'''
 
         self.master.withdraw()
+        self.master.after_cancel(self.UpdateTimer)
 
         image = Image.open(resource_path("icon.ico"))
         menu = (item('Quit', lambda: self.quit_window()), item('Show', lambda: self.show_window(), default=True))
