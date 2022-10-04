@@ -1,8 +1,9 @@
 import os
 import sys
+import time
 from tkinter import *
 import tkinter.ttk as ttk
-from tkinter.ttk import Scrollbar, Style
+from tkinter import messagebox, filedialog
 import pygame
 import pyperclip
 
@@ -57,6 +58,7 @@ class _Entry:
 class SSNI:
     def __init__(self):
         self.after_id = None
+        self.AutoAddFile = os.path.abspath(os.path.join('.', 'AutoAdd.txt'))
         self.file_name = os.path.abspath(os.path.join('.', 'video_file.txt'))
         self.buttons_attributes = {'bd': 0, 'bg': 'green', 'fg': 'white', 'activebackground': 'green', 'activeforeground': 'white', 'cursor': 'hand2'}
 
@@ -108,10 +110,12 @@ class SSNI:
         self.search_button.pack(pady=5, ipady=buttons_ipady)
         self.rename_window_button = Button(self.FirstLeftFrame, text='R E N A M E', **self.buttons_attributes, command=self.ShowRenamingWidgets)
         self.rename_window_button.pack(pady=5, ipady=buttons_ipady)
+        self.auto_add_button = Button(self.FirstLeftFrame, text='A U T O   A D D', **self.buttons_attributes, command=self.AutoAdd)
+        self.auto_add_button.pack(pady=5, ipady=buttons_ipady)
 
         self.ListBoxVariable = Variable()
-        self.ListBox = Listbox(self.RightFrame, width=36, height=13, activestyle='none', listvariable=self.ListBoxVariable)
-        self.scrollbar = Scrollbar(self.RightFrame, orient="vertical", command=self.ListBox.yview)
+        self.ListBox = Listbox(self.RightFrame, width=36, height=15, activestyle='none', listvariable=self.ListBoxVariable)
+        self.scrollbar = ttk.Scrollbar(self.RightFrame, orient="vertical", command=self.ListBox.yview)
         self.ListBox.config(yscrollcommand=self.scrollbar.set)
         self.ListBox.pack(side=LEFT, ipady=1)
         self.scrollbar.pack(side=RIGHT, fill='y')
@@ -143,7 +147,9 @@ class SSNI:
         self.master.mainloop()
 
     def center_window(self):
-        '''Set initial position of the window to the center of the screen'''
+        '''
+        Set initial position of the window to the center of the screen
+        '''
 
         self.master.update()
         self.master.resizable(0, 0)
@@ -154,25 +160,36 @@ class SSNI:
 
         self.master.deiconify()
 
+        if os.path.exists(self.AutoAddFile) is False:
+            self.CreateAutoAddFile()
+
     def key_bindings(self, event, focus_out=False):
-        '''When user clicks in and out of the entry boxes'''
+        '''
+        When user clicks in and out of the entry boxes
+        '''
 
         event.widget.focus()
 
     def ShowRenamingWidgets(self, event=None):
-        '''Show the renaming widgets to rename old name with new name'''
+        '''
+        Show the renaming widgets to rename old name with new name
+        '''
 
         self.FirstLeftFrame.pack_forget()
         self.SecondLeftFrame.pack(side=LEFT)
 
     def back_command(self, event=None):
-        '''When user clicks back button'''
+        '''
+        When user clicks back button
+        '''
 
         self.SecondLeftFrame.pack_forget()
         self.FirstLeftFrame.pack(side=LEFT)
 
     def read_file(self):
-        '''Getting everything from file'''
+        '''
+        Getting everything from file
+        '''
 
         if os.path.exists(self.file_name):
             with open(self.file_name, 'r') as f:
@@ -181,14 +198,18 @@ class SSNI:
         return []
 
     def write_to_file(self, contents):
-        '''Writing new or renamed data to the file'''
+        '''
+        Writing new or renamed data to the file
+        '''
 
         with open(self.file_name, 'w') as f:
             for content in contents:
                 f.write(f'{content}\n')
 
     def InsertToListBox(self, event=None, contents=None, remove=False):
-        '''Insert contents of file in Text widget'''
+        '''
+        Insert contents of file in Text widget
+        '''
 
         if contents is None:
             contents = self.read_file()
@@ -222,7 +243,9 @@ class SSNI:
             self.ListBox.itemconfig(0, foreground='grey')
 
     def add_remove_search_command(self, button_name, from_listbox=None):
-        '''Commands when user clicks either ADD, REMOVE or SEARCH buttons'''
+        '''
+        Commands when user clicks either ADD, REMOVE or SEARCH buttons
+        '''
 
         contents = self.read_file()
 
@@ -266,7 +289,9 @@ class SSNI:
         self.video_entry.SetToDefault()
 
     def rename_command(self, event=None):
-        '''Commands when user clicks RENAME button'''
+        '''
+        Commands when user clicks RENAME button
+        '''
 
         contents = self.read_file()
         old_name = self.old_name_entry.var.get().strip()
@@ -287,8 +312,43 @@ class SSNI:
             self.master.focus()
             self.highlight(new_name, '#45bf7c')
 
+    def CreateAutoAddFile(self):
+        '''
+        Create "AutoAdd.txt" file when needed
+        '''
+
+        with open(self.AutoAddFile, 'w'):
+            pass
+
+    def AutoAdd(self):
+        '''
+        When user clicks "Auto Add" button
+        '''
+
+        confirm = messagebox.askokcancel('Info', 'To add values automatically, you need to store those values in text file "AutoAdd.txt".\n\nNote: Each value must be separated by new_line  (new_line is generated when Enter key is pressed)\n\nWant to Proceed?')
+
+        if confirm:
+            with open(self.AutoAddFile, 'r') as rf:
+                lines = rf.readlines()
+
+                for line in lines:
+                    _line = line.strip('\n')
+
+                    self.video_entry.Entry.focus()
+                    self.video_entry.var.set(_line)
+
+                    self.add_button.focus()
+                    self.add_button.invoke()
+
+                    idx = self.ListBox.get(0, END).index(_line)
+                    self.SetListBoToDefault(idx)
+
+                messagebox.showinfo('Success!!', 'Auto-Add completed')
+
     def highlight(self, value, color):
-        '''Fill color when value is added, removed and searched'''
+        '''
+        Fill color when value is added, removed and searched
+        '''
 
         index = self.ListBox.get(0, END).index(value)
         self.ListBox.see(index)
@@ -299,10 +359,19 @@ class SSNI:
             self.master.after_cancel(self.after_id)
             self.after_id = None
 
-        self.after_id = self.master.after(800, lambda: self.ListBox.itemconfig(index, background='white', foreground='black'))
+        self.after_id = self.master.after(800, lambda: self.SetListBoToDefault(index))
+
+    def SetListBoToDefault(self, index):
+        '''
+        Set highlighted value in listbox to default
+        '''
+
+        self.ListBox.itemconfig(index, background='white', foreground='black')
 
     def copy_cut(self, cut=False, from_listbox=False):
-        '''Command for copying and cutting selected text of entry widget'''
+        '''
+        Command for copying and cutting selected text of entry widget
+        '''
 
         if self.video_entry.Entry.selection_present():
             text = self.video_entry.var.get()
@@ -319,8 +388,10 @@ class SSNI:
         pyperclip.copy(text)  # Copying selected text to clipboard
 
     def paste(self):
-        '''Command for pasting text from system clipboard to the position
-           of cursor in entry widget'''
+        '''
+        Command for pasting text from system clipboard to the position
+        of cursor in entry widget
+        '''
 
         clipboard = pyperclip.paste()
 
@@ -331,7 +402,9 @@ class SSNI:
         self.video_entry.Entry.insert(cur_pos, clipboard)
 
     def RightClick(self, event=None):
-        '''When user right clicks inside list-box'''
+        '''
+        When user right clicks inside list-box
+        '''
 
         x, y = self.master.winfo_pointerxy()
         widget = self.master.winfo_containing(x, y)
@@ -391,13 +464,15 @@ class SSNI:
             RightClickMenu.grab_release()
 
     def resource_path(self, file_name):
-        '''Get absolute path to resource from temporary directory
+        '''
+        Get absolute path to resource from temporary directory
 
         In development:
             Gets path of files that are used in this script like icons, images or file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
+            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory
+        '''
 
         try:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
