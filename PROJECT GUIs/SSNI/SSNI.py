@@ -1,9 +1,8 @@
 import os
 import sys
-import time
 from tkinter import *
 import tkinter.ttk as ttk
-from tkinter import messagebox, filedialog
+from tkinter import messagebox
 import pygame
 import pyperclip
 
@@ -325,7 +324,7 @@ class SSNI:
         When user clicks "Auto Add" button
         '''
 
-        confirm = messagebox.askokcancel('Info', 'To add values automatically, you need to store those values in text file "AutoAdd.txt".\n\nNote: Each value must be separated by new_line  (new_line is generated when Enter key is pressed)\n\nWant to Proceed?')
+        confirm = messagebox.askokcancel('Info', 'To add values automatically, you need to store those values in text file "AutoAdd.txt".\n\nNote: Each value must be in separate lines\n\nWant to Proceed?')
 
         if confirm:
             with open(self.AutoAddFile, 'r') as rf:
@@ -343,7 +342,11 @@ class SSNI:
                     idx = self.ListBox.get(0, END).index(_line)
                     self.SetListBoToDefault(idx)
 
-                messagebox.showinfo('Success!!', 'Auto-Add completed')
+            delete = messagebox.askyesno('Info ?', 'Auto-Add completed\n\nDo you want to clear the contents of Auto-Add.txt')
+
+            if delete:
+                with open(self.AutoAddFile, 'w'):
+                    pass
 
     def highlight(self, value, color):
         '''
