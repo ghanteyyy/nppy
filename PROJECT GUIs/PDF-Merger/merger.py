@@ -14,6 +14,8 @@ class Merger:
         param:
             output_path : path to save the output-pdf
             pdfs        : List of pdf paths to merge
+            listbox     : Listbox object to delete all contents
+            window      : Tk object to open the location of generated pdf
         '''
 
         merger = PdfMerger()
