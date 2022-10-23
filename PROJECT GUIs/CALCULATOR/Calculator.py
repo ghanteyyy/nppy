@@ -26,7 +26,7 @@ class Calculator:
 
         self.var = StringVar()
         self.text_frame = Frame(self.master)
-        self.text_area = Entry(self.text_frame, textvariable=self.var, borderwidth=1, width=47, bg='silver', font=('Arial', 20), cursor='arrow', justify=RIGHT, disabledbackground='white', disabledforeground='black', state='disabled')
+        self.text_area = Entry(self.text_frame, textvariable=self.var, bd=1, width=47, bg='silver', font=('Arial', 20), cursor='arrow', justify=RIGHT, disabledbackground='white', disabledforeground='black', state='disabled')
         self.var.set('0')
         self.text_area.grid(row=0, column=0, sticky='NSEW')
 
@@ -223,7 +223,28 @@ class Calculator:
                 to_calculate = to_calculate.replace(k, v)
 
             if entry_get.count('(') != entry_get.count(')'):  # vi
-                messagebox.showerror('Invalid Brackets', 'Brackets are not inserted in order')
+                # Checking if there is operator
+                is_operator = False
+
+                for idx, val in enumerate(entry_get):
+                    if val in self.operators:
+                        is_operator = True
+                        break
+
+                if is_operator:  # If there is operator then showing the error
+                    if entry_get[idx - 1].isalpha() is False:
+                        messagebox.showerror('Invalid Brackets', 'Brackets are not inserted in order')
+                        return
+
+                # Inserting the required number of closing brackets (
+                number_of_brackets_needed = entry_get.count('(')
+                value = self.var.get() + ')' * number_of_brackets_needed
+                self.var.set(value)
+
+                entry_get = to_calculate = to_calculate + ')' * number_of_brackets_needed
+
+            if entry_get[-1] == '(':
+                messagebox.showerror('No values', 'Numbers were expected after (')
                 return
 
             count = sum([1 for x in entry_get if x in self.operators + '%'])   # Counting Operators
@@ -502,7 +523,7 @@ class Calculator:
         return set_var
 
     def info(self, event=None):
-        '''Show information about binded keys for different actions'''
+        '''Show information about bind-ed keys for different actions'''
 
         key_bindings = ['Q = Quit',
                         'A = Clear all',
