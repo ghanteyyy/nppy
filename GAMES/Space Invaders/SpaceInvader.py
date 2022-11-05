@@ -79,6 +79,8 @@ class SpaceInvader:
         # Sprites for games
         self.UFOImage = pygame.image.load(ResourcePath('Images', 'UFO.png'))
         self.IconImage = pygame.image.load(ResourcePath('Images', 'Icon.png'))
+        self.Keys_2_Image = pygame.image.load(ResourcePath('Images', 'Keys2.png'))
+        self.Keys_1_Image = pygame.image.load(ResourcePath('Images', 'Keys1.png'))
         self.ExplosionImage = pygame.image.load(ResourcePath('Images', 'Explosion.png'))
         self.PlayerDiedAudio = pygame.mixer.Sound(ResourcePath('Audios', 'PlayerDied.wav'))
         self.BulletFiredAudio = pygame.mixer.Sound(ResourcePath('Audios', 'BulletFired.wav'))
@@ -250,9 +252,13 @@ class SpaceInvader:
                             self.EnemyExplodedAudio.set_volume(0)
 
             if self.IsWelcomeWindowShown:  # Showing welcome text when game starts for the first time
+
                 WelcomeText = self.DisplayText('Press any key to start', 50, (255, 255, 255))
+
                 self.WIN.blit(self.BackgroundImage, (0, 0))
-                self.WIN.blit(WelcomeText, (self.WIDTH // 2 - WelcomeText.get_width() // 2, self.HEIGHT // 2 - WelcomeText.get_height() // 2))
+                self.WIN.blit(WelcomeText, (self.WIDTH // 2 - WelcomeText.get_width() // 2, WelcomeText.get_height() + 100))
+                self.WIN.blit(self.Keys_1_Image, (self.WIDTH // 2 - self.Keys_1_Image.get_width() // 2, self.HEIGHT // 2 - WelcomeText.get_height() // 2 - self.Keys_1_Image.get_height() // 2 + 100))
+
                 pygame.display.update()
 
                 AnythingPressed = any(pygame.mouse.get_pressed()) or any(pygame.key.get_pressed())
@@ -344,17 +350,12 @@ class SpaceInvader:
                                 self.UpdateText()
 
                                 GameOverText = self.DisplayText(f'Game Over', 80, (255, 0, 0))
-                                self.WIN.blit(GameOverText, (self.WIDTH // 2 - GameOverText.get_width() // 2, self.HEIGHT // 2 - GameOverText.get_height() // 2 - 50))
 
+                                self.WIN.blit(GameOverText, (self.WIDTH // 2 - GameOverText.get_width() // 2, GameOverText.get_height()))
                                 self.WIN.blit(self.ExplosionImage, (self.UFO_RECT.x, self.UFO_RECT.y - 15))
+                                self.WIN.blit(self.Keys_2_Image, (self.WIDTH // 2 - self.Keys_2_Image.get_width() // 2 + 10, self.HEIGHT // 2 - GameOverText.get_height() // 2 - self.Keys_2_Image.get_height() // 2 + 100))
+
                                 self.PlayerDiedAudio.play()
-
-                                TipsText1 = self.DisplayText('R = Restart Game', 30, (255, 255, 255))
-                                TipsText2 = self.DisplayText('Q = Quit Game', 30, (255, 255, 255))
-
-                                self.WIN.blit(TipsText1, (self.WIDTH // 2 - TipsText1.get_width() // 2 + 10, self.HEIGHT // 2 - TipsText1.get_height() // 2 + 60 - 20))
-                                self.WIN.blit(TipsText2, (self.WIDTH // 2 - TipsText1.get_width() // 2 + 10, self.HEIGHT // 2 - TipsText2.get_height() // 2 + 100 - 10))
-
                                 pygame.display.update()
 
                             else:
