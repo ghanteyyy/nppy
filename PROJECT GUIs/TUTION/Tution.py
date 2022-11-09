@@ -59,11 +59,29 @@ class _Entry:
             self.EntryStyle.configure(self.entry_style, foreground='grey')
 
     def KeyPressed(self, event=None):
+        '''
+        Triggers when any key is pressed.
+
+        It restricts user to enter other characters
+        except numbers in fee Fee-Entry-Widget. It
+        have no effects in Name-Entry-Widget.
+        '''
+
         if self.trace:
             char = event.keysym
 
             if char.isdigit() is False and char not in ['BackSpace', 'Delete', 'Right', 'Left']:
                 return 'break'
+
+    def Reset(self):
+        '''
+        Set Entry values to default
+        after clicking Submit button
+        '''
+
+        self.IsDefault = True
+        self.var.set(self.DEFAULT_TEXT)
+        self.EntryStyle.configure(self.entry_style, foreground='grey')
 
 
 class Tuition:
@@ -97,7 +115,9 @@ class Tuition:
         self.day_combobox = ttk.Combobox(self.date_frame, width=5, height=12)
         self.day_combobox.pack(side=LEFT, padx=5)
 
-        self.submit_button = ttk.Button(self.date_frame, text='Submit', cursor='hand2', command=self.submit_button_command)
+        self.SubmitButtonStyle = ttk.Style()
+        self.SubmitButtonStyle.configure('Submit.TButton', background='silver')
+        self.submit_button = ttk.Button(self.date_frame, text='Submit', cursor='hand2', style='Submit.TButton', command=self.submit_button_command)
         self.submit_button.pack(ipadx=10)
 
         self.date_frame.pack(pady=10)
@@ -343,18 +363,11 @@ class Tuition:
                 self.write_json(head)
                 self.IsAddedFirstTime = True
 
-                self.reset()
+                self.entry_fee.Reset()
+                self.entry_name.Reset()
+
+                self.master.focus()
                 self.insert_at_first()
-
-    def reset(self):
-        '''
-        Reset entries buttons and radio-button to initial state
-        '''
-
-        self.day_combobox.set('Day')
-        self.month_combobox.set('Month')
-
-        self.master.focus()
 
     def insert_at_first(self):
         '''
