@@ -35,11 +35,11 @@ class ListAlarm:
         if contents is None:
             contents = Include.ReadJSON()
 
-            if contents:
-                self.error_msg.place_forget()
+        if contents:
+            self.error_msg.place_forget()
 
-            else:
-                self.error_msg.place(relx=0.5, rely=0.5, anchor="c")
+        else:
+            self.error_msg.place(relx=0.5, rely=0.5, anchor="c")
 
         for key, value in contents.items():
             self.text_widget.insert(END, '\n   ')
