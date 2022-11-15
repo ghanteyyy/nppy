@@ -401,13 +401,14 @@ class GPAD:
             if self.master.winfo_class() == 'Tk':  # When user wants to close the root window
                 if NumberOfWindows > 0:  # When some Toplevel windows is opened
                     exit = False
+                    content['Master Withdrawn'] = True
                     self.master.withdraw()  # Withdrawing Tk window from the window
 
             elif self.master.winfo_class() == 'Toplevel':  # When user wants to close the Toplevel window
                 NumberOfWindows -=1
                 content['Number of Windows'] = NumberOfWindows
 
-                if NumberOfWindows == 0:  # If the window is the last Toplevel window
+                if NumberOfWindows == 0 and content['Master Withdrawn']:  # If the window is the last Toplevel window
                     MasterDestroy = True
 
             content.update({'window_dimension': self.master.geometry()})

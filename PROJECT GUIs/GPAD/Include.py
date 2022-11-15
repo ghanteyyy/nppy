@@ -52,13 +52,26 @@ def resource_path(file_name):
 def GetFontDetails():
     '''Get font-family, font-size and font-style from the json file'''
 
+    DefaultValues = {
+        'Font Family': 'Courier',
+        'Font Size': 9,
+        'Font Style': 'normal',
+        'Number of Windows': 0,
+        'Master Withdrawn': False
+    }
+
     try:
         with open(resource_path('settings.json'), 'r') as f:
             curr_font = json.load(f)
 
+            for key, value in DefaultValues.items():
+                if key not in curr_font:
+                    curr_font[key] = value
+
     except (FileNotFoundError, json.decoder.JSONDecodeError):
-        curr_font = {'Font Family': 'Courier', 'Font Size': 9, 'Font Style': 'normal'}
-        SaveFontDetails(curr_font)
+        curr_font = DefaultValues
+
+    SaveFontDetails(curr_font)
 
     return curr_font
 
