@@ -17,7 +17,9 @@ class FoldersCreator:
         split_path = os.path.split(self.path)[0]
 
         if os.path.exists(split_path):
-            os.mkdir(self.path)
+            if os.path.exists(self.path) is False:
+                os.mkdir(self.path)
+
             return True
 
         else:
