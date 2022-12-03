@@ -4,167 +4,198 @@ import json
 import random
 from tkinter import *
 import tkinter.ttk as ttk
-from tkinter import messagebox
+from tkinter import font
+import pygame
+
+
+class _Entry:
+    def __init__(self, frame, StyleName, DefaultText):
+        self.frame = frame
+        self.IsDefault = True
+        self.ErrorTimer = None
+        self.DEFAULT_TEXT = DefaultText
+        self.entry_style = StyleName + '.TEntry'
+
+        self.var = StringVar()
+        self.var.set(self.DEFAULT_TEXT)
+
+        self.EntryStyle = ttk.Style()
+        self.EntryStyle.configure(self.entry_style, foreground='grey')
+        self.Entry = ttk.Entry(self.frame, width=40, textvariable=self.var, justify='center', style=self.entry_style)
+
+        self.Entry.bind("<FocusIn>", self.focus_in)
+        self.Entry.bind("<FocusOut>", self.focus_out)
+
+    def focus_in(self, event=None):
+        '''
+        Remove temporary placeholder's text when
+        user clicks to respective entry widget
+        '''
+
+        if self.IsDefault:
+            self.var.set('')
+            self.IsDefault = False
+            self.EntryStyle.configure(self.entry_style, foreground='black')
+
+    def focus_out(self, event=None):
+        '''
+        Remove temporary placeholder's text when
+        user clicks out of respective entry widget
+        '''
+
+        if self.IsDefault is False and not self.var.get().strip():
+            self.IsDefault = True
+            self.var.set(self.DEFAULT_TEXT)
+            self.EntryStyle.configure(self.entry_style, foreground='grey')
+
+    def SetDefault(self):
+        '''
+        Set Entry values to default
+        '''
+
+        self.IsDefault = True
+        self.var.set(self.DEFAULT_TEXT)
+        self.EntryStyle.configure(self.entry_style, foreground='grey')
 
 
 class Quiz:
     def __init__(self):
-        self.prev_widget = ''
-        self.quiz_numbers = []
-        self.file_name = os.path.abspath(os.path.join('.', 'quiz.json'))
-        self.buttons_attributes = {'fg': 'white', 'activeforeground': 'white', 'cursor': 'hand2', 'relief': RIDGE}
+        pygame.init()
+        pygame.mixer.init()
 
-        self.master = Tk()
+        self.QuizNumbers = []
+        self.IsInfoMessageShown = False
+        self.FileName = os.path.abspath(os.path.join('.', 'quiz.json'))
+        self.ButtonsAttributes = {'fg': 'white', 'activeforeground': 'white', 'cursor': 'hand2', 'bd': 0, 'width': 34}
 
-        self.title_img_obj = PhotoImage(file=self.resource_path('title.png'))
-        self.title_label = Label(self.master, image=self.title_img_obj, bd=0, bg='white')
-        self.title_label.pack(ipadx=13)
+        self.Window = Tk()
 
-        self.add_labelframe = LabelFrame(self.master, text='Add Q/A', bg='white')
-        self.question_entry_style = ttk.Style()
-        self.question_entry_style.configure('Q.TEntry', foreground='grey')
-        self.question_entry = ttk.Entry(self.add_labelframe, width=40, justify='center', style='Q.TEntry')
-        self.question_entry.insert(END, 'QUESTION')
-        self.question_entry.pack(pady=5, ipady=3)
+        if sys.platform == 'win32':
+            self.ErrorAudio = self.ResourcePath('WinErrSound.wav')
 
-        self.answer_entry_style = ttk.Style()
-        self.answer_entry_style.configure('A.TEntry', foreground='grey')
-        self.answer_entry = ttk.Entry(self.add_labelframe, width=40, justify='center', style='A.TEntry')
-        self.answer_entry.insert(END, 'ANSWER')
-        self.answer_entry.pack(pady=5, ipady=3)
+        else:
+            self.ErrorAudio = self.ResourcePath('LinuxErrSound.wav')
 
-        self.add_button = Button(self.add_labelframe, text='ADD QUESTION', bg='red', activebackground='red', **self.buttons_attributes, command=self.add_button_command)
-        self.add_button.pack(pady=5, ipady=3, ipadx=73)
-        self.add_labelframe.pack(pady=10, ipadx=10)
+        pygame.mixer.music.load(self.ErrorAudio)
 
-        self.pick_labelframe = LabelFrame(self.master, text='PICK QUESTION', bg='white')
-        self.pick_question_entry_style = ttk.Style()
-        self.pick_question_entry_style.configure('QN.TEntry', foreground='grey')
-        self.pick_question_entry = ttk.Entry(self.pick_labelframe, width=40, justify='center', style='QN.TEntry')
-        self.pick_question_entry.insert(END, 'QUESTION NUMBER')
-        self.pick_question_entry.pack(pady=5, ipady=3)
+        self.TitleImage = PhotoImage(file=self.ResourcePath('title.png'))
 
-        self.pick_button = Button(self.pick_labelframe, text='PICK', bg='green', activebackground='green', **self.buttons_attributes, command=self.manual_pick_question)
-        self.pick_button.pack(pady=5, ipady=3, ipadx=107)
+        self.TitleLabel = Label(self.Window, image=self.TitleImage, bd=0, bg='white')
+        self.TitleLabel.pack(ipadx=13)
 
-        self.random_pick_button = Button(self.pick_labelframe, text='PICK RANDOM QUESTION', bg='blue', activebackground='blue', **self.buttons_attributes, command=self.random_pick_question)
-        self.random_pick_button.pack(pady=5, ipady=3, ipadx=47)
-        self.pick_labelframe.pack(ipadx=10)
+        self.LabelFrame = Frame(self.Window, bg='white')
+        self.LabelFrame.pack()
 
-        self.master.after(0, self.center_window)
-        self.master.bind('<Control-n>', self.show_numbers)
-        self.master.bind('<Control-N>', self.show_numbers)
-        self.master.bind('<Button-1>', self.master_bindings)
-        self.add_button.bind('<FocusIn>', self.entry_bindings)
-        self.pick_button.bind('<FocusIn>', self.entry_bindings)
-        self.answer_entry.bind('<FocusIn>', self.entry_bindings)
-        self.add_button.bind('<Return>', self.add_button_command)
-        self.question_entry.bind('<FocusIn>', self.entry_bindings)
-        self.answer_entry.bind('<Return>', self.add_button_command)
-        self.pick_button.bind('<Return>', self.manual_pick_question)
-        self.question_entry.bind('<Return>', self.add_button_command)
-        self.pick_question_entry.bind('<FocusIn>', self.entry_bindings)
-        self.random_pick_button.bind('<Return>', self.manual_pick_question)
-        self.pick_question_entry.bind('<Return>', self.manual_pick_question)
+        self.AddLabelFrame = LabelFrame(self.LabelFrame, text='Add Q/A', bg='white')
+        self.AddLabelFrame.pack(side=LEFT, padx=(10, 0), pady=10, ipadx=10, fill='y')
 
-        self.master.config(bg='white')
-        self.master.mainloop()
+        self.QuestionEntry = _Entry(self.AddLabelFrame, 'Q', 'QUESTION')
+        self.QuestionEntry.Entry.pack(pady=5, ipady=3)
 
-    def center_window(self):
-        '''Setting initial position to the center of the screen'''
+        self.AnswerEntry = _Entry(self.AddLabelFrame, 'A', 'ANSWER')
+        self.AnswerEntry.Entry.pack(pady=5, ipady=3)
 
-        self.master.withdraw()
-        self.master.update()
+        self.AddButton = Button(self.AddLabelFrame, text='ADD QUESTION', bg='red', activebackground='red', **self.ButtonsAttributes, command=self.AddButtonCommand)
+        self.AddButton.pack(pady=5, ipady=5)
 
-        width, height = self.master.winfo_width(), self.master.winfo_height() + 5
-        screen_width, screen_height = self.master.winfo_screenwidth() // 2, self.master.winfo_screenheight() // 2
-        self.master.geometry(f'{width}x{height}+{screen_width - width // 2}+{screen_height - height // 2}')
-        self.master.iconbitmap(self.resource_path('icon.ico'))
-        self.master.title('Quiz')
+        self.PickLabelFrame = LabelFrame(self.LabelFrame, text='PICK QUESTION', bg='white')
+        self.PickLabelFrame.pack(side=RIGHT, ipadx=10, padx=10, pady=10)
 
-        self.master.deiconify()
-        self.master.resizable(0, 0)
+        self.PickQuestionEntry = _Entry(self.PickLabelFrame, 'QN', 'QUESTION NUMBER')
+        self.PickQuestionEntry.Entry.pack(pady=5, ipady=5)
 
-    def master_bindings(self, event=None):
-        '''When user clicks anywhere outside of entry boxes and buttons'''
+        self.PickButton = Button(self.PickLabelFrame, text='PICK', bg='green', activebackground='green', **self.ButtonsAttributes, command=self.ManualPickQuestion)
+        self.PickButton.pack(pady=5, ipady=5)
 
-        widget = event.widget
-        widgets = [self.question_entry, self.answer_entry, self.pick_question_entry, self.add_button, self.pick_button, self.random_pick_button]
-        entries_widgets = {self.question_entry: 'QUESTION', self.answer_entry: 'ANSWER', self.pick_question_entry: 'QUESTION NUMBER'}
-        entries_styles = {self.question_entry: (self.question_entry_style, 'Q.TEntry'), self.answer_entry: (self.answer_entry_style, 'A.TEntry'),
-                          self.pick_question_entry: (self.pick_question_entry_style, 'QN.TEntry')}
+        self.RandomPickButton = Button(self.PickLabelFrame, text='PICK RANDOM QUESTION', bg='blue', activebackground='blue', **self.ButtonsAttributes, command=self.PickRandomQuestion)
+        self.RandomPickButton.pack(pady=5, ipady=5)
 
-        for wid in entries_widgets:
-            if not wid.get().strip() and widget != self.prev_widget:
-                wid.delete(0, END)
-                wid.insert(END, entries_widgets[wid])
-                style, style_name = entries_styles[wid]
-                style.configure(style_name, foreground='grey')
+        self.RandomQuestionAnswerLabelVar = StringVar()
+        self.RandomQuestionAnswerLabel = Label(self.Window, textvariable=self.RandomQuestionAnswerLabelVar, bg='white')
 
-        if widget not in widgets:
-            self.master.focus()
+        self.Window.after(0, self.CenterWindow)
+        self.Window.bind('<Control-n>', self.ShowNumbers)
+        self.Window.bind('<Control-N>', self.ShowNumbers)
+        self.Window.bind_all('<Button-1>', self.FocusToWidget)
+        self.AddButton.bind('<Return>', self.AddButtonCommand)
+        self.PickButton.bind('<Return>', self.ManualPickQuestion)
+        self.AnswerEntry.Entry.bind('<Return>', self.AddButtonCommand)
+        self.QuestionEntry.Entry.bind('<Return>', self.AddButtonCommand)
+        self.RandomPickButton.bind('<Return>', self.ManualPickQuestion)
+        self.PickQuestionEntry.Entry.bind('<Return>', self.ManualPickQuestion)
 
-    def entry_bindings(self, event=None):
-        '''When user clicks in or out of the entries widget'''
+        self.Window.config(bg='white')
+        self.Window.mainloop()
 
-        widget = event.widget
-        entries_widgets = {self.question_entry: 'QUESTION', self.answer_entry: 'ANSWER', self.pick_question_entry: 'QUESTION NUMBER'}
-        entries_styles = {self.question_entry: (self.question_entry_style, 'Q.TEntry'), self.answer_entry: (self.answer_entry_style, 'A.TEntry'),
-                          self.pick_question_entry: (self.pick_question_entry_style, 'QN.TEntry')}
+    def FocusToWidget(self, event=None):
+        '''
+        Focus to the clicked widget
+        '''
 
-        if widget in entries_widgets:
-            if widget.get().strip() == entries_widgets[widget]:
-                widget.delete(0, END)
-                self.prev_widget = widget
-                style, style_name = entries_styles[widget]
-                style.configure(style_name, foreground='black')
+        event.widget.focus()
 
-                entries_widgets.pop(widget)
-                entries_styles.pop(widget)
+    def CenterWindow(self):
+        '''
+        Setting initial position to the center of the screen
+        '''
 
-        for wid in entries_widgets:
-            if not wid.get().strip():
-                wid.delete(0, END)
-                wid.insert(END, entries_widgets[wid])
-                style, style_name = entries_styles[wid]
-                style.configure(style_name, foreground='grey')
+        self.Window.withdraw()
+        self.Window.update()
 
-    def read_json(self):
-        '''Reading data from the .json file.'''
+        width, height = self.Window.winfo_width(), self.Window.winfo_height() + 5
+        screen_width, screen_height = self.Window.winfo_screenwidth(), self.Window.winfo_screenheight()
+        self.Window.geometry(f'+{screen_width // 2 - width // 2}+{screen_height // 2 - height // 2}')
+
+        self.IconImage = PhotoImage(file=self.ResourcePath('icon.png'))
+        self.Window.iconphoto(False, self.IconImage)
+
+        self.Window.title('Quiz')
+
+        self.Window.deiconify()
+        self.Window.resizable(0, 0)
+
+    def ReadJSON(self):
+        '''
+        Reading data from the .json file
+        '''
 
         try:
-            with open(self.file_name, 'r') as f:
+            with open(self.FileName, 'r') as f:
                 contents = json.load(f)
 
                 if not contents:
                     contents = {}
 
         except (FileNotFoundError, json.decoder.JSONDecodeError):
-            with open(self.file_name, 'w'):
+            with open(self.FileName, 'w'):
                 contents = {}
 
         return contents
 
-    def write_json(self, contents):
-        '''Storing data to the .json file'''
+    def WriteJSON(self, contents):
+        '''
+        Storing data to the .json file
+        '''
 
-        with open(self.file_name, 'w') as f:
+        with open(self.FileName, 'w') as f:
             json.dump(contents, f, indent=4)
 
-    def add_button_command(self, event=None):
-        '''When user clicks add question button'''
+    def AddButtonCommand(self, event=None):
+        '''
+        When user clicks add question button
+        '''
 
-        question = self.question_entry.get().strip()
-        answer = self.answer_entry.get().strip()
+        question = self.QuestionEntry.var.get().strip()
+        answer = self.AnswerEntry.var.get().strip()
 
         if question in ['', 'QUESTION']:
-            messagebox.showerror('Invalid Entry', 'Provide a valid question')
+            self.ShowInfoMessage('Provide a valid question', 'red')
 
         elif answer in ['', 'ANSWER']:
-            messagebox.showerror('Invalid Entry', 'Provide a valid answer')
+            self.ShowInfoMessage('Provide a valid answer', 'red')
 
         else:
-            contents = self.read_json()
+            contents = self.ReadJSON()
 
             if contents:
                 head = int(list(contents.keys())[-1]) + 1
@@ -175,76 +206,110 @@ class Quiz:
             tail = {'QUESTION': question, 'ANSWER': answer}
             contents[head] = tail
 
-            self.write_json(contents)
+            self.WriteJSON(contents)
 
             # Setting entry widgets to default
-            self.question_entry.focus()
-            self.answer_entry.delete(0, END)
-            self.question_entry.delete(0, END)
-            self.answer_entry.insert(END, 'ANSWER')
-            self.question_entry.insert(END, 'QUESTION')
-            self.answer_entry_style.configure('A.TEntry', foreground='grey')
-            self.question_entry_style.configure('Q.TEntry', foreground='grey')
+            self.Window.focus()
+            self.QuestionEntry.SetDefault()
+            self.AnswerEntry.SetDefault()
 
-    def manual_pick_question(self, event=None, question_number=None):
-        '''Retrieve the question with respect to the question number provided by the user'''
+    def ShowInfoMessage(self, msg, color):
+        '''
+        Show Error message or Question-Answer information
+        '''
 
-        contents = self.read_json()
+        pygame.mixer.music.play()
 
-        if not question_number:
-            question_number = self.pick_question_entry.get().strip()
+        self.RandomQuestionAnswerLabelVar.set(msg)
+        self.RandomQuestionAnswerLabel.pack(pady=10, fill='both')
 
-        if len(self.quiz_numbers) == len(contents.keys()):
-            messagebox.showinfo('No questions', 'No more questions available')
+        if self.IsInfoMessageShown:
+            self.Window.after_cancel(self.ErrorTimer)
+            self.ErrorTimer = None
 
-        elif question_number in ['', 'QUESTION NUMBER']:
-            messagebox.showerror('Invalid Entry', 'Provide Valid QUESTION NUMBER')
-
-        elif question_number not in contents:
-            messagebox.showinfo('Not Found', 'Question number does not exist')
-
-        elif question_number in self.quiz_numbers:
-            messagebox.showinfo('Invalid Question Number', 'Question number is already taken')
+        if color == 'red':
+            self.IsInfoMessageShown = True
+            self.RandomQuestionAnswerLabel.config(fg=color, font=font.Font(size=15, weight='bold'))
+            self.ErrorTimer = self.Window.after(1500, self.RemoveInfoMessage)
 
         else:
-            question = contents[question_number]['QUESTION']
-            answer = contents[question_number]['ANSWER']
-            messagebox.showinfo('Q/A', f'{question_number}. {question}\n\n  Ans. {answer}')
+            self.RandomQuestionAnswerLabel.config(fg=color, font=font.Font(size=15), justify='left')
 
-            self.pick_question_entry.delete(0, END)
-            self.pick_question_entry.insert(END, 'QUESTION NUMBER')
-            self.pick_question_entry_style.configure('QN.TEntry', foreground='grey')
+    def RemoveInfoMessage(self):
+        '''
+        Remove Error message after 1.5 seconds
+        '''
 
-            self.quiz_numbers.append(question_number)
+        self.IsInfoMessageShown = False
+        self.RandomQuestionAnswerLabel.pack_forget()
 
-            self.master.focus()
+    def ManualPickQuestion(self, event=None, QuestionNumber=None):
+        '''
+        Retrieve the question with respect to
+        the question number provided by the user
+        '''
 
-    def random_pick_question(self):
-        '''Retrieve question randomly'''
+        contents = self.ReadJSON()
+
+        if not QuestionNumber:
+            QuestionNumber = self.PickQuestionEntry.var.get().strip()
+
+        if len(self.QuizNumbers) == len(contents.keys()):
+            self.ShowInfoMessage('No more questions available', 'red')
+
+        elif QuestionNumber in ['', 'QUESTION NUMBER']:
+            self.ShowInfoMessage('Provide Valid QUESTION NUMBER', 'red')
+
+        elif QuestionNumber not in contents:
+            self.ShowInfoMessage('Question number does not exist', 'red')
+
+        elif QuestionNumber in self.QuizNumbers:
+            self.ShowInfoMessage('Question number is already taken', 'red')
+
+        else:
+            question = contents[QuestionNumber]['QUESTION']
+            answer = contents[QuestionNumber]['ANSWER']
+            self.ShowInfoMessage(f'{QuestionNumber}. {question}\n\n  Ans. {answer}', 'black')
+
+            self.PickQuestionEntry.SetDefault()
+            self.QuizNumbers.append(QuestionNumber)
+
+            self.Window.focus()
+
+    def PickRandomQuestion(self):
+        '''
+        Retrieve question randomly
+        '''
 
         try:
-            all_keys = [value for value in self.read_json().keys() if value not in self.quiz_numbers]
-            random_key = random.choice(all_keys)
+            all_keys = [value for value in self.ReadJSON().keys() if value not in self.QuizNumbers]
+            RandomKey = random.choice(all_keys)
 
-            self.manual_pick_question(question_number=random_key)
+            self.ManualPickQuestion(QuestionNumber=RandomKey)
 
         except IndexError:
-            messagebox.showinfo('No questions', 'No more questions available')
+            self.ShowInfoMessage('No more questions available', 'red')
 
-    def show_numbers(self, event=None):
-        '''Show available question numbers when user presses control-s'''
+    def ShowNumbers(self, event=None):
+        '''
+        Show available question numbers
+        when user presses control-n or
+        control-shift-n
+        '''
 
-        numbers = [num for num in self.read_json().keys() if num not in self.quiz_numbers]
-        messagebox.showinfo('Valid Numbers', ', '.join(numbers))
+        numbers = [num for num in self.ReadJSON().keys() if num not in self.QuizNumbers]
+        self.ShowInfoMessage(f'Valid Numbers: {", ".join(numbers)}', 'black')
 
-    def resource_path(self, file_name):
-        '''Get absolute path to resource from temporary directory
+    def ResourcePath(self, FileName):
+        '''
+        Get absolute path to resource from temporary directory
 
         In development:
             Gets path of files that are used in this script like icons, images or file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
+            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory
+        '''
 
         try:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
@@ -252,7 +317,7 @@ class Quiz:
         except AttributeError:
             base_path = os.path.dirname(__file__)
 
-        return os.path.join(base_path, 'assets', file_name)
+        return os.path.join(base_path, 'assets', FileName)
 
 
 if __name__ == '__main__':
