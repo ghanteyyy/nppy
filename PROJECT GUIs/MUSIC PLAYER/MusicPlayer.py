@@ -915,7 +915,6 @@ class MusicPlayer:
 
             else:  # Volume is muted before
                 self.IsMuted = False
-                self.VolumeSlider.config(state='normal')
                 self.VolumeSliderVar.set(self.PreviousVolume)
                 pygame.mixer.music.set_volume(self.PreviousVolume / 100)
                 self.VolumeLabelVar.set(f'{self.PreviousVolume}%')
