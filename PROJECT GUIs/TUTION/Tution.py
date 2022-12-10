@@ -161,6 +161,7 @@ class Tuition:
         self.Tree.bind('<Motion>', self.RestrictResizingHeading)
         self.day_combobox.bind('<KeyPress>', self.ComboKeyPressed)
         self.master.protocol('WM_DELETE_WINDOW', self.withdraw_window)
+        self.Tree.bind('<ButtonPress-1>', self.RestrictResizingHeading)
         self.month_combobox.bind('<<ComboboxSelected>>', self.SetMonthRange)
         self.month_combobox.bind('<KeyPress>', lambda event=Event, _bool=True: self.ComboKeyPressed(event, _bool))
 
