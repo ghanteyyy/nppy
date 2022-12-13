@@ -1,15 +1,15 @@
 import os
 import sys
-import socket
 import subprocess
 from tkinter import *
 import tkinter.ttk as ttk
 from tkinter import filedialog, font
 import pygame
 import requests
+import pyperclip
 
 
-class Image_Downloader:
+class ImageDownloader:
     '''
     Image Downloader, a simple script written in Python that let you
     image from any website just by its address.
@@ -21,11 +21,12 @@ class Image_Downloader:
     '''
 
     def __init__(self):
+        self.IsDefault = True
         self.ErrorTimer = None
         self.extensions = ([('PNG', '*.png'), ('JPG', '*.jpg')])
-        self.icon_path = self.ResourcePath('icon.ico')
-        self.main_path = self.ResourcePath('main.png')
-        self.download_path = self.ResourcePath('download.png')
+        self.IconImagePath = self.ResourcePath('icon.ico')
+        self.MainImagePath = self.ResourcePath('main.png')
+        self.DownloadImagePath = self.ResourcePath('download.png')
 
         if sys.platform == 'win32':
             self.ErrAudioPath = self.ResourcePath('WinErrSound.wav')
@@ -36,116 +37,137 @@ class Image_Downloader:
         pygame.mixer.init()
         pygame.mixer.music.load(self.ErrAudioPath)
 
-        self.master = Tk()
-        self.master.withdraw()
-        self.master.title('Image Downloader')
-        self.master.iconbitmap(self.icon_path)
+        self.Window = Tk()
+        self.Window.withdraw()
+        self.Window.title('Image Downloader')
+        self.Window.iconbitmap(self.IconImagePath)
 
-        self.main_obj = PhotoImage(file=self.main_path)
-        self.label_image = Label(self.master, image=self.main_obj, bd=0)
-        self.label_image.grid(row=0, column=0, padx=5, sticky='w')
+        self.MessageVar = StringVar()
+
+        self.main_obj = PhotoImage(file=self.MainImagePath)
+        self.LabelImage = Label(self.Window, image=self.main_obj, bd=0)
+        self.LabelImage.grid(row=0, column=0, padx=5, sticky='w')
 
         self.style = ttk.Style()
         self.style.configure('E.TEntry', foreground='grey')
 
-        self.container = Frame(self.master, bg='white')
-        self.link_var = StringVar()
-        self.link_var.set('Image Address')
+        self.container = Frame(self.Window, bg='white')
+        self.LinkVar = StringVar()
+        self.LinkVar.set('Image Address')
 
-        self.link_entry = ttk.Entry(self.container, width=48, justify='center', textvariable=self.link_var, style='E.TEntry')
-        self.link_entry.grid(row=0, column=0, padx=5, pady=15, ipady=5)
+        self.LinkEntry = ttk.Entry(self.container, width=48, justify='center', textvariable=self.LinkVar, style='E.TEntry')
+        self.LinkEntry.grid(row=0, column=0, padx=5, pady=15, ipady=5)
 
-        self.download_image_obj = PhotoImage(file=self.download_path)
-        self.download_image_label = Label(self.container, image=self.download_image_obj, bg='white', cursor='hand2', takefocus=True)
-        self.download_image_label.grid(row=0, column=1)
+        self.DownloadImageObj = PhotoImage(file=self.DownloadImagePath)
+        self.DownloadImageLabel = Label(self.container, image=self.DownloadImageObj, bg='white', cursor='hand2', takefocus=True)
+        self.DownloadImageLabel.grid(row=0, column=1)
         self.container.grid(row=1, column=0)
 
         self.InitialPosition()
 
-        self.MessageVar = StringVar()
+        self.LinkEntry.bind('<FocusIn>', self.FocusIn)
+        self.Window.bind('<Button-3>', self.RightClick)
+        self.LinkEntry.bind('<FocusOut>', self.FocusOut)
+        self.Window.bind('<Button-1>', self.MasterBindings)
+        self.DownloadImageLabel.bind('<Button-1>', self.DownloadImage)
 
-        self.master.bind('<Button-1>', self.MasterBindings)
-        self.download_image_label.bind('<Button-1>', self.DownloadImage)
-        self.link_entry.bind('<FocusIn>', self.EntryBindings)
-        self.download_image_label.bind('<FocusIn>', self.EntryBindings)
-        self.master.config(bg='white')
-        self.master.mainloop()
+        self.Window.config(bg='white')
+        self.Window.mainloop()
 
     def InitialPosition(self, event=None):
-        '''Set position of the window to the center of the screen when user open the program'''
+        '''
+        Set position of the window to the center of the screen when user open the program
+        '''
 
         width, height = 340, 361
-        screen_width, screen_height = self.master.winfo_screenwidth() // 2, self.master.winfo_screenheight() // 2
+        ScreenWidth, ScreenHeight = self.Window.winfo_screenwidth() // 2, self.Window.winfo_screenheight() // 2
 
-        self.master.geometry(f'+{screen_width - width // 2}+{screen_height - height // 2}')
-        self.master.after(100, self.master.deiconify)
-        self.master.resizable(0, 0)
+        self.Window.geometry(f'+{ScreenWidth - width // 2}+{ScreenHeight - height // 2}')
+        self.Window.after(100, self.Window.deiconify)
+        self.Window.resizable(0, 0)
 
-    def MasterBindings(self, event=None, widget=None):
-        '''When user clicks anywhere outside of entry boxes and buttons'''
+    def MasterBindings(self, event=None):
+        '''
+        Focus to clicked widget
+        '''
 
-        if widget is None:
-            widget = event.widget
+        event.widget.focus()
 
-        if widget != self.link_entry:
-            if not self.link_var.get().strip():
-                self.link_var.set('Image Address')
-                self.style.configure('E.TEntry', foreground='grey')
+    def FocusOut(self, event=None, widget=None):
+        '''
+        When user clicks anywhere outside of entry boxes and buttons
+        '''
 
-            self.master.focus()
+        entry_get = self.LinkEntry.get().strip()
 
-    def EntryBindings(self, event=None):
-        '''When focus changes in or out of the entry widget'''
+        if widget != self.DownloadImageLabel and not entry_get:
+            self.IsDefault = True
+            self.LinkVar.set('Image Address')
+            self.style.configure('E.TEntry', foreground='grey')
 
-        widget = event.widget
+    def FocusIn(self, event=None):
+        '''
+        When focus changes in or out of the entry widget
+        '''
 
-        if widget == self.link_entry:
-            if self.link_var.get().strip() == 'Image Address':
-                self.link_var.set('')
-                self.style.configure('E.TEntry', foreground='black')
-
-        else:
-            self.MasterBindings(widget=self.master)
+        if self.IsDefault:
+            self.LinkVar.set('')
+            self.IsDefault = False
+            self.style.configure('E.TEntry', foreground='black')
 
     def DownloadImage(self, event=None):
-        '''Download image from the given URL'''
+        '''
+        Download image from the given URL
+        '''
 
-        if self.CheckInternet():
-            url = self.link_var.get().strip()
+        if self.IsDefault:
+            self.ShowMessage('Provide valid URL')
+            return
 
-            response = requests.get(url)
-
-            if response.headers['content-type'] in ("image/png", "image/jpeg", "image/jpg"):  # Validate if provided URL contains image file
-                file_name = filedialog.asksaveasfilename(title='Save', filetypes=self.extensions, initialdir=os.getcwd(), defaultextension=self.extensions)
-
-                if file_name:
-                    with open(file_name, 'wb') as f:
-                        f.write(response.content)
-
-                    self.ShowMessage('Download Completed !!', 'green')
-                    FILEBROWSER_PATH = os.path.join(os.getenv('WINDIR'), 'explorer.exe')
-                    self.master.after(50, lambda: subprocess.run([FILEBROWSER_PATH, '/select,', os.path.normpath(file_name)]))
-
-                    self.link_var.set('Image Address')
-                    self.style.configure('E.TEntry', foreground='grey')
-
-            else:
-                self.ShowMessage('Provided URL does not contain any image')
-
-        else:
+        if self.CheckInternet() is False:
             self.ShowMessage('No Internet Connection')
+            return
 
-    def CheckInternet(self):
-        '''Check if the user is connected to internet'''
+        url = self.LinkVar.get().strip()
 
         try:
-            socket.create_connection(("1.1.1.1", 53))
+            response = requests.get(url)
+
+        except requests.exceptions.MissingSchema:
+            self.ShowMessage('Provide valid URL')
+            return
+
+        if response.headers['content-type'] not in ("image/png", "image/jpeg", "image/jpg"):  # Checking if provided link contains image file
+            self.ShowMessage('Provided URL does not contain any image')
+            return
+
+        file_name = filedialog.asksaveasfilename(title='Save', filetypes=self.extensions, initialdir=os.getcwd(), defaultextension=self.extensions)
+
+        if not file_name:
+            return
+
+        with open(file_name, 'wb') as f:
+            f.write(response.content)
+
+        self.ShowMessage('Download Completed !!', 'green')
+        FILE_BROWSER_PATH = os.path.join(os.getenv('WINDIR'), 'explorer.exe')
+        self.Window.after(50, lambda: subprocess.run([FILE_BROWSER_PATH, '/select,', os.path.normpath(file_name)]))
+
+        self.LinkVar.set('Image Address')
+        self.style.configure('E.TEntry', foreground='grey')
+
+    def CheckInternet(self):
+        '''
+        Check if the user is connected to internet
+        '''
+
+        try:
+            requests.get('http://www.google.com')
+
             return True
 
-        except OSError:
-            pass
-
-        return False
+        except requests.ConnectionError:
+            return False
 
     def ShowMessage(self, msg, fg='red'):
         '''
@@ -157,21 +179,49 @@ class Image_Downloader:
         pygame.mixer.music.play()
 
         if self.ErrorTimer is None:
-            self.ErrLabel = Label(self.master, textvariable=self.MessageVar, bg='white', fg=fg, font=font.Font(size=10, weight='bold'))
+            self.ErrLabel = Label(self.Window, textvariable=self.MessageVar, bg='white', fg=fg, font=font.Font(size=10, weight='bold'))
             self.ErrLabel.grid(row=2, column=0, pady=(0, 10))
 
-            self.ErrorTimer = self.master.after(1600, self.RemoveErrorMessage)
+            self.ErrorTimer = self.Window.after(1600, self.RemoveErrorMessage)
 
         else:
-            self.master.after_cancel(self.ErrorTimer)
+            self.Window.after_cancel(self.ErrorTimer)
             self.ErrorTimer = None
-            self.master.after(0, lambda: self.ShowMessage(msg, fg))
+            self.Window.after(0, lambda: self.ShowMessage(msg, fg))
 
     def RemoveErrorMessage(self):
-        '''Remove the error messages after 1600 ms'''
+        '''
+        Remove the error messages after 1600 ms
+        '''
 
         self.ErrLabel.grid_forget()
         self.ErrorTimer = None
+
+    def RightClick(self, event):
+        '''
+        When user right clicks to Entry widget
+        '''
+
+        self.LinkEntry.focus()
+
+        try:
+            x, y = self.Window.winfo_pointerxy()
+
+            RightClickMenu = Menu(self.Window, tearoff=0)
+            RightClickMenu.add_command(label='Paste', accelerator='Ctrl+V', command=self.PasteFromClipBoard)
+
+            RightClickMenu.post(x, y)
+
+        finally:
+            RightClickMenu.grab_release()
+
+    def PasteFromClipBoard(self):
+        '''
+        Insert clipboard text to Entry widget
+        '''
+
+        ClipBoardText = pyperclip.paste()
+        self.LinkVar.set(ClipBoardText)
 
     def ResourcePath(self, file_name):
         '''
@@ -194,4 +244,4 @@ class Image_Downloader:
 
 
 if __name__ == '__main__':
-    Image_Downloader()
+    ImageDownloader()
