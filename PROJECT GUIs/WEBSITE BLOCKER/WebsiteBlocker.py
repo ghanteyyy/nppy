@@ -1,11 +1,10 @@
 import os
 import sys
 import ctypes
-import winsound
 from tkinter import *
 import tkinter.ttk as ttk
-from tkinter import messagebox
 from tkinter import font, scrolledtext
+import pygame
 
 
 def IsAdmin():
@@ -20,6 +19,17 @@ def IsAdmin():
 
 class WebsiteBlocker:
     def __init__(self):
+        pygame.init()
+        pygame.mixer.init()
+
+        if sys.platform == 'win32':
+            self.AudioFile = self.ResourcePath('WinErrSound.wav')
+
+        else:
+            self.AudioFile = self.ResourcePath('LinuxErrSound.wav')
+
+        pygame.mixer.music.load(self.AudioFile)
+
         self.PreviousText = ''
         self.PreviousEntry = None
         self.LocalHost = '127.0.0.1 '
@@ -116,7 +126,7 @@ class WebsiteBlocker:
             text = f'{self.LocalHost}{text.strip(self.LocalHost)}\n'
 
             if default is None and text in contents:
-                winsound.MessageBeep()
+                pygame.mixer.music.play()
                 return
 
             InnerWidget = Frame(self.DisplayBlockedSites, bg='#e4ede9')
@@ -153,7 +163,7 @@ class WebsiteBlocker:
                 # Entry widget but not when there is no website address found in hosts
                 # file when program starts for the first time
 
-                winsound.MessageBeep()
+                pygame.mixer.music.play()
 
     def RenameDetails(self, event=None, widget=None):
         '''When user clicks Rename button'''

@@ -1,17 +1,23 @@
 import os
 import sys
 import time
-import winsound
+import pygame
 from tkinter import *
 import tkinter.ttk as ttk
 
 
 class RemainderWindow:
     def __init__(self):
+        pygame.init()
+        pygame.mixer.init()
+
         self.birth_dates = {}
         self.todays_date = time.strftime('%m-%d')
+        self.AudioFile = self.resource_path('tone.wav')
         self.files = [os.path.abspath(os.path.join('.', 'birthday_remainder.txt')), os.path.abspath(os.path.join('.', 'seen_birthday.txt'))]
         self.month_number = {'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'}
+
+        pygame.mixer.music.load(self.AudioFile)
 
     def Window(self, name, date):
         '''GUI window for showing those whose have birthday today'''
@@ -111,7 +117,7 @@ class RemainderWindow:
 
         if self.birth_dates:
             for name, date in self.birth_dates.items():
-                winsound.PlaySound(self.resource_path('tone.wav'), winsound.SND_LOOP + winsound.SND_ASYNC)
+                pygame.mixer.music.play(-1)
                 self.Window(name, date)
 
     def resource_path(self, file_name):

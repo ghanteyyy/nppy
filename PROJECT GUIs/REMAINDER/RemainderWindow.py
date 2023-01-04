@@ -2,12 +2,16 @@ import os
 import sys
 import time
 import winreg
-import winsound
+
 from tkinter import *
+import pygame
 
 
 class RemainderWindow:
     def __init__(self):
+        pygame.init()
+        pygame.mixer.init()
+        pygame.mixer.music.load(self.resource_path('tone.wav'))
         self.file_name = 'Remainder.txt'
 
     def window(self, text):
@@ -81,9 +85,9 @@ class RemainderWindow:
                     split_rem_time = rem_time.split()
 
                     if curr_time == rem_time or (split_rem_time[2] == time.strftime('%I') and split_rem_time[3] < time.strftime('%M')) or (split_rem_time[2] < time.strftime('%I')):
-                        winsound.PlaySound(self.resource_path('tone.wav'), winsound.SND_LOOP + winsound.SND_ASYNC)  # Playing Sound before showing remainder window and till user clicks close button.
+                        pygame.mixer.music.play(-1)  # Playing Sound before showing remainder window and till user clicks close button.
                         self.window(rem)
-                        winsound.PlaySound(None, winsound.SND_PURGE)  # Stopping sound when user clicks close button.
+                        pygame.mixer.music.stop()  # Stopping sound when user clicks close button.
 
                         self.remove_remainder(remainder)
 

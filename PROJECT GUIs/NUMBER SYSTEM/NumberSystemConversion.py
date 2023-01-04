@@ -1,8 +1,8 @@
 import os
 import sys
-import winsound
 from tkinter import *
 import tkinter.ttk as ttk
+import pygame
 
 
 class NumberSystemConversion:
@@ -19,7 +19,7 @@ class NumberSystemConversion:
         if all(check):
             return True
 
-        winsound.MessageBeep()
+        pygame.mixer.music.play()
         self.display_answer(f'Invalid {name} Number')
 
         return False
@@ -397,6 +397,17 @@ class NumberSystemConversion:
 
 class GUI:
     def __init__(self):
+        pygame.init()
+        pygame.mixer.init()
+
+        if sys.platform == 'win32':
+            self.AudioFile = self.resource_path('WinErrSound.wav')
+
+        else:
+            self.AudioFile = self.resource_path('LinuxErrSound.wav')
+
+        pygame.mixer.music.load(self.AudioFile)
+
         self.master = Tk()
         self.master.withdraw()
         self.master.after(0, self.master.deiconify)
@@ -566,11 +577,11 @@ class GUI:
         get_value = self.entry_var.get().strip()
 
         if get_value == 'Enter Number' or not get_value:
-            winsound.MessageBeep()
+            pygame.mixer.music.play()
             answer = 'Input Valid Number'
 
         elif self.combo_box.get() == 'Select Number System':
-            winsound.MessageBeep()
+            pygame.mixer.music.play()
             answer = 'Select Valid Conversion'
 
         else:
