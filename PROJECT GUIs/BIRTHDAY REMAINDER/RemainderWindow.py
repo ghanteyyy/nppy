@@ -1,133 +1,199 @@
 import os
 import sys
+import json
 import time
-import pygame
 from tkinter import *
-import tkinter.ttk as ttk
+from tkinter.font import Font
+import pygame
+from PIL import Image, ImageTk
 
 
-class RemainderWindow:
+class ReminderWindow:
     def __init__(self):
         pygame.init()
         pygame.mixer.init()
 
-        self.birth_dates = {}
-        self.todays_date = time.strftime('%m-%d')
-        self.AudioFile = self.resource_path('tone.wav')
-        self.files = [os.path.abspath(os.path.join('.', 'birthday_remainder.txt')), os.path.abspath(os.path.join('.', 'seen_birthday.txt'))]
-        self.month_number = {'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'}
+        self.AudioFile = self.ResourcePath('tone.wav')
+        self.TemplateImage = self.ResourcePath('template.jpg')
+        self.FILE = os.path.abspath(os.path.join('.', 'data.json'))
+        self.QuitButtonImage = self.ResourcePath('QuitButtonImage.png')
 
         pygame.mixer.music.load(self.AudioFile)
 
-    def Window(self, name, date):
-        '''GUI window for showing those whose have birthday today'''
+    def ResizeImages(self, person_image_path):
+        '''
+        Resize required images to appropriate sizes
+        '''
+
+        self.img = Image.open(self.TemplateImage)
+        self.img.thumbnail((600, 600), Image.Resampling.LANCZOS)
+        self.img = ImageTk.PhotoImage(self.img)
+
+        self.PersonImage = Image.open(person_image_path)
+        self.PersonImage.thumbnail((200, 200), Image.Resampling.LANCZOS)
+        self.PersonImage = ImageTk.PhotoImage(self.PersonImage)
+
+        self.QuitImage = Image.open(self.QuitButtonImage)
+        self.QuitImage.thumbnail((250, 250))
+        self.QuitImage = ImageTk.PhotoImage(self.QuitImage)
+
+    def Window(self, _id, name, date, image):
+        '''
+        GUI window for showing wishes of those whose have birthday today
+        '''
+
+        _name = name.replace(' ', '\n')
 
         self.master = Tk()
         self.master.withdraw()
-        self.master.after(0, self.master.deiconify)
         self.master.resizable(0, 0)
-        self.master.config(bg='red')
         self.master.overrideredirect(True)
         self.master.title('BIRTHDAY REMAINDER')
         self.master.wm_attributes('-topmost', 1)
-        self.master.geometry(f'405x170+{self.master.winfo_screenwidth() - 406}+0')
+        _font = Font(family='Segoe print', size=15, weight='bold')
 
-        self.var = IntVar()
-        self.style = ttk.Style()
-        self.style.configure('Red.TCheckbutton', foreground='white', background='red')
+        self.ResizeImages(image)
 
-        self.title = Label(self.master, text='REMAINDER', font=("Courier", 30), bg='red', fg='White')
-        self.wishes = Label(self.master, text=f'Today is {name}\'s Birthday\n({date})', font=("Courier", 15), bg='red', fg='White', wraplength=450)
-        self.check_button = ttk.Checkbutton(self.master, style='Red.TCheckbutton', text='Don\'t show again', variable=self.var)
-        self.close_button = Button(self.master, text='CLOSE', font=("Courier", 12), bg='red', activeforeground='white', activebackground='red', fg='White', width=10, relief='ridge', command=lambda: self.quit_button(name))
+        self.BackgroundImage = Label(self.master, image=self.img)
+        self.BackgroundImage.pack()
 
-        self.title.pack()
-        self.wishes.pack()
-        self.check_button.pack(side='bottom')
-        self.close_button.pack(side='bottom')
+        self.PersonImageLabel = Label(self.master, image=self.PersonImage, bd=0)
+        self.NameLabel = Label(self.master, bg='#d2f0fa', text=_name, font=_font)
+        self.DateLabel = Label(self.master, bg='#c8ecfa', text=date, font=_font)
+        self.CloseButton = Button(self.master, bg='#c20c06', activebackground='#c20c06', bd=0, cursor='hand2', image=self.QuitImage, command=lambda: self.QuitButtonCommand(_id))
 
+        self.WindowPosition()
         self.master.mainloop()
 
-    def read_file(self, filename):
-        '''Storing name and birth dates from the given name of file in a dictionary'''
+    def WindowPosition(self):
+        '''
+        Set window position to the center of
+        the screen when it starts
+        '''
 
-        dic = {}
+        self.master.update()
 
-        with open(filename, 'r') as f:
-            lines = [line.strip('\n') for line in f.readlines()]
+        width = self.master.winfo_width()
+        height = self.master.winfo_height()
+        screen_width = self.master.winfo_screenwidth()
 
-            for line in lines:
-                split = line.split(':')
-                dic.update({split[0].strip(): split[1].strip()})
+        self.master.geometry(f'+{screen_width - width}+0')
 
-        return dic
+        self.CloseButton.place(x=width // 2 - 252 // 2.3, y=height - 65)
+        self.PersonImageLabel.place(x=width // 2 - 163 // 2, y=height // 2 - 200 // 2)
 
-    def get_today_birthdays(self):
-        '''Getting name and date of those whose birthday is today'''
+        # Placing Name and Date Label to the top most part
+        # of the window so that we can get the exact width
+        # and height of the respective label
+        self.NameLabel.place(x=0, y=0)
+        self.DateLabel.place(x=0, y=0)
 
-        try:
-            all_birth_dates = self.read_file(self.files[0])
+        self.master.update()
+        self.NameLabel.place(x=self.PersonImageLabel.winfo_x()- self.NameLabel.winfo_width(), y=self.PersonImageLabel.winfo_y() + self.PersonImageLabel.winfo_height() // 2 - self.NameLabel.winfo_height() // 2)
+        self.DateLabel.place(x=self.PersonImageLabel.winfo_x() + self.PersonImageLabel.winfo_width(), y=self.PersonImageLabel.winfo_y() + self.PersonImageLabel.winfo_height() // 2 - self.DateLabel.winfo_height() // 2)
 
-            if os.path.exists(self.files[1]):
-                today_birth_dates = self.read_file(self.files[1])
+        pygame.mixer.music.play(-1)
+        self.master.deiconify()
 
-                for name, date in all_birth_dates.items():
-                    if name not in today_birth_dates and date == self.todays_date:  # If birth dates from 'birthday_remainder.txt' is same as todays_date and name is not in 'seen_birthday.txt'
-                        self.birth_dates.update({name: date})
+    def ChangeHasSeen(self):
+        '''
+        Set has_seen to false if it is already true.
+        If true then it means that the birthday of
+        the respective name has already been showed.
+        '''
 
-            else:
-                for name, date in all_birth_dates.items():
-                    if date == self.todays_date:
-                        self.birth_dates.update({name: date})
+        from_file = self.ReadJSON()
+        curr_time = time.strftime('%m-%d')
 
-        except FileNotFoundError:
-            return
+        for _, value in from_file.items():
+            if value['has_seen'] and curr_time != value['date']:
+                value['has_seen'] = False
+                self.WriteJSON(from_file)
 
-    def quit_button(self, name):
-        '''Command when close button is closed.
+    def GetTodayBirthdaysDetails(self):
+        '''
+        Getting name, date and image of those whose birthday is today
+        '''
 
-           When close button is clicked with selecting the check_button that means
-           don't show remainder of that name again. So this function saves those
-           names to seen_birthday.txt and excludes the stored birth dates next time
-           when this script runs'''
+        today_birth_dates = []
+        from_file = self.ReadJSON()
+        today_date = time.strftime('%m-%d')
 
-        if self.var.get() == 1:
-            with open(self.files[1], 'a') as tf:
-                tf.write(f'{name.ljust(30)}:{self.birth_dates[name].rjust(10)}\n')
+        for _id, value in from_file.items():
+            if value['has_seen'] is False and value['date'] == today_date:
+                data = (_id, value['name'], value['date'], value['image'])
+                today_birth_dates.append(data)
+
+        return today_birth_dates
+
+    def QuitButtonCommand(self, _id):
+        '''
+        Command when close button is closed
+
+        When close button is clicked then set the has_seen
+        to True so that the same birthday don't get displayed
+        repeatedly
+        '''
+
+        pygame.mixer.music.stop()
+        from_file = self.ReadJSON()
+
+        for ID, value in from_file.items():
+            if _id == ID:
+                value['has_seen'] = True
+                self.WriteJSON(from_file)
+                break
 
         self.master.destroy()
 
-    def remove_file(self):
-        '''Removing seen_birthday.txt if date in that file does not match from
-           today's date'''
+    def ReadJSON(self):
+        '''
+        Reading data from the .json file
+        '''
 
-        if os.path.exists(self.files[1]):
-            contents = self.read_file(self.files[1])
+        try:
+            with open(self.FILE, 'r') as f:
+                contents = json.load(f)
 
-            for key, value in contents.items():
-                if value != self.todays_date:
-                    os.remove(self.files[1])
-                    return
+        except FileNotFoundError:
+            with open(self.FILE, 'w'):
+                contents = {}
+
+        except json.decoder.JSONDecodeError:
+            contents = {}
+
+        return contents
+
+    def WriteJSON(self, contents):
+        '''
+        Storing data to the .json file
+        '''
+
+        with open(self.FILE, 'w') as f:
+            json.dump(contents, f, indent=4)
 
     def main(self):
-        '''Getting, showing and removing birthdays'''
+        '''
+        Entry of the program
+        '''
 
-        self.remove_file()
-        self.get_today_birthdays()
+        while True:
+            self.ChangeHasSeen()
+            birth_dates = self.GetTodayBirthdaysDetails()
 
-        if self.birth_dates:
-            for name, date in self.birth_dates.items():
-                pygame.mixer.music.play(-1)
-                self.Window(name, date)
+            for _id, name, date, image in birth_dates:
+                self.Window(_id, name, date, image)
 
-    def resource_path(self, file_name):
-        '''Get absolute path to resource from temporary directory
+    def ResourcePath(self, file_name):
+        '''
+        Get absolute path to resource from temporary directory
 
         In development:
             Gets path of files that are used in this script like icons, images or file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
+            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory
+        '''
 
         try:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
@@ -139,5 +205,5 @@ class RemainderWindow:
 
 
 if __name__ == '__main__':
-    remainder = RemainderWindow()
+    remainder = ReminderWindow()
     remainder.main()
