@@ -84,10 +84,11 @@ class GPAD:
         self.encoding = Label(self.StatusBarFrame, text='UTF-8')
         self.encoding.grid(row=0, column=4, ipadx=10)
 
+        self.AutoSaveVar = BooleanVar()
         self.fmc = FileMenu.File_Menu(self.master, self.TextWidget, self.status_label_var)
-        self.FileMenuOptions = ['New', 'New Window ', 'Open... ', 'Save', 'SaveAs...', 'Exit']
-        self.FileMenuCommands = [self.fmc.New, self.fmc.NewWindow, self.fmc.Open, self.fmc.Save, self.fmc.SaveAs, self.exit]
-        self.FileMenuAccelerator = ['Ctrl+N', 'Ctrl+Shift+N', 'Ctrl+O', 'Ctrl+S', 'Ctrl+Shift+S', 'Ctrl+Q']
+        self.FileMenuOptions = ['New', 'New Window ', 'Open... ', 'Save', 'SaveAs...', 'Auto Save', 'Exit']
+        self.FileMenuCommands = [self.fmc.New, self.fmc.NewWindow, self.fmc.Open, self.fmc.Save, self.fmc.SaveAs, self.fmc.AutoSave, self.exit]
+        self.FileMenuAccelerator = ['Ctrl+N', 'Ctrl+Shift+N', 'Ctrl+O', 'Ctrl+S', 'Ctrl+Shift+S', 'Ctrl+Alt+S', 'Ctrl+Q']
 
         self.emc = EditMenu.Edit_Menu(self.master, self.TextWidget, self.status_label_var)
         self.EditMenuOptions = ['Undo', 'Cut', 'Copy', 'Paste', 'Delete', 'Search with Google', 'Find...', 'Replace...', 'Go To...', 'Select All', 'Time / Date', 'Strip Trailing Whitespace']
@@ -108,8 +109,12 @@ class GPAD:
         self.HelpMenuCommands = [self.about]
 
         for index, value in enumerate(self.FileMenuOptions):
-            if index in [5, 7]:
+            if index == len(self.FileMenuOptions) - 1:
                 self.file_menu.add_separator()
+
+            elif value == 'Auto Save':
+                self.file_menu.add_checkbutton(label=value.ljust(23), onvalue=1, offvalue=0, variable=self.AutoSaveVar, accelerator=self.FileMenuAccelerator[index], command=lambda: self.fmc.AutoSave(self.AutoSaveVar))
+                continue
 
             self.file_menu.add_command(label=value.ljust(23), accelerator=self.FileMenuAccelerator[index], command=self.FileMenuCommands[index])
 
@@ -189,6 +194,7 @@ class GPAD:
         self.TextWidget.bind('<Alt-l>', lambda e: self.view_menu.invoke(3))
         self.TextWidget.bind('<Control-F>', lambda e: self.Fmc.FontSelection())
         self.TextWidget.bind('<Control-w>', lambda e: self.format_menu.invoke(0))
+        self.TextWidget.bind('<Control-Alt-s>', lambda e: self.fmc.AutoSave(self.AutoSaveVar))
         self.TextWidget.bind('<Configure>', lambda e: self.TextWidget.configure(scrollregion=self.TextWidget.bbox('end')))
         self.master.mainloop()
 
