@@ -615,7 +615,7 @@ class MusicPlayer:
                                 self.InsertLyricsText(lrc_path=lrc_path)
 
                             else:
-                                if self.IsLyricsAdded is not False:
+                                if self.IsLyricsAdded is not None:
                                     self.IsLyricsAdded = None
                                     self.LyricsFrame.pack_forget()
                                     self.TreeFrame.pack()
