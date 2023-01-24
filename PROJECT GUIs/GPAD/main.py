@@ -190,12 +190,13 @@ class GPAD:
         self.TextWidget.bind('<Control-e>', self.emc.SearchWithGoogle)
         self.TextWidget.bind('<Double-Button-1>', self.DoubleLeftClick)
         self.TextWidget.bind('<Alt-Return>', self.ActivateStripWhiteSpace)
-        self.master.after(0, lambda: Include.initial_position(self.master))
         self.TextWidget.bind('<Alt-l>', lambda e: self.view_menu.invoke(3))
         self.TextWidget.bind('<Control-F>', lambda e: self.Fmc.FontSelection())
         self.TextWidget.bind('<Control-w>', lambda e: self.format_menu.invoke(0))
+        self.master.after(0, lambda: Include.initial_position(self.master, self.TextWidget))
         self.TextWidget.bind('<Control-Alt-s>', lambda e: self.fmc.AutoSave(self.AutoSaveVar))
         self.TextWidget.bind('<Configure>', lambda e: self.TextWidget.configure(scrollregion=self.TextWidget.bbox('end')))
+
         self.master.mainloop()
 
     def backspace(self, event=None):

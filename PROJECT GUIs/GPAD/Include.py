@@ -5,7 +5,7 @@ import json
 timer = None
 
 
-def initial_position(master):
+def initial_position(master, text_widget):
     '''Start the program in the center of the screen'''
 
     master.withdraw()
@@ -30,6 +30,8 @@ def initial_position(master):
         master.geometry(f'{width}x{height}+{screen_width - width // 2}+{screen_height - height // 2}')
 
     master.deiconify()
+    text_widget.focus()
+
 
 def resource_path(file_name):
     '''Get absolute path to resource from temporary directory
