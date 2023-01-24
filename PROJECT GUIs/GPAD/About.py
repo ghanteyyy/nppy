@@ -6,7 +6,7 @@ import Search
 
 class About:
     def __init__(self, master):
-        self.BuildNumber = '2.4.1'
+        self.BuildNumber = '2.4.2'
 
         self.master = master
         self.AuthorAddress = 'http://github.com/ghanteyyy'
