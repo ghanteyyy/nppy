@@ -3,15 +3,19 @@ from bs4 import BeautifulSoup
 
 
 class GetPublicIP:
-    '''Gets the external public IP form "myip.com"
+    '''
+    Gets the external public IP form "myip.com"
 
-       Still lacks flexibility. Needs to work more'''
+    Still lacks flexibility. Needs to work more
+    '''
 
     def __init__(self):
         self.servers = ['https://www.myip.com']
 
     def is_internet(self):
-        '''Checks if you have internet connection'''
+        '''
+        Checks if you have internet connection
+        '''
 
         try:
             requests.get(self.servers[0])
@@ -21,12 +25,16 @@ class GetPublicIP:
             return False
 
     def get_html(self):
-        '''Gets the whole html source code of the website'''
+        '''
+        Gets the whole html source code of the website
+        '''
 
         return requests.get(self.servers[0]).content
 
     def get_ip(self):
-        '''Getting IP'''
+        '''
+        Getting IP
+        '''
 
         if self.is_internet():
             html = self.get_html()

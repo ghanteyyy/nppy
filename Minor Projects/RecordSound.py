@@ -9,7 +9,9 @@ class Record_Sound:
         self.duration = duration   # Seconds
 
     def record_sound(self):
-        '''Record sound from your speaker'''
+        '''
+        Record sound from your speaker
+        '''
 
         data = sounddevice.rec(int(self.rate * self.duration), samplerate=self.rate, channels=1, blocking=True)  # Recording ...
         soundfile.write(self.name, data, self.rate)   # Saving the file

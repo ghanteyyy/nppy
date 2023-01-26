@@ -3,7 +3,9 @@ import ctypes
 
 
 def IsAdmin():
-    '''Execute your program with administrator privilege'''
+    '''
+    Execute your program with administrator privilege
+    '''
 
     try:
         return ctypes.windll.shell32.IsUserAnAdmin()

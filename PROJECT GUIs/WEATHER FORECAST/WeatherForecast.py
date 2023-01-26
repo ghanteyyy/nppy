@@ -58,7 +58,10 @@ class WeatherForecast:
         self.master.mainloop()
 
     def initial_position(self, event=None):
-        '''Set position of the window to the center of the screen when user open the program'''
+        '''
+        Set position of the window to the center of the screen when user open
+        the program
+        '''
 
         self.master.update()
         self.master.resizable(0, 0)
@@ -70,7 +73,9 @@ class WeatherForecast:
         self.master.deiconify()
 
     def entry_bind(self, event=None, focus_out=False):
-        '''Add or Remove default text when focused_in or focused_out from the entry_widget'''
+        '''
+        Add or Remove default text when focused_in or focused_out from the entry_widget
+        '''
 
         entry_get = self.entry_var.get().strip()
 
@@ -85,7 +90,9 @@ class WeatherForecast:
                 self.style.configure('E.TEntry', foreground='black')
 
     def master_bind(self, event=None):
-        '''Set focus to maker if user outside of entry_widgets'''
+        '''
+        Set focus to maker if user outside of entry_widgets
+        '''
 
         widget = event.widget
 
@@ -93,7 +100,9 @@ class WeatherForecast:
             self.master.focus()
 
     def get_details(self, location, link):
-        '''Get weather details from user given location'''
+        '''
+        Get weather details from user given location
+        '''
 
         try:
             content = requests.get(link).text
@@ -131,7 +140,9 @@ class WeatherForecast:
             messagebox.showerror('ERR', 'No Internet Connection')
 
     def show_weather_details(self, event=None):
-        '''Get weather details and display them to the user'''
+        '''
+        Get weather details and display them to the user
+        '''
 
         location = self.entry_var.get().strip().title()
         link = f"https://api.openweathermap.org/data/2.5/weather?q={location.replace(' ', '%20')}&appid={self.api_key}"
@@ -140,13 +151,17 @@ class WeatherForecast:
         thread.start()
 
     def resource_path(self, file_name):
-        '''Get absolute path to resource from temporary directory
+        '''
+        Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from temporary directory
+        '''
 
         try:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS

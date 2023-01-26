@@ -57,7 +57,9 @@ class MainWindow:
         self.master.mainloop()
 
     def initial_position(self):
-        '''Start the program in the center of the screen'''
+        '''
+        Start the program in the center of the screen
+        '''
 
         self.master.withdraw()
         self.master.update()
@@ -74,7 +76,9 @@ class MainWindow:
         self.master.deiconify()
 
     def key_bindings(self, event):
-        '''Action when user clicks inside entry widget or outside of the entry widget'''
+        '''
+        Action when user clicks inside entry widget or outside of the entry widget
+        '''
 
         get_from_entry = self.entry_box.get().strip()
 
@@ -91,12 +95,17 @@ class MainWindow:
             self.master.focus()
 
     def get_combo_box_values(self, low, high):
-        '''Get numbers of month, date, hour and min for month, date, hour and minute combobox'''
+        '''
+        Get numbers of month, date, hour and min for month, date, hour and
+        minute combobox
+        '''
 
         return [str(i).zfill(2) for i in range(low, high + 1)]
 
     def add_command(self):
-        '''Command when user clicks "Add Remainder" button'''
+        '''
+        Command when user clicks "Add Remainder" button
+        '''
 
         try:
             message = self.entry_box_var.get().strip()
@@ -149,13 +158,17 @@ class MainWindow:
             messagebox.showerror('Invalid Input', 'Date / Hour / Minute is excepted in numbers')
 
     def resource_path(self, file_name):
-        '''Get absolute path to resource from temporary directory
+        '''
+        Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from temporary directory
+        '''
 
         try:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS

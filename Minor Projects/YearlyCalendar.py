@@ -2,13 +2,17 @@ import calendar
 
 
 class YearlyCalendar:
-    '''Get calendar of a given year'''
+    '''
+    Get calendar of a given year
+    '''
 
     def __init__(self, year):
         self.year = year
 
     def get_calendar(self):
-        '''Getting calendar'''
+        '''
+        Getting calendar
+        '''
 
         print('\n')
         print(calendar.calendar(self.year))

@@ -2,15 +2,19 @@ import random
 
 
 class setup:
-    '''This class is responsible for:
-            1. Showing board each time when user as well as bot enters their turn
-            2. Asking user if he / she wants to go first'''
+    '''
+    This class is responsible for:
+        1. Showing board each time when user as well as bot enters their turn
+        2. Asking user if he / she wants to go first
+    '''
 
     def __init__(self):
         self.board = [str(i) for i in range(1, 10)]
 
     def display_board(self, board):
-        '''Show board with human and bot enters their turn'''
+        '''
+        Show board with human and bot enters their turn
+        '''
 
         for i in range(3):
             display = ' | '.join(board[i * 3:i * 3 + 3])
@@ -24,7 +28,8 @@ class setup:
             print(display, end=sep)
 
     def get_turn(self):
-        '''Asking user if he/she wants to go first.
+        '''
+        Asking user if he/she wants to go first.
 
            If user wants to go first then:
                 Human: X
@@ -32,7 +37,8 @@ class setup:
 
             else:
                 Human: O
-                Bot: X'''
+                Bot: X
+        '''
 
         option = True if input('Do you want to go first (y/n)? ').lower() == 'y' else False
 
@@ -43,17 +49,19 @@ class setup:
 
 
 class playing(setup):
-    '''This class is reponsible for:
-            1. Getting empty places
-            2. Asking user where he/she want to place their turn
-                > Checks if user inputs their turn in empty places. If not then shows warning.
+    '''
+    This class is responsible for:
+        1. Getting empty places
+        2. Asking user where he/she want to place their turn
+            > Checks if user inputs their turn in empty places. If not then shows warning.
 
-            3. Placing bot turn as per the user's turn
-                > Get empty places
-                > Checks if bot itself can win. If yes bot places its turn to that place and wins the game.
-                > If bot cannot win the game then it checks whether user can win the game. If yes, then bot blocks the user next move so user cannot win the game
+        3. Placing bot turn as per the user's turn
+            > Get empty places
+            > Checks if bot itself can win. If yes bot places its turn to that place and wins the game.
+            > If bot cannot win the game then it checks whether user can win the game. If yes, then bot blocks the user next move so user cannot win the game
 
-            4. Check where user or bot won or the game became TIE'''
+        4. Check where user or bot won or the game became TIE
+    '''
 
     def __init__(self):
         super().__init__()
@@ -135,4 +143,5 @@ class playing(setup):
             print('\nHuman and Bot got tied')
 
 
-playing().main()
+if __name__ == '__main__':
+    playing().main()

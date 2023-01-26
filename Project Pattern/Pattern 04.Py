@@ -1,6 +1,5 @@
 class Pattern_Four:
-    '''Pattern four
-
+    '''
         K A T H M A N D U
         K A T H M A N D
         K A T H M A N

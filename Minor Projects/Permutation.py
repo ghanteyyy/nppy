@@ -2,24 +2,30 @@ import math
 
 
 class Permutation:
-    '''Formula to calculate permutation.
-           P(n,r) = n! / (n-r)!   ; n > r
+    '''
+    Formula to calculate permutation.
+        P(n,r) = n! / (n-r)!   ; n > r
 
-                where, n = total number of arrangements
-                       r = difference of arrangements
-                       ! = factorial of the number  eg: 4! = 4 * 3 * 2 * 1 = 24'''
+            where, n = total number of arrangements
+                   r = difference of arrangements
+                   ! = factorial of the number  eg: 4! = 4 * 3 * 2 * 1 = 24
+    '''
 
     def __init__(self, number, difference):
         self.number = number
         self.difference = difference
 
     def factorial(self, num):
-        '''See more about factorial in factorial.py'''
+        '''
+        See more about factorial in factorial.py
+        '''
 
         return math.factorial(num)
 
     def get_permutation(self):
-        '''Calculating permutation of the given number and difference'''
+        '''
+        Calculating permutation of the given number and difference
+        '''
 
         if self.difference > self.number:
             return 'Number must be greater than difference'

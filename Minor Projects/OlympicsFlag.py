@@ -1,4 +1,6 @@
-'''Draw olympics flag'''
+'''
+Draw olympics flag
+'''
 
 
 import turtle

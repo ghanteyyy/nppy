@@ -70,7 +70,6 @@ class SplitPDF:
 
                     return
 
-
         self.output_text_area.insert('end', '\nCompleted.', 'center')
         self.output_text_area.see('end')
         self.output_text_area.config(state='disabled')

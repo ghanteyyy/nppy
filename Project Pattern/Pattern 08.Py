@@ -1,6 +1,5 @@
 class Pattern_Eight:
-    '''Pattern eight
-
+    '''
         P
         P r
         P r o

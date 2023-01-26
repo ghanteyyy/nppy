@@ -1,5 +1,6 @@
 class OctalToQuinary:
-    '''Convert octal number to quinary number
+    '''
+    Convert octal number to quinary number
 
         You can covert octal_number to binary by converting the given octal_number to decimal and then obtained decimal to quinary
             For an instance, lets take an octal number to be 123
@@ -14,9 +15,14 @@ class OctalToQuinary:
                               -----
                                 3
 
-                REQUIRED QUINARY NUMBER is 313 (taking remainder in reverse order)'''
+                REQUIRED QUINARY NUMBER is 313 (taking remainder in reverse order)
+    '''
 
     def IsOctal(self, octal_number):
+        '''
+        Checking if the given number is octal
+        '''
+
         while octal_number > 0:
             remainder = octal_number % 10
             octal_number //= 10
@@ -27,6 +33,10 @@ class OctalToQuinary:
         return True
 
     def toQuinary(self, octal_number):
+        '''
+        Converting the given octal number to quinary
+        '''
+
         decimal_number = 0
         quinary_number = ''
 

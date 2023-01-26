@@ -51,7 +51,9 @@ class DailyExpenses:
         self.master.mainloop()
 
     def bind_keys(self, event, focus_out=False):
-        '''Commands when user clicks in and out of the entries widgets'''
+        '''
+        Commands when user clicks in and out of the entries widgets
+        '''
 
         get_from_item_box = self.items_box_var.get().strip()
         get_from_price_box = self.price_box_var.get().strip()
@@ -86,7 +88,9 @@ class DailyExpenses:
             self.master.focus()
 
     def preload(self):
-        '''Display content of a file at the startup of program'''
+        '''
+        Display content of a file at the startup of program
+        '''
 
         if not os.path.exists(self.file) or os.path.getsize(self.file) == 0:
             self.center_the_text('Your Expenses will be displayed here', 'grey')
@@ -95,7 +99,9 @@ class DailyExpenses:
             self.write_to_text_box()
 
     def write_to_text_box(self):
-        '''Display contents that are stored in daily_expenses.txt'''
+        '''
+        Display contents that are stored in daily_expenses.txt
+        '''
 
         self.display_box.config(state=NORMAL)
         self.display_box.delete('1.0', END)
@@ -108,7 +114,9 @@ class DailyExpenses:
                 self.center_the_text(line, 'black')
 
     def center_the_text(self, text, color):
-        '''Centering each texts in Text widget'''
+        '''
+        Centering each texts in Text widget
+        '''
 
         self.display_box.config(state=NORMAL)
         self.display_box.config(fg=color)
@@ -117,7 +125,9 @@ class DailyExpenses:
         self.display_box.config(state=DISABLED)
 
     def submit_command(self, event=None):
-        '''Commands when user cilcks submit button'''
+        '''
+        Commands when user clicks submit button
+        '''
 
         current_time = time.strftime('%d %b %a')
         get_item = self.items_box.get().strip().title()
@@ -161,13 +171,17 @@ class DailyExpenses:
             self.master.focus()
 
     def resource_path(self, file_name):
-        '''Get absolute path to resource from temporary directory
+        '''
+        Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from temporary directory
+        '''
 
         try:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS

@@ -48,15 +48,19 @@ class Go_To:
         self.GoToWindow.mainloop()
 
     def entry_bind(self, event=None):
-        '''When Ctrl+h is pressed while the focus is in Entry widgets, the last
-           character in Entry widgets gets remove(its default behavior). So,
-           to fix this problem return "break" is must, this tells tkinter
-           not to go for further bindings.'''
+        '''
+        When Ctrl+h is pressed while the focus is in Entry widgets, the last
+        character in Entry widgets gets remove(its default behavior). So, to
+        fix this problem return "break" is must, this tells tkinter not to go
+        for further bindings
+        '''
 
         return 'break'
 
     def GoTo(self, event=None):
-        '''Move cursor to the given number of lines if available'''
+        '''
+        Move cursor to the given number of lines if available
+        '''
 
         try:
             line_number = int(self.GoToEntry.get().strip())

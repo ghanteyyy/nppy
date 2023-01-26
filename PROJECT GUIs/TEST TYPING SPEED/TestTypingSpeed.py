@@ -57,8 +57,9 @@ class TestTypingSpeed:
         self.master.mainloop()
 
     def keep_focus(self, event=None):
-        '''Keep focus to entry widget even if
-           user clicks to displayed words'''
+        '''
+        Keep focus to entry widget even if user clicks to displayed words
+        '''
 
         self.typing_area.focus_force()
         return 'break'
@@ -79,7 +80,9 @@ class TestTypingSpeed:
         self.time_label_var.set('01:00')
 
     def initial_position(self):
-        '''Set position of the window when opened for the first time'''
+        '''
+        Set position of the window when opened for the first time
+        '''
 
         self.master.withdraw()
         self.master.update()
@@ -96,7 +99,9 @@ class TestTypingSpeed:
         self.show_words.focus()
 
     def key_pressed(self, event=None):
-        '''When user presses any key which is printable'''
+        '''
+        When user presses any key which is printable
+        '''
 
         value = event.keysym
 
@@ -119,7 +124,9 @@ class TestTypingSpeed:
             return 'break'
 
     def control_backspace(self, event=None):
-        '''When control backspace key is pressed'''
+        '''
+        When control backspace key is pressed
+        '''
 
         var_get = self.typing_area_var.get().strip()
 
@@ -130,7 +137,9 @@ class TestTypingSpeed:
         return 'break'
 
     def backspace(self, event=None):
-        '''When backspace key is pressed'''
+        '''
+        When backspace key is pressed
+        '''
 
         var_get = self.typing_area_var.get()
 
@@ -150,13 +159,17 @@ class TestTypingSpeed:
         return 'break'
 
     def forbid_default_bindings(self, event=None):
-        '''Stop tkinter to execute its default bindings'''
+        '''
+        Stop tkinter to execute its default bindings
+        '''
 
         return 'break'
 
     def insert_to_text_widget(self):
-        '''Insert random word from text-file when program opened for the
-           first time or when redo button is clicked or F5 button is pressed'''
+        '''
+        Insert random word from text-file when program opened for the first
+        time or when redo button is clicked or F5 button is pressed
+        '''
 
         count = 0
         prev_text = ''
@@ -193,7 +206,10 @@ class TestTypingSpeed:
         self.master.after(10, self.select_word)
 
     def get_space_index(self):
-        '''Getting index of space key present in text-widget to select word when user clicks space-bar'''
+        '''
+        Getting index of space key present in text-widget to select word when
+        user clicks space-bar
+        '''
 
         self.space_index = []
 
@@ -210,7 +226,10 @@ class TestTypingSpeed:
             start_pos = end_pos
 
     def select_word(self, color='#dddddd', tag='select'):
-        '''Set background color to green if user types correct word else set red background color'''
+        '''
+        Set background color to green if user types correct word else set red
+        background color
+        '''
 
         if tag == 'select':
             self.show_words.tag_delete(tag)
@@ -224,7 +243,9 @@ class TestTypingSpeed:
             self.show_words.tag_config(tag, foreground=color)
 
     def next_word(self, event=None):
-        '''Select another word when user presses space-bar'''
+        '''
+        Select another word when user presses space-bar
+        '''
 
         if self.running is False:
             self.running = True
@@ -258,7 +279,9 @@ class TestTypingSpeed:
         return 'break'
 
     def track_time(self, event=None):
-        '''Decrease time by 1 second until it reaches 0'''
+        '''
+        Decrease time by 1 second until it reaches 0
+        '''
 
         if self.running is False:  # Stop timer when redo button is clicked
             if self.timer:
@@ -322,7 +345,9 @@ class TestTypingSpeed:
             self.output_frame.pack()
 
     def redo(self, event=None):
-        '''Reset everything to the beginning'''
+        '''
+        Reset everything to the beginning
+        '''
 
         self.default_values()
 
@@ -339,13 +364,17 @@ class TestTypingSpeed:
         self.master.after(5, self.insert_to_text_widget)
 
     def resource_path(self, file_name):
-        '''Get absolute path to resource from temporary directory
+        '''
+        Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from temporary directory
+        '''
 
         try:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS

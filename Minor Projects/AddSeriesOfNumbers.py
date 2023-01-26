@@ -1,15 +1,20 @@
 class AddSeriesOfNumbers:
-    '''Add given integer entered in series
+    '''
+    Add given integer entered in series
 
         If user inputs 123456789 then the scripts adds all the integers.
               = 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9
-              = 45    '''
+              = 45
+    '''
 
     def __init__(self, integer=123):
         self.integer = str(integer)
 
     def method_one(self):
-        '''Using for loop while appending each integer in a list and adding each integer of a list to get sum'''
+        '''
+        Using for loop while appending each integer in a list and adding each
+        integer of a list to get sum
+        '''
 
         sums = 0
         lists = []
@@ -23,7 +28,9 @@ class AddSeriesOfNumbers:
         return f'Sum of {self.integer} = {sums}'
 
     def method_two(self):
-        '''Using for loop and getting the sum directly without appending to any list'''
+        '''
+        Using for loop and getting the sum directly without appending to any list
+        '''
 
         sums = 0
 
@@ -33,14 +40,18 @@ class AddSeriesOfNumbers:
         return f'Sum of {self.integer} = {sums}'
 
     def method_three(self):
-        '''Using list comprehension'''
+        '''
+        Using list comprehension
+        '''
 
         sums = sum([int(integer) for integer in self.integer])
 
         return f'Sum of {self.integer} = {sums}'
 
     def method_four(self):
-        '''Using for loop and built-in function : sum : to add those integers'''
+        '''
+        Using for loop and built-in function : sum : to add those integers
+        '''
 
         lists = []
 

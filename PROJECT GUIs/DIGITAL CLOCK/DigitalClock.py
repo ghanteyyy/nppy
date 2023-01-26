@@ -22,7 +22,9 @@ class DigitalClock:
         self.master.mainloop()
 
     def get_time(self):
-        '''Get current date and time'''
+        '''
+        Get current date and time
+        '''
 
         self.label.config(text=time.strftime('%d %b %a %Y\n%I:%M:%S %p'))
         self.master.after(200, self.get_time)

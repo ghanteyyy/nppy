@@ -4,7 +4,9 @@ class Reverse:
         self.length = len(self.strings) - 1
 
     def method_one(self):
-        '''Using for loop'''
+        '''
+        Using for loop
+        '''
 
         reverse = ''
 
@@ -14,7 +16,9 @@ class Reverse:
         return reverse
 
     def method_two(self):
-        '''Using while loop'''
+        '''
+        Using while loop
+        '''
 
         reverse = ''
         length = self.length
@@ -26,24 +30,30 @@ class Reverse:
         return reverse
 
     def method_three(self):
-        '''Using slicing method'''
+        '''
+        Using slicing method
+        '''
 
         return self.strings[::-1]
 
     def method_four(self):
-        '''Using built-in function reversed'''
+        '''
+        Using built-in function reversed
+        '''
 
         reverse = reversed(self.strings)
 
         return ''.join(reverse)
 
     def method_five(self):
-        '''Using in-place algorithm
+        '''
+        Using in-place algorithm
 
-           Definition:
-                In-place means that the algorithm does not use extra space for
-                manipulating the input but may require a small though non-constant
-                extra space for its operation.'''
+        Definition:
+            In-place means that the algorithm does not use extra space for
+            manipulating the input but may require a small though non-constant extra
+            space for its operation.
+        '''
 
         strings = list(self.strings)
 
@@ -53,7 +63,9 @@ class Reverse:
         return ''.join(strings)
 
     def method_six(self):
-        '''List Comprehension of method one'''
+        '''
+        List Comprehension of method one
+        '''
 
         reverse = [self.strings[i] for i in range(self.length, -1, -1)]
 

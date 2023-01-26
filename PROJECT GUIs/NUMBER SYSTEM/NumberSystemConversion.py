@@ -12,7 +12,9 @@ class NumberSystemConversion:
         self.num_to_hex = {v: k for k, v in self.hex_to_num.items()}
 
     def is_valid_number_system(self, nums, check, name):
-        '''Check if the given number is valid with resect to the number system from converting'''
+        '''
+        Check if the given number is valid with resect to the number system from converting
+        '''
 
         check = [True if num in check else False for num in nums]
 
@@ -48,8 +50,9 @@ class NumberSystemConversion:
         Convert binary number to octal number
 
         To convert binary to octal you need to:
-            1. Convert binary number to decimal number via "self.binary_to_decimal" function
-            2. Convert obtained decimal number from step 1 to octal via "decimal_to_octal" function
+            1. Convert binary number to decimal number via "self.binary_to_decimal" method
+            2. Convert obtained decimal number from step 1 to octal via
+               "decimal_to_octal" method
         '''
 
         if self.is_valid_number_system(binary_number, '01', 'Binary'):
@@ -63,8 +66,9 @@ class NumberSystemConversion:
         Convert binary number to hexadecimal number
 
         To convert binary to hexadecimal you need to:
-            1. Convert binary number to decimal number via "self.binary_to_decimal" function
-            2. Convert obtained decimal number obtained from step 1 to hexadecimal via "decimal_to_hexadecimal" function
+            1. Convert binary number to decimal number via "self.binary_to_decimal" method
+            2. Convert obtained decimal number obtained from step 1 to hexadecimal
+               via "decimal_to_hexadecimal" method
         '''
 
         if self.is_valid_number_system(binary_number, '01', 'Binary'):
@@ -78,8 +82,9 @@ class NumberSystemConversion:
         Convert binary number to quinary number
 
         To convert binary to quinary you need to:
-            1. Convert binary number to decimal number via "self.binary_to_decimal" function
-            2. Convert obtained decimal number obtained from step 1 to quinary via "decimal_to_quinary" function
+            1. Convert binary number to decimal number via "self.binary_to_decimal" method
+            2. Convert obtained decimal number obtained from step 1 to quinary via
+               "decimal_to_quinary" method
         '''
 
         if self.is_valid_number_system(binary_number, '01', 'Binary'):
@@ -202,8 +207,9 @@ class NumberSystemConversion:
         Convert octal number system to binary number system
 
         To convert octal to binary you need to:
-            1. Convert octal number to decimal number via "self.octal_to_decimal" function
-            2. Convert obtained decimal number obtained from step 1 to binary via "decimal_to_binary" function
+            1. Convert octal number to decimal number via "self.octal_to_decimal" method
+            2. Convert obtained decimal number obtained from step 1 to binary via
+               "decimal_to_binary" method
         '''
 
         if self.is_valid_number_system(octal_number, '01234567', 'Octal'):
@@ -236,8 +242,9 @@ class NumberSystemConversion:
         Convert octal number to hexadecimal number
 
         To convert octal to hexadecimal you need to:
-            1. Convert octal number to decimal number via "self.octal_to_decimal" function
-            2. Convert obtained decimal number obtained from step 1 to hexadecimal via "decimal_to_hexadecimal" function
+            1. Convert octal number to decimal number via "self.octal_to_decimal" method
+            2. Convert obtained decimal number obtained from step 1 to hexadecimal
+               via "decimal_to_hexadecimal" method
         '''
 
         if self.is_valid_number_system(octal_number, '01234567', 'Octal'):
@@ -251,8 +258,9 @@ class NumberSystemConversion:
         Convert octal number to quinary number
 
         To convert octal to quinary you need to:
-            1. Convert octal number to decimal number via "self.octal_to_decimal" function
-            2. Convert obtained decimal number obtained from step 1 to quinary via "decimal_to_quinary" function
+            1. Convert octal number to decimal number via "self.octal_to_decimal" method
+            2. Convert obtained decimal number obtained from step 1 to quinary via
+               "decimal_to_quinary" method
         '''
 
         if self.is_valid_number_system(octal_number, '01234567', 'Octal'):
@@ -266,8 +274,9 @@ class NumberSystemConversion:
         Convert hexadecimal number to binary number
 
            To convert hexadecimal to binary you need to:
-                1. Convert hexadecimal number to decimal number via "self.hexadecimal_to_decimal" function
-                2. Convert obtained decimal number obtained from step 1 to binary via "decimal_to_binary" function
+                1. Convert hexadecimal number to decimal number via "self.hexadecimal_to_decimal" method
+                2. Convert obtained decimal number obtained from step 1 to binary via
+                   "decimal_to_binary" method
         '''
 
         if self.is_valid_number_system(hexadecimal_number, '0123456789ABCDEF', 'Hexadecimal'):
@@ -305,8 +314,9 @@ class NumberSystemConversion:
         Convert hexadecimal number to octal number
 
         To convert hexadecimal to octal you need to:
-            1. Convert hexadecimal number to decimal number via "self.hexadecimal_to_decimal" function
-            2. Convert obtained decimal number obtained from step 1 to octal via "decimal_to_octal" function
+            1. Convert hexadecimal number to decimal number via "self.hexadecimal_to_decimal" method
+            2. Convert obtained decimal number obtained from step 1 to octal via
+               "decimal_to_octal" method
         '''
 
         if self.is_valid_number_system(hexadecimal_number, '0123456789ABCDEF', 'Hexadecimal'):
@@ -320,8 +330,9 @@ class NumberSystemConversion:
         Convert hexadecimal number to quinary number
 
         To convert hexadecimal to quinary you need to:
-            1. Convert hexadecimal number to decimal number via "self.hexadecimal_to_decimal" function
-            2. Convert obtained decimal number obtained from step 1 to quinary via "decimal_to_quinary" function
+            1. Convert hexadecimal number to decimal number via "self.hexadecimal_to_decimal" method
+            2. Convert obtained decimal number obtained from step 1 to quinary via
+               "decimal_to_quinary" method
         '''
 
         if self.is_valid_number_system(hexadecimal_number, '0123456789ABCDEF', 'Hexadecimal'):
@@ -335,8 +346,9 @@ class NumberSystemConversion:
         Convert quinary number to binary number
 
         To convert quinary to binary you need to:
-            1. Convert quinary number to decimal number via "self.quinary_to_decimal" function
-            2. Convert obtained decimal number obtained from step 1 to binary via "decimal_to_binary" function
+            1. Convert quinary number to decimal number via "self.quinary_to_decimal" method
+            2. Convert obtained decimal number obtained from step 1 to binary via
+               "decimal_to_binary" method
         '''
 
         if self.is_valid_number_system(quinary_number, '01234', 'Quinary'):
@@ -369,8 +381,9 @@ class NumberSystemConversion:
         Convert quinary number to octal number
 
         To convert quinary to octal you need to:
-            1. Convert quinary number to decimal number via "self.quinary_to_decimal" function
-            2. Convert obtained decimal number obtained from step 1 to octal via "decimal_to_octal" function
+            1. Convert quinary number to decimal number via "self.quinary_to_decimal" method
+            2. Convert obtained decimal number obtained from step 1 to octal via
+               "decimal_to_octal" method
         '''
 
         if self.is_valid_number_system(quinary_number, '01234', 'Quinary'):
@@ -384,8 +397,9 @@ class NumberSystemConversion:
         Convert quinary number into hexadecimal number
 
         To convert quinary to hexadecimal you need to:
-            1. Convert quinary number to decimal number via "self.quinary_to_decimal" function
-            2. Convert obtained decimal number obtained from step 1 to hexadecimal via "decimal_to_hexadecimal" function
+            1. Convert quinary number to decimal number via "self.quinary_to_decimal" method
+            2. Convert obtained decimal number obtained from step 1 to hexadecimal
+               via "decimal_to_hexadecimal" method
         '''
 
         if self.is_valid_number_system(quinary_number, '01234', 'Quinary'):
@@ -460,7 +474,9 @@ class GUI:
         self.master.mainloop()
 
     def bind_keys(self, event, focus_out=False):
-        '''Commands when user clicks in and out of the entry widget'''
+        '''
+        Commands when user clicks in and out of the entry widget
+        '''
 
         entry_get = self.entry_var.get().strip()
         combo_get = self.combo_box.get().strip()
@@ -488,13 +504,17 @@ class GUI:
             self.master.focus()
 
     def remove_error(self):
-        '''Remove error message after three seconds'''
+        '''
+        Remove error message after three seconds
+        '''
 
         self.text_area.delete('1.0', 'end')
         self.text_area.config(state=DISABLED)
 
     def add_newline(self, result):
-        '''Add new line character at the end of the line'''
+        '''
+        Add new line character at the end of the line
+        '''
 
         li = []
         result = str(result)
@@ -510,7 +530,10 @@ class GUI:
         return ''.join(li).strip()
 
     def show_scrollbar(self):
-        '''Show scrollbar when the character in the text is more than the height of the text widget'''
+        '''
+        Show scrollbar when the character in the text is more than the height
+        of the text widget
+        '''
 
         if self.text_area.cget('height') < int(self.text_area.index('end-1c').split('.')[0]):
             self.scrollbar.grid(column=1, row=0, sticky=N + S)
@@ -521,7 +544,10 @@ class GUI:
             self.master.after(100, self.show_scrollbar)
 
     def hide_scrollbar(self):
-        '''Hide scrollbar when the character in the text is less than the height of the text widget'''
+        '''
+        Hide scrollbar when the character in the text is less than the height
+        of the text widget
+        '''
 
         if self.text_area.cget('height') >= int(self.text_area.index('end-1c').split('.')[0]):
             self.scrollbar.grid_forget()
@@ -532,7 +558,9 @@ class GUI:
             self.master.after(100, self.hide_scrollbar)
 
     def display_answer(self, result):
-        '''Display answer or errors'''
+        '''
+        Display answer or errors
+        '''
 
         if len(str(result)) > 20:
             result = self.add_newline(result)
@@ -557,10 +585,12 @@ class GUI:
         Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from temporary directory
         '''
 
         try:
@@ -572,7 +602,9 @@ class GUI:
         return os.path.join(base_path, 'assets', file_name)
 
     def calculation(self, event=None):
-        '''Converting number with respective selected conversion'''
+        '''
+        Converting number with respective selected conversion
+        '''
 
         get_value = self.entry_var.get().strip()
 

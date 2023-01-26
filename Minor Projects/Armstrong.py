@@ -1,14 +1,18 @@
 class Armstrong():
-    '''Check if given integer is armstrong or not
+    '''
+    Check if given integer is armstrong or not
 
         Armstrong series is the series obtained by adding the cube of each integer in the given number.
-            Example: 153 can be obtained by 1 ** 3 + 5 ** 3 + 3 ** 3 '''
+            Example: 153 can be obtained by 1 ** 3 + 5 ** 3 + 3 ** 3
+    '''
 
     def __init__(self, integer=153):
         self.integer = str(integer)
 
     def method_one(self):
-        '''Using for loop'''
+        '''
+        Using for loop
+        '''
 
         sum_of_cube = 0
 
@@ -22,7 +26,9 @@ class Armstrong():
             return f'{self.integer} is not armstrong\n'
 
     def method_two(self):
-        '''Using list comprehension'''
+        '''
+        Using list comprehension
+        '''
 
         sum_of_cube = sum([int(x) ** 3 for x in str(self.integer)])
 

@@ -1,6 +1,5 @@
 class Pattern_Thirteen:
-    '''Pattern thirteen
-
+    '''
         U
         D
         N

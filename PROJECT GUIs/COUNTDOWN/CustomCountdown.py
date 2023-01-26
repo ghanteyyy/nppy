@@ -61,21 +61,27 @@ class CustomCountdown:
         self.master.mainloop()
 
     def enter_command(self, widget, text):
-        '''When cursor enters the widget'''
+        '''
+        When cursor enters the widget
+        '''
 
         widget.focus()
         widget.select_range(0, END)
         widget.select_from(0)
 
     def leave_command(self, widget, text):
-        '''When cursor leaves the widget'''
+        '''
+        When cursor leaves the widget
+        '''
 
         if len(widget.get()) == 0:
             widget.insert(END, text)
             widget.focus()
 
     def reset(self, event=None):
-        '''Command for RESET button'''
+        '''
+        Command for RESET button
+        '''
 
         self.is_paused = False
         self.change_state('normal')
@@ -90,14 +96,18 @@ class CustomCountdown:
             pass
 
     def set_var(self, hrs, mins, secs):
-        '''Appending hour, minute and second values'''
+        '''
+        Appending hour, minute and second values
+        '''
 
         self.hr_var.set(str(hrs).zfill(2))
         self.min_var.set(str(mins).zfill(2))
         self.sec_var.set(str(secs).zfill(2))
 
     def Counter(self):
-        '''Updating hour, minute and seconds'''
+        '''
+        Updating hour, minute and seconds
+        '''
 
         if self.hour == self.minute == self.second == 0:
             messagebox.showinfo('Finished', 'Time UP!')
@@ -119,7 +129,9 @@ class CustomCountdown:
         self.timer = self.master.after(1000, self.Counter)
 
     def start(self, event=None):
-        '''Command for START / PAUSE button'''
+        '''
+        Command for START / PAUSE button
+        '''
 
         if not self.is_paused:  # When user clicks "START" button
             self.is_paused = True
@@ -151,19 +163,25 @@ class CustomCountdown:
             self.start_button.config(text='START')
 
     def change_state(self, state):
-        '''Change the state of entries widget as per "state" parameter '''
+        '''
+        Change the state of entries widget as per "state" parameter
+        '''
 
         for entry in [self.hour_entry, self.minute_entry, self.second_entry]:
             entry.config(state=state)
 
     def resource_path(self, file_name):
-        '''Get absolute path to resource from temporary directory
+        '''
+        Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from temporary directory
+        '''
 
         try:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS

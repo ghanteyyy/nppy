@@ -2,14 +2,18 @@ import cv2
 
 
 class OpenCVCam:
-    '''Capture image from your camera'''
+    '''
+    Capture image from your camera
+    '''
 
     def __init__(self, image_name):
         self.image_name = image_name
         self.download_link = 'pip install opencv-python'
 
     def capture(self):
-        '''Capturing Image'''
+        '''
+        Capturing Image
+        '''
 
         try:
             cam = cv2.VideoCapture(0)  # Setting default camera

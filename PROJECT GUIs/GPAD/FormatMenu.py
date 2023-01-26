@@ -10,13 +10,17 @@ class Format:
         self.WrapAroundVar = BooleanVar(value=False)
 
     def FontSelection(self, event=None):
-        '''Display GUI window for font selection'''
+        '''
+        Display GUI window for font selection
+        '''
 
         FontUI.UI(self.master, self.font)
 
     def WrapAround(self, event=None):
-        '''Insert word to the new-line if it does not fit to the same line when
-           enabled. Option is available in Format-Menu or Ctrl+W'''
+        '''
+        Insert word to the new-line if it does not fit to the same line when
+        enabled. Option is available in Format-Menu or Ctrl+W
+        '''
 
         if self.WrapAroundVar:
             self.WrapAroundVar = False

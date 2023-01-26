@@ -406,10 +406,12 @@ def ResourcePath(_dir, file_name):
     Get absolute path to resource from temporary directory
 
     In development:
-        Gets path of files that are used in this script like icons, images or file of any extension from current directory
+        Gets path of files that are used in this script like icons, images or
+        file of any extension from current directory
 
     After compiling to .exe with pyinstaller and using --add-data flag:
-        Gets path of files that are used in this script like icons, images or file of any extension from temporary directory
+        Gets path of files that are used in this script like icons, images or
+        file of any extension from temporary directory
     '''
 
     try:

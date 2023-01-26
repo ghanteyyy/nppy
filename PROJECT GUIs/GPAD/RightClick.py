@@ -27,7 +27,9 @@ class RightClick:
             self.menu.add_command(label=value[0], command=value[1])
 
     def IsSelectionAvailable(self):
-        '''Check if any selection is made'''
+        '''
+        Check if any selection is made
+        '''
 
         try:
             self.TextWidget.get('sel.first', 'sel.last')
@@ -39,21 +41,27 @@ class RightClick:
         return ('found' in self.TextWidget.tag_names() or 'triple_click' in self.TextWidget.tag_names())
 
     def OpenFileLocation(self, event=None):
-        '''Open the location of file and select it'''
+        '''
+        Open the location of file and select it
+        '''
 
         FILE_BROWSER_PATH = os.path.join(os.getenv('WINDIR'), 'explorer.exe')
         path = os.path.normpath(self.FileName)
         self.master.after(0, lambda: subprocess.run([FILE_BROWSER_PATH, '/select,', path]))
 
     def TakeScreenshot(self, event=None):
-        '''Take screenshot of the entire window'''
+        '''
+        Take screenshot of the entire window
+        '''
 
         random_name = ''.join(random.choice(string.ascii_letters) for _ in range(8)) + '.png'
         cap = tkcap.CAP(self.master)
         self.master.after(250, lambda: cap.capture(random_name))
 
     def ShowPopUp(self, event=None):
-        '''Display popup menu when user right clicks'''
+        '''
+        Display popup menu when user right clicks
+        '''
 
         try:
             if self.TextWidget.get('1.0', 'end-1c').strip('\n'):  # Enabling 'Undo', 'Cut', 'Copy' and 'Select All' option if there is any text in text_widget

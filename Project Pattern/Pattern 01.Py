@@ -1,6 +1,5 @@
 class Pattern_One:
-    '''Pattern one
-
+    '''
         1
         1 1
         1 1 1

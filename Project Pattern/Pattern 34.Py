@@ -1,6 +1,5 @@
 class Pattern_Thirty_Four:
-    '''Pattern thirty_four
-
+    '''
              *
             * *
            * * *

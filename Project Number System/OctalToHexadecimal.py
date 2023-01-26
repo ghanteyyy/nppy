@@ -1,5 +1,6 @@
 class OctalToHexadecimal:
-    '''Convert octal number to hexadecimal number
+    '''
+    Convert octal number to hexadecimal number
 
         To convert octal number to hexadecimal you need to first convert the octal number to decimal and obtained decimal to hexadecimal
             For an instance, lets take an octal number 276
@@ -14,9 +15,14 @@ class OctalToHexadecimal:
                                    ------
                                       0
 
-                            And our required hexadecimal is BE (taking remainder in reverse(i.e from down to up))'''
+                            And our required hexadecimal is BE (taking remainder in reverse(i.e from down to up))
+    '''
 
     def IsOctal(self, octal_number):
+        '''
+        Checking if the given number is octal
+        '''
+
         while octal_number > 0:
             remainder = octal_number % 10
             octal_number //= 10
@@ -27,6 +33,10 @@ class OctalToHexadecimal:
         return True
 
     def toHexadecimal(self, octal_number):
+        '''
+        Converting the given octal number to hexadecimal
+        '''
+
         if self.IsOctal(octal_number):
             decimal_number = 0
             hexadecimal_number = ''

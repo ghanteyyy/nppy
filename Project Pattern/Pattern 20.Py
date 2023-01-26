@@ -1,6 +1,5 @@
 class Pattern_Twenty:
-    '''Pattern twenty
-
+    '''
         P r o g r a m m i n g
         r o g r a m m i n
         o g r a m m i

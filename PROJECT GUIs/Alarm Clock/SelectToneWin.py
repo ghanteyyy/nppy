@@ -129,8 +129,8 @@ class SelectToneWin:
 
     def Quit(self):
         '''
-        Set background and foreground color of selected value in Listbox to white
-        and black respectively. Also stopping the currently playing audio.
+        Set background and foreground color of selected value in Listbox to
+        white and black respectively. Also stopping the currently playing audio.
         '''
 
         if self.prev_index:

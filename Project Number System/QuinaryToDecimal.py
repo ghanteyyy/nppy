@@ -1,5 +1,6 @@
 class QuinaryToDecimal:
-    '''Convert quinary number to decimal number
+    '''
+    Convert quinary number to decimal number
 
         You can convert quinary number to decimal by multiplying each quinary number with base of 5 with power starting from 0 increasing from left to right.
             For an instance, lets take quinary number be 123
@@ -8,9 +9,14 @@ class QuinaryToDecimal:
                         123 = 1 * 5^2 + 2 * 5^1 + 3 * 5^0
                             = 38
 
-                    And our required quinary number is 38 '''
+                    And our required quinary number is 38
+    '''
 
     def IsQuinary(self, quinary_number):
+        '''
+        Checking if the given number is quinary
+        '''
+
         while quinary_number > 0:
             remainder = quinary_number % 10
             quinary_number //= 10
@@ -21,6 +27,10 @@ class QuinaryToDecimal:
         return True
 
     def toDecimal(self, quinary_number):
+        '''
+        Converting the given quinary number to decimal
+        '''
+
         if self.IsQuinary(quinary_number):
             decimal_number = 0
 

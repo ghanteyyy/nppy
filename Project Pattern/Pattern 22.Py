@@ -1,6 +1,5 @@
 class Pattern_Twenty_Two:
-    ''' Pattern twenty_two
-
+    ''' 
               ***
              *   *
              *   *

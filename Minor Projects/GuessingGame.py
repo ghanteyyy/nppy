@@ -7,12 +7,16 @@ class GuessingGame:
         self.high = high
 
     def is_guess_within_range(self, guess):
-        '''Check if the guess is within the range of self.low and self.high'''
+        '''
+        Check if the guess is within the range of self.low and self.high
+        '''
 
         return self.low <= guess <= self.high
 
     def get_user_guess(self):
-        '''Ask user to enter their guess until the valid guess is entered.'''
+        '''
+        Ask user to enter their guess until the valid guess is entered
+        '''
 
         guess = None
 
@@ -30,19 +34,25 @@ class GuessingGame:
         return guess
 
     def play_again(self):
-        '''Ask user if they want to play the game again.'''
+        '''
+        Ask user if they want to play the game again
+        '''
 
         check = input('\nDo you want to play again (y/n)?').lower()
 
         return check == 'y'
 
     def random_number(self):
-        '''Returns random number which has to be guessed by the user'''
+        '''
+        Returns random number which has to be guessed by the user
+        '''
 
         return random.randint(self.low, self.high)
 
     def main(self):
-        '''Playing the game'''
+        '''
+        Playing the game
+        '''
 
         play = True
 

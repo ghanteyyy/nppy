@@ -89,7 +89,9 @@ class Calculator:
         self.master.mainloop()
 
     def initial_position(self):
-        '''Position when the program opens'''
+        '''
+        Position when the program opens
+        '''
 
         self.master.withdraw()
         self.master.update()
@@ -108,7 +110,10 @@ class Calculator:
         self.master.after(10, self.insert_zero)
 
     def place_at_top(self):
-        '''Place the window to the top of any window opened in the background and resize some widgets'''
+        '''
+        Place the window to the top of any window opened in the background and
+        resize some widgets
+        '''
 
         if self.is_at_top:
             self.is_at_top = False
@@ -126,8 +131,10 @@ class Calculator:
             self.master.geometry(f'{self.width}x{self.height}+{pos_x}+3')
 
     def ac_command(self):
-        '''Remove everything from entry_box and insert '0' when ac button or 'a'
-           key is pressed'''
+        '''
+        Remove everything from entry_box and insert '0' when ac button or 'a'
+        key is pressed
+        '''
 
         self.var.set('')
         self.var.set('0')
@@ -151,7 +158,9 @@ class Calculator:
         self.master.after(10, self.insert_zero)
 
     def del_command(self):
-        '''Remove last character of entry_box when del_button or backspace is pressed'''
+        '''
+        Remove last character of entry_box when del_button or backspace is pressed
+        '''
 
         try:
             entry_get = self.var.get()
@@ -168,8 +177,11 @@ class Calculator:
                     entry_get = entry_get[:-3]
 
             elif entry_get[-1] in self.operators:
-                # Assign self.decimal_placeable to True if there is not any '.' between two operators i.e 850+450+ This means '.' can be placed
-                # Assign self.decimal_placeable to False if there is '.' between two operators i.e 850+45.58+ This means decimal '.' cannot be placed
+                # Assign self.decimal_placeable to True if there is not any '.' between
+                # two operators i.e 850+450+ This means '.' can be placed
+
+                # Assign self.decimal_placeable to False if there is '.' between two
+                # operators i.e 850+45.58+ This means decimal '.' cannot be placed
 
                 found = True
                 last_index = len(entry_get) - 2
@@ -208,8 +220,8 @@ class Calculator:
             ii. Make calculation only if the last_value in entry_box has no any operators
             iii. Replace '%' with '/100', '^' with '**'.
             iv. Make calculation if only trigonometric functions are found without any operators
-            v.  Store the current value of entry_box in PrevAns if user does not provide any operator
-                but still clicks equals to button
+            v.  Store the current value of entry_box in PrevAns if user does not
+                provide any operator but still clicks equals to button
             vi. Do not do calculation if the number of  '(' and ')' are not equal.
         '''
 
@@ -276,14 +288,18 @@ class Calculator:
         '''
         Edge Cases:
             1. When only numbers(0-9) are inputted:
-                i. If initial_value in entry_box is '0' then remove that initial '0' and insert the input value.
+                i. If initial_value in entry_box is '0' then remove that initial '0'
+                   and insert the input value.
                 ii. Insert '*' and value when number is inputted after adding '%'
-                iii. If initial_value in entry_box is not '0' then append the input_value with the value in entry_box
+                iii. If initial_value in entry_box is not '0' then append the input_value
+                     with the value in entry_box
 
             2. When only operators(+-*/) are inputted:
                 i.Insert '.0' when any operator is inputted after '.'
-                ii. Insert user_input operator in entry_box if last value in entry_box has no any operator.
-                iii. If last value in entry_box and user_input is operator then replace entry_box operator with user_input operator.
+                ii. Insert user_input operator in entry_box if last value in entry_box has
+                    no any operator.
+                iii. If last value in entry_box and user_input is operator then replace
+                     entry_box operator with user_input operator.
 
             3. When decimal_point(.) is inputted:
                 i. Insert '.' when not insert previously.
@@ -294,12 +310,15 @@ class Calculator:
                 i. Insert '%' only if the last value in entry_box is not in '+-/*%.'
 
             5. When trigonometric function is pressed:
-                i. If initial_value in entry_box is '0' then remove that initial '0' and insert trigonometric_functions.
-                ii. Insert trigonometric functions only if the last value in entry_get is operator, '('.
+                i. If initial_value in entry_box is '0' then remove that initial '0' and
+                   insert trigonometric_functions.
+                ii. Insert trigonometric functions only if the last value in entry_get is
+                    operator, '('.
                 iii. Remove trigonometric function if 'del' button or 'backspace' key is pressed.
 
             6. When 'n!' button is pressed:
-                i. If initial_value in entry_box is '0' then remove that initial '0' and insert 'factorial('.
+                i. If initial_value in entry_box is '0' then remove that initial '0' and insert
+                   'factorial('.
                 ii. Insert 'factorial(' only if there is only operator at the end.
 
             7. When 'π' button is pressed:
@@ -307,14 +326,17 @@ class Calculator:
                 ii. Insert 'π' only if there is only operator or '(' at the end.
 
             8. When 'Prev Ans' button is pressed:
-                i. If initial_value in entry_box is '0' then remove that initial '0' and insert previous_answer.
-                ii. If there is no initial_value then insert the previous_answer if the last value in entry_box
+                i. If initial_value in entry_box is '0' then remove that initial '0' and insert
+                   previous_answer.
+                ii. If there is no initial_value then insert the previous_answer if the last value
+                    in entry_box
                     is in operator and ( .
-                iii. Don't insert 'prev_ans' if 'prev_ans' have decimal and decimal_placeable(i.e current value
-                        in entry widget also have decimal) is False.
-                iv. If last_value in entry_get is '-' and 'prev_ans' also have '-' then wrap the 'prev_ans' inside '()'
-                v. If the last value in entry widget ends with number or with  )% then insert *(multiplication sign)
-                    followed by the PrevAns
+                iii. Don't insert 'prev_ans' if 'prev_ans' have decimal and decimal_placeable(i.e
+                     current value in entry widget also have decimal) is False.
+                iv. If last_value in entry_get is '-' and 'prev_ans' also have '-' then wrap the
+                    'prev_ans' inside '()'
+                v. If the last value in entry widget ends with number or with  )% then insert
+                    * (multiplication sign) followed by the PrevAns
 
             9. When '(' or ')' button is pressed:
                 i.  If initial_value in entry_box is '0' then remove that and insert '('.
@@ -388,7 +410,9 @@ class Calculator:
             pass
 
     def edge_case_1(self, entry_get, char):
-        '''When only numbers are entered'''
+        '''
+        When only numbers are entered
+        '''
 
         if len(entry_get) == 1 and entry_get[0] == '0':    # Edge Case 1(i)
             self.var.set('')
@@ -403,7 +427,9 @@ class Calculator:
         return set_var
 
     def edge_case_2(self, entry_get, char):
-        '''When only operators are entered'''
+        '''
+        When only operators are entered
+        '''
 
         if entry_get[-1] == '.':   # Edge Case 2(i)
             set_var = entry_get + '0' + char
@@ -419,7 +445,9 @@ class Calculator:
         return set_var
 
     def edge_case_3(self, entry_get, char):
-        '''When decimal_point (.) is entered'''
+        '''
+        When decimal_point (.) is entered
+        '''
 
         if self.decimal_placeable:
             if entry_get[-1] in self.operators + '(':  # Edge Case 3(ii)
@@ -432,7 +460,9 @@ class Calculator:
             return set_var
 
     def edge_case_4(self, entry_get, char):
-        '''When '%' is entered'''
+        '''
+        When '%' is entered
+        '''
 
         if entry_get[-1] not in self.operators + '.%(':   # Edge Case 4(i) and 5(vi)
             set_var = entry_get + char
@@ -440,7 +470,9 @@ class Calculator:
             return set_var
 
     def edge_case_5(self, entry_get, char):
-        '''When trigonometric functions is entered'''
+        '''
+        When trigonometric functions is entered
+        '''
 
         if len(entry_get) == 1 and entry_get[0] == '0':  # Edge Case 5(i)
             self.var.set('')
@@ -455,7 +487,9 @@ class Calculator:
         return set_var
 
     def edge_case_6(self, entry_get, char):
-        '''When 'n!' button is pressed'''
+        '''
+        When 'n!' button is pressed
+        '''
 
         if len(entry_get) == 1 and entry_get[0] == '0':  # Edge Case 6(i)
             set_var = 'factorial('
@@ -466,7 +500,9 @@ class Calculator:
         return set_var
 
     def edge_case_7(self, entry_get, char):
-        '''When 'π' button is pressed'''
+        '''
+        When 'π' button is pressed
+        '''
 
         if len(entry_get) == 1 and entry_get[0] == '0':  # Edge Case 7(i)
             set_var = 'π'
@@ -477,7 +513,9 @@ class Calculator:
         return set_var
 
     def edge_case_8(self, entry_get):
-        '''When 'Prev Ans' button is pressed.'''
+        '''
+        When 'Prev Ans' button is pressed
+        '''
 
         if len(entry_get) == 1 and entry_get[0] == '0':  # Edge Case 8(i)
             set_var = self.prev_ans
@@ -497,7 +535,9 @@ class Calculator:
         return set_var
 
     def edge_case_9(self, entry_get, char):
-        '''When '(' or ')' button is pressed'''
+        '''
+        When '(' or ')' button is pressed
+        '''
 
         start_bracket = entry_get.count('(')
         end_bracket = entry_get.count(')')
@@ -523,7 +563,9 @@ class Calculator:
         return set_var
 
     def info(self, event=None):
-        '''Show information about bind-ed keys for different actions'''
+        '''
+        Show information about bind-ed keys for different actions
+        '''
 
         key_bindings = ['Q = Quit',
                         'A = Clear all',
@@ -539,10 +581,12 @@ class Calculator:
         Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from temporary directory
         '''
 
         try:

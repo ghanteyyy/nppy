@@ -84,7 +84,9 @@ class StickyNotes:
         self.master.mainloop()
 
     def double_click(self, event=None):
-        '''Make selection up-to the end of the line when user makes double left clicks'''
+        '''
+        Make selection up-to the end of the line when user makes double left clicks
+        '''
 
         self.text_widget.tag_delete('sel', '1.0', 'end')
         cursor_pos = self.text_widget.index('insert')
@@ -103,13 +105,18 @@ class StickyNotes:
         return 'break'
 
     def left_click(self, event=None):
-        '''Make cursor visible when user left clicks if hidden previously when selecting all text with 'Ctrl + A' '''
+        '''
+        Make cursor visible when user left clicks if hidden previously when
+        selecting all text with 'Ctrl + A'
+        '''
 
         if self.text_widget['insertofftime'] > 300:
             self.text_widget.config(insertofftime=300, insertontime=600)
 
     def select_all(self, event=None):
-        '''Select all text when user clicks Select-All option or Ctrl+A'''
+        '''
+        Select all text when user clicks Select-All option or Ctrl+A
+        '''
 
         total_lines = int(self.text_widget.index('end-1c').split('.')[0]) + 1
 
@@ -121,7 +128,10 @@ class StickyNotes:
         return 'break'
 
     def save_formatting(self, event=None):
-        '''Saves text styles like bold, italic, underline or overstrike as well as starting_index and ending_index of that style in config.json'''
+        '''
+        Saves text styles like bold, italic, underline or overstrike as well as
+        starting_index and ending_index of that style in config.json
+        '''
 
         self.text_widget.tag_remove('sel', '1.0', 'end')  # Removing all selected area from the text widget.
         self.text_widget.mark_set('insert', END)  # Moving cursor to the end of the text widget.
@@ -153,7 +163,9 @@ class StickyNotes:
                 json.dump(formatter, f, indent=4)
 
     def apply_formatting(self):
-        '''Apply text styles stored in config.json within starting_index and ending_index'''
+        '''
+        Apply text styles stored in config.json within starting_index and ending_index
+        '''
 
         try:
             with open(self.json_filename, 'r') as f:
@@ -166,7 +178,10 @@ class StickyNotes:
             pass
 
     def insert_on_startup(self):
-        '''Inserts text stored in 'sticky_notes.txt' and apply the formatting(if available) to the text widget right after the program starts.'''
+        '''
+        Inserts text stored in 'sticky_notes.txt' and apply the formatting(if
+        available) to the text widget right after the program starts
+        '''
 
         try:
             with open(self.text_filename, 'r') as f:
@@ -184,7 +199,10 @@ class StickyNotes:
             pass
 
     def on_exit(self, event=None):
-        '''Saves text in sticky_notes.txt, styling and indexes in config.json before destroying the window'''
+        '''
+        Saves text in sticky_notes.txt, styling and indexes in config.json
+        before destroying the window
+        '''
 
         contents = self.text_widget.get('1.0', END).strip('\n')
 
@@ -198,7 +216,9 @@ class StickyNotes:
         return 'break'
 
     def tag_exists(self, start_index):
-        '''Checking if the selected text has already another tag'''
+        '''
+        Checking if the selected text has already another tag
+        '''
 
         if self.text_widget.tag_names(start_index)[1:]:
             return True
@@ -206,7 +226,9 @@ class StickyNotes:
         return False
 
     def change_tags(self, tag, start_index='sel.first', end_index='sel.last'):
-        '''Change text styles to bold, italic, underline or overstrike'''
+        '''
+        Change text styles to bold, italic, underline or overstrike
+        '''
 
         new_tag = ''.join([random.choice(string.ascii_letters) for _ in range(10)])   # Generating new tags.
 
@@ -243,13 +265,17 @@ class StickyNotes:
         return 'break'
 
     def resource_path(self, file_name):
-        '''Get absolute path to resource from temporary directory
+        '''
+        Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from temporary directory
+        '''
 
         try:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS

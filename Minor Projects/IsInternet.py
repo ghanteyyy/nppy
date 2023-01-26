@@ -2,7 +2,9 @@ import requests
 
 
 def IsInternet():
-    '''Check if you are connected to internet'''
+    '''
+    Check if you are connected to internet
+    '''
 
     try:
         requests.get("http://www.google.com")

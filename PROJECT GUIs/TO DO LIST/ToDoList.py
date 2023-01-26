@@ -85,7 +85,9 @@ class ToDoList:
         self.master.mainloop()
 
     def key_bindings(self, event):
-        '''Different actions when user click to different widgets '''
+        '''
+        Different actions when user click to different widgets
+        '''
 
         get = self.entry_var.get().strip()
 
@@ -102,7 +104,9 @@ class ToDoList:
             self.master.focus()
 
     def collapse(self):
-        '''Expand and shrink window'''
+        '''
+        Expand and shrink window
+        '''
 
         if self.is_collapsed:
             self.is_collapsed = False
@@ -115,7 +119,9 @@ class ToDoList:
             self.collapse_button.config(text='<<')
 
     def show_scrollbar(self):
-        '''show scrollbar when text is more than the text area'''
+        '''
+        Show scrollbar when text is more than the text area
+        '''
 
         if len(self.list_box.get(0, END)) > self.list_box.cget('height'):
             self.scrollbar.grid(column=1, row=0, sticky=N + S)
@@ -126,7 +132,9 @@ class ToDoList:
             self.master.after(100, self.show_scrollbar)
 
     def hide_scrollbar(self):
-        '''hide scrollbar when text is less than the text area'''
+        '''
+        Hide scrollbar when text is less than the text area
+        '''
 
         if len(self.list_box.get(0, END)) <= self.list_box.cget('height'):
             self.scrollbar.grid_forget()
@@ -137,7 +145,9 @@ class ToDoList:
             self.master.after(100, self.hide_scrollbar)
 
     def popup_menu(self, event=None):
-        '''Display menu when right click is clicked'''
+        '''
+        Display menu when right click is clicked
+        '''
 
         try:
             selection = self.list_box.curselection()
@@ -156,7 +166,10 @@ class ToDoList:
             self.delete_menu.grab_release()
 
     def check_for_file(self, clear_all=False):
-        '''Create "to_do_list.txt" file if not exists or delete the contents of file if user press delete previous data'''
+        '''
+        Create "to_do_list.txt" file if not exists or delete the contents of
+        file if user press delete previous data
+        '''
 
         if not os.path.exists(self.file_name) or clear_all:
             with open(self.file_name, 'w'):
@@ -165,14 +178,18 @@ class ToDoList:
             self.clear()
 
     def save_content(self, contents):
-        '''Save user list to the file'''
+        '''
+        Save user list to the file
+        '''
 
         with open(self.file_name, 'a') as file:
             for content in contents:
                 file.write(f'{content}\n')
 
     def read_content(self):
-        '''Read contents of the file'''
+        '''
+        Read contents of the file
+        '''
 
         with open(self.file_name, 'r') as file:
             contents = [content.strip('\n') for content in file.readlines()]
@@ -180,7 +197,9 @@ class ToDoList:
         return contents
 
     def add_to_list(self, data=None):
-        '''Get the contents from the file and add them to the list box'''
+        '''
+        Get the contents from the file and add them to the list box
+        '''
 
         if os.path.exists(self.file_name):
             if data:
@@ -195,7 +214,9 @@ class ToDoList:
                 self.list_box.insert(index, content.strip('\n'))
 
     def add_command(self, event=None):
-        '''Command for add button'''
+        '''
+        Command for add button
+        '''
 
         get_from_entry_box = self.entry_box.get().strip()
 
@@ -210,12 +231,16 @@ class ToDoList:
             messagebox.showerror('Invalid Entry', 'Enter something in the entry box')
 
     def clear(self):
-        '''Command for clear button'''
+        '''
+        Command for clear button
+        '''
 
         self.list_box.delete(0, END)
 
     def popup_delete(self, mode=None):
-        '''Command when user right clicks'''
+        '''
+        Command when user right clicks
+        '''
 
         selection = self.list_box.curselection()
         from_list = [value for index, value in enumerate(self.list_box.get(0, END)) if index not in selection]
@@ -234,13 +259,17 @@ class ToDoList:
                 self.add_to_list(from_list)
 
     def resource_path(self, file_name):
-        '''Get absolute path to resource from temporary directory
+        '''
+        Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from temporary directory
+        '''
 
         try:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS

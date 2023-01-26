@@ -2,7 +2,9 @@ import os
 
 
 class CountAnyFiles:
-    '''Count number of files of given extension in a given path'''
+    '''
+    Count number of files of given extension in a given path
+    '''
 
     def __init__(self, path, extension):
         self.count = 0
@@ -13,7 +15,9 @@ class CountAnyFiles:
                         'swapfile.sys', 'System Volume Information', 'Windows', 'Public', '.idlerc', 'AppData', 'MicrosoftEdgeBackups', 'All Users']  # These directories is to be excluded.
 
     def is_path_valid(self):
-        '''Check if the path given by the user is valid'''
+        '''
+        Check if the path given by the user is valid
+        '''
 
         if not os.path.exists(self.path):
             raise FileNotFoundError(f'{self.path} does not exists')
@@ -21,7 +25,9 @@ class CountAnyFiles:
         return True
 
     def main(self):
-        '''Count files'''
+        '''
+        Count files
+        '''
 
         if self.is_path_valid():
             for dirs, dirn, files in os.walk(self.path):  # Going through all directories and files of the path

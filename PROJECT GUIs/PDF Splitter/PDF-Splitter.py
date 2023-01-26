@@ -39,7 +39,8 @@ class _Entry:
 
     def focus_out(self, event=None):
         '''
-        Remove temporary placeholder's text when user clicks out of respective entry widget
+        Remove temporary placeholder's text when user clicks out of respective
+        entry widget
         '''
 
         if self.IsDefault is False and not self.var.get().strip():
@@ -394,10 +395,12 @@ class PDFSplitter:
         Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from temporary directory
         '''
 
         try:

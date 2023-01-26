@@ -15,7 +15,9 @@ class RemainderWindow:
         self.file_name = 'Remainder.txt'
 
     def window(self, text):
-        '''GUI window'''
+        '''
+        GUI window
+        '''
 
         self.root = Tk()
         self.root.withdraw()
@@ -38,13 +40,17 @@ class RemainderWindow:
         self.root.mainloop()
 
     def read_file(self):
-        '''Getting contents of "Remainder.txt" '''
+        '''
+        Getting contents of "Remainder.txt"
+        '''
 
         with open(self.file_name, 'r') as f:
             return [line.strip('\n') for line in f.readlines()]
 
     def get_remainder(self):
-        '''Getting remainders for today'''
+        '''
+        Getting remainders for today
+        '''
 
         remainders = []
         remainder_time = time.strftime('%b %d')
@@ -62,7 +68,9 @@ class RemainderWindow:
         return remainders
 
     def remove_remainder(self, remainder):
-        '''Removing displayed remainders from files'''
+        '''
+        Removing displayed remainders from files
+        '''
 
         lines = self.read_file()
         check = ' | '.join(remainder)
@@ -73,7 +81,9 @@ class RemainderWindow:
                     f.write(f'{line}\n')
 
     def main(self):
-        '''Getting, showing and removing remainders'''
+        '''
+        Getting, showing and removing remainders
+        '''
 
         try:
             while True:
@@ -97,13 +107,17 @@ class RemainderWindow:
             return
 
     def resource_path(self, file_name):
-        '''Get absolute path to resource from temporary directory
+        '''
+        Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from temporary directory
+        '''
 
         try:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
@@ -115,14 +129,18 @@ class RemainderWindow:
 
 
 class is_at_startup:
-    '''Add the program path to startup'''
+    '''
+    Add the program path to startup
+    '''
 
     def __init__(self, program_path):
         self.program_path = program_path
         self.program_basename = os.path.basename(self.program_path)
 
     def is_path_valid(self):
-        '''Check if the given program path actually exists'''
+        '''
+        Check if the given program path actually exists
+        '''
 
         if os.path.exists(self.program_path):
             return True
@@ -130,7 +148,9 @@ class is_at_startup:
         return False
 
     def main(self):
-        '''Adding to startup'''
+        '''
+        Adding to startup
+        '''
 
         if self.is_path_valid():
             areg = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
@@ -139,8 +159,6 @@ class is_at_startup:
                 akey = winreg.OpenKey(areg, f'SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\{self.program_basename}', 0, winreg.KEY_WRITE)
                 areg.Close()
                 akey.Close()
-
-                print(f'{self.program_path} already at startup')
 
             except WindowsError:
                 key = winreg.OpenKey(areg, r'SOFTWARE\Microsoft\Windows\CurrentVersion\Run', 0, winreg.KEY_SET_VALUE)

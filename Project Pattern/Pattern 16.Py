@@ -1,6 +1,5 @@
 class Pattern_Sixteen:
-    ''' Pattern sixteen
-
+    ''' 
         9
         9 8
         9 8 7

@@ -1,5 +1,6 @@
 class JoinWord:
-    '''Join your word with your joining keyword
+    '''
+    Join your word with your joining keyword
         Example:
                 word = PYTHON
                 delimiter = -
@@ -13,7 +14,9 @@ class JoinWord:
         self.delimiter = delimiter
 
     def method_one(self):
-        '''Using for loop'''
+        '''
+        Using for loop
+        '''
 
         join_word = ""
 
@@ -27,7 +30,9 @@ class JoinWord:
         print(join_word)
 
     def method_two(self):
-        '''Using built-in function : join :'''
+        '''
+        Using built-in function "join"
+        '''
 
         join = (self.delimiter).join(self.string)
 

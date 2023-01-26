@@ -5,15 +5,19 @@ from configparser import ConfigParser
 
 
 class Startup:
-    '''This script is to execute Tution.exe on startup. Tution.exe is made
-    when Tution.exe is compiled to exe using Pyinstaller or other similar
-    script. This script is also to be compiled to exe'''
+    '''
+    This script is to execute Tuition.exe on startup. Tuition.exe is made
+    when Tuition.exe is compiled to exe using Pyinstaller or other similar
+    script. This script is also to be compiled to exe
+    '''
 
     def __init__(self):
         self.configFile = os.path.join(os.environ['USERPROFILE'], r'AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Tution\settings.ini')
 
     def AlterConfig(self):
-        '''Edit config file with respective values'''
+        '''
+        Edit config file with respective values
+        '''
 
         dirpath = os.path.dirname(self.configFile)
 
@@ -38,7 +42,9 @@ class Startup:
         return status
 
     def main(self):
-        '''Entry point of this script'''
+        '''
+        Entry point of this script
+        '''
 
         if self.AlterConfig():
             os.startfile(self.main_executable)
@@ -47,7 +53,7 @@ class Startup:
             root = Tk()
             root.withdraw()
 
-            if messagebox.showinfo('TUTION', 'settings.ini is corrupted. Could\'t not execute Tution.exe.\n\nRun Tution.exe manually.') == 'ok':
+            if messagebox.showinfo('TUITION', 'settings.ini is corrupted. Could\'t not execute Tution.exe.\n\nRun Tution.exe manually.') == 'ok':
                 root.quit()
                 root.destroy()
 

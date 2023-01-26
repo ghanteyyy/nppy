@@ -1,6 +1,5 @@
 class Pattern_Elevan:
-    '''Pattern elevan
-
+    '''
         K A T H M A N D U
         A T H M A N D U
         T H M A N D U

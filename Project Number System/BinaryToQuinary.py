@@ -1,5 +1,6 @@
 class BinaryToQuinary:
-    '''Convert binary number to quinary number
+    '''
+    Convert binary number to quinary number
 
         To convert quinary to binary we need to:
             Step 1: Convert given binary to decimal
@@ -18,10 +19,14 @@ class BinaryToQuinary:
                                4
 
                     Write remainder going from down to up i.e 443
-                    Required quinary number is 443 '''
+
+                    Required quinary number is 443
+    '''
 
     def IsBinary(self, binary_number):
-        '''Check if the given number is binary'''
+        '''
+        Check if the given number is binary
+        '''
 
         while binary_number > 0:
             remainder = binary_number % 10
@@ -33,6 +38,10 @@ class BinaryToQuinary:
         return True
 
     def toQuinary(self, binary_number):
+        '''
+        Converting binary number to quinary
+        '''
+
         if self.IsBinary(binary_number):
             decimal_number = 0
             quinary_number = ''
@@ -40,7 +49,7 @@ class BinaryToQuinary:
             for power, num in enumerate(str(binary_number)[::-1]):
                 decimal_number += int(num) * 2 ** power
 
-            while decimal_number > 0:  # Converting obtained decimal to quinary
+            while decimal_number > 0:
                 tempQuinaryNumber = decimal_number % 5
                 quinary_number += str(tempQuinaryNumber)
                 decimal_number = decimal_number // 5

@@ -56,10 +56,9 @@ class Snake:
 
     def ChangePositionOfSnakeBody(self):
         '''
-        Change the position of preceding block with
-        the successive block. For example: 2nd block
-        gets the position of 1st block, 3rd block gets
-        the position of 2nd block and so on.
+        Change the position of preceding block with the successive block. For
+        example: 2nd block gets the position of 1st block, 3rd block gets the
+        position of 2nd block and so on.
         '''
 
         if self.HasStarted:
@@ -69,8 +68,7 @@ class Snake:
 
     def GrowSnake(self):
         '''
-        Increase the length of the snake by
-        one block whenever snake eats food
+        Increase the length of the snake by one block whenever snake eats food
         '''
 
         self.Score += 1
@@ -81,8 +79,7 @@ class Snake:
 
     def SnakeAteItself(self):
         '''
-        Check if Head of the Snake touches
-        any one part of its body. If yes,
+        Check if Head of the Snake touches any one part of its body. If yes,
         then the game gets over
         '''
 
@@ -118,9 +115,8 @@ class Snake:
             if self.Direction == 'D':
                 self.SnakeBody[0].y += self.LengthOfEachPiece + 1
 
-            # Make snake appears from another end
-            # when it disappears from one end of
-            # the edge of screen
+            # Make snake appears from another end when it disappears from one end
+            # of the edge of screen
             if self.SnakeBody[0].x + 5 >= self.WIDTH:
                 self.SnakeBody[0].x = 1
 
@@ -141,8 +137,7 @@ class Snake:
 
     def GetUserDirection(self):
         '''
-        Get user direction to move snake
-        towards to that direction
+        Get user direction to move snake towards to that direction
         '''
 
         keys = pygame.key.get_pressed()
@@ -324,10 +319,12 @@ class Snake:
         Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from temporary directory
         '''
 
         try:

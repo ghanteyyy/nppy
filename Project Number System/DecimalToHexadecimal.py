@@ -1,5 +1,6 @@
 class DecimalToHexadecimal:
-    '''Convert decimal number to hexadecimal number
+    '''
+    Convert decimal number to hexadecimal number
         To convert decimal number to hexadecimal, you need to:
             For instance, lets take decimal number as 123
                 Divide decimal number until remainder becomes 0
@@ -7,9 +8,14 @@ class DecimalToHexadecimal:
                                            ------
                                               7
 
-                Required hexadecimal number is 7B '''
+                Required hexadecimal number is 7B
+    '''
 
     def IsDecimal(self, decimal_number):
+        '''
+        Checking if the given number is decimal
+        '''
+
         while decimal_number > 0:
             remainder = decimal_number % 10
             decimal_number //= 10
@@ -20,6 +26,10 @@ class DecimalToHexadecimal:
         return True
 
     def toHexadecimal(self, decimal_number):
+        '''
+        Converting decimal number to hexadecimal
+        '''
+
         if self.IsDecimal(decimal_number):
             hexadecimal = ''
             hex_value = {'10': 'A', '11': 'B', '12': 'C', '13': 'D', '14': 'E', '15': 'F'}

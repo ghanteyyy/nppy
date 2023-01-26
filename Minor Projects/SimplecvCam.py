@@ -7,7 +7,9 @@ class SimpleCVCam:
         self.download_link = 'https://sourceforge.net/projects/simplecv/files/latest/download?source=files'
 
     def capture(self):
-        '''Capture image from your camera'''
+        '''
+        Capture image from your camera
+        '''
 
         cam = Camera
         cap = cam.getImage()

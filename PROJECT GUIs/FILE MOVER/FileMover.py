@@ -73,7 +73,9 @@ class FileMover:
         self.master.mainloop()
 
     def bind_keys(self, event, focus_out=False):
-        '''Commands when user clicks in and out of the entries widgets'''
+        '''
+        Commands when user clicks in and out of the entries widgets
+        '''
 
         get_from_entry = self.from_entry_var.get().strip()
         get_to_entry = self.to_entry_var.get().strip()
@@ -108,10 +110,12 @@ class FileMover:
             self.master.focus()
 
     def is_thread_alive(self, thread, to_path):
-        '''Call this function until the thread is not finished executing. If the thread
-           finished executing the restore default values to the respective widgets and
-           also show th success message and open the directory where the files / folders
-           are moved or copied'''
+        '''
+        Call this function until the thread is not finished executing. If the
+        thread finished executing the restore default values to the respective
+        widgets and also show th success message and open the directory where the
+        files / folders are moved or copied
+        '''
 
         if not thread.isAlive():    # When thread has finished executing
             self.var.set(0)
@@ -132,7 +136,9 @@ class FileMover:
             self.master.after(10, lambda: self.is_thread_alive(thread, to_path))
 
     def submit_command(self, event=None):
-        '''Action when user clicks submit button'''
+        '''
+        Action when user clicks submit button
+        '''
 
         from_path = self.from_entry_var.get().strip()
         to_path = self.to_entry_var.get().strip()
@@ -154,13 +160,17 @@ class FileMover:
             self.master.after(10, lambda: self.is_thread_alive(thread, to_path))
 
     def resource_path(self, file_name):
-        '''Get absolute path to resource from temporary directory
+        '''
+        Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from temporary directory
+        '''
 
         try:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
@@ -194,7 +204,9 @@ class move_or_copy:
             self.extensions = self.extensions_list[self.file_type]
 
     def duplicates(self, files):
-        '''Checking duplicates files of from_path and to_path'''
+        '''
+        Checking duplicates files of from_path and to_path
+        '''
 
         from_file_path = set([os.path.basename(file) for file in files])
         to_file_path = set(os.listdir(self.to_path))
@@ -206,7 +218,9 @@ class move_or_copy:
         return False
 
     def filter_function(self, file):
-        '''Filtering files as per the extension given by the user'''
+        '''
+        Filtering files as per the extension given by the user
+        '''
 
         if (os.path.isfile(file) and os.path.basename(file).split('.')[1].lower() in self.extensions) or (os.path.isdir(file) and self.extensions == 'Folders'):
             return True
@@ -214,7 +228,9 @@ class move_or_copy:
         return False
 
     def mv_or_cp(self, file):
-        '''Move or Copy files and folders'''
+        '''
+        Move or Copy files and folders
+        '''
 
         to_path = os.path.join(self.to_path, os.path.basename(file))
 
@@ -228,7 +244,9 @@ class move_or_copy:
             shutil.move(file, to_path)
 
     def main(self):
-        '''Main function for copying/moving file/folders'''
+        '''
+        Main function for copying/moving file/folders
+        '''
 
         try:
             all_files = [os.path.join(self.from_path, f) for f in os.listdir(self.from_path)]

@@ -8,7 +8,9 @@ class Search:
         self.master = master
 
     def is_internet(self, link):
-        '''Check if user is connected to internet'''
+        '''
+        Check if user is connected to internet
+        '''
 
         try:
             requests.get(link)
@@ -18,7 +20,9 @@ class Search:
             return False
 
     def OpenLink(self, link):
-        '''Open link to the user's default browser'''
+        '''
+        Open link to the user's default browser
+        '''
 
         if self.is_internet(link):
             webbrowser.open(link)

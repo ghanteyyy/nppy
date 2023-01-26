@@ -75,8 +75,7 @@ class ImageToPDF:
 
     def InitialPosition(self):
         '''
-        Placing window at the center of screen
-        when the GUI starts at first
+        Placing window at the center of screen when the GUI starts at first
         '''
 
         self.window.update()
@@ -97,8 +96,8 @@ class ImageToPDF:
 
     def RestrictDefaultBindings(self, event):
         '''
-        Restrict text-widget to insert cursor when user
-        tries by clicking into it or by using TAB key
+        Restrict text-widget to insert cursor when user tries by clicking into
+        it or by using TAB key
         '''
 
         return 'break'
@@ -244,11 +243,12 @@ class ImageToPDF:
         Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory
-
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from temporary directory
 
         param:
             FileName: image, audio, or any other file_name present in the assets directory

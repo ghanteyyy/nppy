@@ -3,14 +3,18 @@ import winreg
 
 
 class IsAtStartup:
-    '''Adding the given program path to startup'''
+    '''
+    Adding the given program path to startup
+    '''
 
     def __init__(self, program_path):
         self.program_path = program_path
         self.program_basename = os.path.basename(self.program_path)
 
     def main(self):
-        '''Adding to startup'''
+        '''
+        Adding to startup
+        '''
 
         if os.path.exists(self.program_path):
             areg = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)

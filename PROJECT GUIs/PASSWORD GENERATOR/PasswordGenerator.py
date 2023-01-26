@@ -70,8 +70,7 @@ class PasswordGenerator:
 
     def InitialPosition(self):
         '''
-        Placing window at the center of screen
-        when the GUI starts at first
+        Placing window at the center of screen when the GUI starts at first
         '''
 
         self.master.update()
@@ -109,8 +108,8 @@ class PasswordGenerator:
 
     def FocusOut(self, event=None):
         '''
-        Remove focus from Entry widget when already
-        focused and still user presses TAB key
+        Remove focus from Entry widget when already focused and still user
+        presses TAB key
         '''
 
         get = self.NumberBoxVar.get().strip()
@@ -122,9 +121,8 @@ class PasswordGenerator:
 
     def VarTrace(self):
         '''
-        Continuously check if the last value in number_box_var
-        is not digit. If found TRUE then set this var without
-        that non-digit value
+        Continuously check if the last value in number_box_var is not digit. If
+        found TRUE then set this var without that non-digit value
         '''
 
         VarGet = self.NumberBoxVar.get()
@@ -201,15 +199,14 @@ class PasswordGenerator:
         get_var = [var.get() for var in self.vars]
         num_get = self.NumberBoxVar.get().strip()
 
-        # Set the value of entry-widget to 8 if its value
-        # is same as the value in self.DEFAULT_TEXT
+        # Set the value of entry-widget to 8 if its value is same as the value
+        # in self.DEFAULT_TEXT
         if num_get == self.DEFAULT_TEXT:
             num_get = '8'
             self.NumberBoxVar.set('8')
             self.NumberBoxStyle.configure('N.TEntry', foreground='black')
 
-        # Selecting the last check-buttons
-        # if user have not selected one
+        # Selecting the last check-buttons if user have not selected one
         if not any(get_var):
             get_var[-1] = 1
             self.AllVar.set(1)
@@ -230,10 +227,12 @@ class PasswordGenerator:
         Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from temporary directory
         '''
 
         try:

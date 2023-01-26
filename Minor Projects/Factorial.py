@@ -2,15 +2,20 @@ import math
 
 
 class Factorial:
-    '''Factorial is the product of an integer and all the integers below. It is represented also by '!'
-                Example: Factorial of 5 or 5! = 5 * 4 * 3 * 2 * 1
-                                              = 120 '''
+    '''
+    Factorial is the product of an integer and all the integers below.
+    It is represented also by '!'
+        Example: Factorial of 5 or 5! = 5 * 4 * 3 * 2 * 1
+                                      = 120
+    '''
 
     def __init__(self, number=5):
         self.number = number
 
     def method_one(self):
-        '''Using while loop'''
+        '''
+        Using while loop
+        '''
 
         get_factorial = 1
         nums = self.number
@@ -22,7 +27,9 @@ class Factorial:
         return f'{self.number}! = {get_factorial}'
 
     def method_two(self):
-        '''Using for loop'''
+        '''
+        Using for loop
+        '''
 
         get_factorial = 1
 
@@ -32,13 +39,17 @@ class Factorial:
         return f'{self.number}! = {get_factorial}'
 
     def method_three(self):
-        '''Using built-in <math> module'''
+        '''
+        Using built-in "math" module
+        '''
 
         get_factorial = math.factorial(self.number)
         return f'{self.number}! = {get_factorial}'
 
     def method_four(self, number):
-        '''Using recursive method'''
+        '''
+        Using recursive method
+        '''
 
         if number == 1:
             return number

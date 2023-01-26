@@ -20,13 +20,13 @@ class ListAlarm:
         Insert alarm from the file to the text-widget
 
         param:
-            contents: When None, it implies that all the alarms should be read
-                      from the file. When not None, it implies that only new
-                      alarm is to be displayed
+            contents: When None, it implies that all the alarms should be read from
+                      the file. When not None, it implies that only new alarm is to
+                      be displayed
 
-            new: Delete all existing widgets from the text-widget so that all
-                 the alarms can be added from the file with modified details
-                 if set True
+                new:  Delete all existing widgets from the text-widget so that all
+                      the alarms can be added from the file with modified details
+                      if set True
         '''
 
         if new is True:
@@ -92,12 +92,11 @@ class ListAlarm:
 
     def GetCorrespondingTime(self, widget):
         '''
-        Extract time value from the left-frame of the text-widget
-        of the clicked button either toggle button or delete button
+        Extract time value from the left-frame of the text-widget of the
+        clicked button either toggle button or delete button
 
         param:
-            widget: Clicked button-object from the displayed alarm
-                    in text-widget
+            widget: Clicked button-object from the displayed alarm in text-widget
         '''
 
         widget_parent = widget
@@ -116,15 +115,14 @@ class ListAlarm:
 
     def PauseRemoveAlarm(self, event, action):
         '''
-        Pause the alarm when clicked to toggle button and
-        remove the alarm when clicked to delete button
+        Pause the alarm when clicked to toggle button and remove the alarm when
+        clicked to delete button
 
         param:
-            event: Event object automatically generated when
-                   clicked to any buttons
+            event: Event object automatically generated when clicked to any buttons
 
-            action: "pause" to pause or unpause the alarm when clicked to toggle button
-                    "delete" to delete the alarm when clicked to delete button
+            action: "pause" to pause or unpause the alarm when clicked to toggle
+                    button "delete" to delete the alarm when clicked to delete button
         '''
 
         _time = self.GetCorrespondingTime(event.widget)

@@ -1,6 +1,5 @@
 class Pattern_Fourteen:
-    '''Pattern fourteen
-
+    '''
         K
          A
           T

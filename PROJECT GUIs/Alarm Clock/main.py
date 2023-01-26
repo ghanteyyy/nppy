@@ -77,25 +77,24 @@ class AlarmClock:
 
     def RestrictDefaultBindings(self, event):
         '''
-        Restrict text-widget to insert cursor when user
-        tries by clicking into it or by using TAB key
+        Restrict text-widget to insert cursor when user tries by clicking into
+        it or by using TAB key
         '''
 
         return 'break'
 
     def MouseWheel(self, event):
         '''
-        Make text-widget to scroll when user moves
-        scroll button hovering to text-widget-windows
+        Make text-widget to scroll when user moves scroll button hovering to
+        text-widget-windows
         '''
 
         self.TextWidget.yview_scroll(int(-1*(event.delta/120)), "units")
 
     def RedrawChangedWidgets(self):
         '''
-        Redraw widgets in text-widget whenever the value
-        in it changes. Changes are triggered when the
-        alarms are deleted, paused or unpaused
+        Redraw widgets in text-widget whenever the value in it changes. Changes
+        are triggered when the alarms are deleted, paused or unpaused
         '''
 
         contents = Include.ReadJSON()
@@ -105,20 +104,20 @@ class AlarmClock:
         CurrHash = hashlib.md5(bytes(str(contents), encoding='utf-8')).digest()
 
         if self.PrevHash is None:
-            # When self.PrevHash is None, it means that no
-            # widgets has been inserted in text-widget
+            # When self.PrevHash is None, it means that no widgets has been
+            # inserted in text-widget
 
             self.PrevHash = CurrHash
 
         elif self.PrevHash != CurrHash:
-            # When previous and current hash are not equal
-            # then it means the changes has been made
+            # When previous and current hash are not equal then it means the
+            # changes has been made
 
             self.PrevHash = CurrHash
 
             for window in self.TextWidget.window_names():
-                # text_widget.get_names() returns the widget as a string
-                # so we have to convert that string to tkinter object
+                # text_widget.get_names() returns the widget as a string so we have to
+                # convert that string to tkinter object
                 frame = self.window.nametowidget(window)
 
                 # Getting children widgets of that frame
@@ -138,8 +137,8 @@ class AlarmClock:
                     widget_status = status_widget['text']
 
                     if content_status != widget_status:
-                        # When the value of status inside file and in the label-widget of tex-widget
-                        # are different then toggling its value from on to off or vice-versa.
+                        # When the value of status inside file and in the label-widget of text
+                        # widget are different then toggling its value from on to off or vice-versa.
                         if content_status:
                             text_status = 'on'
                             img = self.pi.on_image
@@ -152,8 +151,9 @@ class AlarmClock:
                         status_widget.image = img
 
                 else:
-                    # When the extracted time from the widget in text-widget is not in file then it
-                    # implies that some alarms are deleted so, re-inserting all alarms present in the file
+                    # When the extracted time from the widget in text-widget is not in
+                    # file then it implies that some alarms are deleted so, re-inserting
+                    # all alarms present in the file
                     self.ListAlarm.ListWidgets(new=True)
                     break
 
@@ -211,8 +211,7 @@ class AlarmClock:
 
     def Quit(self):
         '''
-        When user clicks Quit menu by right-clicking
-        to the icon in system-try
+        When user clicks Quit menu by right-clicking to the icon in system-try
         '''
 
         self.icon.stop()

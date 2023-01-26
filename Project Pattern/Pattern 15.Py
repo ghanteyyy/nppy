@@ -1,6 +1,5 @@
 class Pattern_Fifteen:
-    ''' Pattern fifteen
-
+    ''' 
         1
         1 2
         1 2 3

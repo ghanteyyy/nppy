@@ -3,6 +3,10 @@ class HexadecimalToBinary:
         self.HexValue = {'A': '10', 'B': '11', 'C': '12', 'D': '13', 'E': '14', 'F': '15'}
 
     def IsHexadecimal(self, hexadecimal_number):
+        '''
+        Checking if the given number is hexadecimal
+        '''
+
         for num in hexadecimal_number:
             if num not in '0123456789ABCDEF':
                 return False
@@ -10,7 +14,8 @@ class HexadecimalToBinary:
         return True
 
     def toBinary(self, hexadecimal_number):
-        '''Convert hexadecimal number to binary number
+        '''
+        Convert hexadecimal number to binary number
 
             To convert hexadecimal to binary, you need to first convert hexadecimal to decimal and obtained decimal to binary
                 Step 1: Convert hexadecimal to decimal
@@ -36,7 +41,8 @@ class HexadecimalToBinary:
                            ------
                              1
 
-                Required binary number is 100100011 (taking remainder in reverse order)'''
+                Required binary number is 100100011 (taking remainder in reverse order)
+        '''
 
         hexadecimal_number = str(hexadecimal_number)
 
@@ -61,13 +67,14 @@ class HexadecimalToBinary:
             raise ValueError('Invalid Hexadecimal Number')
 
     def AlternativeMethod(self, hexadecimal_number):
-        '''1. Loop to each hexadecimal number
-           2. Convert each hexadecimal number to binary
-           3. If obtained binary length is not 4 then reverse
-              it and insert '0's to make its length 4
-           4. If obtained binary length is equal to 4 then
-              reversing it
-           5. Remove leading '0' from the obtained binary'''
+        '''
+        1. Loop to each hexadecimal number
+        2. Convert each hexadecimal number to binary
+        3. If obtained binary length is not 4 then reverse it and insert '0's to
+           make its length 4
+        4. If obtained binary length is equal to 4 then reversing it
+        5. Remove leading '0' from the obtained binary
+        '''
 
         binary_number = ''
         hexadecimal_number = str(hexadecimal_number)

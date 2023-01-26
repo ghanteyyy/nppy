@@ -220,8 +220,8 @@ class AddAlarm:
 
     def Quit(self):
         '''
-        When user clicks (x) button or when user exits
-        the "Add Alarm" window by clicking X in title-bar
+        When user clicks (x) button or when user exits the "Add Alarm" window
+        by clicking X in title-bar
         '''
 
         self.AddAlarmWindow.destroy()

@@ -59,7 +59,9 @@ class QRCODE_GENERATOR:
         self.master.mainloop()
 
     def InitialPosition(self):
-        '''Set window position to the center when program starts first time'''
+        '''
+        Set window position to the center when program starts first time
+        '''
 
         self.master.update()
         self.master.resizable(0, 0)
@@ -75,12 +77,16 @@ class QRCODE_GENERATOR:
         self.master.update()
 
     def focus_here(self, event=None):
-        '''Focus to the clicked widget'''
+        '''
+        Focus to the clicked widget
+        '''
 
         event.widget.focus_force()
 
     def focus_in(self, event=None):
-        '''Remove default text when user clicks to entry widget'''
+        '''
+        Remove default text when user clicks to entry widget
+        '''
 
         if self.ClearedDefault is False:
             self.ClearedDefault = True
@@ -88,8 +94,10 @@ class QRCODE_GENERATOR:
             self.message_box_style.configure('MB.TEntry', foreground='black')
 
     def focus_out(self, event=None):
-        '''Insert default text if user does not add any text to
-           entry widget and changes the focus to other widget'''
+        '''
+        Insert default text if user does not add any text to entry widget and
+        changes the focus to other widget
+        '''
 
         if not self.message_box_var.get():
             self.ClearedDefault = False
@@ -97,15 +105,19 @@ class QRCODE_GENERATOR:
             self.message_box_style.configure('MB.TEntry', foreground='grey')
 
     def tab_focus_out(self, event=None):
-        '''Remove focus from Entry widget when already
-           focused and still user presses TAB key'''
+        '''
+        Remove focus from Entry widget when already focused and still user
+        presses TAB key
+        '''
 
         if event.widget == self.message_box:
             self.master.focus()
             return 'break'
 
     def ControlBackSpace(self, event=None):
-        '''Delete a word before a white-space'''
+        '''
+        Delete a word before a white-space
+        '''
 
         var_get = self.message_box_var.get()
         word_splits = var_get.split()
@@ -117,7 +129,9 @@ class QRCODE_GENERATOR:
         return 'break'
 
     def trace_var(self, *args):
-        '''When user changes value in entry widget'''
+        '''
+        When user changes value in entry widget
+        '''
 
         text = self.message_box_var.get().strip()
 
@@ -127,7 +141,9 @@ class QRCODE_GENERATOR:
         self.make_QR(text)
 
     def make_QR(self, data):
-        '''Make QR code based on the text inserted in the entry widget'''
+        '''
+        Make QR code based on the text inserted in the entry widget
+        '''
 
         try:
             self.img = self.QRImage = qrcode.make(data)
@@ -145,7 +161,9 @@ class QRCODE_GENERATOR:
             self.message_box_var.set('')
 
     def SaveImage(self, event=None):
-        '''Save QR code to the user selected location'''
+        '''
+        Save QR code to the user selected location
+        '''
 
         file_types = [('PNG', '*.png'), ('JPG', '*.jpg')]
         path = filedialog.asksaveasfilename(title='Save', filetypes=file_types, defaultextension=([file_types[0]]))
@@ -154,7 +172,9 @@ class QRCODE_GENERATOR:
             self.QRImage.save(path)
 
     def CopyImage(self, event=None):
-        '''Copy image to clipboard'''
+        '''
+        Copy image to clipboard
+        '''
 
         memory = io.BytesIO()
         self.QRImage.convert('RGB').save(memory, format='BMP')
@@ -169,15 +189,14 @@ class QRCODE_GENERATOR:
                 win32clipboard.CloseClipboard()
 
             except pywintypes.error:
-                # Encountered pywintypes.error when pressed
-                # control-c continuously to copy image in clipboard.
-                # There should be some interval while opening
+                # Encountered pywintypes.error when pressed control-c continuously to
+                # copy image in clipboard. There should be some interval while opening
                 # clipboard frequently
                 pass
 
         else:
-            # I do not have a linux machine so I have no idea if the
-            # following code works in linux. Hope it works for linux
+            # I do not have a linux machine so I have no idea if the following code works
+            # in linux. Hope it works for linux
             output = subprocess.Popen(("xclip", "-selection", "clipboard", "-t", "image/png", "-i"), stdin=subprocess.PIPE)
             output.stdin.write(memory.getvalue())  # write image to stdin
             output.stdin.close()
@@ -191,13 +210,17 @@ class QRCODE_GENERATOR:
         self.master.after(200, self.restore_QR_Image)
 
     def restore_QR_Image(self):
-        '''Replace blank white image with QR image'''
+        '''
+        Replace blank white image with QR image
+        '''
 
         self.qr_label.config(image=self.img)
         self.qr_label.image = self.img
 
     def RightClick(self, event=None):
-        '''When user right clicks to QR image'''
+        '''
+        When user right clicks to QR image
+        '''
 
         if not isinstance(event.widget, ttk.Entry):  # When right-click is not invoked in Entry widget
             RightClickMenu = Menu(self.master, tearoff=0)
@@ -210,13 +233,17 @@ class QRCODE_GENERATOR:
                 RightClickMenu.grab_release()
 
     def ResourcePath(self, FileName):
-        '''Get absolute path to resource from temporary directory
+        '''
+        Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from temporary directory
+        '''
 
         try:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS

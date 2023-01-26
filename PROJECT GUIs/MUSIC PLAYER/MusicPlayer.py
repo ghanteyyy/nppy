@@ -251,7 +251,9 @@ class MusicPlayer:
         self.master.mainloop()
 
     def RestrictResizingHeading(self, event):
-        '''Restrict user to resize the columns of Treeview '''
+        '''
+        Restrict user to resize the columns of Treeview
+        '''
 
         if self.Tree.identify_region(event.x, event.y) == "separator":
             return "break"
@@ -275,7 +277,9 @@ class MusicPlayer:
         self.master.after(5, self.StopWindowFlicking)
 
     def InitialPosition(self):
-        '''Set window position to the center when program starts first time'''
+        '''
+        Set window position to the center when program starts first time
+        '''
 
         self.master.update()
         self.master.resizable(0, 0)
@@ -294,7 +298,9 @@ class MusicPlayer:
         return self.Tree.identify('item', event.x, event.y) == ''
 
     def SingleLeftClick(self, event):
-        '''When user single left click inside Tree widget'''
+        '''
+        When user single left click inside Tree widget
+        '''
 
         if self.Tree.identify_region(event.x, event.y) == 'heading':
             # Restrict single left clicking if the cursor is on Treeview's heading
@@ -308,7 +314,9 @@ class MusicPlayer:
             return 'break'
 
     def FormatEscapedTime(self, _time):
-        '''Remove 00 from the hour part if found'''
+        '''
+        Remove 00 from the hour part if found
+        '''
 
         _time = _time.split(':')
 
@@ -318,7 +326,9 @@ class MusicPlayer:
             return _time
 
     def DoubleLeftClick(self, event=None):
-        '''When user double clicks anywhere in window'''
+        '''
+        When user double clicks anywhere in window
+        '''
 
         x, y = self.master.winfo_pointerxy()
         widget = self.master.winfo_containing(x, y)
@@ -352,7 +362,9 @@ class MusicPlayer:
             self.DRY_1()
 
     def SpaceBarBindings(self, event=None):
-        '''When user presses space-bar'''
+        '''
+        When user presses space-bar
+        '''
 
         if self.master.focus_get() != self.SearchEntry:
             selections = self.Tree.selection()
@@ -363,7 +375,9 @@ class MusicPlayer:
             self.PlayOrPauseAudio()
 
     def MouseWheel(self, event):
-        '''Change Volume or Skip Audio when ScrollWheel button'''
+        '''
+        Change Volume or Skip Audio when ScrollWheel button
+        '''
 
         x, y = self.master.winfo_pointerxy()
         widget = self.master.winfo_containing(x, y)
@@ -375,18 +389,23 @@ class MusicPlayer:
             self.SkipAudio(event)
 
     def ShowVolumeSlider(self, event=None):
-        '''Show the volume slider when user hovers to volume button'''
+        '''
+        Show the volume slider when user hovers to volume button
+        '''
 
         self.VolumeSliderFrame.pack(side=LEFT)
 
     def HideVolumeSlider(self, event=None):
-        '''Hide the volume slider when user hovers away from the
-           volume button'''
+        '''
+        Hide the volume slider when user hovers away from the volume button
+        '''
 
         self.VolumeSliderFrame.pack_forget()
 
     def OpenFiles(self, event=None, files=None):
-        '''Open dialog box to select audio files'''
+        '''
+        Open dialog box to select audio files
+        '''
 
         audio_name = ''
         ShowErrorMessage = False
@@ -481,7 +500,9 @@ class MusicPlayer:
         return 'break'
 
     def SortAudio(self, by):
-        '''Sort audio list in Treeview alphabetically'''
+        '''
+        Sort audio list in Treeview alphabetically
+        '''
 
         selected_text = ''
         sel = self.Tree.selection()
@@ -518,7 +539,9 @@ class MusicPlayer:
             self.Tree.see(child)
 
     def GetPlaylist(self, event=None):
-        '''Get audio path stored in a file'''
+        '''
+        Get audio path stored in a file
+        '''
 
         try:
             with open(self.PlaylistPath, 'r') as f:
@@ -537,8 +560,8 @@ class MusicPlayer:
 
     def ScrollTopDown(self, event=None, _dir=None):
         '''
-        Scroll to the top when "HOME" key is pressed
-        or to the bottom when "END" key is pressed
+        Scroll to the top when "HOME" key is pressed or to the bottom when
+        "END" key is pressed
         '''
 
         try:
@@ -555,7 +578,9 @@ class MusicPlayer:
             self.PlayError.play()
 
     def AddRemoveSelection(self, status):
-        '''Add or Remove selection when audio changes'''
+        '''
+        Add or Remove selection when audio changes
+        '''
 
         if self.AudioName:
             _tag = self.AudioFiles[self.AudioName]['TagCount']
@@ -573,7 +598,9 @@ class MusicPlayer:
                 self.Tree.selection_remove(self.Tree.selection()[0])
 
     def PlayOrPauseAudio(self, event=None):
-        '''Play or pause audio when play or pause button is pressed'''
+        '''
+        Play or pause audio when play or pause button is pressed
+        '''
 
         try:
             if self.AudioFiles:
@@ -663,7 +690,9 @@ class MusicPlayer:
             pass
 
     def StopAudio(self, event=None):
-        '''Stop playing audio'''
+        '''
+        Stop playing audio
+        '''
 
         if self.isPlaying is not None:  # If audio is playing or is paused
             pygame.mixer.music.stop()
@@ -698,7 +727,9 @@ class MusicPlayer:
             self.PlayError.play()
 
     def ToggleRepeat(self, event=None):
-        '''When user clicks repeat button'''
+        '''
+        When user clicks repeat button
+        '''
 
         if self.RepeatAudio is None:  # Button has not clicked yet
             self.RepeatAudio = 'LoopAll'
@@ -713,7 +744,9 @@ class MusicPlayer:
             self.RepeatButton.config(image=self.RepeatAllImage, relief='raised')
 
     def ToggleRandom(self, event=None):
-        '''When user clicks random button'''
+        '''
+        When user clicks random button
+        '''
 
         if self.PlayRandom is False:
             self.PlayRandom = True
@@ -724,8 +757,9 @@ class MusicPlayer:
             self.RandomButton.config(image=self.RandomDisabledImage)
 
     def UpdateScale(self, event=None):
-        '''Continuously update escaping time and slider values
-           until songs comes to end'''
+        '''
+        Continuously update escaping time and slider values until songs comes to end
+        '''
 
         self.CurrentPos = pygame.mixer.music.get_pos() / 1000
         self.ShowSubtitle()
@@ -788,7 +822,9 @@ class MusicPlayer:
             self.ScaleTimer = self.master.after(1000, self.UpdateScale)
 
     def PreviousNextAudio(self, event=None, button_name=None):
-        '''Play previous and present audio present in list-box'''
+        '''
+        Play previous and present audio present in list-box
+        '''
 
         try:
             if self.AudioFiles:
@@ -833,7 +869,9 @@ class MusicPlayer:
             pass
 
     def SkipAudio(self, event=None, direction=None):
-        '''Skip song as the user moves the slider'''
+        '''
+        Skip song as the user moves the slider
+        '''
 
         if self.isPlaying:
             SkipAt = self.AudioSliderVar.get()
@@ -863,8 +901,8 @@ class MusicPlayer:
 
     def ChangeVolume(self, event=None, change=None):
         '''
-        Increase or decrease volume when user drags volume bar or
-        when user presses right arrow or left arrow
+        Increase or decrease volume when user drags volume bar or when user
+        presses right arrow or left arrow
             Here volume value is between 0-1
         '''
 
@@ -900,9 +938,8 @@ class MusicPlayer:
         '''
         Mute and Unmute volume
 
-        nochange parameter is to skip indented block of
-        following first if statement to un-change volume
-        when audio is skipped or changed
+        nochange parameter is to skip indented block of following first if
+        statement to un-change volume when audio is skipped or changed
         '''
 
         if nochange is False:
@@ -937,7 +974,9 @@ class MusicPlayer:
             self.MuteUnmuteButton.config(image=self.VolumeImage4)
 
     def ShowRemainingTime(self, event=None):
-        '''Show remaining time of current playing audio'''
+        '''
+        Show remaining time of current playing audio
+        '''
 
         if self.isPlaying is not None:
             if self.ShowRemTime is False:  # If remaining time has not been shown
@@ -954,7 +993,9 @@ class MusicPlayer:
                 self.TotalTimeVar.set(_time)
 
     def ChangeTime(self):
-        '''Calculate remaining time of currently playing song'''
+        '''
+        Calculate remaining time of currently playing song
+        '''
 
         gmtime = time.gmtime(self.TotalTime - self.CurrentPos)
 
@@ -965,7 +1006,9 @@ class MusicPlayer:
         self.RemTimer = self.master.after(500, self.ChangeTime)
 
     def RightClick(self, event=None):
-        '''When user right clicks inside list-box'''
+        '''
+        When user right clicks inside list-box
+        '''
 
         x, y = event.x , event.y  # Cursor position with respect to Tk window
         _x, _y = self.master.winfo_pointerxy()  # Cursor position with respect to monitor resolution
@@ -1018,7 +1061,9 @@ class MusicPlayer:
             RightClickMenu.grab_release()
 
     def RemoveFromList(self, event=None):
-        '''Remove selected item from the list-box'''
+        '''
+        Remove selected item from the list-box
+        '''
 
         try:
             CurrentIndexes = self.Tree.selection()
@@ -1048,13 +1093,17 @@ class MusicPlayer:
             pass
 
     def RemoveFromPlaylist(self, event=None):
-        '''Remove selected item from the list-box as well from the playlist file'''
+        '''
+        Remove selected item from the list-box as well from the playlist file
+        '''
 
         self.RemoveFromList()
         self.SavePlaylist()
 
     def RemovePermanently(self):
-        '''Delete the selected files entirely from the device'''
+        '''
+        Delete the selected files entirely from the device
+        '''
 
         selections = self.Tree.selection()
         confirm = messagebox.askyesno('Really?', 'This action will permanently delete your selected file(s). You cannot undo this action.\n\nDo you still want to continue?')
@@ -1070,7 +1119,9 @@ class MusicPlayer:
             self.RemoveFromPlaylist()
 
     def SavePlaylist(self, event=None, show_message=False):
-        '''Save audio path present in list-box'''
+        '''
+        Save audio path present in list-box
+        '''
 
         if self.AudioFiles:
             newAudioFiles = {v['path']: {'Lyrics': v['Lyrics']} for _, v in self.AudioFiles.items()}  # Saving Audios path without tagCount
@@ -1086,7 +1137,9 @@ class MusicPlayer:
             self.PlayError.play()
 
     def ShowFindWidget(self, event=None):
-        '''Show Find widget if not already shown'''
+        '''
+        Show Find widget if not already shown
+        '''
 
         if self.AudioFiles:
             if self.IsFindWidgetShown is False:
@@ -1102,7 +1155,9 @@ class MusicPlayer:
             self.PlayError.play()
 
     def DestroyFindWidget(self, event=None):
-        '''Destroy Find widget when pressed ESC or X button'''
+        '''
+        Destroy Find widget when pressed ESC or X button
+        '''
 
         self.master.focus_force()
         self.SearchEntryVar.set('')
@@ -1111,7 +1166,9 @@ class MusicPlayer:
         self.SearchButton.pack(side=LEFT)
 
     def SearchAudio(self, *args):
-        '''Searching Audio'''
+        '''
+        Searching Audio
+        '''
 
         try:
             value = self.SearchEntryVar.get().lower()
@@ -1128,7 +1185,9 @@ class MusicPlayer:
             pass
 
     def UpDownSearchItems(self, event=None):
-        '''When user presses Up or Down arrow in SearchEntry box'''
+        '''
+        When user presses Up or Down arrow in SearchEntry box
+        '''
 
         try:
             arrow = event.keysym
@@ -1162,7 +1221,9 @@ class MusicPlayer:
             self.PlayError.play()
 
     def SearchEntryReturnBind(self, event=None):
-        '''When user hits Enter key when focused to SearchEntry box'''
+        '''
+        When user hits Enter key when focused to SearchEntry box
+        '''
 
         if self.SearchGlobalIndex:
             item = self.childrens[self.SearchGlobalIndex]
@@ -1176,8 +1237,10 @@ class MusicPlayer:
             self.DestroyFindWidget()
 
     def DRY_1(self):
-        '''Some conditions that are used for multiple times. So,
-           to avoid repetition putting them in this method'''
+        '''
+        Some conditions that are used for multiple times. So, to avoid
+        repetition putting them in this method
+        '''
 
         if self.isPlaying is not None:
             self.PlayOrPauseAudio()
@@ -1186,7 +1249,9 @@ class MusicPlayer:
             self.OpenFiles()
 
     def ShowInfo(self, event=None):
-        '''Show basic audio information'''
+        '''
+        Show basic audio information
+        '''
 
         try:
             TotalFiles = len(self.AudioFiles)
@@ -1207,9 +1272,8 @@ class MusicPlayer:
         '''
         Show Album Picture instead of TreeView when clicked to art button
 
-        When user plays next or previous audio then force_show when True
-        changes the album picture when the previous album picture is shown
-        already
+        When user plays next or previous audio then force_show when True changes
+        the album picture when the previous album picture is shown already
         '''
 
         self.StopImageRotation()
@@ -1274,7 +1338,9 @@ class MusicPlayer:
             self.TreeFrame.pack()
 
     def SetAlbumArt(self, event=None):
-        '''Add image to album art of a selected audio'''
+        '''
+        Add image to album art of a selected audio
+        '''
 
         try:
             image_path = filedialog.askopenfilenames(filetypes=[('Images', '.jpg .png .jpeg')])
@@ -1324,7 +1390,9 @@ class MusicPlayer:
             messagebox.showerror('ERR', 'Cannot add album art to the selected audio')
 
     def RewindCurrentAudio(self, event=None):
-        '''Rewind the playing audio from the start when user presses 0 '''
+        '''
+        Rewind the playing audio from the start when user presses 0
+        '''
 
         if isinstance(event.widget, ttk.Entry):
             # Don't re-wind the audio when the
@@ -1356,7 +1424,9 @@ class MusicPlayer:
             self.master.focus_set()
 
     def ReadLyricsFile(self, lrc_path):
-        '''Extracting lyrics from either lrc, srt or vtt file'''
+        '''
+        Extracting lyrics from either lrc, srt or vtt file
+        '''
 
         details = dict()
 
@@ -1388,7 +1458,9 @@ class MusicPlayer:
         return details
 
     def ShowSubtitle(self):
-        '''Update Lyrics as the position of the audio'''
+        '''
+        Update Lyrics as the position of the audio
+        '''
 
         if self.IsLyricsAdded:
             _time = datetime.timedelta(seconds=self.AudioSliderVar.get()).total_seconds() + 1
@@ -1412,7 +1484,9 @@ class MusicPlayer:
             self.LyricsBox.see(f'{self.TrackLine}.0')
 
     def ShowLyricsCommand(self, event=None):
-        '''When user clicks lyrics button'''
+        '''
+        When user clicks lyrics button
+        '''
 
         if self.AudioFiles:
             filetypes = [('Lyrics', '*.lrc *srt *vtt')]
@@ -1450,7 +1524,9 @@ class MusicPlayer:
             self.PlayError.play()
 
     def GetTotalSeconds(self, _time):
-        '''Convert string time into total seconds'''
+        '''
+        Convert string time into total seconds
+        '''
 
         split = _time.split(':')
         format = ['%H', '%M', '%S.%f']
@@ -1469,8 +1545,8 @@ class MusicPlayer:
 
     def take_closest(self, myList, myNumber):
         '''
-        Assumes myList is sorted. Returns closest value to myNumber.
-        If two numbers are equally close, return the smallest number.
+        Assumes myList is sorted. Returns closest value to myNumber. If two
+        numbers are equally close, return the smallest number.
         '''
 
         pos = bisect.bisect_left(myList, myNumber)
@@ -1491,7 +1567,9 @@ class MusicPlayer:
             return before
 
     def InsertLyrics(self, event=None, lrc_path=None):
-        '''Save lyrics with the corresponding audio'''
+        '''
+        Save lyrics with the corresponding audio
+        '''
 
         filetypes = [('Lyrics', '*.lrc *srt *vtt')]
 
@@ -1506,7 +1584,9 @@ class MusicPlayer:
             self.SavePlaylist()
 
     def InsertLyricsText(self, lrc_path):
-        '''Add text to lyrics text box'''
+        '''
+        Add text to lyrics text box
+        '''
 
         self.LyricsDetails = self.ReadLyricsFile(lrc_path)
         self.LyricsBox.tag_configure("center", justify='center')
@@ -1517,7 +1597,9 @@ class MusicPlayer:
         self.LyricsBox.tag_add("center", "1.0", "end")
 
     def rotate_image(self):
-        '''Rotating image continuously like an animation'''
+        '''
+        Rotating image continuously like an animation
+        '''
 
         size = (175, 175)
 
@@ -1539,7 +1621,9 @@ class MusicPlayer:
         self.RotateImageTimer = self.master.after(10, self.rotate_image)
 
     def StopImageRotation(self):
-        '''Cancel image rotation animation'''
+        '''
+        Cancel image rotation animation
+        '''
 
         if self.RotateImageTimer is not None:
             self.master.after_cancel(self.RotateImageTimer)
@@ -1550,10 +1634,12 @@ class MusicPlayer:
         Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from temporary directory
         '''
 
         try:

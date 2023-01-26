@@ -90,17 +90,21 @@ class Replace:
         self.ReplaceWindow.mainloop()
 
     def entry_bind(self, event=None):
-        '''When Ctrl+h is pressed while the focus is in Entry widgets, the last
-           character in Entry widgets gets remove(its default behavior). So,
-           to fix this problem return "break" is must, this tells tkinter
-           not to go for further bindings.'''
+        '''
+        When Ctrl+h is pressed while the focus is in Entry widgets, the last
+        character in Entry widgets gets remove(its default behavior). So, to
+        fix this problem return "break" is must, this tells tkinter not to go
+        for further bindings
+        '''
 
         return 'break'
 
     def InsertSelectedText(self, event=None):
-        '''If user selects certain word and then gets the find-widget then
-           inserting the selected word to the "Find what" entry widget to
-           make more convenient.'''
+        '''
+        If user selects certain word and then gets the find-widget then
+        inserting the selected word to the "Find what" entry widget to
+        make more convenient
+        '''
 
         try:
             selected_text = self.TextWidget.get('sel.first', 'sel.last').strip().strip('\n')
@@ -120,7 +124,9 @@ class Replace:
             self.ReplaceFindWhatEntry.insert('end', selected_text)
 
     def AddTag(self, start_pos, end_pos):
-        '''Add "found" tag to select the letters when match is replace by another word'''
+        '''
+        Add "found" tag to select the letters when match is replace by another word
+        '''
 
         try:
             self.TextWidget.tag_delete('found', '1.0', 'end')
@@ -133,7 +139,9 @@ class Replace:
             self.TextWidget.tag_delete('found', '1.0', 'end')
 
     def GetCurrentPosition(self):
-        '''Getting the index of the word right after the position of the cursor'''
+        '''
+        Getting the index of the word right after the position of the cursor
+        '''
 
         line, column = tuple(self.TextWidget.index(INSERT).split('.'))
 
@@ -146,7 +154,9 @@ class Replace:
         return len(self.WordIndexes) - 1
 
     def SearchIndex(self, text_widget, target_text):
-        '''Getting index of word which we need to find'''
+        '''
+        Getting index of word which we need to find
+        '''
 
         self.WordIndexes = []
 
@@ -163,7 +173,9 @@ class Replace:
             start_pos = end_pos
 
     def FindNext(self, event=None):
-        '''Commands when user clicks "Find Next" button in Replace window'''
+        '''
+        Commands when user clicks "Find Next" button in Replace window
+        '''
 
         replace_what = self.ReplaceFindWhatEntry.get()
         match_case = self.MatchVar.get()
@@ -216,7 +228,9 @@ class Replace:
             self.AddTag(start_pos, end_pos)
 
     def Replace(self, event=None):
-        '''When user clicks "Replace" button in Replace window'''
+        '''
+        When user clicks "Replace" button in Replace window
+        '''
 
         self.FindNext()  # Getting indexes of the text in replace
 
@@ -242,7 +256,9 @@ class Replace:
         self.AddTag(start_pos, f'{start_pos}+{len(new_text)}c')
 
     def ReplaceAll(self, event=None):
-        '''When user clicks "Replace All" button in Replace window'''
+        '''
+        When user clicks "Replace All" button in Replace window
+        '''
 
         old_text = self.ReplaceFindWhatEntry.get()
         new_text = self.ReplaceWithEntry.get()
@@ -264,7 +280,9 @@ class Replace:
         self.TextWidget.insert('1.0', contents)
 
     def exit(self, event=None):
-        '''When user quits the find window'''
+        '''
+        When user quits the find window
+        '''
 
         self.FindIndex = None
 

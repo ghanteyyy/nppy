@@ -35,7 +35,9 @@ class StopWatch:
         self.master.mainloop()
 
     def initial_position(self):
-        '''Position of window when program starts'''
+        '''
+        Position of window when program starts
+        '''
 
         self.master.update()
 
@@ -46,7 +48,9 @@ class StopWatch:
         self.master.deiconify()
 
     def start_pause(self, event=None):
-        '''When user Start or Pause button is clicked'''
+        '''
+        When user Start or Pause button is clicked
+        '''
 
         if self.has_started:
             self.master.after_cancel(self.timer)
@@ -62,7 +66,9 @@ class StopWatch:
             self.start_pause_button.config(text='Pause')
 
     def reset(self, event=None):
-        '''When reset button is clicked'''
+        '''
+        When reset button is clicked
+        '''
 
         self.elapsed_time = 0.0
         self.has_started = False
@@ -77,7 +83,9 @@ class StopWatch:
             pass
 
     def update(self):
-        '''Update hour, minute, second and millisecond'''
+        '''
+        Update hour, minute, second and millisecond
+        '''
 
         self.elapsed_time = time.time() - self.start_time
 
@@ -89,13 +97,17 @@ class StopWatch:
         self.timer = self.master.after(50, self.update)
 
     def resource_path(self, file_name):
-        '''Get absolute path to resource from temporary directory
+        '''
+        Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from temporary directory
+        '''
 
         try:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS

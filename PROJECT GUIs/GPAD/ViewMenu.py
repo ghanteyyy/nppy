@@ -10,7 +10,9 @@ class Zoom:
         self.ZoomLabel = zoom_label
 
     def ZoomIn(self, event=None):
-        '''Increase font_size by 1 upto 50 times from default_size'''
+        '''
+        Increase font_size upto 50 times from default_size
+        '''
 
         if self.ZoomCount != 500:  # 500% is the maximum percentage to zoom-in
             self.Zoomed += 1
@@ -22,7 +24,9 @@ class Zoom:
             self.SaveZoom(self.Zoomed)
 
     def ZoomOut(self, event=None):
-        '''Decrease font_size by 1 upto 10 times from default_size'''
+        '''
+        Decrease font_size upto 10 times from default_size
+        '''
 
         if self.ZoomCount != 10:  # 10% is the minimum percentage to zoom-out
             self.Zoomed -= 1
@@ -36,14 +40,18 @@ class Zoom:
             self.SaveZoom(self.Zoomed)
 
     def DefaultZoom(self, event=None):
-        '''Change zoomed_in and zoomed_out fonts to the default_size'''
+        '''
+        Change zoomed_in and zoomed_out fonts to the default_size
+        '''
 
         self.ZoomCount = 100
         self.ZoomLabel['text'] = '100%'
         self.SaveZoom()
 
     def SaveZoom(self, zoomed=None):
-        '''Save the amount of zoom in and zoom out to the json file'''
+        '''
+        Save the amount of zoom in and zoom out to the json file
+        '''
 
         font_details = Include.GetFontDetails()
 
@@ -62,7 +70,9 @@ class Zoom:
 
 
 class LineNumber:
-    '''Update line numbers'''
+    '''
+    Update line numbers
+    '''
 
     def __init__(self, master, line_canvas, text_widget, font):
         self.font = font
@@ -71,7 +81,9 @@ class LineNumber:
         self.TextWidget = text_widget
 
     def redraw(self):
-        '''Draw line number when the cursor goes to new line'''
+        '''
+        Draw line number when the cursor goes to new line
+        '''
 
         self.LineCanvas.delete("all")
         i = self.TextWidget.index("@0,0")
@@ -117,7 +129,9 @@ class View:
         self.Zoom.DefaultZoom()
 
     def WheelZoom(self, event=None):
-        '''Zoom in or out when pinching in and out on mousepad'''
+        '''
+        Zoom in or out when pinching in and out on mousepad
+        '''
 
         if event.state == 44:
             if event.delta > 0:
@@ -129,8 +143,10 @@ class View:
             return 'break'
 
     def toggle_statusbar(self, event=None):
-        '''Show or hide status-bar when user clicks Status-bar sub-menu in
-           View menu or when user presses Alt+S'''
+        '''
+        Show or hide status-bar when user clicks Status-bar sub-menu in View
+        menu or when user presses Alt+S
+        '''
 
         if self.ShowStatusBar:
             self.ShowStatusBar = False
@@ -141,14 +157,18 @@ class View:
             self.StatusBarFrame.grid(row=2, column=0, sticky='e')
 
     def set_full_screen(self, event=None):
-        '''Change window to full-screen when user user clicks FullScreen
-           sub-menu in View-Menu or when presses F11'''
+        '''
+        Change window to full-screen when user user clicks FullScreen sub-menu
+        in View-Menu or when presses F11
+        '''
 
         state = False if self.master.wm_attributes('-fullscreen') else True
         self.master.wm_attributes('-fullscreen', state)
 
     def ToggleLineNumber(self, event=None):
-        '''Hide and show line_number'''
+        '''
+        Hide and show line_number
+        '''
 
         if self.LineNumberVar:
             self.LineNumberVar = False

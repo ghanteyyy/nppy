@@ -38,8 +38,7 @@ class _Entry:
 
     def focus_in(self, event=None):
         '''
-        Remove temporary placeholder's text when
-        user clicks to respective entry widget
+        Remove default text when user clicks to respective entry widget
         '''
 
         if self.IsDefault:
@@ -49,8 +48,7 @@ class _Entry:
 
     def focus_out(self, event=None):
         '''
-        Remove temporary placeholder's text when
-        user clicks out of respective entry widget
+        Remove default text when user clicks out of respective entry widget
         '''
 
         if self.IsDefault is False and not self.var.get().strip():
@@ -62,9 +60,8 @@ class _Entry:
         '''
         Triggers when any key is pressed.
 
-        It restricts user to enter other characters
-        except numbers in fee Fee-Entry-Widget. It
-        have no effects in Name-Entry-Widget.
+        It restricts user to enter other characters except numbers in fee
+        Fee-Entry-Widget. It have no effects in Name-Entry-Widget.
         '''
 
         if self.trace:
@@ -75,8 +72,7 @@ class _Entry:
 
     def Reset(self):
         '''
-        Set Entry values to default
-        after clicking Submit button
+        Set Entry values to default after clicking Submit button
         '''
 
         self.IsDefault = True
@@ -191,8 +187,8 @@ class Tuition:
 
     def center_window(self):
         '''
-        Set position of the window to the center
-        of the screen when user open the program
+        Set position of the window to the center of the screen when user open
+        the program
         '''
 
         self.master.update()
@@ -217,8 +213,8 @@ class Tuition:
 
     def focus_anywhere(self, event=None):
         '''
-        Focus to the click widget. Also remove the
-        selection(s) if made in ttk.Treeview
+        Focus to the click widget. Also remove the selection(s) if made in
+        ttk.Treeview
         '''
 
         widget = event.widget
@@ -231,24 +227,32 @@ class Tuition:
         widget.focus()
 
     def ClickedAtEmptySpace(self, event=None):
-        '''Check if user has clicked in empty space'''
+        '''
+        Check if user has clicked in empty space
+        '''
 
         return self.Tree.identify('item', event.x, event.y) == ''
 
     def RestrictResizingHeading(self, event):
-        '''Restrict user to resize the columns of Treeview '''
+        '''
+        Restrict user to resize the columns of Treeview
+        '''
 
         if self.Tree.identify_region(event.x, event.y) == "separator":
             return "break"
 
     def SelectAll(self, event=None):
-        '''Select all values of ttk.Treeview when user presses control-A'''
+        '''
+        Select all values of ttk.Treeview when user presses Control-A
+        '''
 
         childrens = self.Tree.get_children()
         self.Tree.selection_add(childrens)
 
     def RightClick(self, event=None):
-        '''When user right clicks inside list-box'''
+        '''
+        When user right clicks inside list-box
+        '''
 
         CurrentSelections = self.Tree.selection()
         RightClickMenu = Menu(self.master, tearoff=False)
@@ -263,7 +267,9 @@ class Tuition:
             RightClickMenu.grab_release()
 
     def read_json(self):
-        '''Reading data from the .json file.'''
+        '''
+        Reading data from the .json file
+        '''
 
         try:
             with open(self.file_name, 'r') as f:
@@ -279,15 +285,17 @@ class Tuition:
         return contents
 
     def write_json(self, contents):
-        '''Storing data to the .json file'''
+        '''
+        Storing data to the .json file
+        '''
 
         with open(self.file_name, 'w') as f:
             json.dump(contents, f, indent=4)
 
     def get_next_payment_date(self, joined_str):
         '''
-        Calculate next payment date when user adds data for
-        the first time or when user gets monthly payment
+        Calculate next payment date when user adds data for the first time or
+        when user gets monthly payment
         '''
 
         today = datetime.date.today()
@@ -308,7 +316,9 @@ class Tuition:
         return next_payment.strftime('%Y-%b-%d')
 
     def delete_details(self):
-        '''When user selects items in treeview and clicks delete menu'''
+        '''
+        When user selects items in treeview and clicks delete menu
+        '''
 
         is_error_shown = False
         contents = self.read_json()
@@ -329,7 +339,9 @@ class Tuition:
         self.insert_at_first()
 
     def submit_button_command(self):
-        '''When user clicks SUBMIT button '''
+        '''
+        When user clicks SUBMIT button
+        '''
 
         fee = self.entry_fee.var.get().strip()
         name = self.entry_name.var.get().strip()
@@ -449,8 +461,8 @@ class Tuition:
 
     def SetDefaultDates(self):
         '''
-        Set month and day combobox to current month
-        and day when program loads for the first time
+        Set month and day combobox to current month and day when program loads
+        for the first time
         '''
 
         today = datetime.datetime.today()
@@ -461,8 +473,7 @@ class Tuition:
 
     def SetMonthRange(self, event=None):
         '''
-        Set day range to respective month
-        selected month name from month-combobox
+        Set day range to respective month selected month name from month-combobox
         '''
 
         day_range = self.day_combobox.get().strip()
@@ -489,8 +500,8 @@ class Tuition:
 
     def UpdateListBox(self):
         '''
-        When the program keeps running and at 12:00 am the value of
-        left days decreases by 1. So, updating this left days value.
+        When the program keeps running and at 12:00 am the value of left days
+        decreases by 1. So, updating this left days value
         '''
 
         if self.master.state() == 'normal':
@@ -518,14 +529,18 @@ class Tuition:
         self.UpdateTimer = self.master.after(10, self.UpdateListBox)
 
     def quit_window(self):
-        '''Quit window from the system tray'''
+        '''
+        Quit window from the system tray
+        '''
 
         self.icon.stop()
         self.master.quit()
         subprocess.call('taskkill /IM "{sys.executable}" /F', creationflags=0x08000000)
 
     def show_window(self):
-        '''Restore window from the system tray'''
+        '''
+        Restore window from the system tray
+        '''
 
         self.icon.stop()
 
@@ -534,7 +549,9 @@ class Tuition:
         self.master.after(250, self.UpdateListBox)
 
     def withdraw_window(self):
-        '''Hide window to the system tray'''
+        '''
+        Hide window to the system tray
+        '''
 
         self.master.withdraw()
         self.master.after_cancel(self.UpdateTimer)
@@ -545,7 +562,9 @@ class Tuition:
         self.icon.run()
 
     def Minimize(self):
-        '''Hide window to the system tray when user clicks the minimize button'''
+        '''
+        Hide window to the system tray when user clicks the minimize button
+        '''
 
         state = self.master.state()
 
@@ -559,7 +578,9 @@ class Tuition:
         self.master.after(250, self.Minimize)
 
     def AlterConfigFile(self):
-        '''Read and Write the config file'''
+        '''
+        Read and Write the config file
+        '''
 
         config = ConfigParser()
         config.read(self.configFile)
@@ -584,7 +605,9 @@ class Tuition:
         return status
 
     def AddToStartUp(self):
-        '''Adding Tuition-Startup.exe to startup'''
+        '''
+        Adding Tuition-Startup.exe to startup
+        '''
 
         if os.path.exists(self.startupFile):
             if os.path.exists(self.startupFile):
@@ -608,10 +631,12 @@ def resource_path(file_name):
     Get absolute path to resource from temporary directory
 
     In development:
-        Gets path of files that are used in this script like icons, images or file of any extension from current directory
+        Gets path of files that are used in this script like icons, images or
+        file of any extension from current directory
 
     After compiling to .exe with pyinstaller and using --add-data flag:
-        Gets path of files that are used in this script like icons, images or file of any extension from temporary directory
+        Gets path of files that are used in this script like icons, images or
+        file of any extension from temporary directory
     '''
 
     try:

@@ -3,13 +3,17 @@ import subprocess
 
 
 class GetMACAddress:
-    '''Getting all MAC address'''
+    '''
+    Getting all MAC address
+    '''
 
     def __init__(self):
         self.command = 'getmac'
 
     def method_one(self):
-        '''Using os module'''
+        '''
+        Using os module
+        '''
 
         try:
             mac = os.system(self.command).read()
@@ -19,7 +23,9 @@ class GetMACAddress:
             pass
 
     def method_two(self):
-        '''Using subprocess module'''
+        '''
+        Using subprocess module
+        '''
 
         mac = subprocess.check_output(self.command, encoding='utf-8', creationflags=0x08000000)
         print(mac)

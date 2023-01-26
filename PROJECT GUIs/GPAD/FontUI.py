@@ -7,7 +7,9 @@ import Include
 
 
 class Widgets:
-    '''Create a label, entry-widget and listbox'''
+    '''
+    Create a label, entry-widget and listbox
+    '''
 
     def __init__(self, master, frame, label_text, values, entry_size, listbox_size):
         self.keys = []
@@ -41,7 +43,9 @@ class Widgets:
         self.ListBox.bind('<<ListboxSelect>>', self.ClickBind)
 
     def DownDirection(self, event=None):
-        '''Move selection in downwards direction in listbox'''
+        '''
+        Move selection in downwards direction in listbox
+        '''
 
         index = self.ListBox.curselection()[0]
 
@@ -58,7 +62,9 @@ class Widgets:
         return 'break'
 
     def UpDirection(self, event=None):
-        '''Move selection in upwards direction in listbox'''
+        '''
+        Move selection in upwards direction in listbox
+        '''
 
         index = self.ListBox.curselection()[0]
 
@@ -75,7 +81,9 @@ class Widgets:
         return 'break'
 
     def ClickBind(self, event=None):
-        '''Insert value of selected text from the listbox in entry widget'''
+        '''
+        Insert value of selected text from the listbox in entry widget
+        '''
 
         selection_index = self.ListBox.curselection()[0]
         data = self.ListBox.get(selection_index)
@@ -84,7 +92,9 @@ class Widgets:
         self.master.after(10, lambda: SetSelection(self.Entry, self.EntryVar))
 
     def KeyPressed(self, event=None):
-        '''When keys are pressed down'''
+        '''
+        When keys are pressed down
+        '''
 
         key = event.keysym
 
@@ -111,7 +121,9 @@ class Widgets:
         return 'break'
 
     def KeyReleased(self, event=None):
-        '''When the pressed keys are released'''
+        '''
+        When the pressed keys are released
+        '''
 
         key = event.keysym
 
@@ -124,7 +136,9 @@ class Widgets:
         return 'break'
 
     def BackSpace(self, event=None):
-        '''When backspace key is pressed'''
+        '''
+        When backspace key is pressed
+        '''
 
         value = self.EntryVar.get()[:-1]
         self.EntryVar.set(value)
@@ -140,8 +154,9 @@ class Widgets:
         return 'break'
 
     def TabCompletion(self, event=None):
-        '''Select all text in entry widget of matched one.
-           Also select the same value in listbox'''
+        '''
+        Select matched value in entry as well as in listbox
+        '''
 
         value = self.EntryVar.get()
 
@@ -151,12 +166,14 @@ class Widgets:
         index = self.values.index(value)
         self.ListBox.selection_clear(0, 'end')
         self.ListBox.selection_set(index)
+
         return 'break'
 
     def AutoComplete(self):
-        '''Get matched fonts from the user entered font and if the whole
-           font name is same as the first matched font then select the whole
-           text in entry widget'''
+        '''
+        Get matched fonts from the user entered font and if the whole font name
+        is same as the first matched font then select the whole text in entry widget
+        '''
 
         value = self.EntryVar.get().strip().lower()
         matched = [f for f in self.LowerCaseValues if f.startswith(value)]
@@ -179,7 +196,9 @@ class Widgets:
 
 
 class UI:
-    '''Main window for selecting fonts'''
+    '''
+    Main window for selecting fonts
+    '''
 
     def __init__(self, master, _font):
         self.font = _font
@@ -256,7 +275,9 @@ class UI:
         self.FontWindow.mainloop()
 
     def UpDown(self, event):
-        '''When user wants to select value using up or down arrows in select_font window'''
+        '''
+        When user wants to select value using up or down arrows in select_font window
+        '''
 
         arrow_key = event.keysym
 
@@ -297,7 +318,9 @@ class UI:
             focused_listbox.event_generate('<<ListboxSelect>>')
 
     def NonDuplicatesFonts(self):
-        '''Filter fonts starting with same name'''
+        '''
+        Filter fonts starting with same name
+        '''
 
         prev_family = ' '
         font_families = []
@@ -310,8 +333,10 @@ class UI:
         self.FontFamilies = font_families
 
     def ConfigSampleLabel(self):
-        '''Configure sample text as per the font_name, font_size and font_style
-           from the entries widgets'''
+        '''
+        Configure sample text as per the font_name, font_size and font_style
+        from the entries widgets
+        '''
 
         try:
             font_name = self.FontFamiliesFrame.Entry.get()
@@ -334,9 +359,11 @@ class UI:
             pass
 
     def ApplyAndSaveDetails(self, event=None):
-        '''Set font_family, font_size and font_style to the text-widget and save
-           them to the file so that same font details are used when the program
-           runs next time.'''
+        '''
+        Set font_family, font_size and font_style to the text-widget and save
+        them to the file so that same font details are used when the program
+        runs next time
+        '''
 
         font_family = self.FontFamiliesFrame.EntryVar.get().strip()
         font_style = self.FontStyleFrame.EntryVar.get().strip().lower()
@@ -378,9 +405,10 @@ class UI:
         self.FontWindow.destroy()
 
     def SetToDefault(self):
-        '''Get font_family, font_size and font_styles from the file and set
-           details to the text-widget when the program opens for the first
-           time'''
+        '''
+        Get font_family, font_size and font_styles from the file and set
+        details to the text-widget when the program opens for the first time
+        '''
 
         self.FontFamiliesFrame.EntryVar.set('')
         self.FontStyleFrame.EntryVar.set('')
@@ -416,7 +444,9 @@ class UI:
 
 
 def SetSelection(entry_widget, var):
-    # Selecting font_family in entry_widget
+    '''
+    Selecting font_family in entry_widget
+    '''
 
     entry_widget.select_range(0, len(var.get()) + 1)
     entry_widget.focus()

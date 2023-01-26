@@ -1,6 +1,8 @@
 class BinaryToOctal:
     def IsBinary(self, binary_number):
-        '''Check if the given number is binary'''
+        '''
+        Check if the given number is binary
+        '''
 
         while binary_number > 0:
             remainder = binary_number % 10
@@ -12,7 +14,8 @@ class BinaryToOctal:
         return True
 
     def toOctal(self, binary_number):
-        '''Convert binary number to octal number
+        '''
+        Convert binary number to octal number
 
             Binary number = 1111011
 
@@ -38,7 +41,9 @@ class BinaryToOctal:
                                     = 3
 
                 Step 4: Append each value from first, second, and third which becomes to 173
-                Required octal number is 173 '''
+
+                Required octal number is 173
+        '''
 
         if self.IsBinary(binary_number):
             binary_number = str(binary_number)[::-1]
@@ -54,31 +59,33 @@ class BinaryToOctal:
                         Then, len(binary_number) // 3 + 1 = 2 + 1 = 3
                         So, range = (0, 1, 2)'''
 
-                sliced_binary = binary_number[:3]  # Storing three value from binary_number in each iteration
-                binary_number = binary_number[3:]  # Overwriting binary_number variable excluding value stored in sliced_binary using slicing
+                sliced_binary = binary_number[:3]
+                binary_number = binary_number[3:]
 
-                if len(sliced_binary) == 3:  # Checking if the length of value stored in sliced_binary variable
-                    binaryGroup.append(sliced_binary[::-1])  # Then, appending binaryGroup list by reversing value stored in sliced_binary
+                if len(sliced_binary) == 3:
+                    binaryGroup.append(sliced_binary[::-1])
 
                 else:
                     binaryGroup.append(sliced_binary[::-1].zfill(3))
-                    '''If length of sliced_binary is less than 3 then:
+                    '''
+                    If length of sliced_binary is less than 3 then:
                         First, reversing value of sliced_binary
                         Second, filling 0 to make three character value
 
                         For instance,
-                            At last we get, 01 whose length is less than 3
-                                then we reverse it so we get 10
-                                and we fill that value '10' with '0' using zfill(3) '010' so that the length becomes 3'''
+                            At last we get, 01 whose length is less than 3 then we reverse it so we
+                            get 10 and we fill that value '10' with '0' using zfill(3) '010' so that
+                            the length becomes 3
+                    '''
 
-            binaryGroup = binaryGroup[::-1]  # Reversing the value of binaryGroup "list"
+            binaryGroup = binaryGroup[::-1]
 
-            for group in binaryGroup:  # looping to each value in binaryGroup list
-                for x in range(len(group)):  # Then we get range value (0,1,2) which is stored in temporary variable 'x' in each iteration. Here, range is generator (python 2.7)
-                    tempOctal += int(group[x]) * rule[x]  # Here, first slicing value from 'l' and rule with the value 'x' and converting value got from l by slicing into integer
+            for group in binaryGroup:
+                for x in range(len(group)):
+                    tempOctal += int(group[x]) * rule[x]
 
-                OctalNumber += str(tempOctal)  # Converting integer value stored in tempOctal to string and appending it to OctalNumber variable
-                tempOctal = 0  # Overwriting tempOctal variable to '0' again
+                OctalNumber += str(tempOctal)
+                tempOctal = 0
 
             return int(OctalNumber.strip('0'))
 
@@ -86,20 +93,22 @@ class BinaryToOctal:
             raise ValueError('Invalid Binary Number')
 
     def AlternativeMethod(self, binary_number):
-        ''' First, split binary number to between three digits like
+        '''
+        First, split binary number to between three digits like
                     001            111             011
 
-            Second, use 4, 2, 1 rule to convert each splitted value to decimal number
-                        001 = 0 * 4 + 0 * 2 + 1 * 1
-                            = 1
+        Second, use 4, 2, 1 rule to convert each splitted value to decimal number
+            001 = 0 * 4 + 0 * 2 + 1 * 1
+                = 1
 
-                        111 = 1 * 4 + 1 * 2 + 1 * 1
-                            = 7
+            111 = 1 * 4 + 1 * 2 + 1 * 1
+                = 7
 
-                        011 = 0 * 4 + 1 * 2 + 1 * 1
-                            = 3
+            011 = 0 * 4 + 1 * 2 + 1 * 1
+                = 3
 
-                    Hence, append all value and we get final result 173 (octal number) '''
+        Hence, append all value and we get final result 173 (octal number)
+        '''
 
         def BinaryToDecimal():
             decimal_number = 0
@@ -120,7 +129,7 @@ class BinaryToOctal:
                     OctalNumber += str(octal)
                     DecimalNumber = DecimalNumber // 8
 
-                return OctalNumber[::-1] # printing reverse of value stored in OctalNumber
+                return OctalNumber[::-1]
 
             else:
                 raise ValueError('Invalid Binary Number')

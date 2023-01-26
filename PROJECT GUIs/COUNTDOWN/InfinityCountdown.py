@@ -31,7 +31,9 @@ class InfinityCountdown:
         self.master.mainloop()
 
     def start(self):
-        '''Command for START button'''
+        '''
+        Command for START button
+        '''
 
         if self.is_paused:  # Pause program if program is running.
             self.is_paused = False
@@ -47,7 +49,9 @@ class InfinityCountdown:
             self.start_pause_button.config(text='PAUSE')
 
     def reset(self):
-        '''Command for RESET button'''
+        '''
+        Command for RESET button
+        '''
 
         self.is_paused = False
         self.time['text'] = '00:00:00'
@@ -55,7 +59,9 @@ class InfinityCountdown:
         self.start_pause_button.config(text='START')
 
     def counter(self):
-        '''Updating hour, minute and seconds'''
+        '''
+        Updating hour, minute and seconds
+        '''
 
         if self.is_paused:
             if self.second == self.minute == 59:
@@ -73,13 +79,17 @@ class InfinityCountdown:
         self.timer = self.master.after(1000, self.counter)
 
     def resource_path(self, file_name):
-        '''Get absolute path to resource from temporary directory
+        '''
+        Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from temporary directory
+        '''
 
         try:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS

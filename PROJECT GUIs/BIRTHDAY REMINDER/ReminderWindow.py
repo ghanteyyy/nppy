@@ -67,8 +67,7 @@ class ReminderWindow:
 
     def WindowPosition(self):
         '''
-        Set window position to the center of
-        the screen when it starts
+        Set window position to the center of the screen when it starts
         '''
 
         self.master.update()
@@ -82,9 +81,8 @@ class ReminderWindow:
         self.CloseButton.place(x=width // 2 - 252 // 2.3, y=height - 65)
         self.PersonImageLabel.place(x=width // 2 - 163 // 2, y=height // 2 - 200 // 2)
 
-        # Placing Name and Date Label to the top most part
-        # of the window so that we can get the exact width
-        # and height of the respective label
+        # Placing Name and Date Label to the top most part of the window so
+        # that we can get the exact width and height of the respective label
         self.NameLabel.place(x=0, y=0)
         self.DateLabel.place(x=0, y=0)
 
@@ -97,9 +95,8 @@ class ReminderWindow:
 
     def ChangeHasSeen(self):
         '''
-        Set has_seen to false if it is already true.
-        If true then it means that the birthday of
-        the respective name has already been showed.
+        Set has_seen to false if it is already true. If true then it means that
+        the birthday of the respective name has already been showed.
         '''
 
         from_file = self.ReadJSON()
@@ -130,9 +127,8 @@ class ReminderWindow:
         '''
         Command when close button is closed
 
-        When close button is clicked then set the has_seen
-        to True so that the same birthday don't get displayed
-        repeatedly
+        When close button is clicked then set the has_seen to True so that the
+        same birthday don't get displayed repeatedly
         '''
 
         pygame.mixer.music.stop()
@@ -189,10 +185,12 @@ class ReminderWindow:
         Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from temporary directory
         '''
 
         try:

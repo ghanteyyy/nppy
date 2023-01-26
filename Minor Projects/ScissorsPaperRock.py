@@ -2,17 +2,21 @@ import random
 
 
 class ScissorsPaperRock:
-    '''Game Rules:
+    '''
+    Game Rules:
         If a rock and scissors are formed, the rock wins, because a rock can smash scissors.
         If scissors and paper are formed, the scissors win, because scissors can cut paper.
-        If paper and a rock are formed, the paper wins, because a sheet of paper can cover a rock. '''
+        If paper and a rock are formed, the paper wins, because a sheet of paper can cover a rock.
+    '''
 
     def __init__(self):
         self.choices = ['s', 'p', 'r']
         self.user_winning = [('r', 's'), ('s', 'p'), ('p', 'r')]   # Combination for user to win
 
     def get_user_input(self):
-        '''Ask user to input their choice'''
+        '''
+        Ask user to input their choice
+        '''
 
         user_input = input('\nscissors (s) or paper (p) or rock (r): ').lower()
 
@@ -23,12 +27,16 @@ class ScissorsPaperRock:
             print('Invalid input')
 
     def get_bot_input(self):
-        '''Bot Input: Random choice between "spr" '''
+        '''
+        Bot Input: Random choice between "s p r"
+        '''
 
         return random.choice(self.choices)
 
     def check_winner(self, user, bot):
-        '''check if user won or bot or the game is draw'''
+        '''
+        Check if user won or bot or the game is draw
+        '''
 
         if user == bot:
             return 'Draw'
@@ -40,7 +48,9 @@ class ScissorsPaperRock:
         return 'You Lost'
 
     def play(self):
-        '''Playing the game'''
+        '''
+        Playing the game
+        '''
 
         print('\nQuit Command: Ctrl + C')
 

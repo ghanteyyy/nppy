@@ -1,6 +1,5 @@
 class Pattern_Twelve:
-    '''Pattern twelve
-
+    '''
         U
         D U
         N D U

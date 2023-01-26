@@ -28,7 +28,9 @@ class _Entry:
         self.Entry.bind('<Return>', self.generate_func)
 
     def FocusIn(self, event=None):
-        '''When user set focus to respective entry widget'''
+        '''
+        When user set focus to respective entry widget
+        '''
 
         if self.isDefault:
             self.var.set('')
@@ -36,7 +38,9 @@ class _Entry:
             self.Style.configure(self.style_name, foreground='black')
 
     def FocusOut(self, event=None):
-        '''When user set focus out of respective entry widget'''
+        '''
+        When user set focus out of respective entry widget
+        '''
 
         if self.isDefault is False and not self.var.get().strip():
             self.isDefault = True
@@ -45,9 +49,8 @@ class _Entry:
 
     def KeyPressed(self, event=None):
         '''
-        When user presses any character from the keyboard and if that
-        character is not a digit then forcing tkinter not to insert
-        that character
+        When user presses any character from the keyboard and if that character
+        is not a digit then forcing tkinter not to insert that character
         '''
 
         char = event.keysym
@@ -97,12 +100,16 @@ class MultiplicationTable:
         self.master.mainloop()
 
     def focus_everywhere(self, event=None):
-        '''Focus to respective widgets where clicked'''
+        '''
+        Focus to respective widgets where clicked
+        '''
 
         event.widget.focus()
 
     def initial_position(self):
-        '''Position window to the center of screen when the program opens'''
+        '''
+        Position window to the center of screen when the program opens
+        '''
 
         self.master.update()
         self.master.iconbitmap(self.resource_path('icon.ico'))
@@ -121,7 +128,9 @@ class MultiplicationTable:
         self.master.deiconify()
 
     def generate_table(self, event=None):
-        '''Insert multiplication table in text_widget '''
+        '''
+        Insert multiplication table in text_widget
+        '''
 
         num = self.num_entry.var.get().strip()
         upto = self.upto_entry.var.get().strip()
@@ -153,7 +162,9 @@ class MultiplicationTable:
             messagebox.showinfo('ERR', 'Number must be integer')
 
     def copy_to_clipboard(self, event=None):
-        '''Copy the multiplication table to the clipboard'''
+        '''
+        Copy the multiplication table to the clipboard
+        '''
 
         text = self.table_text.get('1.0', 'end').strip()
 
@@ -167,10 +178,12 @@ class MultiplicationTable:
         Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from temporary directory
         '''
 
         try:

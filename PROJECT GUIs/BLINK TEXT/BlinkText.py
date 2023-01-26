@@ -6,7 +6,9 @@ import pyperclip
 
 
 class BlinkText:
-    '''Show and hide the given text such that it appears as blinking'''
+    '''
+    Show and hide the given text such that it appears as blinking
+    '''
 
     def __init__(self):
         self.KeyCombo = set()
@@ -51,7 +53,9 @@ class BlinkText:
         self.master.mainloop()
 
     def initial_position(self):
-        '''Centering window when program starts'''
+        '''
+        Centering window when program starts
+        '''
 
         self.master.update()
 
@@ -64,7 +68,9 @@ class BlinkText:
         self.blink()
 
     def left_click(self, event=None):
-        '''When user clicks to anywhere in the window'''
+        '''
+        When user clicks to anywhere in the window
+        '''
 
         widget = event.widget
 
@@ -72,7 +78,9 @@ class BlinkText:
             self.master.focus()
 
     def focus_in(self, event=None):
-        '''Change focus when user clicks in of the entry widget'''
+        '''
+        Change focus when user clicks in of the entry widget
+        '''
 
         if self.IsDefault:
             self.BlinkTextEntryVar.set('')
@@ -80,7 +88,9 @@ class BlinkText:
             self.BlinkTextEntry.config(fg='black')
 
     def focus_out(self, event=None):
-        '''Change focus when user clicks out of the entry widget'''
+        '''
+        Change focus when user clicks out of the entry widget
+        '''
 
         get_from_entry = self.BlinkTextEntryVar.get().strip()
 
@@ -90,7 +100,9 @@ class BlinkText:
             self.BlinkTextEntry.config(fg='grey')
 
     def ControlBackSpace(self, event=None):
-        '''When user presses control and backspace key at the same time'''
+        '''
+        When user presses control and backspace key at the same time
+        '''
 
         get_from_entry = self.BlinkTextEntryVar.get().strip()
 
@@ -103,7 +115,9 @@ class BlinkText:
         return 'break'
 
     def key_pressed(self, event=None):
-        '''When user presses any key'''
+        '''
+        When user presses any key
+        '''
 
         key = event.keysym
 
@@ -124,7 +138,9 @@ class BlinkText:
                     return 'break'
 
     def key_released(self, event=None):
-        '''When user releases the pressed key'''
+        '''
+        When user releases the pressed key
+        '''
 
         key = event.keysym
 
@@ -132,7 +148,9 @@ class BlinkText:
             self.KeyCombo.remove(key)
 
     def blink(self):
-        '''Change color of text between #422a91 and white every 100 milliseconds'''
+        '''
+        Change color of text between #422a91 and white every 100 milliseconds
+        '''
 
         if self.BlinkLabel['fg'] == '#422a91':
             self.BlinkLabel['fg'] = 'white'
@@ -143,7 +161,9 @@ class BlinkText:
         self.master.after(100, self.blink)
 
     def change_text(self, *args):
-        '''When user makes any changes in Entry widget'''
+        '''
+        When user makes any changes in Entry widget
+        '''
 
         get_from_entry = self.BlinkTextEntryVar.get().strip()
 
@@ -154,7 +174,9 @@ class BlinkText:
             self.BlinkLabelVar.set('Blink')
 
     def CopyText(self, event=None, cut=False):
-        '''Copy text to the system clipboard rather than only in tkinter clipboard'''
+        '''
+        Copy text to the system clipboard rather than only in tkinter clipboard
+        '''
 
         if self.BlinkTextEntry.selection_present():
             selected_text = self.BlinkTextEntry.selection_get()
@@ -171,14 +193,12 @@ class BlinkText:
         '''
         Paste clipboard text to the entry widget
 
-        If the length of clipboard text and entry widget's text
-        combined is more than 22 characters (I set the maximum
-        characters of 22 to be in blink effect. Though more
-        than 22 characters can be made but looks awful when in
-        action) and also if there is selection in entry widget
-        then the selected text gets removed and only part of the
-        clipboard text that makes the length of text 22 gets inserted
-        in entry widget.
+        If the length of clipboard text and entry widget's text combined is
+        more than 22 characters (I set the maximum characters of 22 to be in
+        blink effect. Though more than 22 characters can be made but looks
+        awful when in action) and also if there is selection in entry widget
+        then the selected text gets removed and only part of the clipboard
+        text that makes the length of text 22 gets inserted in entry widget.
         '''
 
         required_length = 0
@@ -210,10 +230,12 @@ class BlinkText:
         Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from temporary directory
         '''
 
         try:

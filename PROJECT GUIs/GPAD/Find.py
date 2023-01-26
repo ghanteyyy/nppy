@@ -79,16 +79,20 @@ class Find:
         self.FindWindow.mainloop()
 
     def entry_bind(self, event=None):
-        '''When Ctrl+h is pressed while the focus is in Entry widgets, the last
-           character in Entry widgets gets remove(its default behavior). So,
-           to fix this problem return "break" is must, this tells tkinter
-           not to go for further bindings.'''
+        '''
+        When Ctrl+h is pressed while the focus is in Entry widgets, the last
+        character in Entry widgets gets remove(its default behavior). So, to
+        fix this problem return "break" is must, this tells tkinter not to go
+        for further bindings
+        '''
 
         return 'break'
 
     def InsertSelectedText(self, event=None):
-        '''If user selects certain word and then gets the find-widget then inserting the selected
-           word to the "Find what" entry widget to make more convenient.'''
+        '''
+        If user selects certain word and then gets the find-widget then inserting
+        the selected word to the "Find what" entry widget to make more convenient
+        '''
 
         selected_text = None
 
@@ -106,7 +110,9 @@ class Find:
             self.FindWhatEntry.insert('end', selected_text)
 
     def AddTag(self, start_pos, end_pos):
-        '''Add "found" tag to select the letters when match is found'''
+        '''
+        Add "found" tag to select the letters when match is found
+        '''
 
         try:  # Removing 'sel' tag if it contains any selection
             self.TextWidget.get('sel.first', 'sel.last')
@@ -123,7 +129,9 @@ class Find:
         self.TextWidget.see(self.TextWidget.index('found.last'))
 
     def GetCursorPosition(self):
-        '''Getting the index of the word right after the position of the cursor'''
+        '''
+        Getting the index of the word right after the position of the cursor
+        '''
 
         line, column = tuple(self.TextWidget.index(INSERT).split('.'))
 
@@ -136,7 +144,9 @@ class Find:
         return len(self.WordIndexes)
 
     def SearchIndex(self, text_widget, target_text):
-        '''Getting index of word which we need to find'''
+        '''
+        Getting index of word which we need to find
+        '''
 
         start_pos = '1.0'
         self.WordIndexes = []
@@ -152,7 +162,9 @@ class Find:
             start_pos = end_pos
 
     def Find(self, event=None):
-        '''Command when user clicks Find Next button in Find window'''
+        '''
+        Command when user clicks Find Next button in Find window
+        '''
 
         find_what = self.FindWhatEntry.get()
         direction = self.DirectionVar.get()
@@ -246,7 +258,9 @@ class Find:
             messagebox.showinfo('GPAD', f'Could not found "{find_what}"', parent=self.FindWindow)
 
     def exit(self, event=None):
-        '''When user quits the find window'''
+        '''
+        When user quits the find window
+        '''
 
         self.FindIndex = None
 

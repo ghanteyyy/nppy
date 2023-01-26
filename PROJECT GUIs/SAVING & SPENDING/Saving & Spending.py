@@ -72,12 +72,16 @@ class Saving_Spending:
         self.master.mainloop()
 
     def forbid_default_bindings(self, event=None):
-        '''Stop tkinter to execute its default bindings'''
+        '''
+        Stop tkinter to execute its default bindings
+        '''
 
         return 'break'
 
     def show_details_window(self, title, text, image, file_name, yet):
-        '''Displays saving or spending details'''
+        '''
+        Displays saving or spending details
+        '''
 
         self.master.title(title)
         self.home_frame.pack_forget()
@@ -143,7 +147,9 @@ class Saving_Spending:
         self.text_area.config(state=DISABLED)
 
     def add_saving_or_spending_window(self):
-        '''Create window to enter source of spending'''
+        '''
+        Create window to enter source of spending
+        '''
 
         self.home_frame.pack_forget()
         self.master.title('Add Earning | Expenditure')
@@ -207,7 +213,9 @@ class Saving_Spending:
         self.submit_button.grid(row=3, column=1, pady=11, padx=5, sticky='e')
 
     def edit_window(self):
-        '''Create window to enter source of spending'''
+        '''
+        Create window to enter source of spending
+        '''
 
         for _var in self._vars:
             _var.set(0)
@@ -260,7 +268,9 @@ class Saving_Spending:
         self.append_button.grid(row=4, column=1, pady=11, padx=5, sticky='e')
 
     def back_button_command(self, add_frame, title):
-        '''Command when user clicks back button'''
+        '''
+        Command when user clicks back button
+        '''
 
         self.master.title(title)
         frames = [self.home_frame, self.edit_window_frame, self.earned_spent_frame, self.add_earned_spent_frame]
@@ -282,7 +292,9 @@ class Saving_Spending:
         add_frame.pack(ipadx=900, ipady=500)
 
     def read_details(self, file_name):
-        '''Retrieve data from the given file_name'''
+        '''
+        Retrieve data from the given file_name
+        '''
 
         try:
             with open(file_name, 'r') as f:
@@ -294,7 +306,9 @@ class Saving_Spending:
         return lines
 
     def write_details(self, file_name, _contents):
-        '''Store data to the given file_name'''
+        '''
+        Store data to the given file_name
+        '''
 
         _contents.sort()
 
@@ -303,7 +317,9 @@ class Saving_Spending:
                 f.write(f'{_content}\n')
 
     def edit_command(self, source_entry, new_source_entry, old_entry, new_entry, var):
-        '''save values of edit window'''
+        '''
+        Save values of edit window
+        '''
 
         var_get = var.get()
 
@@ -364,7 +380,9 @@ class Saving_Spending:
                 messagebox.showerror('NOT FOUND', 'Value not found in file')
 
     def add_details(self, source_entry, money_entry, _vars):
-        '''Add details to the file'''
+        '''
+        Add details to the file
+        '''
 
         success = False
         get_money_earned = money_entry.get().strip()
@@ -450,13 +468,17 @@ class Saving_Spending:
             self.master.focus()
 
     def resource_path(self, file_name):
-        '''Get absolute path to resource from temporary directory
+        '''
+        Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from temporary directory
+        '''
 
         try:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS

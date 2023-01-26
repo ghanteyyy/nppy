@@ -74,7 +74,9 @@ class WebsiteBlocker:
         self.BlockerWindow.mainloop()
 
     def ForbidDefaultBindings(self, event=None):
-        '''When user clicks Text Widget'''
+        '''
+        When user clicks Text Widget
+        '''
 
         try:
             wid = event.widget.winfo_parent().winfo_parent()[0]
@@ -98,14 +100,18 @@ class WebsiteBlocker:
         return 'break'
 
     def FocusIn(self, event=None):
-        '''When user clicks to the Entry widget to add new Address'''
+        '''
+        When user clicks to the Entry widget to add new Address
+        '''
 
         if self.EntryVar.get().strip() == self.DefaultAddress:
             self.EntryVar.set('')
             self.style.configure('Ent.TEntry', foreground='black')
 
     def FocusOut(self, event=None):
-        '''When user clicks other widget'''
+        '''
+        When user clicks other widget
+        '''
 
         if not self.EntryVar.get().strip():
             self.EntryVar.set(self.DefaultAddress)
@@ -113,7 +119,9 @@ class WebsiteBlocker:
             self.BlockerWindow.focus()
 
     def AddDetails(self, event=None, default=None):
-        '''When user clicks + button'''
+        '''
+        When user clicks + button
+        '''
 
         if event:
             text = self.EntryVar.get().strip()
@@ -166,7 +174,9 @@ class WebsiteBlocker:
                 pygame.mixer.music.play()
 
     def RenameDetails(self, event=None, widget=None):
-        '''When user clicks Rename button'''
+        '''
+        When user clicks Rename button
+        '''
 
         if self.PreviousEntry == widget:
             self.RenameInsideFile()
@@ -185,7 +195,9 @@ class WebsiteBlocker:
         self.PreviousEntry = widget
 
     def DeleteDetails(self, event=None, frame=None):
-        '''When user clicks Delete button'''
+        '''
+        When user clicks Delete button
+        '''
 
         contents = self.ReadContents()
         site = f'{self.LocalHost}{frame.winfo_children()[0].get()}\n'
@@ -200,7 +212,9 @@ class WebsiteBlocker:
         frame.destroy()
 
     def StartUpInsert(self):
-        '''Insert Website Address when program starts'''
+        '''
+        Insert Website Address when program starts
+        '''
 
         contents = self.ReadContents()
 
@@ -209,20 +223,26 @@ class WebsiteBlocker:
                 self.AddDetails(default=content.strip('\n'))
 
     def ReadContents(self):
-        '''Read host file and returns the contents of it'''
+        '''
+        Read host file and returns the contents of it
+        '''
 
         with open(self.HostFile, 'r') as f:
             return f.readlines()
 
     def WriteSite(self, contents):
-        '''Save Website Address to the host file'''
+        '''
+        Save Website Address to the host file
+        '''
 
         with open(self.HostFile, 'w') as f:
             for content in contents:
                 f.write(content)
 
     def RenameInsideFile(self):
-        '''Replace old entry with new entry inside the file'''
+        '''
+        Replace old entry with new entry inside the file
+        '''
 
         NewText = f'{self.LocalHost}{self.PreviousEntry.get()}\n'
         contents = self.ReadContents()
@@ -238,7 +258,9 @@ class WebsiteBlocker:
                 pass
 
     def StartAtCenter(self):
-        '''Place window at the center of screen when it opens for the first time'''
+        '''
+        Place window at the center of screen when it opens for the first time
+        '''
 
         self.BlockerWindow.update()
         self.BlockerWindow.resizable(0, 0)
@@ -250,13 +272,17 @@ class WebsiteBlocker:
         self.BlockerWindow.deiconify()
 
     def ResourcePath(self, file_name):
-        '''Get absolute path to resource from temporary directory
+        '''
+        Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from temporary directory
+        '''
 
         try:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS

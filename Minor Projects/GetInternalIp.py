@@ -4,7 +4,9 @@ import platform
 
 
 class GetInternalIP:
-    '''Getting internal IP'''
+    '''
+    ssGetting internal IP
+    ss'''
 
     def get_ip(self, host):
         '''Getting IP'''
@@ -12,13 +14,17 @@ class GetInternalIP:
         return socket.gethostbyname(host)
 
     def method_one(self):
-        '''Getting host name using os module.'''
+        '''
+        ssGetting host name using os module
+        ss'''
 
         host = os.environ['COMPUTERNAME']
         return self.get_ip(host)
 
     def method_two(self):
-        '''Getting host name using platform module.'''
+        '''
+        ssGetting host name using platform module
+        ss'''
 
         host = platform.node()
         return self.get_ip(host)

@@ -2,13 +2,17 @@ import cv2
 
 
 class PlayVideoFromCamera:
-    '''Getting live video from your webcam'''
+    '''
+    Getting live video from your webcam
+    '''
 
     def __init__(self, window_name='Live Stream'):
         self.window_name = window_name
 
     def live_stream(self):
-        '''Streaming Video'''
+        '''
+        Streaming Video
+        '''
 
         cam = cv2.VideoCapture(cv2.CAP_DSHOW)
 

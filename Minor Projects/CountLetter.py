@@ -6,7 +6,9 @@ class CountLetter:
         self.strings = strings
 
     def method_one(self):
-        '''Using for loop'''
+        '''
+        Using for loop
+        '''
 
         dic = {}
 
@@ -24,7 +26,9 @@ class CountLetter:
             print('{} : {}'.format(key, dic[key]))
 
     def method_two(self):
-        '''Using built-in module : collections :'''
+        '''
+        Using built-in module "collections"
+        '''
 
         dic = collections.Counter(self.strings)
 

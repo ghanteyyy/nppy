@@ -17,28 +17,38 @@ class File_Menu:
         self.PreviousSignature = self.GetSignature(self.GetContents())
 
     def set_var(self, text, time=4000):
-        '''Config text to the status_label'''
+        '''
+        Config text to the status_label
+        '''
 
         Include.set_var(self.master, self.Var, text, time)
 
     def GetContents(self):
-        '''Get everything that is in text_widget'''
+        '''
+        Get everything that is in text_widget
+        '''
 
         return self.TextWidget.get('1.0', 'end-1c')
 
     def GetSignature(self, contents):
-        '''Get the hash of the text inside of text_widget'''
+        '''
+        Get the hash of the text inside of text_widget
+        '''
 
         return hashlib.md5(bytes(self.GetContents(), encoding='utf-8')).digest()
 
     def IsFileChanged(self):
-        '''Check if the signature of the the previous content in text_widget is
-           not the same of the current content in text_widget.'''
+        '''
+        Check if the signature of the the previous content in text_widget is
+        not the same of the current content in text_widget
+        '''
 
         return self.GetSignature(self.GetContents()) != self.PreviousSignature
 
     def WriteToFile(self):
-        '''Write the content of the text_widget to the given filename'''
+        '''
+        Write the content of the text_widget to the given filename
+        '''
 
         with open(self.FileName, 'w', encoding='utf-8') as f:
             self.isSaved = True
@@ -47,7 +57,9 @@ class File_Menu:
             self.set_var(f'Saved to {self.FileName}')
 
     def New(self, event=None):
-        '''When user presses ctrl+n or clicks new option from file menu'''
+        '''
+        When user presses Ctrl+N or clicks new option
+        '''
 
         if self.IsFileChanged():
             choice = messagebox.askyesnocancel('GPAD', 'Do you want to quit without saving?')
@@ -70,12 +82,16 @@ class File_Menu:
             self.PreviousSignature = self.GetSignature(self.GetContents)
 
     def NewWindow(self, event=None):
-        '''When user presses ctrl+shift+n or clicks new_window option from file_menu'''
+        '''
+        When user presses Ctrl+Shift+N or clicks new_window option
+        '''
 
         main.GPAD(NewWindow=True)
 
     def Open(self, event=None):
-        '''When user presses ctrl+o or clicks open option from file menu'''
+        '''
+        When user presses Ctrl+O or clicks open option
+        '''
 
         if self.IsFileChanged():
             choice = messagebox.askyesnocancel('GPAD', 'Do you want to open another file without saving the current one?')
@@ -109,7 +125,9 @@ class File_Menu:
         return 'break'
 
     def Save(self, event=None):
-        '''When user presses ctrl+s or clicks save option from the file menu'''
+        '''
+        When user presses Ctrl+S or clicks save option
+        '''
 
         if self.FileName and self.IsFileChanged():  # When user wants to save the file that is already saved once.
             self.WriteToFile()
@@ -118,7 +136,9 @@ class File_Menu:
             self.SaveAs()
 
     def SaveAs(self, event=None):
-        '''When user presses ctrl+shift+s or clicks save_as option from the file_menu'''
+        '''
+        When user presses Ctrl+Shift+S or clicks save_as option
+        '''
 
         self.master.update()
         file_name = filedialog.asksaveasfilename(title="Save", filetypes=self.extensions, initialdir=os.getcwd(), defaultextension=self.extensions)
@@ -133,8 +153,7 @@ class File_Menu:
 
     def AutoSave(self, AutoSaveVar):
         '''
-        Save contents automatically when
-        any changes are detected
+        Save contents automatically when any changes are detected
         '''
 
         if self.IsAutoSaveEnabled:
@@ -160,7 +179,9 @@ class File_Menu:
             self.master.after(50, self.AutoSave, AutoSaveVar)
 
     def DeleteZoom(self):
-        '''Delete the amount of zoomed from the json file'''
+        '''
+        Delete the amount of zoomed from the json file
+        '''
 
         font_details = Include.get_font_details()
 

@@ -100,8 +100,7 @@ class CustomDays:
 
     def Quit(self):
         '''
-        When user closes the Custom Days window
-        then setting the repeat days to 'Once'
+        When user closes the Custom Days window then setting the repeat days to 'Once'
         '''
 
         self.days = 'Once'

@@ -81,9 +81,8 @@ class PdfMerger:
 
     def SetSelection(self, event):
         '''
-        Select and deselect value in ListBox when
-        holding control key and click to respective
-        value.
+        Select and deselect value in ListBox when holding control key and
+        click to respective value
         '''
 
         index = self.PdfLists.nearest(event.y)
@@ -164,8 +163,7 @@ class PdfMerger:
 
     def RightClickRemove(self, event=None):
         '''
-        Remove the selected item of listbox from
-        right-click menu
+        Remove the selected item of listbox from right-click menu
         '''
 
         selections = reversed(self.PdfLists.curselection())
@@ -207,8 +205,8 @@ class PdfMerger:
 
     def ShowScrollBar(self):
         '''
-        Show ScrollBar when the contents of TreeView is
-        more than the height of TreeView
+        Show ScrollBar when the contents of TreeView is more than the height
+        of TreeView
         '''
 
         if  len(self.PdfLists.get(0, END)) > 22:
@@ -222,8 +220,8 @@ class PdfMerger:
 
     def HideScrollBar(self):
         '''
-        Hide ScrollBar when the contents of TreeView is
-        less or equal than the height of TreeView
+        Hide ScrollBar when the contents of TreeView is less or equal than the
+        height of TreeView
         '''
 
         if len(self.PdfLists.get(0, END)) <= 22:
@@ -239,10 +237,12 @@ class PdfMerger:
         Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from temporary directory
         '''
 
         try:

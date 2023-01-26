@@ -40,8 +40,7 @@ def WriteToJson(contents):
     Save alarms details to the alarm file
 
     param:
-        contents: dictionary object of the alarm that
-                  is to written in the json file
+        contents: dictionary object of the alarm that is to written in the json file
     '''
 
     with open('Alarm.json', 'w') as f:
@@ -53,10 +52,12 @@ def ResourcePath(FileName):
     Get absolute path to resource from temporary directory
 
     In development:
-        Gets path of files that are used in this script like icons, images or file of any extension from current directory
+        Gets path of files that are used in this script like icons, images or
+        file of any extension from current directory
 
     After compiling to .exe with pyinstaller and using --add-data flag:
-        Gets path of files that are used in this script like icons, images or file of any extension from temporary directory
+        Gets path of files that are used in this script like icons, images or
+        file of any extension from temporary directory
 
 
     param:

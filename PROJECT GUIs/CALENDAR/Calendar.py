@@ -43,7 +43,9 @@ class Calendar:
         self.master.mainloop()
 
     def initial_position(self):
-        '''Position of the window when program opens for the first time'''
+        '''
+        Position of the window when program opens for the first time
+        '''
 
         self.master.update()
 
@@ -55,20 +57,20 @@ class Calendar:
         self.master.geometry(f'{win_width}x{win_height}+{screen_width - win_width // 2}+{screen_height - win_height}')
 
     def make_calendar(self, year=None, month=None):
-        '''Display calendar'''
+        '''
+        Display calendar
+        '''
 
         if year:  # When the user has clicked next or previous button
             today_date = datetime.date(year=year, month=month, day=1)
 
-            # Destroying previous dates
-            # so that we can add new month dates
-            # without overlapping with previous dates
+            # Destroying previous dates so that we can add new month dates without
+            # overlapping with previous dates
             for children_widget in self.container_frame.winfo_children():
                 children_widget.destroy()
 
         else:
-            # When the program loads for the first time
-            # Then showing the todays month calendar
+            # When the program loads for the first time Then showing the todays month calendar
             today_date = datetime.date.today()
 
         # Displaying days name
@@ -112,7 +114,9 @@ class Calendar:
             row += 1
 
     def show_next_month(self, event=None):
-        '''Display the calendar of next month when user click next button'''
+        '''
+        Display the calendar of next month when user click next button
+        '''
 
         self.month += 1
 
@@ -123,7 +127,9 @@ class Calendar:
         self.make_calendar(year=self.year, month=self.month)
 
     def show_prev_month(self, event=None):
-        '''Display the calendar of previous month when user click previous button'''
+        '''
+        Display the calendar of previous month when user click previous button
+        '''
 
         self.month -= 1
 
@@ -137,10 +143,12 @@ class Calendar:
         '''Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from temporary directory'''
 
         try:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS

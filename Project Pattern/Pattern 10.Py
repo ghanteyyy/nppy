@@ -1,6 +1,5 @@
 class Pattern_Ten:
-    '''Pattern ten
-
+    '''
                         K
                       K A
                     K A T

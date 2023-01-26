@@ -85,8 +85,8 @@ class DisplayAlarm:
         param:
             audio_path  : audio-path of the respective alarm
             _time       : time value of the alarm that is to be displayed
-            snooze      : If true, indicates that the alarm that is about to
-                          get displayed is the alarm that is snoozed
+            snooze      : If true, indicates that the alarm that is about to get
+                          displayed is the alarm that is snoozed
         '''
 
         if self.IsAlarmShown:
@@ -94,9 +94,9 @@ class DisplayAlarm:
             self.Quit()
 
         if snooze:
-            # When snooze time comes to end. Then, check if the status
-            # of that snoozed original time is still True or the original
-            # time still exists in the file
+            # When snooze time comes to end. Then, check if the status of that
+            # snoozed original time is still True or the original # time still
+            # exists in the file
 
             contents = Include.ReadJSON()
 

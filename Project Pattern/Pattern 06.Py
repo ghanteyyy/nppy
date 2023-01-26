@@ -1,6 +1,5 @@
 class Pattern_Six:
-    '''Pattern six
-
+    '''
                    *
                   * *
                  * * *

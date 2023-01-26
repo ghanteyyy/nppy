@@ -11,8 +11,8 @@ import pyperclip
 
 class ImageDownloader:
     '''
-    Image Downloader, a simple script written in Python that let you
-    image from any website just by its address.
+    Image Downloader, a simple script written in Python that let you image
+    from any website just by its address.
 
     Q. How to copy image address?
         1. Click on image.
@@ -76,7 +76,8 @@ class ImageDownloader:
 
     def InitialPosition(self, event=None):
         '''
-        Set position of the window to the center of the screen when user open the program
+        Set position of the window to the center of the screen when user open
+        the program
         '''
 
         width, height = 340, 361
@@ -171,8 +172,8 @@ class ImageDownloader:
 
     def ShowMessage(self, msg, fg='red'):
         '''
-        Show any error message that user have encounter while
-        downloading image or show download successful message
+        Show any error message that user have encounter while downloading image
+        or show download successful message
         '''
 
         self.MessageVar.set(msg)
@@ -228,10 +229,12 @@ class ImageDownloader:
         Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from temporary directory
         '''
 
         try:

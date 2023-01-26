@@ -16,12 +16,16 @@ class Edit_Menu:
         self.TextWidget = text_widget
 
     def SetVar(self, text, time=4000):
-        '''Config text to the status_label'''
+        '''
+        Config text to the status_label
+        '''
 
         Include.set_var(self.master, self.var, text, time)
 
     def GetSelectedText(self):
-        '''Returns text which user tends to copy or cut'''
+        '''
+        Returns text which user tends to copy or cut
+        '''
 
         if 'TripleClick' in self.TextWidget.tag_names():
             # 'TripleClick' tag is added when user triple clicks to a certain line
@@ -48,7 +52,9 @@ class Edit_Menu:
         return self.TextWidget.get(f'{line}.0', f'{line}.end+1c')
 
     def undo(self, event=None):
-        '''Undo functionality when user clicks Undo option or presses Ctrl+Z'''
+        '''
+        Undo functionality when user clicks Undo option or presses Ctrl+Z
+        '''
 
         try:
             self.TextWidget.edit_undo()
@@ -57,7 +63,9 @@ class Edit_Menu:
             pass
 
     def cut(self, event=None):
-        '''Cut functionality when user clicks cut option or presses Ctrl+X'''
+        '''
+        Cut functionality when user clicks cut option or presses Ctrl+X
+        '''
 
         text = self.GetSelectedText()
 
@@ -82,7 +90,9 @@ class Edit_Menu:
         return 'break'
 
     def copy(self, event=None):
-        '''Copy functionality when user clicks cut option or presses Ctrl+C'''
+        '''
+        Copy functionality when user clicks cut option or presses Ctrl+C
+        '''
 
         text = self.GetSelectedText()
         pyperclip.copy(text)
@@ -91,7 +101,9 @@ class Edit_Menu:
         return 'break'
 
     def paste(self, event=None):
-        '''Paste functionality when user clicks paste option or presses Ctrl+V'''
+        '''
+        Paste functionality when user clicks paste option or presses Ctrl+V
+        '''
 
         try:
             self.TextWidget.delete('sel.first', 'sel.last')
@@ -107,7 +119,9 @@ class Edit_Menu:
         return 'break'
 
     def delete(self, event=None):
-        '''Remove selected character or single character after the cursor'''
+        '''
+        Remove selected character or single character after the cursor
+        '''
 
         if 'TripleClick' in self.TextWidget.tag_names():  # Delete text that is inside 'triple click' tag
             self.TextWidget.delete('TripleClick.first', 'TripleClick.last')
@@ -133,7 +147,9 @@ class Edit_Menu:
         return 'break'
 
     def SearchWithGoogle(self, event=None):
-        '''Search selected text with Google search engine'''
+        '''
+        Search selected text with Google search engine
+        '''
 
         text = self.GetSelectedText().strip().strip('\n')
 
@@ -144,22 +160,30 @@ class Edit_Menu:
             messagebox.showerror('GPAD', 'You need to select text to make search')
 
     def FindWidget(self, event=None):
-        '''Display find GUI window when user clicks find option or presses Ctrl+F'''
+        '''
+        Display find GUI when user clicks find option or presses Ctrl+F
+        '''
 
         Find.Find(self.master, self.TextWidget)
 
     def ReplaceWidget(self, event=None):
-        '''Display replace GUI window when user clicks find option or presses Ctrl+H'''
+        '''
+        Display replace GUI when user clicks find option or presses Ctrl+H
+        '''
 
         Replace.Replace(self.master, self.TextWidget)
 
     def GoToWidget(self, event=None):
-        '''Display Go-To GUI window when user clicks find option or presses Ctrl+G'''
+        '''
+        Display Go-To GUI when user clicks find option or presses Ctrl+G
+        '''
 
         GoTo.Go_To(self.master, self.TextWidget)
 
     def SelectAll(self, event=None):
-        '''Select all text when user clicks Select-All option or Ctrl+A'''
+        '''
+        Select all text when user click Select-All option or Ctrl+A
+        '''
 
         from_text_widget = self.TextWidget.get('1.0', 'end-1c').strip('\n')
         lines = len(from_text_widget.split('\n'))
@@ -179,7 +203,9 @@ class Edit_Menu:
         return 'break'
 
     def GetDateTime(self, event=None):
-        '''Inserts current date and time'''
+        '''
+        Inserts current date and time
+        '''
 
         cursor_pos = self.TextWidget.index('insert')
         today_time = time.strftime('%I:%M %p %m/%d/%Y')
@@ -195,7 +221,9 @@ class Edit_Menu:
         self.TextWidget.insert(cursor_pos, today_time)
 
     def StripWhitespaces(self):
-        '''Strip white-spaces from each line'''
+        '''
+        Strip white-spaces from each line
+        '''
 
         get_text = self.TextWidget.get('1.0', 'end-1c').split('\n')
         strip_text = '\n'.join([get.rstrip().strip('\n') for get in get_text])

@@ -1,5 +1,6 @@
 class QuinaryToOctal:
-    '''Convert quinary number to octal number
+    '''
+    Convert quinary number to octal number
 
         You can convert quinary number to octal, first by converting quinary
         number to decimal and obtained decimal number to quinary number
@@ -14,9 +15,14 @@ class QuinaryToOctal:
                                   -----
                                     4
 
-                    And our required octal number is 46 (taken in a reverse way)'''
+                    And our required octal number is 46 (taken in a reverse way)
+    '''
 
     def IsQuinary(self, quinary_number):
+        '''
+        Checking if the given number is quinary
+        '''
+
         while quinary_number > 0:
             remainder = quinary_number % 10
             quinary_number //= 10
@@ -27,6 +33,10 @@ class QuinaryToOctal:
         return True
 
     def toOctal(self, quinary_number):
+        '''
+        Converting the given quinary number to octal
+        '''
+
         if self.IsQuinary(quinary_number):
             octal_number = ''
             decimal_number = 0

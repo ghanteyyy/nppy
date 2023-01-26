@@ -1,5 +1,6 @@
 class QuinaryToHexadecimal:
-    '''Convert quinary number into hexadecimal number
+    '''
+    Convert quinary number into hexadecimal number
 
         You can convert quinary number, first by converting quinary number to decimal and then obtained decimal to hexadecimal number
             For an instance, lets take quinary number to be 123
@@ -13,9 +14,14 @@ class QuinaryToHexadecimal:
                                -----
                                  2
 
-                    And our required hexadecimal number is 26'''
+                    And our required hexadecimal number is 26
+    '''
 
     def IsQuinary(self, quinary_number):
+        '''
+        Checking if the given number is quinary
+        '''
+
         while quinary_number > 0:
             remainder = quinary_number % 10
             quinary_number //= 10
@@ -26,6 +32,10 @@ class QuinaryToHexadecimal:
         return True
 
     def toHexadecimal(self, quinary_number):
+        '''
+        Converting the given quinary number to hexadecimal
+        '''
+
         if self.IsQuinary(quinary_number):
             decimal_number = 0
             hexadecimal_number = ''

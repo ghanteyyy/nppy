@@ -27,7 +27,9 @@ class _Entry:
         self.Entry.bind('<FocusOut>', self.FocusOut)
 
     def FocusIn(self, event=None):
-        '''When ttk.Entry gets focus either by click to it or by pressing TAB key'''
+        '''
+        When focus changes to Entry widget(s)
+        '''
 
         if self.IsDefault and self.var.get().strip() == self.default_text:
             self.IsDefault = False
@@ -35,7 +37,9 @@ class _Entry:
             self.Style.configure(self.style_name, foreground='black')
 
     def FocusOut(self, event=None):
-        '''When ttk.Entry gets focus out either by click to another widget or by pressing TAB key'''
+        '''
+        When focus changes out of Entry widget(s)
+        '''
 
         if self.IsDefault is False and not self.var.get().strip():
             self.IsDefault = True
@@ -44,8 +48,8 @@ class _Entry:
 
     def SetToDefault(self):
         '''
-        Set the default values to respective ttk.Entry when
-        user finish adding, deleting or renaming values
+        Set the default values to respective ttk.Entry when user finish adding,
+        deleting or renaming values
         '''
 
         self.IsDefault = True
@@ -223,12 +227,11 @@ class SSNI:
                 self.ListBoxVariable.set(contents)
 
             else:
-                # When user removes any value then the deleted value
-                # gets selected by red color first and then after 800ms
-                # the value in the ListBox gets deleted. When doing so
-                # the ListBox scrolls back to the top(its default behavior).
-                # To avoid this default scrolling remove parameter removes
-                # the respective value without scrolling to the top.
+                # When user removes any value then the deleted value gets selected by
+                # red color first and then after 800ms, the value in the ListBox gets
+                # deleted. When doing so the ListBox scrolls back to the top(its
+                # default behavior). To avoid this default scrolling remove parameter
+                # removes the respective value without scrolling to the top.
 
                 index = self.ListBox.get(0, END).index(remove)
                 self.ListBox.delete(index)
@@ -392,8 +395,8 @@ class SSNI:
 
     def paste(self):
         '''
-        Command for pasting text from system clipboard to the position
-        of cursor in entry widget
+        Command for pasting text from system clipboard to the position of
+        cursor in entry widget
         '''
 
         clipboard = pyperclip.paste()
@@ -419,23 +422,22 @@ class SSNI:
             RightClickMenu.add_command(label='Paste', command=self.paste)
 
             if not pyperclip.paste():
-                # When there is no text in clipboard then
-                # disabling paste options in right-click menu
+                # When there is no text in clipboard then disabling paste options in
+                # right-click menu
 
                 RightClickMenu.entryconfig(2, state='disabled')
 
             if widget.select_present() is False:
-                # When there is no selection in entry widget then
-                # disabling copy and cut options in right-click menu
+                # When there is no selection in entry widget then disabling copy and
+                # cut options in right-click menu
 
                 RightClickMenu.entryconfig(0, state='disabled')
                 RightClickMenu.entryconfig(1, state='disabled')
 
                 if self.master.focus_get() != widget:
-                    # When the cursor is over the entry widget and
-                    # user right clicks to entry widget then generating
-                    # left click event to set focus to entry widget
-                    # before showing pop-up menu
+                    # When the cursor is over the entry widget and user right clicks to
+                    # entry widget then generating left click event to set focus to entry
+                    # widget before showing pop-up menu
 
                     widget.event_generate('<Button-1>')
 
@@ -471,10 +473,12 @@ class SSNI:
         Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from temporary directory
         '''
 
         try:

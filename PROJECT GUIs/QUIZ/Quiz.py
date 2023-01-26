@@ -28,8 +28,7 @@ class _Entry:
 
     def focus_in(self, event=None):
         '''
-        Remove temporary placeholder's text when
-        user clicks to respective entry widget
+        Remove temporary placeholder's text when user clicks to respective entry widget
         '''
 
         if self.IsDefault:
@@ -39,8 +38,8 @@ class _Entry:
 
     def focus_out(self, event=None):
         '''
-        Remove temporary placeholder's text when
-        user clicks out of respective entry widget
+        Remove temporary placeholder's text when user clicks out of
+        respective entry widget
         '''
 
         if self.IsDefault is False and not self.var.get().strip():
@@ -245,8 +244,8 @@ class Quiz:
 
     def ManualPickQuestion(self, event=None, QuestionNumber=None):
         '''
-        Retrieve the question with respect to
-        the question number provided by the user
+        Retrieve the question with respect to the question number provided by
+        the user
         '''
 
         contents = self.ReadJSON()
@@ -292,9 +291,8 @@ class Quiz:
 
     def ShowNumbers(self, event=None):
         '''
-        Show available question numbers
-        when user presses control-n or
-        control-shift-n
+        Show available question numbers when user presses Control-N or
+        Control-Shift-N
         '''
 
         numbers = [num for num in self.ReadJSON().keys() if num not in self.QuizNumbers]
@@ -305,10 +303,12 @@ class Quiz:
         Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from temporary directory
         '''
 
         try:

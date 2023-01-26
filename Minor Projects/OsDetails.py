@@ -3,7 +3,9 @@ import platform
 
 
 def OSDetails():
-    '''Returns some information regrading your Operating System (OS)'''
+    '''
+    Returns some information regrading your Operating System (OS)
+    '''
 
     print(f'''
     COMPUTER NAME                      : {os.environ['COMPUTERNAME']}

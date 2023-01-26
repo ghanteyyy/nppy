@@ -27,8 +27,11 @@ class PlaceValue:
                             'Hundred Googolplex']
 
     def make_group(self, values):
-        '''Group number of length 3.
-            If user enters 1234567890 then this function returns [[1], [234], [567], [890]] '''
+        '''
+        Group number of length 3
+
+        If user enters 1234567890 then this function returns [[1], [234], [567], [890]]
+        '''
 
         groups = []
         loop_for = len(values) // 3 if len(values) % 3 == 0 else len(values) // 3 + 1
@@ -45,7 +48,9 @@ class PlaceValue:
         return groups
 
     def getting_in_words(self, value):
-        '''Getting the number in words with respect to their place value'''
+        '''
+        Getting the number in words with respect to their place value
+        '''
 
         in_words = ''
         length = len(value)
@@ -81,7 +86,7 @@ class PlaceValue:
         return in_words
 
     def main(self):
-        place_value = self.place_value[:len(self.num)][::-1]  # Slicing place_value as per the length of the given number
+        place_value = self.place_value[:len(self.num)][::-1]
 
         # Grouping number and their place_value of length 3
         num_group = self.make_group(self.num)[::-1]

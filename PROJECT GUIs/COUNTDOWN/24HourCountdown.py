@@ -26,7 +26,9 @@ class TwentyFourHourCountdown:
         self.master.mainloop()
 
     def Counter(self):
-        '''Updating hour, minute and seconds'''
+        '''
+        Updating hour, minute and seconds
+        '''
 
         if self.pause is False:
             if self.sec == self.min == self.hrs == 0:
@@ -52,10 +54,12 @@ class TwentyFourHourCountdown:
         '''Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from temporary directory'''
 
         try:
             base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS

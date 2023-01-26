@@ -4,7 +4,10 @@ import shutil
 
 
 class CleanDesktop:
-    '''Cleaning up the desktop by moving directories and files to directory named "CLEAN DESKTOP"'''
+    '''
+    Cleaning up the desktop by moving directories and files to directory
+    named "CLEAN DESKTOP"
+    '''
 
     def __init__(self):
         self.exclude_extensions = ['ini', 'lnk']
@@ -12,7 +15,9 @@ class CleanDesktop:
         self.exclude_directories = ['CLEANUP DESKTOP', 'My Projects', 'Tor Browser']
 
     def create_today_directory(self):
-        '''Create directory as per today's date inside "CLEAN DESKTOP" directory'''
+        '''
+        Create directory as per today's date inside "CLEAN DESKTOP" directory
+        '''
 
         today_date = time.strftime('%a %b %m %Y')
         self.cleanup_location = os.path.join(self.desktop_location, 'CLEANUP DESKTOP', today_date)
@@ -21,7 +26,9 @@ class CleanDesktop:
             os.makedirs(self.cleanup_location)
 
     def is_valid_file(self, file):
-        '''Checks if the file type is not within the exclude_extensions list'''
+        '''
+        Checks if the file type is not within the exclude_extensions list
+        '''
 
         file = os.path.basename(file)
 
@@ -35,7 +42,9 @@ class CleanDesktop:
         return True
 
     def get_common_files_or_directories(self):
-        '''Get common files that are in desktop and the cleanup locations'''
+        '''
+        Get common files that are in desktop and the cleanup locations
+        '''
 
         desktop_files = set(os.listdir(self.desktop_location))
         cleanup_files = set(os.listdir(self.cleanup_location))
@@ -44,8 +53,9 @@ class CleanDesktop:
         return [f for f in common_files if self.is_valid_file(f)]
 
     def rename_common_files(self):
-        '''Rename files or directories if they
-           exists in desktop and cleanup directories'''
+        '''
+        Rename files or directories if they exists in desktop and cleanup directories
+        '''
 
         common_files = self.get_common_files_or_directories()
 
@@ -55,8 +65,10 @@ class CleanDesktop:
                 os.rename(file, new_name)
 
     def extract_file_number(self, file):
-        '''Extract file_number having same name of **file**
-           parameter's basename and add 1 to it'''
+        '''
+        Extract file_number having same name of **file** parameter's basename
+        and add 1 to it
+        '''
 
         _dir, basename = os.path.split(file)
         file_name = basename.split('.')[0]
@@ -87,7 +99,9 @@ class CleanDesktop:
         return os.path.join(_dir, new_name)
 
     def main(self):
-        '''Cleaning desktop'''
+        '''
+        Cleaning desktop
+        '''
 
         self.create_today_directory()
         self.rename_common_files()

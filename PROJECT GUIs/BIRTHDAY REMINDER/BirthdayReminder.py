@@ -74,8 +74,7 @@ class BirthdayReminder:
 
     def InitialPosition(self):
         '''
-        Set GUI window to the center of
-        the screen when it starts
+        Set GUI window to the center of the screen when it starts
         '''
 
         self.master.update()
@@ -94,8 +93,7 @@ class BirthdayReminder:
 
     def EntryFocusIn(self, event=None):
         '''
-        Remove the default text when user
-        clicks to the entry widget
+        Remove the default text when user clicks to the entry widget
         '''
 
         if self.NameEntryDefaultText:
@@ -105,9 +103,8 @@ class BirthdayReminder:
 
     def EntryFocusOut(self, event=None):
         '''
-        Re-insert the default text to entry widget
-        when user clicks outside of the entry widget
-        without entering any value in it
+        Re-insert the default text to entry widget when user clicks outside of
+        the entry widget without entering any value in it
         '''
 
         if not self.NameEntryVar.get().strip():
@@ -251,10 +248,12 @@ class BirthdayReminder:
         Get absolute path to resource from temporary directory
 
         In development:
-            Gets path of files that are used in this script like icons, images or file of any extension from current directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from current directory
 
         After compiling to .exe with pyinstaller and using --add-data flag:
-            Gets path of files that are used in this script like icons, images or file of any extension from temporary directory
+            Gets path of files that are used in this script like icons, images or
+            file of any extension from temporary directory
         '''
 
         try:

@@ -1,6 +1,5 @@
 class Pattern_Two:
-    '''Pattern two
-
+    '''
         1 1 1 1 1 1 1
         1 1 1 1 1 1
         1 1 1 1 1
@@ -8,7 +7,6 @@ class Pattern_Two:
         1 1 1
         1 1
         1
-
     '''
 
     def __init__(self, strings='1', steps=10):

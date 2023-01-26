@@ -6,7 +6,9 @@ class RemovingVowels:
         self.vowels = ['a', 'e', 'i', 'o', 'u']
 
     def method_one(self):
-        '''Using for loop'''
+        '''
+        Using for loop
+        '''
 
         words_removed_vowels = ''
 
@@ -17,7 +19,9 @@ class RemovingVowels:
         return words_removed_vowels
 
     def method_two(self):
-        '''Using list comprehension'''
+        '''
+        Using list comprehension
+        '''
 
         words_removed_vowels = [string for string in self.strings if string not in self.vowels]
 
