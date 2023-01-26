@@ -6,7 +6,7 @@ import Search
 
 class About:
     def __init__(self, master):
-        self.BuildNumber = '2.4.2'
+        self.BuildNumber = '2.4.3'
 
         self.master = master
         self.AuthorAddress = 'http://github.com/ghanteyyy'
@@ -69,7 +69,9 @@ class About:
         self.AboutWindow.mainloop()
 
     def WindowInitialPosition(self):
-        '''Set initial position of the about window'''
+        '''
+        Set initial position of the about window
+        '''
 
         width, height = 460, 130
         master_width, master_height = self.master.winfo_width() // 2, self.master.winfo_height() // 2
@@ -78,23 +80,31 @@ class About:
         self.AboutWindow.resizable(0, 0)
 
     def Enter(self, button, link):
-        '''When the cursor enters the boundary of author-name and source-code link'''
+        '''
+        When the cursor enters the boundary of author-name and source-code link
+        '''
 
         self.LinkLabel.config(text=link, fg='white', bg='grey')
         button.config(fg='red', activeforeground='red', cursor='hand2')
 
     def Leave(self, button):
-        '''When the cursor leaves the boundary of author-name and source-code link'''
+        '''
+        When the cursor leaves the boundary of author-name and source-code link
+        '''
 
         self.LinkLabel.config(text='', bg='white')
         button.config(fg='black', activeforeground='black')
 
     def GoToAuthorAddress(self, event=None):
-        '''Open author's Git-hub page '''
+        '''
+        Open author's Git-hub page
+        '''
 
         self.AboutWindow.after(250, lambda: self.search.OpenLink(self.AuthorAddress))
 
     def GoToSourceCodeAddress(self, event=None):
-        '''Open source-code Git-hub page '''
+        '''
+        Open source-code Git-hub page
+        '''
 
         self.AboutWindow.after(250, lambda: self.search.OpenLink(self.SourceCodeAddress))
