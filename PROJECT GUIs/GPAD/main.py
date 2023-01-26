@@ -200,13 +200,17 @@ class GPAD:
         self.master.mainloop()
 
     def backspace(self, event=None):
-        '''When backspace key is pressed'''
+        '''
+        When backspace key is pressed
+        '''
 
         self.status_label_var.set('')
         self.TextWidget.config(insertofftime=300, insertontime=600)
 
     def UpdateLabelText(self):
-        '''Show the number of text selected, number of text copied or cut'''
+        '''
+        Show the number of text selected, number of text copied or cut
+        '''
 
         try:
             selected_text = self.TextWidget.get('sel.first', 'sel.last')
@@ -218,7 +222,9 @@ class GPAD:
         self.master.after(10, self.UpdateLabelText)
 
     def SingleLeftClick(self, event=None):
-        '''Remove "found" tag and restore the blinking time to default'''
+        '''
+        Remove "found" tag and restore the blinking time to default
+        '''
 
         self.status_label_var.set('')
 
@@ -232,12 +238,17 @@ class GPAD:
             self.TextWidget.config(insertofftime=300, insertontime=600)
 
     def button_3(self, event=None):
-        '''When user right clicks'''
+        '''
+        When user right clicks
+        '''
 
         RightClick.RightClick(self.master, self.TextWidget, self.fmc, self.status_label_var).ShowPopUp(event=event)
 
     def RemoveSelection(self, event=None):
-        '''Remove "found" and "triple_click" tags from the text_widget and reset the blinking time to default'''
+        '''
+        Remove "found" and "triple_click" tags from the text_widget and reset
+        the blinking time to default
+        '''
 
         if event.keysym in ['Up', 'Down', 'Right', 'Left']:
             self.SingleLeftClick()
@@ -246,7 +257,9 @@ class GPAD:
             self.status_label_var.set('')
 
     def change_title(self, event=None):
-        '''Insert * to the title of the window when user makes any change to the content'''
+        '''
+        Insert * to the title of the window when user makes any change to the content
+        '''
 
         title = self.master.title()
 
@@ -258,7 +271,9 @@ class GPAD:
             self.master.title(title.lstrip('*'))
 
     def UpdateLineColumn(self, event=None):
-        '''Insert the line number and column number at the status bar'''
+        '''
+        Insert the line number and column number at the status bar
+        '''
 
         line, column = tuple(self.TextWidget.index(INSERT).split('.'))
         self.LineColumnVar.set(f'Ln {line}, Col {int(column) + 1}')
@@ -267,7 +282,9 @@ class GPAD:
         self.master.after(50, self.UpdateLineColumn)
 
     def EnableDisableMenu(self):
-        '''Enable or disable some sub-menus in edit-menus'''
+        '''
+        Enable or disable some sub-menus in edit-menus
+        '''
 
         text_from_text_widget = self.TextWidget.get('1.0', 'end-1c').strip()
 
@@ -329,23 +346,29 @@ class GPAD:
         self.master.after(100, self.EnableDisableMenu)
 
     def ShowFindWidget(self, event=None):
-        '''Command when user clicks find sub-menu in Edit-Menu or when user
-           presses Ctrl+F only if the respective sub-menu is activated.'''
+        '''
+        Command when user clicks find sub-menu in Edit-Menu or when user
+        presses Ctrl+F only if the respective sub-menu is activated
+        '''
 
         if self.edit_menu.entrycget(9, 'state') == 'normal':
             self.emc.FindWidget()
 
     def ShowReplaceWidget(self, event=None):
-        '''Command when user clicks replace sub-menu in Edit-Menu or when user
-           presses Ctrl+H only if the respective sub-menu is activated.'''
+        '''
+        Command when user clicks replace sub-menu in Edit-Menu or when user
+        presses Ctrl+H only if the respective sub-menu is activated
+        '''
 
         if self.edit_menu.entrycget(11, 'state') == 'normal':
             self.emc.ReplaceWidget()
 
     def ActivateStripWhiteSpace(self, event=None):
-        '''Commands for striping whitespaces from each line when user clicks
-           strip-whitespaces sub-menu in Edit-Menu or when user presses
-           Alt+Enter if the respective sub-menu is activated'''
+        '''
+        Commands for striping whitespaces from each line when user clicks
+        strip-whitespaces sub-menu in Edit-Menu or when user presses
+        Alt+Enter if the respective sub-menu is activated
+        '''
 
         if self.edit_menu.entrycget(14, 'state') == 'normal':
             self.emc.strip_whitespaces()
@@ -353,8 +376,9 @@ class GPAD:
         return 'break'
 
     def DoubleLeftClick(self, event=None):
-        '''Make selection up-to the end of the line when user makes left double
-           clicks'''
+        '''
+        Make selection up-to the end of the line when user makes left double clicks
+        '''
 
         self.TextWidget.tag_delete('triple_click', '1.0', 'end')
         cursor_pos = self.TextWidget.index('insert')
@@ -366,7 +390,9 @@ class GPAD:
         self.TextWidget.config(insertofftime=1000000, insertontime=0)
 
     def TripleClick(self, event=None):
-        '''When user triple clicks select all texts within that line'''
+        '''
+        When user triple clicks select all texts within that line
+        '''
 
         contents = self.TextWidget.get('1.0', 'end').strip('\n')
 
@@ -379,12 +405,16 @@ class GPAD:
             return 'break'
 
     def about(self, event=None):
-        '''When user clicks about sub-menu in Help menu'''
+        '''
+        When user clicks about sub-menu in Help menu
+        '''
 
         About.About(self.master)
 
     def exit(self, event=None):
-        '''When user wants to exit the program'''
+        '''
+        When user wants to exit the program
+        '''
 
         if self.fmc.IsFileChanged():
             choice = messagebox.askyesnocancel('GPAD', 'Do you really want to quit without saving?')
@@ -418,7 +448,6 @@ class GPAD:
                 if NumberOfWindows == 0 and content['Master Withdrawn']:  # If the window is the last Toplevel window
                     MasterDestroy = True
 
-            content.update({'window_dimension': self.master.geometry()})
             Include.SaveFontDetails(content)
 
             if MasterDestroy:  # Ending the mainloop of Tk window if there is no any Toplevel window
