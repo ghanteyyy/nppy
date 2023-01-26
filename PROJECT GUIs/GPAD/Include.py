@@ -6,7 +6,9 @@ timer = None
 
 
 def initial_position(master, text_widget):
-    '''Start the program in the center of the screen'''
+    '''
+    Start the program in the center of the screen
+    '''
 
     master.withdraw()
     master.update()
@@ -14,33 +16,24 @@ def initial_position(master, text_widget):
     master.iconbitmap(resource_path('icon.ico'))
     master.title('Untitled - GPAD')
 
-    width, height = master.winfo_width() + 348, master.winfo_height() + 60
-    screen_width, screen_height = master.winfo_screenwidth() // 2, master.winfo_screenheight() // 2
-
-    try:
-        win_details = GetFontDetails()['window_dimension']
-
-        if win_details:
-            master.geometry(win_details)
-
-        else:
-            master.geometry(f'{width}x{height}+{screen_width - width // 2}+{screen_height - height // 2}')
-
-    except KeyError:
-        master.geometry(f'{width}x{height}+{screen_width - width // 2}+{screen_height - height // 2}')
+    master.state('zoomed')
 
     master.deiconify()
     text_widget.focus()
 
 
 def resource_path(file_name):
-    '''Get absolute path to resource from temporary directory
+    '''
+    Get absolute path to resource from temporary directory
 
     In development:
-        Gets path of files that are used in this script like icons, images or file of any extension from current directory
+        Gets path of files that are used in this script like icons, images or
+        file of any extension from current directory
 
     After compiling to .exe with pyinstaller and using --add-data flag:
-        Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
+        Gets path of files that are used in this script like icons, images or
+        file of any extension from temporary directory
+    '''
 
     try:
         base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
@@ -52,7 +45,9 @@ def resource_path(file_name):
 
 
 def GetFontDetails():
-    '''Get font-family, font-size and font-style from the json file'''
+    '''
+    Get font-family, font-size and font-style from the json file
+    '''
 
     DefaultValues = {
         'Font Family': 'Courier',
@@ -79,14 +74,18 @@ def GetFontDetails():
 
 
 def SaveFontDetails(font_details):
-    '''Saves font-family, font-size and font-style to the json file'''
+    '''
+    Saves font-family, font-size and font-style to the json file
+    '''
 
     with open(resource_path('settings.json'), 'w') as f:
         json.dump(font_details, f, indent=4)
 
 
 def ConfigFontStyle(font_style, font_obj):
-    '''Configure font style to italic, bold, bold + italic and normal'''
+    '''
+    Configure font style to italic, bold, bold + italic and normal
+    '''
 
     if 'bold' in font_style:
         font_obj.configure(weight='bold')
@@ -114,7 +113,9 @@ def ConfigFontStyle(font_style, font_obj):
 
 
 def set_var(master, var, text, time):
-    '''Config text to the status_label'''
+    '''
+    Config text to the status_label
+    '''
 
     global timer
 
