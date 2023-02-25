@@ -12,7 +12,7 @@ from tkinter import messagebox
 from configparser import ConfigParser
 from pystray._base import MenuItem as item
 import pystray._win32
-from PIL import Image
+from PIL import Image, ImageTk
 from dateutil.relativedelta import relativedelta
 
 
@@ -83,6 +83,7 @@ class _Entry:
 class Tuition:
     def __init__(self):
         self.tag = 0
+        self.CanvasWidth = 857
         self.UpdateTimer = None
         self.WindowState = 'normal'
         self.IsAddedFirstTime = False
@@ -95,32 +96,35 @@ class Tuition:
         self.master.withdraw()
         self.master.title('TUITION')
 
-        self.add_details_frame = Frame(self.master, bg='silver')
+        self.CoverImage = Image.open(resource_path('cover.jpg'))
+        self.CoverImage.thumbnail((1000, 1000), Image.Resampling.LANCZOS)
+        self.CoverImage = ImageTk.PhotoImage(self.CoverImage)
 
-        self.entry_name = _Entry(self.add_details_frame, 'EntryName.TEntry', 'Name of Student', 50)
-        self.entry_name.Entry.pack(ipady=4, pady=5)
+        self.Canvas = Canvas(self.master, width=855, height=364, highlightthickness=0)
+        self.Canvas.pack(fill=BOTH, expand=True)
 
-        self.entry_fee = _Entry(self.add_details_frame, 'EntryFee.TEntry', 'Fee', 50, True)
-        self.entry_fee.Entry.pack(ipady=4)
+        self.CoverTitle = self.Canvas.create_image(0, 0, image=self.CoverImage, anchor='nw')
+
+        self.entry_name = _Entry(self.master, 'EntryName.TEntry', 'Name of Student', 50)
+        self.Canvas.create_window(self.CanvasWidth // 2, 40, window=self.entry_name.Entry, anchor=CENTER, height=35)
+
+        self.entry_fee = _Entry(self.master, 'EntryFee.TEntry', 'Fee', 50, True)
+        self.Canvas.create_window(self.CanvasWidth // 2, 85, window=self.entry_fee.Entry, anchor=CENTER, height=35)
 
         self.months = list(calendar.month_abbr)[1:]
-        self.date_frame = Frame(self.add_details_frame, bg='silver')
-        self.month_combobox = ttk.Combobox(self.date_frame, values=self.months, width=8, height=12)
-        self.month_combobox.pack(side=LEFT, padx=5)
+        self.month_combobox = ttk.Combobox(self.master, values=self.months, width=8, height=12)
+        self.Canvas.create_window(self.CanvasWidth // 2 - 70, 125, window=self.month_combobox, anchor=CENTER, height=25)
 
-        self.day_combobox = ttk.Combobox(self.date_frame, width=5, height=12)
-        self.day_combobox.pack(side=LEFT, padx=5)
+        self.day_combobox = ttk.Combobox(self.master, width=5, height=12)
+        self.Canvas.create_window(self.CanvasWidth // 2, 125, window=self.day_combobox, anchor=CENTER, height=25)
 
         self.SubmitButtonStyle = ttk.Style()
-        self.SubmitButtonStyle.configure('Submit.TButton', background='silver')
-        self.submit_button = ttk.Button(self.date_frame, text='Submit', cursor='hand2', style='Submit.TButton', command=self.submit_button_command)
-        self.submit_button.pack(ipadx=10)
-
-        self.date_frame.pack(pady=10)
-        self.add_details_frame.pack(pady=10)
+        self.SubmitButtonStyle.configure('Submit.TButton')
+        self.submit_button = ttk.Button(self.master, text='Submit', cursor='hand2', style='Submit.TButton', command=self.submit_button_command)
+        self.Canvas.create_window(self.CanvasWidth // 2 + 70, 125, window=self.submit_button, anchor=CENTER, height=30)
 
         self.TreeFrame = Frame(self.master, bg='silver')
-        self.TreeFrame.pack(padx=3)
+        self.Canvas.create_window(428, 255, window=self.TreeFrame, anchor=CENTER)
 
         self.Columns = ['NAME', 'FEE', 'JOINED', 'PREV DATE', 'NEXT PAY', 'LEFT', 'LATE PAY']
         self.Tree = ttk.Treeview(self.TreeFrame, show='headings', columns=self.Columns)
@@ -176,7 +180,7 @@ class Tuition:
         char = event.keysym
 
         if char not in ['BackSpace', 'Delete', 'Left', 'Right']:
-            if _bool is True:
+            if _bool:
                 month_combo_get = self.month_combobox.get().strip() + event.char
 
                 if len(month_combo_get) > 3:
@@ -224,7 +228,7 @@ class Tuition:
             if selections:
                 self.Tree.selection_remove(selections)
 
-        widget.focus()
+        widget.focus_set()
 
     def ClickedAtEmptySpace(self, event=None):
         '''
