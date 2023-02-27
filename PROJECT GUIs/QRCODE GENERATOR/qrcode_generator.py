@@ -15,7 +15,7 @@ from PIL import Image, ImageTk
 
 class QRCODE_GENERATOR:
     def __init__(self):
-        self.bg_color = '#F6F6F6'
+        self.bg_color = '#f0f0f0'
         self.DEFAULT_TEXT = 'QR Text'
         self.QR_DEFAULT_TEXT = 'https://github.com/ghanteyyy'
         self.ClearedDefault = False  # Track if user have inserted data
@@ -28,6 +28,10 @@ class QRCODE_GENERATOR:
         self.IconImage = PhotoImage(file=self.ResourcePath('icon.png'))
         self.master.iconphoto(None, self.IconImage)
 
+        self.ClearImage = Image.open(self.ResourcePath('delete.png'))
+        self.ClearImage.thumbnail((24, 24), Image.Resampling.LANCZOS)
+        self.ClearImage = ImageTk.PhotoImage(self.ClearImage)
+
         self.message_box_style = ttk.Style()
         self.message_box_style.configure('MB.TEntry', foreground='grey')
 
@@ -35,8 +39,12 @@ class QRCODE_GENERATOR:
         self.message_box_var.set(self.DEFAULT_TEXT)
         self.message_box_var.trace('w', self.trace_var)
 
-        self.message_box = ttk.Entry(self.master, width=48, textvariable=self.message_box_var, style='MB.TEntry', justify='center')
-        self.message_box.pack(padx=20, ipady=5, pady=8)
+        self.TopWidgetsFrame = Frame(self.master)
+        self.TopWidgetsFrame.pack()
+        self.message_box = ttk.Entry(self.TopWidgetsFrame, width=47, textvariable=self.message_box_var, style='MB.TEntry', justify='center')
+        self.message_box.pack(side=LEFT, padx=(20, 0), ipady=5, pady=8)
+        self.ClearButton = Button(self.TopWidgetsFrame, image=self.ClearImage, bd=0, cursor='hand2', command=self.ClearText)
+        self.ClearButton.pack(side=RIGHT)
 
         self.qr_label = Label(self.master, bd=0)
         self.qr_label.pack()
@@ -159,6 +167,15 @@ class QRCODE_GENERATOR:
         except qrcode.exceptions.DataOverflowError:
             messagebox.showinfo('ERR', 'Upto 2,394 characters are allowed')
             self.message_box_var.set('')
+
+    def ClearText(self):
+        '''
+        Clear entry text when user clicks 'x' button
+        '''
+
+        if self.ClearedDefault:
+            self.message_box_var.set('')
+            self.focus_out()
 
     def SaveImage(self, event=None):
         '''
