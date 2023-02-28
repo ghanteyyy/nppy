@@ -10,17 +10,19 @@ from tkinter import messagebox
 
 class PasswordGenerator:
     def __init__(self):
+        self.bg = "#0F0E0E"
         self.PrevKeySym = []
         self.ClearedDefault = False
         self.DEFAULT_TEXT = 'Number of Character'
 
         self.master = Tk()
         self.master.withdraw()
+        self.master.config(bg=self.bg)
         self.master.title('Password GENERATOR')
-        self.master.iconbitmap(self.ResourcePath('icon.ico'))
+        self.master.iconphoto(False, PhotoImage(file=self.ResourcePath("icon.png")))
 
         self.image = PhotoImage(file=self.ResourcePath('title_image.png'))
-        self.ImageLabel = Label(self.master, image=self.image)
+        self.ImageLabel = Label(self.master, image=self.image, bg=self.bg)
         self.ImageLabel.pack(pady=5, padx=20)
 
         self.NumberBoxVar = StringVar()
@@ -30,14 +32,14 @@ class PasswordGenerator:
         self.NumberBoxVar.set(self.DEFAULT_TEXT)
         self.NumberBoxEntry.pack(pady=5, ipady=3)
 
-        self.CheckBoxFrame = Frame(self.master)
+        self.CheckBoxFrame = Frame(self.master, bg=self.bg)
         self.CheckBoxItems = ['UPPERCASE', 'LOWERCASE', 'NUMBERS', 'SPECIAL CHARACTERS', 'ALL']  # Options for generating password
 
         self.UpperVar, self.LowerVar, self.NumVar, self.SpecialVar, self.AllVar = IntVar(), IntVar(), IntVar(), IntVar(), IntVar()
         self.vars = [self.UpperVar, self.LowerVar, self.NumVar, self.SpecialVar, self.AllVar]
 
         self.CheckBoxStyle = ttk.Style()
-        self.CheckBoxStyle.configure('C.TCheckbutton', font=('Calibri', 12))
+        self.CheckBoxStyle.configure('C.TCheckbutton', font=('Calibri', 12), background=self.bg, foreground='white')
 
         for index, value in enumerate(self.CheckBoxItems):  # Creating Check-buttons as per name in "self.CheckBoxItems" and variables as per in self.vars
             self.CheckBox = ttk.Checkbutton(self.CheckBoxFrame, text=value, variable=self.vars[index], cursor='hand2', style='C.TCheckbutton')
@@ -48,9 +50,9 @@ class PasswordGenerator:
         self.GeneratePasswordButton = Button(self.master, text='Generate Password', bg='Green', fg='white', activeforeground='white', activebackground='Green', font=('Calibri', 12), relief=FLAT, cursor='hand2', command=self.GenerateButtonCommand)
         self.GeneratePasswordButton.pack(pady=10, ipadx=5, ipady=5)
 
-        self.BottomFrame = Frame(self.master)
+        self.BottomFrame = Frame(self.master, bg=self.bg)
         self.BottomFrame.pack(side=BOTTOM, expand=True, fill='both')
-        self.PasswordLabel = Label(self.BottomFrame, font=('Calibri', 20))
+        self.PasswordLabel = Label(self.BottomFrame, font=('Calibri', 20), bg=self.bg, fg='white')
         self.CopyButton = Button(self.BottomFrame, text='Copy', bd=0, bg='Green', fg='white', activeforeground='white', activebackground='Green', relief=FLAT, cursor='hand2', command=self.CopyToClipboard)
 
         self.master.bind('<Button-1>', self.FocusHere)
@@ -92,7 +94,11 @@ class PasswordGenerator:
         Focus to the clicked widget
         '''
 
-        event.widget.focus_force()
+        if isinstance(event.widget, ttk.Checkbutton):
+            self.master.focus()
+
+        else:
+            event.widget.focus_force()
 
     def FocusIn(self, event=None):
         '''
