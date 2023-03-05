@@ -1,6 +1,5 @@
 import os
 import sys
-import json
 import winreg
 import ctypes
 import calendar
@@ -14,6 +13,7 @@ from pystray._base import MenuItem as item
 import pystray._win32
 from PIL import Image, ImageTk
 from dateutil.relativedelta import relativedelta
+from db import DB
 
 
 class _Entry:
@@ -82,15 +82,15 @@ class _Entry:
 
 class Tuition:
     def __init__(self):
-        self.tag = 0
         self.CanvasWidth = 857
         self.UpdateTimer = None
         self.WindowState = 'normal'
-        self.IsAddedFirstTime = False
 
         self.configFile = os.path.join(os.environ['USERPROFILE'], r'AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Tuition\settings.ini')
         self.startupFile = os.path.join(os.path.dirname(sys.executable), 'Tuition-StartUp.exe')
-        self.file_name = os.path.join(os.path.dirname(self.configFile), 'tuition.json')
+        self.file_name = os.path.join(os.path.dirname(self.configFile), 'database.db')
+
+        self.db = DB(self.file_name)
 
         self.master = Tk()
         self.master.withdraw()
@@ -105,63 +105,64 @@ class Tuition:
 
         self.CoverTitle = self.Canvas.create_image(0, 0, image=self.CoverImage, anchor='nw')
 
-        self.entry_name = _Entry(self.master, 'EntryName.TEntry', 'Name of Student', 50)
-        self.Canvas.create_window(self.CanvasWidth // 2, 40, window=self.entry_name.Entry, anchor=CENTER, height=35)
+        self.NameEntry = _Entry(self.master, 'EntryName.TEntry', 'Name of Student', 50)
+        self.Canvas.create_window(self.CanvasWidth // 2, 40, window=self.NameEntry.Entry, anchor=CENTER, height=35)
 
-        self.entry_fee = _Entry(self.master, 'EntryFee.TEntry', 'Fee', 50, True)
-        self.Canvas.create_window(self.CanvasWidth // 2, 85, window=self.entry_fee.Entry, anchor=CENTER, height=35)
+        self.FeeEntry = _Entry(self.master, 'EntryFee.TEntry', 'Fee', 50, True)
+        self.Canvas.create_window(self.CanvasWidth // 2, 85, window=self.FeeEntry.Entry, anchor=CENTER, height=35)
 
         self.months = list(calendar.month_abbr)[1:]
         self.month_combobox = ttk.Combobox(self.master, values=self.months, width=8, height=12)
         self.Canvas.create_window(self.CanvasWidth // 2 - 70, 125, window=self.month_combobox, anchor=CENTER, height=25)
 
-        self.day_combobox = ttk.Combobox(self.master, width=5, height=12)
-        self.Canvas.create_window(self.CanvasWidth // 2, 125, window=self.day_combobox, anchor=CENTER, height=25)
+        self.DayComboBox = ttk.Combobox(self.master, width=5, height=12)
+        self.Canvas.create_window(self.CanvasWidth // 2, 125, window=self.DayComboBox, anchor=CENTER, height=25)
 
         self.SubmitButtonStyle = ttk.Style()
         self.SubmitButtonStyle.configure('Submit.TButton')
-        self.submit_button = ttk.Button(self.master, text='Submit', cursor='hand2', style='Submit.TButton', command=self.submit_button_command)
+        self.submit_button = ttk.Button(self.master, text='Submit', cursor='hand2', style='Submit.TButton', command=self.SubmitButtonCommand)
         self.Canvas.create_window(self.CanvasWidth // 2 + 70, 125, window=self.submit_button, anchor=CENTER, height=30)
 
-        self.TreeFrame = Frame(self.master, bg='silver')
-        self.Canvas.create_window(428, 255, window=self.TreeFrame, anchor=CENTER)
+        self.TreeViewFrame = Frame(self.master, bg='silver')
+        self.Canvas.create_window(428, 255, window=self.TreeViewFrame, anchor=CENTER)
 
         self.Columns = ['NAME', 'FEE', 'JOINED', 'PREV DATE', 'NEXT PAY', 'LEFT', 'LATE PAY']
-        self.Tree = ttk.Treeview(self.TreeFrame, show='headings', columns=self.Columns)
-        self.Tree.pack(side=LEFT)
+        self.TreeView = ttk.Treeview(self.TreeViewFrame, show='headings', columns=self.Columns)
+        self.TreeView.pack(side=LEFT)
 
-        self.Tree.heading('NAME', text='NAME')
-        self.Tree.column('NAME')
-        self.Tree.heading('FEE', text='FEE')
-        self.Tree.column('FEE', width=80, anchor='center')
-        self.Tree.heading('JOINED', text='JOINED')
-        self.Tree.column('JOINED', width=130, anchor='center')
-        self.Tree.heading('PREV DATE', text='PREV DATE')
-        self.Tree.column('PREV DATE', width=130, anchor='center')
-        self.Tree.heading('NEXT PAY', text='NEXT PAY')
-        self.Tree.column('NEXT PAY', width=130, anchor='center')
-        self.Tree.heading('LEFT', text='LEFT')
-        self.Tree.column('LEFT', width=80, anchor='center')
-        self.Tree.heading('LATE PAY', text='LATE PAY')
-        self.Tree.column('LATE PAY', width=80, anchor='center')
+        self.TreeView.heading('NAME', text='NAME')
+        self.TreeView.column('NAME')
+        self.TreeView.heading('FEE', text='FEE')
+        self.TreeView.column('FEE', width=80, anchor='center')
+        self.TreeView.heading('JOINED', text='JOINED')
+        self.TreeView.column('JOINED', width=130, anchor='center')
+        self.TreeView.heading('PREV DATE', text='PREV DATE')
+        self.TreeView.column('PREV DATE', width=130, anchor='center')
+        self.TreeView.heading('NEXT PAY', text='NEXT PAY')
+        self.TreeView.column('NEXT PAY', width=130, anchor='center')
+        self.TreeView.heading('LEFT', text='LEFT')
+        self.TreeView.column('LEFT', width=80, anchor='center')
+        self.TreeView.heading('LATE PAY', text='LATE PAY')
+        self.TreeView.column('LATE PAY', width=80, anchor='center')
 
-        self.scrollbar = ttk.Scrollbar(self.TreeFrame, orient="vertical", command=self.Tree.yview)
-        self.Tree.config(yscrollcommand=self.scrollbar.set)
+        self.scrollbar = ttk.Scrollbar(self.TreeViewFrame, orient="vertical", command=self.TreeView.yview)
+        self.TreeView.config(yscrollcommand=self.scrollbar.set)
         self.scrollbar.pack(side=RIGHT, fill='y')
 
-        self.master.after(0, self.center_window)
+        self.master.after(0, self.CenterWindow)
         self.master.config(bg='silver')
 
         self.Minimize()
         self.SetDefaultDates()
 
-        self.Tree.bind('<Control-a>', self.SelectAll)
-        self.Tree.bind('<Button-3>', self.RightClick)
-        self.master.bind('<Button-1>', self.focus_anywhere)
-        self.Tree.bind('<Motion>', self.RestrictResizingHeading)
-        self.day_combobox.bind('<KeyPress>', self.ComboKeyPressed)
-        self.master.protocol('WM_DELETE_WINDOW', self.withdraw_window)
-        self.Tree.bind('<ButtonPress-1>', self.RestrictResizingHeading)
+        self.TreeView.bind('<Control-a>', self.SelectAll)
+        self.TreeView.bind('<Button-3>', self.RightClick)
+        self.TreeView.bind('<Delete>', self.DeleteDetails)
+        self.master.bind('<Button-1>', self.FocusAnyWhere)
+        self.DayComboBox.bind('<KeyPress>', self.ComboKeyPressed)
+        self.master.protocol('WM_DELETE_WINDOW', self.HideWindow)
+        self.TreeView.bind('<Motion>', self.RestrictResizingHeading)
+        self.TreeView.bind('<ButtonPress-1>', self.RestrictResizingHeading)
         self.month_combobox.bind('<<ComboboxSelected>>', self.SetMonthRange)
         self.month_combobox.bind('<KeyPress>', lambda event=Event, _bool=True: self.ComboKeyPressed(event, _bool))
 
@@ -189,7 +190,7 @@ class Tuition:
             if char.isdigit() is _bool:
                 return 'break'
 
-    def center_window(self):
+    def CenterWindow(self):
         '''
         Set position of the window to the center of the screen when user open
         the program
@@ -207,26 +208,26 @@ class Tuition:
         self.RanAtStartup = self.AlterConfigFile() == 'True'
 
         if self.RanAtStartup:
-            self.withdraw_window()
+            self.HideWindow()
 
         else:
-            self.insert_at_first()
+            self.InsertToTreeView()
             self.master.deiconify()
 
-        self.UpdateListBox()
+        self.UpdateLeftDays()
 
-    def focus_anywhere(self, event=None):
+    def FocusAnyWhere(self, event=None):
         '''
         Focus to the click widget. Also remove the selection(s) if made in
         ttk.Treeview
         '''
 
         widget = event.widget
-        selections = self.Tree.selection()
+        selections = self.TreeView.selection()
 
         if self.ClickedAtEmptySpace(event) or isinstance(widget, ttk.Treeview) is False:
             if selections:
-                self.Tree.selection_remove(selections)
+                self.TreeView.selection_remove(selections)
 
         widget.focus_set()
 
@@ -235,14 +236,14 @@ class Tuition:
         Check if user has clicked in empty space
         '''
 
-        return self.Tree.identify('item', event.x, event.y) == ''
+        return self.TreeView.identify('item', event.x, event.y) == ''
 
     def RestrictResizingHeading(self, event):
         '''
         Restrict user to resize the columns of Treeview
         '''
 
-        if self.Tree.identify_region(event.x, event.y) == "separator":
+        if self.TreeView.identify_region(event.x, event.y) == "separator":
             return "break"
 
     def SelectAll(self, event=None):
@@ -250,19 +251,19 @@ class Tuition:
         Select all values of ttk.Treeview when user presses Control-A
         '''
 
-        childrens = self.Tree.get_children()
-        self.Tree.selection_add(childrens)
+        childrens = self.TreeView.get_children()
+        self.TreeView.selection_add(childrens)
 
     def RightClick(self, event=None):
         '''
         When user right clicks inside list-box
         '''
 
-        CurrentSelections = self.Tree.selection()
+        CurrentSelections = self.TreeView.selection()
         RightClickMenu = Menu(self.master, tearoff=False)
 
         if CurrentSelections:
-            RightClickMenu.add_command(label='Delete', command=self.delete_details)
+            RightClickMenu.add_command(label='Delete', command=self.DeleteDetails)
 
         try:
             RightClickMenu.post(event.x_root, event.y_root)
@@ -270,86 +271,40 @@ class Tuition:
         finally:
             RightClickMenu.grab_release()
 
-    def read_json(self):
-        '''
-        Reading data from the .json file
-        '''
-
-        try:
-            with open(self.file_name, 'r') as f:
-                contents = json.load(f)
-
-        except FileNotFoundError:
-            with open(self.file_name, 'w'):
-                contents = {}
-
-        except json.decoder.JSONDecodeError:
-            contents = {}
-
-        return contents
-
-    def write_json(self, contents):
-        '''
-        Storing data to the .json file
-        '''
-
-        with open(self.file_name, 'w') as f:
-            json.dump(contents, f, indent=4)
-
-    def get_next_payment_date(self, joined_str):
+    def GetNextPaymentDate(self, PrevNextPayStr):
         '''
         Calculate next payment date when user adds data for the first time or
         when user gets monthly payment
         '''
 
-        today = datetime.date.today()
-        joined_obj = datetime.datetime.strptime(joined_str, '%Y-%b-%d')
-        joined_obj = datetime.date(joined_obj.year, joined_obj.month, joined_obj.day)
+        PrevNextPayObj = datetime.datetime.strptime(PrevNextPayStr, '%Y-%b-%d').date()
+        next_payment = PrevNextPayObj + relativedelta(months=1)
 
-        difference = relativedelta(today, joined_obj)
-        diff_days = abs(today.day - joined_obj.day)
-
-        if difference.months == 0:
-            diff_days = difference.days
-
-        elif joined_obj > today:
-            today = joined_obj
-            diff_days = 0
-
-        next_payment = today - relativedelta(days=diff_days) + relativedelta(months=1)
         return next_payment.strftime('%Y-%b-%d')
 
-    def delete_details(self):
+    def DeleteDetails(self, event=None):
         '''
         When user selects items in treeview and clicks delete menu
         '''
 
-        is_error_shown = False
-        contents = self.read_json()
-        selections = self.Tree.selection()
+        selections = self.TreeView.selection()
 
         for selection in selections:
-            value = self.Tree.item(selection)['values'][0]
+            item = self.TreeView.item(selection)
+            tags = item['tags'][0]
 
-            try:
-                contents.pop(value)
+            self.db.DeleteUser(tags)
 
-            except KeyError:
-                if is_error_shown is False:
-                    is_error_shown = True
-                    messagebox.showerror('ERR', f'Some values are not found in the file. Ignoring them.')
+        self.TreeView.delete(*selections)
 
-        self.write_json(contents)
-        self.insert_at_first()
-
-    def submit_button_command(self):
+    def SubmitButtonCommand(self):
         '''
         When user clicks SUBMIT button
         '''
 
-        fee = self.entry_fee.var.get().strip()
-        name = self.entry_name.var.get().strip()
-        day = self.day_combobox.get().strip()
+        fee = self.FeeEntry.var.get().strip()
+        name = self.NameEntry.var.get().strip()
+        day = self.DayComboBox.get().strip()
         month = self.month_combobox.get().strip()
 
         if name in ['Name of Student', '']:
@@ -366,101 +321,52 @@ class Tuition:
 
         else:
             joined_str = f'{datetime.date.today().year}-{month}-{str(day).zfill(2)}'
-            next_pay = self.get_next_payment_date(joined_str)
+            next_pay = self.GetNextPaymentDate(joined_str)
 
-            head = self.read_json()
+            details = (name, fee, joined_str, next_pay)
+            self.db.AddNewStudent(details)
 
-            if name in head:
-                messagebox.showerror('Exists', f'{name} is already in the file')
+            self.InsertToTreeView(new_added=True)
 
-            else:
-                tails = {name: {'fee': fee, 'joined': joined_str, 'prev_pay': [], 'late_pay': {}, 'next_pay': next_pay}}
-                head.update(tails)
-
-                self.write_json(head)
-                self.IsAddedFirstTime = True
-
-                self.entry_fee.Reset()
-                self.entry_name.Reset()
-
-                self.master.focus()
-                self.insert_at_first()
-
-    def insert_at_first(self):
+    def InsertToTreeView(self, new_added=False):
         '''
-        Inserts data from .json file to the TEXT widgets and also calculated
+        Inserts data from database file to the TEXT widgets and also calculated
         the next payment date as well as the number of date left for the payment
         '''
 
-        self.tag = 0
-
-        contents = self.read_json()
-        self.Tree.delete(*self.Tree.get_children())
+        contents = self.db.RetrieveData()
+        self.TreeView.delete(*self.TreeView.get_children())
 
         self.master.attributes('-topmost', True)
 
-        for key, value in contents.items():
-            name = key
-            fee = value['fee']
-            joined = value['joined']
-            prev_pay = value['prev_pay']
-            next_pay = value['next_pay']
+        for id, values in contents.items():
+            fee = values['Fee']
+            name = values['Name']
+            left = values['Left']
+            joined = values['Joined']
+            next_pay = values['NextPay']
+            late_pay = values['LatePay']
+            prev_pay = values['PrevDate']
 
             today = datetime.date.today()
-            next_pay_obj = datetime.datetime.strptime(next_pay, '%Y-%b-%d')
-            next_pay_obj = datetime.date(year=next_pay_obj.year, month=next_pay_obj.month, day=next_pay_obj.day)
-
-            left = (next_pay_obj - today).days
-
-            if prev_pay:
-                prev_pay = prev_pay[-1]
-
-            else:
-                prev_pay = 'Not Yet'
+            today_str = today.strftime('%Y-%b-%d')
 
             if left <= 0:  # When its the day to get pay
-                if self.IsAddedFirstTime:
-                    late_pay = '0'
+                if new_added is False and messagebox.askyesno('Got Payment?', f'Did you get paid from {name}?'):
+                    prev_pay = today_str
+                    self.db.UpdatePreviousPay(id, prev_pay)
+                    self.db.UpdateLateDates(id, prev_pay, late_pay)
 
-                else:
-                    late_pay = (today - next_pay_obj).days
+                    next_pay = self.GetNextPaymentDate(next_pay)
+                    self.db.UpdateNextPay(id, next_pay)
 
-                if self.IsAddedFirstTime is False and messagebox.askyesno('Got Payment?', f'Did you get paid from {name}?'):
-                    prev_pay = f'{today.year}-{calendar.month_abbr[today.month]}-{str(today.day).zfill(2)}'
-                    contents[name]['prev_pay'].append(prev_pay)
-
-                    next_pay = self.get_next_payment_date(joined)
-                    next_pay_obj = datetime.datetime.strptime(next_pay, '%Y-%b-%d')
-                    next_pay_obj = datetime.date(year=next_pay_obj.year, month=next_pay_obj.month, day=next_pay_obj.day)
+                    next_pay_obj = datetime.datetime.strptime(next_pay, '%Y-%b-%d').date()
                     left = (next_pay_obj - today).days
 
-                    contents[name]['next_pay'] = next_pay
-                    contents[name]['late_pay'][str(today)] = f'{late_pay} days'
-
-                    late_pay = contents[name]['late_pay'][str(today)]
-
-                else:
-                    late_pay = f'{late_pay} days'
-
-                if left < 0:  # When user does not get paid then it becomes late_pay where left becomes negative. So, in that case left becomes 0
-                    left = '0'
-
-            else:  # When its not the time to get pay
-                if contents[name]['late_pay']:  # If there is last payment in the file
-                    last_key = list(contents[name]['late_pay'].keys())[-1]
-                    late_pay = contents[name]['late_pay'][last_key]
-
-                else:  # If there is not last payment in the file
-                    late_pay = '0 days'
-
-            values = (name, fee, joined, prev_pay, next_pay, f'{left} days', late_pay)
-            self.Tree.insert('', END, values=values, tag=self.tag)
-
-            self.tag += 1
+            values = (name, fee, joined, prev_pay, next_pay, f'{left} days', f'{late_pay} days')
+            self.TreeView.insert('', END, values=values, tag=id)
 
         self.master.focus()
-        self.write_json(contents)
-
         self.master.attributes('-topmost', False)
 
     def SetDefaultDates(self):
@@ -471,7 +377,7 @@ class Tuition:
 
         today = datetime.datetime.today()
         self.month_combobox.set(today.strftime('%b'))
-        self.day_combobox.set(today.strftime('%d'))
+        self.DayComboBox.set(today.strftime('%d'))
 
         self.SetMonthRange()
 
@@ -480,7 +386,7 @@ class Tuition:
         Set day range to respective month selected month name from month-combobox
         '''
 
-        day_range = self.day_combobox.get().strip()
+        day_range = self.DayComboBox.get().strip()
         month_name = self.month_combobox.get().strip().capitalize()
 
         today = datetime.date.today()
@@ -493,66 +399,64 @@ class Tuition:
             messagebox.showerror('ERR', 'Invalid Month name. Setting to DEFAULT month JAN')
             return
 
-        month_index = list(calendar.month_abbr).index(month_name)
+        month_index = self.months.index(month_name)
         month_range = calendar.monthrange(today.year, month_index)[1]
 
         if int(day_range) > month_range:
             messagebox.showerror('ERR', 'Day range is beyond the actual range. Setting to DEFAULT value 1')
 
         else:
-            self.day_combobox.config(values=list(range(1, month_range + 1)))
+            self.DayComboBox.config(values=list(range(1, month_range + 1)))
 
-    def UpdateListBox(self):
+    def UpdateLeftDays(self):
         '''
-        When the program keeps running and at 12:00 am the value of left days
-        decreases by 1. So, updating this left days value
+        When the program keeps running and at 12:00 am decreasing the value of
+        left days by 1
         '''
 
         if self.master.state() == 'normal':
-            children = self.Tree.get_children()
+            children = self.TreeView.get_children()
 
             for child in children:
-                item = self.Tree.item(child)
+                item = self.TreeView.item(child)
 
                 values = item['values']
                 prev_left = int(values[-2].split()[0])
 
-                today = datetime.date.today()
-                next_pay = datetime.datetime.strptime(values[4], '%Y-%b-%d')
-                next_pay_obj = datetime.date(year=next_pay.year, month=next_pay.month, day=next_pay.day)
+                left_days = self.db.GetLeftAndLateDays(values[4])[0]
 
-                actual_left = (next_pay_obj - today).days
+                if left_days < 0:
+                    left_days = 0
 
-                if actual_left < 0:
-                    actual_left = 0
+                if prev_left != left_days:
+                    values[-2] = f'{left_days} days'
+                    self.TreeView.item(child, values=values, tags=item['tags'][0])
 
-                if prev_left != actual_left:
-                    values[-2] = f'{actual_left} days'
-                    self.Tree.item(child, values=values, tags=item['tags'][0])
+        self.UpdateTimer = self.master.after(10, self.UpdateLeftDays)
 
-        self.UpdateTimer = self.master.after(10, self.UpdateListBox)
-
-    def quit_window(self):
+    def QuitWindow(self):
         '''
         Quit window from the system tray
         '''
 
         self.icon.stop()
         self.master.quit()
+
+        self.db.EndConnection()
         subprocess.call('taskkill /IM "{sys.executable}" /F', creationflags=0x08000000)
 
-    def show_window(self):
+    def ShowWindow(self):
         '''
         Restore window from the system tray
         '''
 
         self.icon.stop()
 
-        self.master.after(250, self.insert_at_first)
+        self.master.after(250, self.InsertToTreeView)
         self.master.after(0, self.master.deiconify)
-        self.master.after(250, self.UpdateListBox)
+        self.master.after(250, self.UpdateLeftDays)
 
-    def withdraw_window(self):
+    def HideWindow(self):
         '''
         Hide window to the system tray
         '''
@@ -561,7 +465,7 @@ class Tuition:
         self.master.after_cancel(self.UpdateTimer)
 
         image = Image.open(resource_path("icon.ico"))
-        menu = (item('Quit', lambda: self.quit_window()), item('Show', lambda: self.show_window(), default=True))
+        menu = (item('Quit', lambda: self.QuitWindow()), item('Show', lambda: self.ShowWindow(), default=True))
         self.icon = pystray.Icon("name", image, "Tuition", menu)
         self.icon.run()
 
@@ -574,7 +478,7 @@ class Tuition:
 
         if (state, self.WindowState) == ('iconic', 'normal'):
             self.WindowState = 'iconic'
-            self.withdraw_window()
+            self.HideWindow()
 
         elif (state, self.WindowState) == ('normal', 'iconic'):
             self.WindowState = 'normal'
