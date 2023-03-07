@@ -55,6 +55,7 @@ class CustomDays:
         '''
 
         self.CustomDaysWin = Toplevel(self.window)
+        self.CustomDaysWin.transient(self.window)
         self.CustomDaysWin.grab_set()
         self.CustomDaysWin.withdraw()
 

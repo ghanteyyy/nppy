@@ -52,6 +52,7 @@ class AddAlarm:
         '''
 
         self.AddAlarmWindow = Toplevel(self.window)
+        self.AddAlarmWindow.transient(self.window)
         self.AddAlarmWindow.withdraw()
         self.AddAlarmWindow.grab_set()
 

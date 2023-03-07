@@ -54,6 +54,7 @@ class SelectToneWin:
         self.all_audios = os.listdir(self.audio_path)
 
         self.ToneWin = Toplevel(self.window)
+        self.ToneWin.transient(self.window)
         self.ToneWin.grab_set()
 
         self.ToneWin.withdraw()
