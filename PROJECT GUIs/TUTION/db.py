@@ -10,6 +10,9 @@ class DB:
 
         self.CreateTable()
 
+    def __del__(self):
+        self.EndConnection()
+
     def StartConnection(self):
         self.conn = sqlite3.connect(self.db_file)
         self.conn.execute("PRAGMA foreign_keys = ON")
