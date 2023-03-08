@@ -4,6 +4,7 @@ import winreg
 import ctypes
 import calendar
 import datetime
+import threading
 import subprocess
 from tkinter import *
 import tkinter.ttk as ttk
@@ -17,10 +18,10 @@ from db import DB
 
 
 class _Entry:
-    def __init__(self, frame, entry_style, default_text, width=30, trace=False):
+    def __init__(self, frame, default_text, width=30, trace=False):
         self.frame = frame
         self.trace = trace
-        self.entry_style = entry_style
+        self.entry_style = f'{default_text}.TEntry'
 
         self.IsDefault = True
         self.DEFAULT_TEXT = default_text
@@ -85,12 +86,16 @@ class Tuition:
         self.CanvasWidth = 857
         self.UpdateTimer = None
         self.WindowState = 'normal'
+        self.IsScrollBarShown = False
 
-        self.configFile = os.path.join(os.environ['USERPROFILE'], r'AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Tuition\settings.ini')
-        self.startupFile = os.path.join(os.path.dirname(sys.executable), 'Tuition-StartUp.exe')
-        self.file_name = os.path.join(os.path.dirname(self.configFile), 'database.db')
+        self.RootPath = os.path.join(os.environ['USERPROFILE'], r'AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Tuition')
 
-        self.db = DB(self.file_name)
+        if os.path.exists(self.RootPath) is False:
+            os.mkdir(self.RootPath)
+
+        self.ConfigPath = os.path.join(self.RootPath, 'settings.ini')
+        self.DatabasePath = os.path.join(os.path.dirname(self.RootPath), 'database.db')
+        self.StartUpExePath = os.path.join(os.path.dirname(sys.executable), 'Tuition-StartUp.exe')
 
         self.master = Tk()
         self.master.withdraw()
@@ -105,26 +110,26 @@ class Tuition:
 
         self.CoverTitle = self.Canvas.create_image(0, 0, image=self.CoverImage, anchor='nw')
 
-        self.NameEntry = _Entry(self.master, 'EntryName.TEntry', 'Name of Student', 50)
-        self.Canvas.create_window(self.CanvasWidth // 2, 40, window=self.NameEntry.Entry, anchor=CENTER, height=35)
+        self.NameEntry = _Entry(self.master, 'Name of Student', 50)
+        self.Canvas.create_window(self.CanvasWidth // 2, 30, window=self.NameEntry.Entry, anchor=CENTER, height=35)
 
-        self.FeeEntry = _Entry(self.master, 'EntryFee.TEntry', 'Fee', 50, True)
-        self.Canvas.create_window(self.CanvasWidth // 2, 85, window=self.FeeEntry.Entry, anchor=CENTER, height=35)
+        self.FeeEntry = _Entry(self.master, 'Fee', 50, True)
+        self.Canvas.create_window(self.CanvasWidth // 2, 75, window=self.FeeEntry.Entry, anchor=CENTER, height=35)
 
         self.months = list(calendar.month_abbr)[1:]
-        self.month_combobox = ttk.Combobox(self.master, values=self.months, width=8, height=12)
-        self.Canvas.create_window(self.CanvasWidth // 2 - 70, 125, window=self.month_combobox, anchor=CENTER, height=25)
+        self.MonthComboBox = ttk.Combobox(self.master, values=self.months, width=8, height=12)
+        self.Canvas.create_window(self.CanvasWidth // 2 - 70, 115, window=self.MonthComboBox, anchor=CENTER, height=25)
 
         self.DayComboBox = ttk.Combobox(self.master, width=5, height=12)
-        self.Canvas.create_window(self.CanvasWidth // 2, 125, window=self.DayComboBox, anchor=CENTER, height=25)
+        self.Canvas.create_window(self.CanvasWidth // 2, 115, window=self.DayComboBox, anchor=CENTER, height=25)
 
         self.SubmitButtonStyle = ttk.Style()
         self.SubmitButtonStyle.configure('Submit.TButton')
         self.submit_button = ttk.Button(self.master, text='Submit', cursor='hand2', style='Submit.TButton', command=self.SubmitButtonCommand)
-        self.Canvas.create_window(self.CanvasWidth // 2 + 70, 125, window=self.submit_button, anchor=CENTER, height=30)
+        self.Canvas.create_window(self.CanvasWidth // 2 + 70, 115, window=self.submit_button, anchor=CENTER, height=30)
 
         self.TreeViewFrame = Frame(self.master, bg='silver')
-        self.Canvas.create_window(428, 255, window=self.TreeViewFrame, anchor=CENTER)
+        self.Canvas.create_window(428, 252, window=self.TreeViewFrame, anchor=CENTER)
 
         self.Columns = ['NAME', 'FEE', 'JOINED', 'PREV DATE', 'NEXT PAY', 'LEFT', 'LATE PAY']
         self.TreeView = ttk.Treeview(self.TreeViewFrame, show='headings', columns=self.Columns)
@@ -147,7 +152,6 @@ class Tuition:
 
         self.scrollbar = ttk.Scrollbar(self.TreeViewFrame, orient="vertical", command=self.TreeView.yview)
         self.TreeView.config(yscrollcommand=self.scrollbar.set)
-        self.scrollbar.pack(side=RIGHT, fill='y')
 
         self.master.after(0, self.CenterWindow)
         self.master.config(bg='silver')
@@ -163,8 +167,8 @@ class Tuition:
         self.master.protocol('WM_DELETE_WINDOW', self.HideWindow)
         self.TreeView.bind('<Motion>', self.RestrictResizingHeading)
         self.TreeView.bind('<ButtonPress-1>', self.RestrictResizingHeading)
-        self.month_combobox.bind('<<ComboboxSelected>>', self.SetMonthRange)
-        self.month_combobox.bind('<KeyPress>', lambda event=Event, _bool=True: self.ComboKeyPressed(event, _bool))
+        self.MonthComboBox.bind('<<ComboboxSelected>>', self.SetMonthRange)
+        self.MonthComboBox.bind('<KeyPress>', lambda event=Event, _bool=True: self.ComboKeyPressed(event, _bool))
 
         self.master.mainloop()
 
@@ -182,7 +186,7 @@ class Tuition:
 
         if char not in ['BackSpace', 'Delete', 'Left', 'Right']:
             if _bool:
-                month_combo_get = self.month_combobox.get().strip() + event.char
+                month_combo_get = self.MonthComboBox.get().strip() + event.char
 
                 if len(month_combo_get) > 3:
                     return 'break'
@@ -215,6 +219,7 @@ class Tuition:
             self.master.deiconify()
 
         self.UpdateLeftDays()
+        self.ShowHideScrollBar()
 
     def FocusAnyWhere(self, event=None):
         '''
@@ -245,6 +250,29 @@ class Tuition:
 
         if self.TreeView.identify_region(event.x, event.y) == "separator":
             return "break"
+
+    def ShowHideScrollBar(self):
+        childrens = self.TreeView.get_children()
+        TreeViewHeight = self.TreeView.cget('height') + 1
+
+        if len(childrens) >= TreeViewHeight:
+            if self.IsScrollBarShown is False:
+                self.IsScrollBarShown = True
+                self.scrollbar.pack(side=RIGHT, fill='y')
+
+        else:
+            if self.IsScrollBarShown:
+                self.scrollbar.pack_forget()
+                self.IsScrollBarShown = False
+
+    def ResetToDefaults(self):
+        '''
+        Reset Entry and dates values
+        '''
+
+        self.FeeEntry.Reset()
+        self.NameEntry.Reset()
+        self.SetDefaultDates()
 
     def SelectAll(self, event=None):
         '''
@@ -293,9 +321,10 @@ class Tuition:
             item = self.TreeView.item(selection)
             tags = item['tags'][0]
 
-            self.db.DeleteUser(tags)
+            DB(self.DatabasePath).DeleteUser(tags)
 
         self.TreeView.delete(*selections)
+        self.ShowHideScrollBar()
 
     def SubmitButtonCommand(self):
         '''
@@ -305,7 +334,7 @@ class Tuition:
         fee = self.FeeEntry.var.get().strip()
         name = self.NameEntry.var.get().strip()
         day = self.DayComboBox.get().strip()
-        month = self.month_combobox.get().strip()
+        month = self.MonthComboBox.get().strip()
 
         if name in ['Name of Student', '']:
             messagebox.showerror('Invalid Name', 'Name of Student is invalid.')
@@ -324,9 +353,11 @@ class Tuition:
             next_pay = self.GetNextPaymentDate(joined_str)
 
             details = (name, fee, joined_str, next_pay)
-            self.db.AddNewStudent(details)
+            DB(self.DatabasePath).AddNewStudent(details)
 
             self.InsertToTreeView(new_added=True)
+            self.ShowHideScrollBar()
+            self.ResetToDefaults()
 
     def InsertToTreeView(self, new_added=False):
         '''
@@ -334,7 +365,7 @@ class Tuition:
         the next payment date as well as the number of date left for the payment
         '''
 
-        contents = self.db.RetrieveData()
+        contents = DB(self.DatabasePath).RetrieveData()
         self.TreeView.delete(*self.TreeView.get_children())
 
         self.master.attributes('-topmost', True)
@@ -354,11 +385,12 @@ class Tuition:
             if left <= 0:  # When its the day to get pay
                 if new_added is False and messagebox.askyesno('Got Payment?', f'Did you get paid from {name}?'):
                     prev_pay = today_str
-                    self.db.UpdatePreviousPay(id, prev_pay)
-                    self.db.UpdateLateDates(id, prev_pay, late_pay)
+
+                    DB(self.DatabasePath).UpdatePreviousPay(id, prev_pay)
+                    DB(self.DatabasePath).UpdateLateDates(id, prev_pay, late_pay)
 
                     next_pay = self.GetNextPaymentDate(next_pay)
-                    self.db.UpdateNextPay(id, next_pay)
+                    DB(self.DatabasePath).UpdateNextPay(id, next_pay)
 
                     next_pay_obj = datetime.datetime.strptime(next_pay, '%Y-%b-%d').date()
                     left = (next_pay_obj - today).days
@@ -376,8 +408,8 @@ class Tuition:
         '''
 
         today = datetime.datetime.today()
-        self.month_combobox.set(today.strftime('%b'))
         self.DayComboBox.set(today.strftime('%d'))
+        self.MonthComboBox.set(today.strftime('%b'))
 
         self.SetMonthRange()
 
@@ -387,7 +419,7 @@ class Tuition:
         '''
 
         day_range = self.DayComboBox.get().strip()
-        month_name = self.month_combobox.get().strip().capitalize()
+        month_name = self.MonthComboBox.get().strip().capitalize()
 
         today = datetime.date.today()
 
@@ -423,7 +455,7 @@ class Tuition:
                 values = item['values']
                 prev_left = int(values[-2].split()[0])
 
-                left_days = self.db.GetLeftAndLateDays(values[4])[0]
+                left_days = DB(self.DatabasePath).GetLeftAndLateDays(values[4])[0]
 
                 if left_days < 0:
                     left_days = 0
@@ -442,7 +474,6 @@ class Tuition:
         self.icon.stop()
         self.master.quit()
 
-        self.db.EndConnection()
         subprocess.call('taskkill /IM "{sys.executable}" /F', creationflags=0x08000000)
 
     def ShowWindow(self):
@@ -467,7 +498,9 @@ class Tuition:
         image = Image.open(resource_path("icon.ico"))
         menu = (item('Quit', lambda: self.QuitWindow()), item('Show', lambda: self.ShowWindow(), default=True))
         self.icon = pystray.Icon("name", image, "Tuition", menu)
-        self.icon.run()
+
+        thread = threading.Thread(target=self.icon.run)
+        thread.start()
 
     def Minimize(self):
         '''
@@ -491,12 +524,7 @@ class Tuition:
         '''
 
         config = ConfigParser()
-        config.read(self.configFile)
-
-        dirpath = os.path.dirname(self.configFile)
-
-        if not os.path.exists(dirpath):
-            os.mkdir(dirpath)
+        config.read(self.ConfigPath)
 
         if 'STATUS' in config:
             status = config['STATUS']['Startup']
@@ -507,7 +535,7 @@ class Tuition:
         config['STATUS'] = {'Startup': False}
         config['PATH'] = {'EXE PATH': sys.executable}
 
-        with open(self.configFile, 'w') as file:
+        with open(self.ConfigPath, 'w') as file:
             config.write(file)
 
         return status
@@ -517,21 +545,18 @@ class Tuition:
         Adding Tuition-Startup.exe to startup
         '''
 
-        if os.path.exists(self.startupFile):
-            if os.path.exists(self.startupFile):
-                areg = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
+        if os.path.exists(self.StartUpExePath):
+            reg = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
 
-                try:
-                    akey = winreg.OpenKey(areg, f'SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\Tuition-StartUp', 0, winreg.KEY_WRITE)
-                    areg.Close()
-                    akey.Close()
+            try:
+                key = winreg.OpenKey(reg, f'SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\Tuition-StartUp', 0, winreg.KEY_WRITE)
 
-                except WindowsError:
-                    key = winreg.OpenKey(areg, r'SOFTWARE\Microsoft\Windows\CurrentVersion\Run', 0, winreg.KEY_SET_VALUE)
-                    winreg.SetValueEx(key, 'Tuition-StartUp', 0, winreg.REG_SZ, self.startupFile)
+            except WindowsError:
+                key = winreg.OpenKey(reg, r'SOFTWARE\Microsoft\Windows\CurrentVersion\Run', 0, winreg.KEY_SET_VALUE)
+                winreg.SetValueEx(key, 'Tuition-StartUp', 0, winreg.REG_SZ, self.StartUpExePath)
 
-                    areg.Close()
-                    key.Close()
+            reg.Close()
+            key.Close()
 
 
 def resource_path(file_name):
