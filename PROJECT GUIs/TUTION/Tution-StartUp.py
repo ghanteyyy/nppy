@@ -7,7 +7,7 @@ from configparser import ConfigParser
 class Startup:
     '''
     This script is to execute Tuition.exe on startup. Tuition.exe is made
-    when Tuition.exe is compiled to exe using Pyinstaller or other similar
+    when Tuition.py is compiled to exe using Pyinstaller or other similar
     script. This script is also to be compiled to exe
     '''
 
