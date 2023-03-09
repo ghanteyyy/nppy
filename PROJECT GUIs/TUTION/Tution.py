@@ -9,12 +9,17 @@ import subprocess
 from tkinter import *
 import tkinter.ttk as ttk
 from tkinter import messagebox
+import pyautogui
 from configparser import ConfigParser
 from pystray._base import MenuItem as item
 import pystray._win32
 from PIL import Image, ImageTk
 from dateutil.relativedelta import relativedelta
 from db import DB
+
+
+RootPath = os.path.join(os.environ['USERPROFILE'], r'AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Tuition')
+ConfigPath = os.path.join(RootPath, 'settings.ini')
 
 
 class _Entry:
@@ -88,13 +93,10 @@ class Tuition:
         self.WindowState = 'normal'
         self.IsScrollBarShown = False
 
-        self.RootPath = os.path.join(os.environ['USERPROFILE'], r'AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Tuition')
+        if os.path.exists(RootPath) is False:
+            os.mkdir(RootPath)
 
-        if os.path.exists(self.RootPath) is False:
-            os.mkdir(self.RootPath)
-
-        self.ConfigPath = os.path.join(self.RootPath, 'settings.ini')
-        self.DatabasePath = os.path.join(os.path.dirname(self.RootPath), 'database.db')
+        self.DatabasePath = os.path.join(os.path.dirname(RootPath), 'database.db')
         self.StartUpExePath = os.path.join(os.path.dirname(sys.executable), 'Tuition-StartUp.exe')
 
         self.master = Tk()
@@ -156,7 +158,6 @@ class Tuition:
         self.master.after(0, self.CenterWindow)
         self.master.config(bg='silver')
 
-        self.Minimize()
         self.SetDefaultDates()
 
         self.TreeView.bind('<Control-a>', self.SelectAll)
@@ -220,6 +221,7 @@ class Tuition:
 
         self.UpdateLeftDays()
         self.ShowHideScrollBar()
+        self.Minimize()
 
     def FocusAnyWhere(self, event=None):
         '''
@@ -482,6 +484,7 @@ class Tuition:
         '''
 
         self.icon.stop()
+        self.AlterConfigFile()
 
         self.master.after(250, self.InsertToTreeView)
         self.master.after(0, self.master.deiconify)
@@ -494,6 +497,8 @@ class Tuition:
 
         self.master.withdraw()
         self.master.after_cancel(self.UpdateTimer)
+
+        self.AlterConfigFile(True)
 
         image = Image.open(resource_path("icon.ico"))
         menu = (item('Quit', lambda: self.QuitWindow()), item('Show', lambda: self.ShowWindow(), default=True))
@@ -509,6 +514,10 @@ class Tuition:
 
         state = self.master.state()
 
+        config = ConfigParser()
+        config.read(ConfigPath)
+        is_minimized = config['MINIMIZED']['Status']
+
         if (state, self.WindowState) == ('iconic', 'normal'):
             self.WindowState = 'iconic'
             self.HideWindow()
@@ -516,15 +525,35 @@ class Tuition:
         elif (state, self.WindowState) == ('normal', 'iconic'):
             self.WindowState = 'normal'
 
+        elif (state, is_minimized) == ('withdrawn', 'False'):
+            self.icon.stop()
+            self.master.deiconify()
+
+            self.master.attributes('-topmost', True)
+            self.master.attributes('-topmost', False)
+
+            self.master.after(100, self.ClickToWindow)
+
         self.master.after(250, self.Minimize)
 
-    def AlterConfigFile(self):
+    def ClickToWindow(self):
+        '''
+        Click to window and set the mouse position to where it was clicked before
+        '''
+
+        mouseX, mouseY = pyautogui.position()
+        win_x, win_y = self.master.winfo_rootx() + 10, self.master.winfo_rooty() + 10
+
+        pyautogui.click(win_x, win_y)
+        pyautogui.moveTo(mouseX, mouseY)
+
+    def AlterConfigFile(self, is_minimized=False):
         '''
         Read and Write the config file
         '''
 
         config = ConfigParser()
-        config.read(self.ConfigPath)
+        config.read(ConfigPath)
 
         if 'STATUS' in config:
             status = config['STATUS']['Startup']
@@ -533,9 +562,10 @@ class Tuition:
             status = False
 
         config['STATUS'] = {'Startup': False}
-        config['PATH'] = {'EXE PATH': sys.executable}
+        config['PATH'] = {'EXEPATH': sys.executable}
+        config['MINIMIZED'] = {'Status': is_minimized}
 
-        with open(self.ConfigPath, 'w') as file:
+        with open(ConfigPath, 'w') as file:
             config.write(file)
 
         return status
@@ -582,20 +612,28 @@ def resource_path(file_name):
 
 
 if __name__ == '__main__':
+    start = False
     handle = ctypes.windll.user32.FindWindowW(None, "Tuition")
 
     if handle:  # When the program is already running
-        root = Tk()
-        root.withdraw()
-        root.attributes('-topmost', True)
-        root.iconbitmap(resource_path('icon.ico'))
-        res = messagebox.showinfo("ERR", "Already running ...")
+        if os.path.exists(ConfigPath) is False:
+            start = True
 
-        if res == 'ok':
-            root.quit()
-            root.destroy()
+        else:
+            config = ConfigParser()
+            config.read(ConfigPath)
 
-        root.mainloop()
+            if 'MINIMIZED' not in config:
+                start = True
+
+            else:
+                config['MINIMIZED'] = {'Status': False}
+
+                with open(ConfigPath, 'w') as file:
+                    config.write(file)
 
     else:
+        start = True
+
+    if start:
         Tuition()
