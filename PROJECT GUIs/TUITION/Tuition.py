@@ -204,7 +204,8 @@ class Tuition:
         self.master.update()
 
         self.master.resizable(0, 0)
-        self.master.iconbitmap(resource_path('icon.ico'))
+
+        self.master.iconphoto(False, PhotoImage(file=resource_path('icon.png')))
         width, height = self.master.winfo_width(), self.master.winfo_height() + 5
         screenwidth, screenheight = self.master.winfo_screenwidth() // 2, self.master.winfo_screenheight() // 2
         self.master.geometry(f'{width}x{height}+{screenwidth - width // 2}+{screenheight - height // 2}')
@@ -216,9 +217,9 @@ class Tuition:
             self.HideWindow()
 
         else:
-            self.InsertToTreeView()
             self.master.deiconify()
 
+        self.InsertToTreeView()
         self.UpdateLeftDays()
         self.ShowHideScrollBar()
         self.Minimize()
@@ -433,7 +434,7 @@ class Tuition:
             messagebox.showerror('ERR', 'Invalid Month name. Setting to DEFAULT month JAN')
             return
 
-        month_index = self.months.index(month_name)
+        month_index = self.months.index(month_name) + 1
         month_range = calendar.monthrange(today.year, month_index)[1]
 
         if int(day_range) > month_range:
