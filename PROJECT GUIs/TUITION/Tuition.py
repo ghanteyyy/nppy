@@ -501,7 +501,7 @@ class Tuition:
 
         self.AlterConfigFile(True)
 
-        image = Image.open(resource_path("icon.ico"))
+        image = Image.open(resource_path("icon.png"))
         menu = (item('Quit', lambda: self.QuitWindow()), item('Show', lambda: self.ShowWindow(), default=True))
         self.icon = pystray.Icon("name", image, "Tuition", menu)
 
