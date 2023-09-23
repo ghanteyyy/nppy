@@ -1,63 +1,46 @@
 import os
-from tkinter import *
-from tkinter import messagebox
-from configparser import ConfigParser
+import sys
+import winreg
+from config import Config
 
 
 class Startup:
     '''
-    This script is to execute Tuition.exe on startup. Tuition.exe is made
-    when Tuition.py is compiled to exe using Pyinstaller or other similar
-    script. This script is also to be compiled to exe
+    This class provides functionality to add an executable to the Windows startup
+    programs. It is specifically designed to execute 'Tuition.exe' on startup,
+    which is created by compiling 'Tuition.py' to an executable using tools like
+    PyInstaller.
     '''
 
     def __init__(self):
-        self.configFile = os.path.join(os.environ['USERPROFILE'], r'AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Tution\settings.ini')
+        self.CONFIG = Config()
+        self.MainExecutablePath = os.path.join(os.path.dirname(sys.executable), 'Tuition.exe')
 
-    def AlterConfig(self):
-        '''
-        Edit config file with respective values
-        '''
+    def AddToStartup(self):
+        reg = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
 
-        dirpath = os.path.dirname(self.configFile)
+        try:
+            key = winreg.OpenKey(reg, f'SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\Tuition', 0, winreg.KEY_WRITE)
 
-        if not os.path.exists(dirpath):
-            os.mkdir(dirpath)
+        except WindowsError:
+            key = winreg.OpenKey(reg, r'SOFTWARE\Microsoft\Windows\CurrentVersion\Run', 0, winreg.KEY_SET_VALUE)
+            winreg.SetValueEx(key, 'Tuition', 0, winreg.REG_SZ, sys.executable)
 
-        config = ConfigParser()
-        config.read(self.configFile)
-
-        if 'PATH' in config:
-            status = True
-            self.main_executable = config['PATH']['exe path']
-
-        else:
-            status = False
-
-        config['STATUS'] = {'Startup': True}
-
-        with open(self.configFile, 'w') as file:
-            config.write(file)
-
-        return status
+        reg.Close()
+        key.Close()
 
     def main(self):
         '''
         Entry point of this script
         '''
 
-        if self.AlterConfig():
-            os.startfile(self.main_executable)
+        if self.CONFIG.contents.get('Is-Added-To-Startup', False) is False:
+            self.CONFIG.ToggleValues('Is-Added-To-Startup', True)
 
-        else:  # When the config file is corrupt or does not exist
-            root = Tk()
-            root.withdraw()
+            self.AddToStartup()
 
-            if messagebox.showinfo('TUITION', 'settings.ini is corrupted. Could\'t not execute Tution.exe.\n\nRun Tution.exe manually.') == 'ok':
-                root.quit()
-                root.destroy()
-
-            root.mainloop()
+        self.CONFIG.ToggleValues('From-StartUp', True)
+        os.startfile(self.MainExecutablePath)
 
 
 if __name__ == '__main__':
