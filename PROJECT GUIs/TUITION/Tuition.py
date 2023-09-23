@@ -1,7 +1,5 @@
 import os
 import sys
-import winreg
-import ctypes
 import calendar
 import datetime
 import threading
@@ -10,16 +8,12 @@ from tkinter import *
 import tkinter.ttk as ttk
 from tkinter import messagebox
 import pyautogui
-from configparser import ConfigParser
-from pystray._base import MenuItem as item
 import pystray._win32
 from PIL import Image, ImageTk
+from pystray._base import MenuItem as item
 from dateutil.relativedelta import relativedelta
 from db import DB
-
-
-RootPath = os.path.join(os.environ['USERPROFILE'], r'AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Tuition')
-ConfigPath = os.path.join(RootPath, 'settings.ini')
+from config import Config
 
 
 class _Entry:
@@ -93,11 +87,10 @@ class Tuition:
         self.WindowState = 'normal'
         self.IsScrollBarShown = False
 
-        if os.path.exists(RootPath) is False:
-            os.mkdir(RootPath)
+        self.CONFIG = Config()
+        self.CONFIG.ToggleValues("Is-Running", True)
 
-        self.DatabasePath = os.path.join(os.path.dirname(RootPath), 'database.db')
-        self.StartUpExePath = os.path.join(os.path.dirname(sys.executable), 'Tuition-StartUp.exe')
+        self.DatabasePath = 'database.db'
 
         self.master = Tk()
         self.master.withdraw()
@@ -210,14 +203,15 @@ class Tuition:
         screenwidth, screenheight = self.master.winfo_screenwidth() // 2, self.master.winfo_screenheight() // 2
         self.master.geometry(f'{width}x{height}+{screenwidth - width // 2}+{screenheight - height // 2}')
 
-        self.AddToStartUp()
-        self.RanAtStartup = self.AlterConfigFile() == 'True'
+        self.RanAtStartup = self.CONFIG.contents.get('From-StartUp', False)
 
-        if self.RanAtStartup:
+        if self.RanAtStartup and CheckIfItIsExecutable():
             self.HideWindow()
 
         else:
             self.master.deiconify()
+
+        self.CONFIG.ToggleValues('From-StartUp', False)
 
         self.InsertToTreeView()
         self.UpdateLeftDays()
@@ -474,6 +468,8 @@ class Tuition:
         Quit window from the system tray
         '''
 
+        self.CONFIG.SetDefaultValues()
+
         self.icon.stop()
         self.master.quit()
 
@@ -484,8 +480,9 @@ class Tuition:
         Restore window from the system tray
         '''
 
+        self.CONFIG.ToggleValues('Is-Minimized', False)
+
         self.icon.stop()
-        self.AlterConfigFile()
 
         self.master.after(250, self.InsertToTreeView)
         self.master.after(0, self.master.deiconify)
@@ -496,10 +493,10 @@ class Tuition:
         Hide window to the system tray
         '''
 
+        self.CONFIG.ToggleValues('Is-Minimized', True)
+
         self.master.withdraw()
         self.master.after_cancel(self.UpdateTimer)
-
-        self.AlterConfigFile(True)
 
         image = Image.open(resource_path("icon.png"))
         menu = (item('Quit', lambda: self.QuitWindow()), item('Show', lambda: self.ShowWindow(), default=True))
@@ -515,9 +512,7 @@ class Tuition:
 
         state = self.master.state()
 
-        config = ConfigParser()
-        config.read(ConfigPath)
-        is_minimized = config['MINIMIZED']['Status']
+        is_minimized = self.CONFIG.contents['Is-Minimized']
 
         if (state, self.WindowState) == ('iconic', 'normal'):
             self.WindowState = 'iconic'
@@ -526,7 +521,7 @@ class Tuition:
         elif (state, self.WindowState) == ('normal', 'iconic'):
             self.WindowState = 'normal'
 
-        elif (state, is_minimized) == ('withdrawn', 'False'):
+        elif (state, is_minimized) == ('withdrawn', False):
             self.icon.stop()
             self.master.deiconify()
 
@@ -548,46 +543,17 @@ class Tuition:
         pyautogui.click(win_x, win_y)
         pyautogui.moveTo(mouseX, mouseY)
 
-    def AlterConfigFile(self, is_minimized=False):
-        '''
-        Read and Write the config file
-        '''
 
-        config = ConfigParser()
-        config.read(ConfigPath)
+def CheckIfItIsExecutable():
+    '''
+    Return the directory path if it is running as executable
+    '''
 
-        if 'STATUS' in config:
-            status = config['STATUS']['Startup']
+    try:
+        return sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
 
-        else:
-            status = False
-
-        config['STATUS'] = {'Startup': False}
-        config['PATH'] = {'EXEPATH': sys.executable}
-        config['MINIMIZED'] = {'Status': is_minimized}
-
-        with open(ConfigPath, 'w') as file:
-            config.write(file)
-
-        return status
-
-    def AddToStartUp(self):
-        '''
-        Adding Tuition-Startup.exe to startup
-        '''
-
-        if os.path.exists(self.StartUpExePath):
-            reg = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
-
-            try:
-                key = winreg.OpenKey(reg, f'SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\Tuition-StartUp', 0, winreg.KEY_WRITE)
-
-            except WindowsError:
-                key = winreg.OpenKey(reg, r'SOFTWARE\Microsoft\Windows\CurrentVersion\Run', 0, winreg.KEY_SET_VALUE)
-                winreg.SetValueEx(key, 'Tuition-StartUp', 0, winreg.REG_SZ, self.StartUpExePath)
-
-            reg.Close()
-            key.Close()
+    except AttributeError:
+        return False
 
 
 def resource_path(file_name):
@@ -603,38 +569,17 @@ def resource_path(file_name):
         file of any extension from temporary directory
     '''
 
-    try:
-        base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
+    base_path = CheckIfItIsExecutable()
 
-    except AttributeError:
+    if base_path is False:
         base_path = os.path.dirname(__file__)
 
     return os.path.join(base_path, 'assets', file_name)
 
 
 if __name__ == '__main__':
-    start = False
-    handle = ctypes.windll.user32.FindWindowW(None, "Tuition")
+    os.startfile('Tuition-Startup.exe')
+    is_running = Config().GetContents().get('Is-Running', False)
 
-    if handle:  # When the program is already running
-        if os.path.exists(ConfigPath) is False:
-            start = True
-
-        else:
-            config = ConfigParser()
-            config.read(ConfigPath)
-
-            if 'MINIMIZED' not in config:
-                start = True
-
-            else:
-                config['MINIMIZED'] = {'Status': False}
-
-                with open(ConfigPath, 'w') as file:
-                    config.write(file)
-
-    else:
-        start = True
-
-    if start:
+    if is_running is False:
         Tuition()
