@@ -14,7 +14,6 @@ class Startup:
 
     def __init__(self):
         self.CONFIG = Config()
-        self.MainExecutablePath = os.path.join(os.path.dirname(sys.executable), 'Tuition.exe')
 
     def AddToStartup(self):
         reg = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
@@ -40,7 +39,6 @@ class Startup:
             self.AddToStartup()
 
         self.CONFIG.ToggleValues('From-StartUp', True)
-        os.startfile(self.MainExecutablePath)
 
 
 if __name__ == '__main__':
