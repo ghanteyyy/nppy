@@ -578,7 +578,12 @@ def resource_path(file_name):
 
 
 if __name__ == '__main__':
-    os.startfile('Tuition-Startup.exe')
+    try:
+        os.startfile('Tuition-Startup.exe')
+
+    except FileNotFoundError:
+        pass
+
     is_running = Config().GetContents().get('Is-Running', False)
 
     if is_running is False:
