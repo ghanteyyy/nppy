@@ -1,6 +1,7 @@
 import os
 import sys
 import winreg
+import psutil
 from config import Config
 
 
@@ -28,6 +29,13 @@ class Startup:
         reg.Close()
         key.Close()
 
+    def CheckIfMainExecutableIsRunning(self):
+        '''
+        Check if Tuition.exe is running
+        '''
+
+        return "Tuition.exe" in (p.name() for p in psutil.process_iter())
+
     def main(self):
         '''
         Entry point of this script
@@ -38,7 +46,17 @@ class Startup:
 
             self.AddToStartup()
 
-        self.CONFIG.ToggleValues('From-StartUp', True)
+        is_main_executable_running = self.CheckIfMainExecutableIsRunning()
+
+        if is_main_executable_running is False:
+            self.CONFIG.SetDefaultValues()
+            self.CONFIG.ToggleValues('From-StartUp', True)
+            self.CONFIG.ToggleValues('Is-Minimized', True)
+
+            main_executable_path = os.path.join(os.environ['USERPROFILE'], 'Desktop', 'Tuition.exe')
+
+            if os.path.exists(main_executable_path):
+                os.startfile(main_executable_path)
 
 
 if __name__ == '__main__':
