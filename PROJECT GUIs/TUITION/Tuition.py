@@ -6,8 +6,7 @@ import threading
 import subprocess
 from tkinter import *
 import tkinter.ttk as ttk
-from tkinter import messagebox
-import pyautogui
+from tkinter import messagebox, filedialog
 import pystray._win32
 from PIL import Image, ImageTk
 from pystray._base import MenuItem as item
@@ -90,7 +89,8 @@ class Tuition:
         self.CONFIG = Config()
         self.CONFIG.ToggleValues("Is-Running", True)
 
-        self.DatabasePath = 'database.db'
+        self.DatabasePath = self.CONFIG.contents.get('db_dir', None)
+        self.RanAtStartup = self.CONFIG.contents.get('From-StartUp', False)
 
         self.master = Tk()
         self.master.withdraw()
@@ -148,7 +148,6 @@ class Tuition:
         self.scrollbar = ttk.Scrollbar(self.TreeViewFrame, orient="vertical", command=self.TreeView.yview)
         self.TreeView.config(yscrollcommand=self.scrollbar.set)
 
-        self.master.after(0, self.CenterWindow)
         self.master.config(bg='silver')
 
         self.SetDefaultDates()
@@ -164,6 +163,7 @@ class Tuition:
         self.MonthComboBox.bind('<<ComboboxSelected>>', self.SetMonthRange)
         self.MonthComboBox.bind('<KeyPress>', lambda event=Event, _bool=True: self.ComboKeyPressed(event, _bool))
 
+        self.master.after(250, self.CenterWindow)
         self.master.mainloop()
 
     def ComboKeyPressed(self, event=None, _bool=False):
@@ -188,7 +188,7 @@ class Tuition:
             if char.isdigit() is _bool:
                 return 'break'
 
-    def CenterWindow(self):
+    def CenterWindow(self, extra_height=5):
         '''
         Set position of the window to the center of the screen when user open
         the program
@@ -199,11 +199,11 @@ class Tuition:
         self.master.resizable(0, 0)
 
         self.master.iconphoto(False, PhotoImage(file=resource_path('icon.png')))
-        width, height = self.master.winfo_width(), self.master.winfo_height() + 5
+        width, height = self.master.winfo_width(), self.master.winfo_height() + extra_height
         screenwidth, screenheight = self.master.winfo_screenwidth() // 2, self.master.winfo_screenheight() // 2
         self.master.geometry(f'{width}x{height}+{screenwidth - width // 2}+{screenheight - height // 2}')
 
-        self.RanAtStartup = self.CONFIG.contents.get('From-StartUp', False)
+        self.CONFIG.ToggleValues('From-StartUp', False)
 
         if self.RanAtStartup and CheckIfItIsExecutable():
             self.HideWindow()
@@ -211,12 +211,26 @@ class Tuition:
         else:
             self.master.deiconify()
 
-        self.CONFIG.ToggleValues('From-StartUp', False)
+            if not self.CONFIG.contents.get('db_dir', None):
+                messagebox.showinfo('Tuition-INFO', 'Unable to locate the database path. Please select a database path')
 
-        self.InsertToTreeView()
-        self.UpdateLeftDays()
-        self.ShowHideScrollBar()
-        self.Minimize()
+                while True:
+                    directory = filedialog.askdirectory(initialdir=os.getcwd)
+
+                    if os.path.exists(directory):
+                        self.DatabasePath = os.path.join(directory, 'database.db')
+
+                        self.CONFIG.contents.update({'db_dir': self.DatabasePath})
+                        self.CONFIG.WriteContents(self.CONFIG.contents)
+
+                        break
+
+                    messagebox.showerror('Tuition-INFO', 'Selected directory does not exists. Please try again')
+
+            self.InsertToTreeView()
+            self.UpdateLeftDays()
+            self.ShowHideScrollBar()
+            self.Minimize()
 
     def FocusAnyWhere(self, event=None):
         '''
@@ -473,7 +487,7 @@ class Tuition:
         self.icon.stop()
         self.master.quit()
 
-        subprocess.call('taskkill /IM "{sys.executable}" /F', creationflags=0x08000000)
+        subprocess.call(f'taskkill /IM "[{os.path.basename(sys.executable)}]" /F', creationflags=0x08000000)
 
     def ShowWindow(self):
         '''
@@ -483,20 +497,21 @@ class Tuition:
         self.CONFIG.ToggleValues('Is-Minimized', False)
 
         self.icon.stop()
-
-        self.master.after(250, self.InsertToTreeView)
-        self.master.after(0, self.master.deiconify)
-        self.master.after(250, self.UpdateLeftDays)
+        self.CenterWindow(extra_height=0)
 
     def HideWindow(self):
         '''
         Hide window to the system tray
         '''
 
+        self.RanAtStartup = False   # To ensure that the window does not get hidden always
         self.CONFIG.ToggleValues('Is-Minimized', True)
 
-        self.master.withdraw()
-        self.master.after_cancel(self.UpdateTimer)
+        if self.master.state != 'normal':
+            self.master.withdraw()
+
+        if self.UpdateTimer is not None:
+            self.master.after_cancel(self.UpdateTimer)
 
         image = Image.open(resource_path("icon.png"))
         menu = (item('Quit', lambda: self.QuitWindow()), item('Show', lambda: self.ShowWindow(), default=True))
@@ -510,38 +525,16 @@ class Tuition:
         Hide window to the system tray when user clicks the minimize button
         '''
 
+        self.SetDefaultDates()
         state = self.master.state()
-
         is_minimized = self.CONFIG.contents['Is-Minimized']
 
-        if (state, self.WindowState) == ('iconic', 'normal'):
+        if state == 'iconic' or is_minimized is True:
             self.WindowState = 'iconic'
             self.HideWindow()
 
-        elif (state, self.WindowState) == ('normal', 'iconic'):
-            self.WindowState = 'normal'
-
-        elif (state, is_minimized) == ('withdrawn', False):
-            self.icon.stop()
-            self.master.deiconify()
-
-            self.master.attributes('-topmost', True)
-            self.master.attributes('-topmost', False)
-
-            self.master.after(100, self.ClickToWindow)
-
-        self.master.after(250, self.Minimize)
-
-    def ClickToWindow(self):
-        '''
-        Click to window and set the mouse position to where it was clicked before
-        '''
-
-        mouseX, mouseY = pyautogui.position()
-        win_x, win_y = self.master.winfo_rootx() + 10, self.master.winfo_rooty() + 10
-
-        pyautogui.click(win_x, win_y)
-        pyautogui.moveTo(mouseX, mouseY)
+        else:
+            self.master.after(250, self.Minimize)
 
 
 def CheckIfItIsExecutable():
@@ -578,13 +571,13 @@ def resource_path(file_name):
 
 
 if __name__ == '__main__':
-    try:
-        os.startfile('Tuition-Startup.exe')
+    config = Config().contents
 
-    except FileNotFoundError:
-        pass
+    if config.get('From-StartUp', False) is False:
+        if os.path.exists('Tuition-StartUp.exe'):
+            subprocess.run(['Tuition-StartUp.exe'])
 
-    is_running = Config().GetContents().get('Is-Running', False)
+    is_running = config.get('Is-Running', False)
 
     if is_running is False:
         Tuition()
