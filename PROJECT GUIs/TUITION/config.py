@@ -24,6 +24,11 @@ class Config:
             'From-StartUp': False
         }
 
+        db_dir = self.contents.get('db_dir', None)
+
+        if db_dir:
+            defaultValues.update({'db_dir': db_dir})
+
         is_added_to_startup = self.contents.get('Is-Added-To-Startup', False)
         defaultValues.update({'Is-Added-To-Startup': is_added_to_startup})
 
