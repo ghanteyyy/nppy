@@ -85,6 +85,7 @@ class Tuition:
         self.UpdateTimer = None
         self.WindowState = 'normal'
         self.IsScrollBarShown = False
+        self.CurrentObtainedDate = ''
 
         self.CONFIG = Config()
         self.CONFIG.ToggleValues("Is-Running", True)
@@ -525,7 +526,12 @@ class Tuition:
         Hide window to the system tray when user clicks the minimize button
         '''
 
-        self.SetDefaultDates()
+        current_date = str(datetime.date.today())
+
+        if self.CurrentObtainedDate != current_date:
+            self.SetDefaultDates()
+            self.CurrentObtainedDate = current_date
+
         state = self.master.state()
         is_minimized = self.CONFIG.contents['Is-Minimized']
 
