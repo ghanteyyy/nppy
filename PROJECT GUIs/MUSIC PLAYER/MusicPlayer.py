@@ -491,7 +491,7 @@ class MusicPlayer:
                     self.PlayOrPauseAudio()
 
                 elif self.isPlaying:  # Resuming audio after finishing opening audios
-                    pygame.mixer.music.load(self.AudioFiles[self.AudioName][0])
+                    pygame.mixer.music.load(self.AudioFiles[self.AudioName]['path'])
                     pygame.mixer.music.play(start=self.CurrentPos)
                     self.UpdateScale()
 
